@@ -1,0 +1,43 @@
+== Configuration ==
+
+If you have wireless enabled and a MythTV backend is on the local network !MythDroid will hopefully locate it automatically and you will be presented with the main menu. See Manual Backend Configuration below if your backend is not on the local network.
+
+!MythDroid can't locate frontends automatically - you have to configure them. To do this, press the menu button and select 'Settings'. Then select 'Frontends Config' and add your frontends. !MythDroid is now ready to go.
+
+== General ==
+
+For actions that could take place in several locations (like watching tv, playing a recording or viewing the program guide), long pressing the relevant menu entry or button will pop up a dialog that allows you to select where the action should take place. The frontend that you choose becomes the _default frontend_. A short press will perform the action in the default location. In the case of watching tv or playing a recording, the default location is the first defined frontend, unless a _default frontend_ has been selected. For displaying the program guide, the default location is within !MythDroid.
+
+== Main Menu ==
+
+The menu button brings up a menu that lets you configure !MythDroid, start the appropriate remote (depending on frontend state) or set the _default frontend_. The _default frontend_ is the frontend on which actions will take place when certain menu items or buttons are short pressed. Examples include Watch TV, playing a recording or selecting the remote entry in the Main Menu sub-menu. In most circumstances, long pressing such items will pop up a chooser allowing you to select a frontend on which to perform the activity. Doing this will automatically set the _default frontend_.
+
+== Recordings ==
+
+The recordings activity lists the recordings available on the backend. Short pressing a recording takes you to the Program Detail activity, where you'll be shown more information about the program and offered the chance to play or delete the recording. Long pressing a recording allows you to select a frontend on which to play the recording. 
+
+== Nav Remote ==
+
+The Nav Remote allows you to navigate around the MythTV interface. If you navigate to a location such as watching tv or viewing a recording, the TV Remote will automatically start. Pressing menu will allow you to change the interface from button to gesture or vice versa. In the gesture interface, the following gestures are recognised:
+
+ * Swipe - equivalent to pressing the relevant directional key once
+ * Drag - sends a directional key at a fixed interval of distance dragged
+ * Tap - equivalent to pressing the enter key
+
+== TV Remote ==
+
+Hopefully self explanatory. The menu button gives you the choice of showing the OSD menu on the frontend or switching interfaces (button or gesture). In the gesture interface, the following gestures are recognised:
+
+ * Swipe left / right - skip backwards or forwards
+ * Swipe up / down - browses channels in livetv, jumps backwards or forwards when watching a recording
+ * Drag left / right - seek backwards or forwards, seeks faster the further you drag
+ * Drag up / down - volume control
+ * Tap - pause / unpause
+
+== Program Guide ==
+
+Pressing on a program will bring up additional details about the program. Short pressing a channel will play that channel in LiveTV on the _default frontend_. Long pressing a channel will display the frontend chooser.
+
+== Manual Backend Configuration ==
+
+You can manually configure the address of a MythTV backend in Settings, found by pressing the menu button on the Main Menu. You would have to do this if your MythTV backend is not on your local network.
