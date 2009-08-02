@@ -48,7 +48,7 @@ public class MythDroid extends MDListActivity implements
     AdapterView.OnItemLongClickListener {
 
     /** Debug? */
-    final public static boolean debug = true;
+    final public static boolean debug = false;
     /** Backend protocol version */
     final public static int protoVersion  = 40;
     /** A BackendManager representing a connected backend */
