@@ -1,4 +1,4 @@
 #summary A selection of screenshots
 
-||Main Menu||TV Remote||TV Remote (Gesture)||
-||http://mythdroid.googlecode.com/files/MainMenu160.png||http://mythdroid.googlecode.com/files/TVRemote.png||http://mythdroid.googlecode.com/files/TVGestureRemote.png||
+||Main Menu||TV Remote||TV Remote (Gesture)||Nav Remote||
+||http://mythdroid.googlecode.com/files/MainMenu160.png||http://mythdroid.googlecode.com/files/TVRemote.png||http://mythdroid.googlecode.com/files/TVGestureRemote.png||http://mythdroid.googlecode.com/files/NavRemote.png||
