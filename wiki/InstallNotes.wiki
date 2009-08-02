@@ -2,7 +2,7 @@
 
 !MythDroid currently supports the MythTV 0.21-fixes branch. 
 
-For the program guide viewer to function correctly, you must apply [http://code.google.com/p/mythdroid/files/guide-xml.patch this patch] to the MythTV 0.21 fixes source code.
+For the program guide viewer to function correctly, you must apply [http://mythdroid.googlecode.com/files/guide-xml.patch this patch] to the MythTV 0.21 fixes source code.
 
 Once you have checked out a copy of release-0-21-fixes, apply the patch like so:
 
