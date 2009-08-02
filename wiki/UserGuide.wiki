@@ -1,4 +1,4 @@
-#summary Ramblings on how to use !MythDroid
+#summary Ramblings on how to use MythDroid
 
 == Configuration ==
 
