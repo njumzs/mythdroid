@@ -1,3 +1,5 @@
 #summary A selection of screenshots
 
-[http://mythdroid.googlecode.com/files/MainMenu.png Main Menu]
+===Main Menu===
+
+http://mythdroid.googlecode.com/files/MainMenu.png
