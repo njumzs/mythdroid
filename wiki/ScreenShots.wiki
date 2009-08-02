@@ -2,3 +2,6 @@
 
 ||Main Menu||TV Remote||TV Remote (Gesture)||Nav Remote||
 ||http://mythdroid.googlecode.com/files/MainMenu160.png||http://mythdroid.googlecode.com/files/TVRemote.png||http://mythdroid.googlecode.com/files/TVGestureRemote.png||http://mythdroid.googlecode.com/files/NavRemote.png||
+
+||Recordings||Program Detail||Frontend Chooser||Program Guide||
+||http://mythdroid.googlecode.com/files/Recordings.png||http://mythdroid.googlecode.com/files/RecordedDetail.png||http://mythdroid.googlecode.com/files/FrontendChooser.png||http://mythdroid.googlecode.com/files/Guide.png||
