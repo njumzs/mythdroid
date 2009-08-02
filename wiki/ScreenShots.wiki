@@ -1,5 +1,4 @@
 #summary A selection of screenshots
 
-===Main Menu===
-
-http://mythdroid.googlecode.com/files/MainMenu160.png
+||Main Menu||TV Remote||TV Remote (Gesture)||
+||http://mythdroid.googlecode.com/files/MainMenu160.png||||||||
