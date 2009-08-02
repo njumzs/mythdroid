@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="8sp">
+
+    <TextView android:id="@+id/enclist_encoder"
+     	android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="20sp"/>
+
+    <TextView android:id="@+id/enclist_state"
+    	android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/enclist_encoder"
+    	android:textStyle="italic"
+        android:textSize="18sp"/>
+        
+    <TextView android:id="@+id/enclist_program"
+       	android:layout_width="wrap_content"
+       	android:layout_height="wrap_content"
+       	android:layout_below="@id/enclist_state"
+       	android:paddingTop="2dp"
+       	android:textSize="14sp"/>
+        	
+    <TextView android:id="@+id/enclist_endTime"
+       	android:layout_width="wrap_content"
+       	android:layout_height="wrap_content"
+       	android:layout_below="@id/enclist_program"
+       	android:paddingTop="2dp"
+       	android:textSize="14sp"/>
+       	
+	<ProgressBar android:id="@+id/enclist_rec"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentTop="true"
+		android:layout_alignParentRight="true"
+		android:indeterminateOnly="true"
+		style="?android:attr/progressBarStyleSmallTitle"/>
+
+</RelativeLayout>
