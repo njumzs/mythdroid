@@ -57,6 +57,8 @@ public class MythDroid extends MDListActivity implements
     public static FrontendManager feMgr  = null;
     /** A handler for the worker thread */
     public static Handler wHandler = null;
+    /** The name of the current default frontend */
+    public static String defaultFrontend = null;
 
     /** To remember where we were */
     public static FrontendLocation lastLocation  =

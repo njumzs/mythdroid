@@ -42,8 +42,7 @@ public abstract class MDActivity extends Activity {
     /** A frontend chooser dialog */
     final protected static int FRONTEND_CHOOSER = -1, DIALOG_LOAD = -2;
     final protected Context ctx = this;
-    /** The name of the current default frontend */
-    protected static String defaultFrontend;
+
     /** 
      * The activity we are on the way to when the frontend chooser dialog
      * finishes
@@ -60,7 +59,8 @@ public abstract class MDActivity extends Activity {
         new OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                if (defaultFrontend == null || nextActivity == null) return;
+                if (MythDroid.defaultFrontend == null || nextActivity == null)
+                    return;
                 FrontendDB.close();
                 final Intent intent = new Intent().setClass(ctx, nextActivity);
                 for (String extra : boolExtras)
@@ -145,7 +145,8 @@ public abstract class MDActivity extends Activity {
                     public void onClick(DialogInterface dialog, int which) {
                         Cursor c = ca.getCursor();
                         c.moveToPosition(which);
-                        defaultFrontend = c.getString(FrontendDB.NAME);
+                        MythDroid.defaultFrontend = 
+                            c.getString(FrontendDB.NAME);
                         dialog.dismiss();
                     }
                 }
