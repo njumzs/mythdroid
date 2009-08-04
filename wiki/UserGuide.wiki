@@ -26,6 +26,8 @@ The Nav Remote allows you to navigate around the MythTV interface. If you naviga
  * Drag - sends a directional key at a fixed interval of distance dragged
  * Tap - equivalent to pressing the enter key
 
+You can also use the trackball in either interface mode.
+
 If your device has a hardware keyboard, keystrokes made on it will be passed to the relevant frontend.
 
 == TV Remote ==
@@ -37,6 +39,8 @@ Hopefully self explanatory. The menu button gives you the choice of showing the 
  * Drag left / right - seek backwards or forwards, seeks faster the further you drag
  * Drag up / down - volume control
  * Tap - pause / unpause
+
+You can also use the trackball (which performs the same actions as dragging) in either interface mode.
 
 If your device has a hardware keyboard, keystrokes made on it will be passed to the relevant frontend.
 
