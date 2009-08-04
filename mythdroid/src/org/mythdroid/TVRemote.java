@@ -224,6 +224,8 @@ public class TVRemote extends Remote {
                 Util.err(this, e);
             }
         }
+        ctrls.remove(R.id.tv_rec);
+        ctrls.remove(R.id.tv_guide);
     }
 
     @Override
