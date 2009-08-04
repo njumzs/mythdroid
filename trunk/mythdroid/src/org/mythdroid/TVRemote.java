@@ -85,6 +85,7 @@ public class TVRemote extends Remote {
         ctrls.put(R.id.tv_seek_forward, Key.SEEK_FORWARD);
         ctrls.put(R.id.tv_info,         Key.INFO);
         ctrls.put(R.id.tv_skip,         Key.SKIP_COMMERCIAL);
+        ctrls.put(R.id.tv_guide,        Key.GUIDE);
     }
 
     final private Handler    handler      = new Handler();
@@ -98,8 +99,6 @@ public class TVRemote extends Remote {
     private boolean 
         paused = false, livetv = false, jump = false, 
         gesture = false, wasPaused = false;
-    
-    
 
     /** Run periodically to update title and progress bar */
     private class UpdateStatusTask extends TimerTask {
@@ -186,7 +185,11 @@ public class TVRemote extends Remote {
         jump = !getIntent().hasExtra(MythDroid.DONTJUMP);
         jumpChan = getIntent().getIntExtra(MythDroid.JUMPCHAN, -1);
 
-        fillCtrls(livetv);
+        
+        if (livetv) 
+            ctrls.put(R.id.tv_rec, Key.RECORD);
+        else
+            ctrls.put(R.id.tv_rec, Key.EDIT);
 
         setupViews(gesture);
 
@@ -224,8 +227,6 @@ public class TVRemote extends Remote {
                 Util.err(this, e);
             }
         }
-        ctrls.remove(R.id.tv_rec);
-        ctrls.remove(R.id.tv_guide);
     }
 
     @Override
@@ -531,16 +532,7 @@ public class TVRemote extends Remote {
         pBar.setFocusable(false);
 
     }
-
-    private void fillCtrls(boolean livetv) {
-        if (livetv) {
-            ctrls.put(R.id.tv_guide, Key.GUIDE);
-            ctrls.put(R.id.tv_rec, Key.RECORD);
-        }
-        else
-            ctrls.put(R.id.tv_rec, Key.EDIT);
-    }
-
+   
     @Override
     protected void onScrollDown() {
         try {
