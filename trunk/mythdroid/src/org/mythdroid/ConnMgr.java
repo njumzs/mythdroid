@@ -57,11 +57,17 @@ public class ConnMgr {
         try {
             sock.connect(sa, 1000);
         } catch (UnknownHostException e) {
-            throw (new IOException("Unknown Host"));
+            throw (new IOException("Unknown Host: " + host));
         } catch (SocketTimeoutException e) {
-            throw (new IOException("Connection failed"));
+            throw (
+                new IOException(
+                    "Connection to " + host + ":" + port + " failed")
+                );
         } catch (IOException e) {
-            throw (new IOException("Connection refused"));
+            throw (
+                new IOException(
+                    "Connection to " + host + ":" + port + " refused")
+                );
         }
 
         os = sock.getOutputStream();
@@ -128,7 +134,7 @@ public class ConnMgr {
         while (true) {
             c = readChar();
             sb.append(c);
-            if (c == '\n' && sb.charAt(sb.length() - 2) == '\r') break;
+            if (c == '\n') break;
             else if (sb.charAt(0) == '#' && c == ' ') break;
         }
 
@@ -181,6 +187,14 @@ public class ConnMgr {
 
         bytes = readBytes(len);
         return Arrays.asList(new String(bytes).split("\\[\\]:\\[\\]"));
+    }
+    
+    /**
+     * Get the IP address of the remote host
+     * @return a String containing IP address
+     */
+    public String getAddress() {
+        return sock.getInetAddress().getHostAddress();
     }
 
     /**

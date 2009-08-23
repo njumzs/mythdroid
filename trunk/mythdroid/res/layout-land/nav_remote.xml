@@ -56,7 +56,6 @@
     	android:scaleType="fitCenter"
     	android:focusable="false"
     	android:src="@drawable/down"/>
-    	
    	
    	<ImageButton android:id="@+id/nav_back"
     	android:layout_width="72dp"
@@ -64,15 +63,23 @@
     	android:layout_alignParentTop="true"
     	android:layout_alignParentLeft="true"
     	android:scaleType="fitCenter"
-    	android:focusable="false"
     	android:src="@drawable/back"/>
+    	
+    <TextView android:id="@+id/nav_item"
+   		android:layout_width="fill_parent"
+   		android:layout_height="wrap_content"
+   		android:layout_alignParentBottom="true"
+   		android:layout_alignParentLeft="true"
+   		android:layout_marginLeft="10dp"
+   		android:textColor="@color/light_grey_text"
+   		android:textSize="18sp"/>
     	
    	<TextView android:id="@+id/nav_loc"
    		android:layout_width="fill_parent"
    		android:layout_height="wrap_content"
-   		android:layout_alignParentBottom="true"
-		android:layout_alignParentLeft="true"
-		android:focusable="false"	   		
+   		android:layout_above="@id/nav_item"
+   		android:layout_marginLeft="10dp"
+   		android:textColor="@color/light_grey_text"
    		android:textSize="20sp"/>
 
 </RelativeLayout>

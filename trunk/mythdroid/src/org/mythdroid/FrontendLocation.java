@@ -31,7 +31,8 @@ public class FrontendLocation {
     public int     position, end;
     public float   rate;
     public String  filename;
-    public boolean video = false, livetv = false, music = false;
+    public boolean 
+        video = false, livetv = false, music = false, musiceditor = false;
 
     /**
      * Constructor
@@ -60,6 +61,9 @@ public class FrontendLocation {
 
         else if (loc.equals("playmusic")) 
             music = true;
+        
+        else if (loc.equals("musicplaylists"))
+            musiceditor = true;
         
         if (MythDroid.debug) 
             Log.d(

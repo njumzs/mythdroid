@@ -24,6 +24,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,10 +35,31 @@ public class NavRemote extends Remote implements View.OnClickListener {
 
     final private static int MENU_GESTURE = 0, MENU_BUTTON = 1;
 
+    final private Handler    handler = new Handler();
+    
     private FrontendLocation lastLoc = null;
-    private TextView         locView = null;
+    private MDDManager       mddMgr  = null;
+    private TextView         locView = null, itemView = null;
+    
     private boolean 
-        gesture = false, calledByTVRemote = false, jumpGuide = false;
+        gesture = false, jumpGuide = false, calledByRemote = false,
+        calledByTVRemote = false, calledByMusicRemote = false;
+    
+    private class mddListener implements MenuListener {
+        @Override
+        public void onMenuItem(final String menu, final String item) {
+           handler.post(
+               new Runnable() {
+                   @Override
+                   public void run() {
+                       if (locView == null || itemView == null) return;
+                       locView.setText(menu);
+                       itemView.setText(item);
+                   }
+               }
+           );
+        }
+    };
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -47,17 +69,27 @@ public class NavRemote extends Remote implements View.OnClickListener {
         if (getIntent().hasExtra(MythDroid.GUIDE)) 
             jumpGuide = true;
 
+        String calledBy = null;
+        
         ComponentName caller = getCallingActivity();
-        if (caller != null && caller.getShortClassName().equals(".TVRemote"))
-            calledByTVRemote = true;
+        if (caller != null) 
+            calledBy = caller.getShortClassName();
+        
+        if (calledBy != null) { 
+            if(calledBy.equals(".TVRemote"))
+                calledByTVRemote = true;
+            else if (calledBy.equals(".MusicRemote"))
+                calledByMusicRemote = true;
+        }
+        
+        calledByRemote = calledByTVRemote || calledByMusicRemote;
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        feMgr = MythDroid.connectFrontend(this);
-
-        if (feMgr == null) {
+        if((feMgr = MythDroid.connectFrontend(this)) == null) {
             finish();
             return;
         }
@@ -67,23 +99,48 @@ public class NavRemote extends Remote implements View.OnClickListener {
                 feMgr.jumpTo("guidegrid");
             updateLoc();
         } catch (IOException e) { Util.err(this, e); }
+        
+        if (!calledByRemote) {
+            try {
+                mddMgr = new MDDManager(MythDroid.beMgr.getAddress());
+            } catch (IOException e) { mddMgr = null; }
+            
+            if (mddMgr != null) {
+                mddMgr.setMenuListener(new mddListener());
+            }
+        }
     }
-
+    
+    private void cleanup() {
+        try {
+            if (feMgr != null && !calledByRemote)  
+                feMgr.disconnect();
+            feMgr = null;
+            if (mddMgr != null)
+                mddMgr.shutdown();
+            mddMgr = null;
+        } catch (IOException e) { Util.err(this, e); }
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        cleanup();
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cleanup();
+    }
+    
+    
     @Override
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
         setupViews(gesture);
         try {
             updateLoc();
-        } catch (IOException e) { Util.err(this, e); }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (feMgr != null && !calledByTVRemote) try {
-            feMgr.disconnect();
-            feMgr = null;
         } catch (IOException e) { Util.err(this, e); }
     }
 
@@ -173,6 +230,12 @@ public class NavRemote extends Remote implements View.OnClickListener {
         return false;
         
     }
+    
+    @Override
+    public void onActivityResult(int reqCode, int resCode, Intent data) {
+        if (resCode == REMOTE_RESULT_FINISH)
+            finish();
+    }
 
     @Override
     protected void onAction() {
@@ -180,17 +243,19 @@ public class NavRemote extends Remote implements View.OnClickListener {
             updateLoc();
         } catch (IOException e) { Util.err(this, e); }
     }
-
+    
     private void setupViews(boolean gesture) {
         setContentView(
             gesture ? R.layout.nav_gesture_remote : R.layout.nav_remote
         );
 
-        locView = (TextView) findViewById(R.id.nav_loc);
+        locView = (TextView)findViewById(R.id.nav_loc);
+        itemView = (TextView)findViewById(R.id.nav_item);
 
-        if (feMgr != null) try {
-            updateLoc();
-        } catch (IOException e) { Util.err(this, e); }
+        if (feMgr != null) 
+            try {
+                updateLoc();
+            } catch (IOException e) { Util.err(this, e); }
 
         if (gesture) {
             findViewById(R.id.nav_back).setOnClickListener(this);
@@ -208,15 +273,18 @@ public class NavRemote extends Remote implements View.OnClickListener {
 
     private void updateLoc() throws IOException {
         
-        if (locView == null) return;
+        if (calledByMusicRemote) return;
+        
+        if (locView == null || itemView == null) return;
 
         final FrontendLocation newLoc = feMgr.getLoc();
         locView.setText(newLoc.niceLocation);
+        itemView.setText("");
 
         if (newLoc.video) {
             if (lastLoc != null) 
                 MythDroid.lastLocation = lastLoc;
-            if (calledByTVRemote)
+            if (calledByRemote)
                 finish();
             else {
                 final Intent intent = 
@@ -225,10 +293,20 @@ public class NavRemote extends Remote implements View.OnClickListener {
                 
                 if (newLoc.livetv) 
                     intent.putExtra(MythDroid.LIVETV, true);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
             }
         }
-
+        
+        else if (newLoc.music) {
+            if (lastLoc != null)
+                MythDroid.lastLocation = lastLoc;
+            startActivity(
+                new Intent()
+                    .setClass(this, MusicRemote.class)
+                    .putExtra(MythDroid.DONTJUMP, true)
+            );
+        }
+         
         else
             lastLoc = newLoc;
 
