@@ -19,7 +19,7 @@ and then follow the normal steps to configure, build and install MythTV.
 
 ==MDD==
 
-mdd is a perl program that, once installed on a frontend, provides mythdroid with extended
+[http://mythdroid.googlecode.com/files/mdd-0.1.pl mdd] is a perl program that, once installed on a frontend, provides mythdroid with extended
 functionality. This includes 'push' updates for TV remote, more detail about current location in Nav remote and song information in Music remote. To install mdd, download it to a frontend and run it as root:
 
 {{{
