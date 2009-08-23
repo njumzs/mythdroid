@@ -1,6 +1,6 @@
 #summary Ramblings on how to use MythDroid
 
-== Configuration ==
+= Configuration =
 
 If you have wireless enabled and a MythTV backend is on the local network !MythDroid will hopefully locate it automatically and you will be presented with the main menu. See Manual Backend Configuration below if your backend is not on the local network.
 
@@ -43,6 +43,20 @@ Hopefully self explanatory. The menu button gives you the choice of showing the 
 You can also use the trackball (which performs the same actions as dragging) in either interface mode.
 
 If your device has a hardware keyboard, keystrokes made on it will be passed to the relevant frontend.
+
+== Music Remote ==
+
+The music remote employs both buttons and gestures. The gestures supported are:
+
+ * Swipe left / right - previous or next track
+ * Swipe up / down - move selection up or down
+ * Drag left / right - seek backwards or forwards
+ * Drag up / down - volume control
+ * Tap - pause / resume
+
+You can also use the trackball (which performs the same actions as dragging). If your device has a hardware keyboard, keystrokes made on it will be passed to the relevant frontend.
+
+Pressing the menu button allows you to enter the playlist editor, change the visualiser, fullscreen the visualiser, toggle shuffle and repeat modes and open the on screen menu on the frontend.
 
 == Program Guide ==
 
