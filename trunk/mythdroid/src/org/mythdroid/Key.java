@@ -54,7 +54,7 @@ public enum Key {
     MUSIC_REPEAT        ("2"),
     MUSIC_EDIT          ("3"),
     MUSIC_VISUALISE     ("4"),
-    MUSIC_CHANGE_VISUAL ("5"),
+    MUSIC_CHANGE_VISUAL ("6"),
     NUMPAD              ("numpad");
 
     private String str = null;
