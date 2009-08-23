@@ -1,6 +1,6 @@
 #summary Ramblings on how to use MythDroid
 
-= Configuration =
+== Configuration ==
 
 If you have wireless enabled and a MythTV backend is on the local network !MythDroid will hopefully locate it automatically and you will be presented with the main menu. See Manual Backend Configuration below if your backend is not on the local network.
 
