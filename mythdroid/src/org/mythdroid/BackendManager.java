@@ -127,6 +127,14 @@ public class BackendManager {
     }
     
     /**
+     * Get the IP address of the backend
+     * @return a String containing the backend IP address
+     */
+    public String getAddress() {
+        return cmgr.getAddress();
+    }
+    
+    /**
      * Get the URL of the status / XML service
      * @return A String containing the URL
      */

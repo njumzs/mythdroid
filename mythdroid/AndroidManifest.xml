@@ -30,6 +30,10 @@
         <activity android:name=".FrontendList" 
         	android:label="Frontends"/>
         	
+        <activity android:name=".Media" 
+        	android:label="Media"
+        	android:configChanges="keyboardHidden|orientation"/>
+                	
         <activity android:name=".Status" 
         	android:label="Status"
         	android:configChanges="keyboardHidden|orientation"/>
@@ -59,6 +63,10 @@
        		android:configChanges="keyboardHidden|orientation"/>
        		
         <activity android:name=".TVRemote" 
+        	android:theme="@android:style/Theme.NoTitleBar"
+        	android:configChanges="keyboardHidden|orientation"/>
+        	
+       	<activity android:name=".MusicRemote" 
         	android:theme="@android:style/Theme.NoTitleBar"
         	android:configChanges="keyboardHidden|orientation"/>
         	

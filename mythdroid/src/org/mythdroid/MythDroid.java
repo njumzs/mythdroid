@@ -94,7 +94,7 @@ public class MythDroid extends MDListActivity implements
 
     /** Entries for the main menu list */
     final private static String[] MenuItems =
-        { "Watch TV", "Recordings", "Guide", "Status" };
+        { "Watch TV", "Recordings", "Music", "Guide", "Status" };
 
     /** ListAdapter containing the main menu entries */
     private ArrayAdapter<String> menuAdapter   = null;
@@ -162,13 +162,14 @@ public class MythDroid extends MDListActivity implements
     @Override
     public void onListItemClick(ListView list, View item, int pos, long id) {
         
-        final String action = (String) list.getItemAtPosition(pos);
+        final String action = (String)list.getItemAtPosition(pos);
         Class<?> activity = null;
 
-        if (action.equals("Watch TV"))          activity = TVRemote.class;
-        else if (action.equals("Recordings"))   activity = Recordings.class;
-        else if (action.equals("Guide"))        activity = Guide.class;
-        else if (action.equals("Status"))       activity = Status.class;
+        if      (action.equals("Watch TV"))    activity = TVRemote.class;
+        else if (action.equals("Recordings"))  activity = Recordings.class;
+        else if (action.equals("Music"))       activity = MusicRemote.class;
+        else if (action.equals("Guide"))       activity = Guide.class;
+        else if (action.equals("Status"))      activity = Status.class;
 
         startActivity(
             new Intent().putExtra(LIVETV, true).setClass(this, activity)
@@ -186,6 +187,11 @@ public class MythDroid extends MDListActivity implements
         if (action.equals("Watch TV")) {
             nextActivity = TVRemote.class;
             setExtra(LIVETV);
+            showDialog(FRONTEND_CHOOSER);
+        }
+        
+        else if (action.equals("Music")) {
+            nextActivity = MusicRemote.class;
             showDialog(FRONTEND_CHOOSER);
         }
 

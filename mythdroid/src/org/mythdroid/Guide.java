@@ -78,7 +78,6 @@ public class Guide extends MDActivity {
 
     private static Date now = null, later = null;
 
-    /** Add the channels to the table */
     final private Handler handler = new Handler();
             
     final private long[] times = new long[numTimes + 1];

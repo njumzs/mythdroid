@@ -36,6 +36,9 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     final private static KeyCharacterMap keyMap =
         KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
 
+    /** Result codes for when a remote is startActivityForResult()'d */
+    final protected int REMOTE_RESULT_FINISH = RESULT_FIRST_USER;
+    
     private boolean alt = false, shift = false;
     
     private GestureDetector gDetector;
@@ -250,7 +253,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         return true;
 
     }
-
+    
     /**
      * Listen to gestures
      * @param listen - true to start listening, false to stop

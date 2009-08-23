@@ -175,13 +175,21 @@ public class FrontendManager {
             return false;
     }
 
+    /**
+     * Get the IP address of the backend
+     * @return a String containing the backend IP address
+     */
+    public String getAddress() {
+        return cmgr.getAddress();
+    }
+    
     /** Disconnect from the frontend */
     public void disconnect() throws IOException {
         if (cmgr == null) return;
         cmgr.disconnect();
         cmgr = null;
     }
-
+    
     private synchronized ArrayList<String> getResponse() throws IOException {
         ArrayList<String> resp = new ArrayList<String>();
         String msg = "";

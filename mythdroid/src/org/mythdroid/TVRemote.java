@@ -27,10 +27,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,11 +53,11 @@ public class TVRemote extends Remote {
         MENU_OSDMENU = 0, MENU_GESTURE = 1, MENU_BUTTON = 2;
 
     final private static int 
-        DIALOG_LOAD  = 0, DIALOG_NUMPAD = 1, DIALOG_GUIDE = 2;
+        DIALOG_LOAD  = 0, DIALOG_NUMPAD = 1, DIALOG_GUIDE = 2, DIALOG_QUIT = 3;
 
     private static HashMap<Integer, Key>
-        ctrls = new HashMap<Integer, Key>(12),
-        nums = new HashMap<Integer, Key>(20);
+        ctrls = new HashMap<Integer, Key>(20),
+        nums = new HashMap<Integer, Key>(12);
 
     static {
         nums.put(R.id.one,              Key.ONE);
@@ -90,11 +93,13 @@ public class TVRemote extends Remote {
 
     final private Handler    handler      = new Handler();
     final private Context    ctx          = this;
+    private TextView         titleView    = null;
     private ProgressBar      pBar         = null;
-    private String           lastFilename;
+    private String           lastFilename = null,   lastTitle = null;
     private Timer            timer        = null;
-    private int              progress     = 0, end = 0, jumpChan = -1;
+    private int              jumpChan     = -1,     lastProgress = 0;
     private UpdateStatusTask updateStatus = null;
+    private MDDManager       mddMgr       = null;
 
     private boolean 
         paused = false, livetv = false, jump = false, 
@@ -110,26 +115,36 @@ public class TVRemote extends Remote {
                 final FrontendLocation loc = feMgr.getLoc();
             
                 if (!loc.video) {
-                    finish();
+                    done();
                     return;
                 }
+                
+                final String name = loc.filename;
 
-                if (livetv && !loc.filename.equals(lastFilename))
+                if (livetv && !name.equals(lastFilename))
                     handler.post(
                         new Runnable() { 
                             @Override
-                            public void run() { setupStatus(loc); }
+                            public void run() { 
+                                try {
+                                    Program prog = 
+                                        MythDroid.beMgr.getRecording(name);
+                                    titleView.setText(prog.Title);
+                                } catch (IOException e) { 
+                                    Util.posterr(ctx, e); 
+                                    return;
+                                }
+                            }
                         }
                     );
 
                 else if (!livetv) {
-                    progress = loc.position;
-                    pBar.setProgress(progress);
+                    pBar.setProgress(loc.position);
                 }
 
             } catch (IOException e) {
                 Util.posterr(ctx, e);
-                finish();
+                done();
                 return;
             }
 
@@ -142,8 +157,12 @@ public class TVRemote extends Remote {
             if (jump)
                 dismissDialog(DIALOG_LOAD);
             setupStatus(null);
-            updateStatus = new UpdateStatusTask();
-            timer.scheduleAtFixedRate(updateStatus, 8000, 8000);
+            if (mddMgr == null) {
+                updateStatus = new UpdateStatusTask();
+                timer.scheduleAtFixedRate(updateStatus, 8000, 8000);
+            }
+            else
+                mddMgr.setChannelListener(new mddListener());
         }
     };
 
@@ -156,7 +175,7 @@ public class TVRemote extends Remote {
                     feMgr.jumpTo("livetv");
                     if (!feMgr.getLoc().livetv) {
                         Util.posterr(ctx, "Timeout entering LiveTV");
-                        finish();
+                        done();
                         return;
                     }
                     if (jumpChan >= 0) { 
@@ -175,6 +194,44 @@ public class TVRemote extends Remote {
         
         }
     };
+    
+    private class mddListener implements ChannelListener {
+
+        @Override
+        public void onChannel(
+            final String channel, final String title, final String subtitle
+        ) {
+            handler.post(
+                new Runnable() { 
+                    @Override
+                    public void run() { 
+                        titleView.setText(title);
+                        lastTitle = title;
+                    }
+                }
+            );
+        }
+
+        @Override
+        public void onProgress(final int pos) {
+            handler.post(
+                new Runnable() { 
+                    @Override
+                    public void run() { 
+                        if (livetv) return;
+                        pBar.setProgress(pos);
+                        lastProgress = pos;
+                    }
+                }
+            );
+        }
+        
+        @Override
+        public void onExit() {
+            done();
+        }
+        
+    };
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -184,70 +241,70 @@ public class TVRemote extends Remote {
         livetv = getIntent().hasExtra(MythDroid.LIVETV);
         jump = !getIntent().hasExtra(MythDroid.DONTJUMP);
         jumpChan = getIntent().getIntExtra(MythDroid.JUMPCHAN, -1);
-
+        
+        setResult(RESULT_OK);
         
         if (livetv) 
             ctrls.put(R.id.tv_rec, Key.RECORD);
         else
             ctrls.put(R.id.tv_rec, Key.EDIT);
-
+        
         setupViews(gesture);
-
-        feMgr = MythDroid.connectFrontend(this);
-
-        if (feMgr == null) {
+        
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        if((feMgr = MythDroid.connectFrontend(this)) == null) {
             finish();
             return;
         }
+        
+        try {
+            mddMgr = new MDDManager(MythDroid.feMgr.getAddress());
+        } catch (IOException e) { 
+            mddMgr = null;
+            timer = new Timer();
+        }
 
-        timer = new Timer();
-
-        if (jump) {
+        if (jump && !wasPaused) {
             showDialog(DIALOG_LOAD);
             MythDroid.wHandler.post(jumpRun);
         }
-
         else
             handler.post(ready);
-
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    
+    private void cleanup() {
+        try {
+            if (feMgr != null) 
+                feMgr.disconnect();
+            feMgr = null;
+        
+            if (mddMgr != null)
+                mddMgr.shutdown();
+            mddMgr = null;
+        } catch (IOException e) { Util.err(this, e); }
+        
         if (timer != null) {
             timer.cancel();
             timer.purge();
-        }
-        if (feMgr != null && jump) {
-            try {
-                feMgr.jumpTo(MythDroid.lastLocation);
-                feMgr.disconnect();
-            } catch (IOException e) {
-                Util.err(this, e);
-            }
+            timer = null;
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        cleanup();
         wasPaused = true;
-        timer.cancel();
-        timer.purge();
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (feMgr == null) {
-            finish();
-            return;
-        }
-        if (wasPaused) {
-            timer = new Timer();
-            handler.post(ready);
-        }
+    
+    @Override 
+    public void onDestroy() {
+        super.onDestroy();
+        cleanup();
     }
 
     @Override
@@ -259,6 +316,7 @@ public class TVRemote extends Remote {
 
     @Override
     public void onAction() {
+        if (mddMgr != null) return;
         updateStatus.run();
     }
 
@@ -298,12 +356,14 @@ public class TVRemote extends Remote {
         switch (id) {
 
             case DIALOG_LOAD:
+                
                 final ProgressDialog d = new ProgressDialog(this);
                 d.setIndeterminate(true);
                 d.setMessage("Loading");
                 return d;
 
             case DIALOG_NUMPAD:
+                
                 final Dialog pad = new Dialog(this);
                 pad.setContentView(R.layout.numpad);
                 pad.findViewById(android.R.id.title).setVisibility(View.GONE);
@@ -317,6 +377,7 @@ public class TVRemote extends Remote {
                 return pad;
 
             case DIALOG_GUIDE:
+                
                 return new AlertDialog.Builder(ctx)
                     .setIcon(drawable.ic_menu_upload_you_tube)
                     .setTitle("Display Guide")
@@ -327,6 +388,41 @@ public class TVRemote extends Remote {
                         , null
                     )
                     .create();
+                
+            case DIALOG_QUIT:
+                
+                OnClickListener cl = new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        
+                        dialog.dismiss();
+                        
+                        switch(which) {
+                            case Dialog.BUTTON_POSITIVE: 
+                                jump = true;
+                                break;
+                            case Dialog.BUTTON_NEUTRAL:
+                                jump = false;
+                                setResult(REMOTE_RESULT_FINISH);
+                                break;
+                            default:
+                                return;
+                                
+                        }
+                        
+                        done();
+                    
+                    }
+                };
+                
+                return 
+                    new AlertDialog.Builder(ctx)
+                        .setTitle("Leave Remote")
+                        .setMessage("Halt playback?")
+                        .setPositiveButton("Yes", cl)
+                        .setNeutralButton("No", cl)
+                        .setNegativeButton("Cancel", cl)
+                        .create();
 
         }
 
@@ -432,6 +528,16 @@ public class TVRemote extends Remote {
         return true;
 
     }
+    
+    @Override
+    public boolean onKeyDown(int code, KeyEvent event) {
+        if (code == KeyEvent.KEYCODE_BACK) {
+            showDialog(DIALOG_QUIT);
+            return true;
+        }
+        else 
+            return super.onKeyDown(code, event);
+    }
 
     private void setupViews(boolean gesture) {
 
@@ -493,44 +599,62 @@ public class TVRemote extends Remote {
 
     private void setupStatus(FrontendLocation loc) {
 
+        titleView = (TextView)findViewById(R.id.tv_title);
+        pBar = (ProgressBar)findViewById(R.id.tv_progress);
+        titleView.setFocusable(false);
+        pBar.setFocusable(false);
+        
+        if (livetv) 
+            pBar.setVisibility(View.GONE);
+        
+        if (mddMgr != null) {
+            titleView.setText(lastTitle);    
+            pBar.setMax(1000);
+            pBar.setProgress(lastProgress);
+            return;
+        }
+        
         Program prog = null;
 
         try {
             if (loc == null)
                 loc = feMgr.getLoc();
             if (!loc.video) {
-                finish();
+                done();
                 return;
             }
             prog = MythDroid.beMgr.getRecording(loc.filename);
         } catch (IOException e) {
             Util.err(this, e);
-            finish();
+            done();
             return;
         } catch (NullPointerException e) {
             Util.err(this, "Backend connection gone away");
-            finish();
+            done();
             return;
         }
+        
+        titleView.setText(prog.Title);
 
-        TextView tv = (TextView)findViewById(R.id.tv_title);
-        tv.setText(prog.Title);
-        tv.setFocusable(false);
-
-        pBar = (ProgressBar)findViewById(R.id.tv_progress);
-
-        if (livetv) {
-            pBar.setVisibility(View.GONE);
+        if (livetv) { 
             lastFilename = loc.filename;
             return;
         }
 
-        end = loc.end;
-        pBar.setMax(end);
-        progress = loc.position;
-        pBar.setProgress(progress);
-        pBar.setFocusable(false);
+        pBar.setMax(loc.end);
+        pBar.setProgress(loc.position);
 
+    }
+    
+    private void done() {
+        if (feMgr != null && jump) {
+            try {
+                feMgr.jumpTo(MythDroid.lastLocation);
+            } catch (IOException e) {
+                Util.err(this, e);
+            }
+        }
+        finish();
     }
    
     @Override
