@@ -38,4 +38,4 @@ mdd will check these settings during installation and let you know if you need t
 
 ==Installation==
 
-You can install !MythDroid to your device either by checking out the source code (via Eclipse with the [http://subclipse.tigris.org/ SubClipse] and [http://developer.android.com/sdk/1.5_r3/installing.html#installingplugin Android ADT] plugins), connecting your device and running !MythDroid on it or by downloading the latest [http://mythdroid.googlecode.com/files/MythDroid-0.1.apk MythDroid APK] and using adb (from the Android SDK) or an application from the Android Market to install it.
+You can install !MythDroid to your device either by checking out the source code (via Eclipse with the [http://subclipse.tigris.org/ SubClipse] and [http://developer.android.com/sdk/1.5_r3/installing.html#installingplugin Android ADT] plugins), connecting your device and running !MythDroid on it or by downloading the latest [http://mythdroid.googlecode.com/files/MythDroid-0.2.apk MythDroid APK] and using adb (from the Android SDK) or an application from the Android Market to install it.
