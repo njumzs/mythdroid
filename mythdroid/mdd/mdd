@@ -41,7 +41,6 @@ sub handle_music_player_prop($$);
 sub handle_channel($);
 sub handle_channel_progress($);
 sub sendMsg($);
-sub fake_response($);
 
 my $lcdServerPort = 6545;
 my $listenPort = 16546;
@@ -366,28 +365,6 @@ sub sendMsg($) {
 
     syswrite($client, $msg) if (defined $client);
 
-}
-
-sub fake_response($) {
-    
-    my $data = shift;
-
-    foreach my $cmd (split /\n/, $data) {
-
-        next unless length($cmd) > 4;
-
-        if ($cmd eq 'HELLO') {
-            syswrite(
-                $lcdClient, 
-                "CONNECT 16 2\n"
-            );
-        }
-
-        else {
-            syswrite($lcdClient, "OK\n");
-        }
-
-    }
 }
 
 sub killKids {
