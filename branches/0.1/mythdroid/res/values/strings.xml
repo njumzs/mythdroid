@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">MythDroid</string>
+	<string name="host_prefs">Host Preferences</string>
+	<string name="no_be">No backends found</string>
+	<string name="no_be_detail">Configure one manually in settings perhaps?</string>
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/host_prefs">
+    
+    	<EditTextPreference
+    		android:key="backend"
+    		android:dialogTitle="Backend Address"
+    		android:title="Manual Backend Config"
+    		android:singleLine="true"
+    		android:summary="Manually configure a backend"/>
+    		
+    	<PreferenceScreen
+    		android:key="frontends"
+    		android:title="Frontends Config"
+    		android:summary="Configure frontends">
+    		 		
+    		<intent android:targetClass="org.mythdroid.FrontendList"
+    				android:targetPackage="org.mythdroid"/>
+    				
+    	</PreferenceScreen>
+    	
+    </PreferenceCategory>
+    
+</PreferenceScreen>
+            

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.mythdroid"
+    android:versionCode="1"
+    android:versionName="1.0">
+      
+	<application 
+      	android:icon="@drawable/logo" 
+      	android:label="@string/app_name">
+      	
+        <activity android:name=".MythDroid" android:label="@string/app_name">
+          <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <activity android:name=".Recordings" 
+        	android:label="Recordings"
+        	android:configChanges="keyboardHidden|orientation"/>
+        	
+        <activity android:name=".RecordingDetail" 
+        	android:label="Program Details"
+        	android:configChanges="keyboardHidden|orientation"/>
+        	
+        <activity android:name=".Prefs" 
+        	android:label="@string/app_name"/>
+        	
+        <activity android:name=".FrontendList" 
+        	android:label="Frontends"/>
+        	
+        <activity android:name=".Status" 
+        	android:label="Status"
+        	android:configChanges="keyboardHidden|orientation"/>
+        	
+        <activity android:name=".StatusRecorders" 
+        	android:label="Recorder Status"
+        	android:configChanges="keyboardHidden|orientation"/>
+        	
+        <activity android:name=".StatusScheduled" 
+        	android:label="Scheduled Recordings"
+        	android:configChanges="keyboardHidden|orientation"/>
+        	
+		<activity android:name=".StatusJobs" 
+        	android:label="Job Queue"
+        	android:configChanges="keyboardHidden|orientation"/>
+        	
+        <activity android:name=".StatusBackend" 
+        	android:label="Backend Status"
+        	android:configChanges="keyboardHidden|orientation"/>
+        	
+        <activity android:name=".Guide" 
+        	android:theme="@android:style/Theme.NoTitleBar"
+        	android:configChanges="keyboardHidden|orientation"/>
+        	        	        	
+        <activity android:name=".NavRemote" 
+       		android:theme="@android:style/Theme.NoTitleBar"
+       		android:configChanges="keyboardHidden|orientation"/>
+       		
+        <activity android:name=".TVRemote" 
+        	android:theme="@android:style/Theme.NoTitleBar"
+        	android:configChanges="keyboardHidden|orientation"/>
+        	
+    </application>
+    
+    <uses-permission android:name="android.permission.INTERNET"/>
+    
+    <uses-sdk android:minSdkVersion="3" />
+    
+</manifest> 
