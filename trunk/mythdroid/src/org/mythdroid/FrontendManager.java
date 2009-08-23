@@ -79,7 +79,7 @@ public class FrontendManager {
      * @return true if we jumped ok, false otherwise
      */
     public synchronized boolean jumpTo(FrontendLocation loc) throws IOException {
-        if (loc == null) return false;
+        if (cmgr == null || loc == null || loc.location == null) return false;
         cmgr.writeLine("jump " + loc.location.toLowerCase());
         if (getResponse().get(0).equals("OK"))
             return true;

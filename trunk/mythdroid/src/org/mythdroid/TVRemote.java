@@ -648,7 +648,7 @@ public class TVRemote extends Remote {
     }
     
     private void done() {
-        if (feMgr != null && jump) {
+        if (feMgr != null && feMgr.isConnected() && jump) {
             try {
                 feMgr.jumpTo(MythDroid.lastLocation);
             } catch (IOException e) {
