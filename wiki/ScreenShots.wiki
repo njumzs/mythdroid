@@ -1,7 +1,10 @@
 #summary A selection of screenshots
 
 ||Main Menu||TV Remote||TV Remote (Gesture)||Nav Remote||
-||http://mythdroid.googlecode.com/files/MainMenu160-0.2.png||http://mythdroid.googlecode.com/files/TVRemote.png||http://mythdroid.googlecode.com/files/TVGestureRemote.png||http://mythdroid.googlecode.com/files/NavRemote.png||
+||http://mythdroid.googlecode.com/files/MainMenu160-0.2.png||http://mythdroid.googlecode.com/files/TVRemote.png||http://mythdroid.googlecode.com/files/TVGestureRemote-0.2.png||http://mythdroid.googlecode.com/files/NavRemote-0.2.png||
 
 ||Recordings||Program Detail||Frontend Chooser||Program Guide||
 ||http://mythdroid.googlecode.com/files/Recordings.png||http://mythdroid.googlecode.com/files/RecordedDetail.png||http://mythdroid.googlecode.com/files/FrontendChooser.png||http://mythdroid.googlecode.com/files/Guide.png||
+
+||Music||
+||http://mythdroid.googlecode.com/files/MusicRemote-0.2.png||
