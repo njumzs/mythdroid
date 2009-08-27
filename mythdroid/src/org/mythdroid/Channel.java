@@ -97,26 +97,29 @@ public class Channel implements Comparable<Channel> {
         public void start(Attributes attr) {
             chan = new Channel();
             chan.callSign = attr.getValue("callSign");
-            chan.num = Integer.valueOf(attr.getValue("chanNum"));
+            chan.num = attr.getValue("chanNum");
             chan.ID = Integer.valueOf(attr.getValue("chanId"));
         }
 
     }
 
-    public String callSign;
-    public int num, ID;
+    public String callSign, num;
+    public int ID;
     public ArrayList<Program> programs = new ArrayList<Program>();
 
     /** Construct an empty Channel */
     public Channel() {}
-
+    
     @Override
     public int compareTo(Channel other) {
-        if (num > other.num) {
-            return 1;
-        }
-        else if (num < other.num) { return -1; }
-        return 0;
+        int l = num.length();
+        int ol = other.num.length();
+        if (l > ol) return 1;
+        else if (l < ol) return -1;
+        int c = num.compareTo(other.num);
+        if (c > 0) return 1;
+        else if (c < 0) return -1; 
+        else return 0;
     }
-
+    
 }
