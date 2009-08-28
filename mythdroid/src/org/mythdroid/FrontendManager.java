@@ -122,7 +122,7 @@ public class FrontendManager {
         String loc = getResponse().get(0);
 
         int i = 0;
-        while (loc.startsWith("ERROR: Timed out") && i++ < 4) {
+        while (loc.startsWith("ERROR: Timed out") && i++ < 8) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {}
