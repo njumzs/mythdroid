@@ -17,6 +17,10 @@ patch -p1 < xml-guide.patch
 
 and then follow the normal steps to configure, build and install MythTV.
 
+==MythTV Configuration==
+
+You must enable the 'Enable frontend network control' option in each frontend's general settings.
+
 ==MDD==
 
 [http://mythdroid.googlecode.com/files/mdd-0.1.pl mdd] is a perl program that, once installed on a frontend, provides mythdroid with extended
