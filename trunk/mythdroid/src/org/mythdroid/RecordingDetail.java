@@ -78,9 +78,9 @@ public class RecordingDetail extends MDActivity {
             case DELETE_DIALOG:
                 return 
                     new AlertDialog.Builder(this)
-                        .setTitle("Delete recording")
-                        .setMessage("Are you sure?")
-                        .setPositiveButton("Yes",
+                        .setTitle(R.string.del_rec)
+                        .setMessage(R.string.sure)
+                        .setPositiveButton(R.string.yes,
                             new OnClickListener() {
                                 @Override
                                 public void onClick(
@@ -98,15 +98,15 @@ public class RecordingDetail extends MDActivity {
                                 }
                             }
                         )
-                        .setNegativeButton("No", no)
+                        .setNegativeButton(R.string.no, no)
                         .create();
 
             case STOP_DIALOG:
                 return
                     new AlertDialog.Builder(this)
-                        .setTitle("Stop recording")
-                        .setMessage("Are you sure?")
-                        .setPositiveButton("Yes",
+                        .setTitle(R.string.stop_rec)
+                        .setMessage(R.string.sure)
+                        .setPositiveButton(R.string.yes,
                             new OnClickListener() {
                                 @Override
                                 public void onClick(
@@ -125,7 +125,7 @@ public class RecordingDetail extends MDActivity {
                                 }
                             }
                         )
-                        .setNegativeButton("No", no)
+                        .setNegativeButton(R.string.no, no)
                         .create();
              default:
                  return super.onCreateDialog(id);

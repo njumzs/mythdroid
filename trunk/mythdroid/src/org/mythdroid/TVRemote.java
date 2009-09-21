@@ -173,9 +173,9 @@ public class TVRemote extends Remote {
             
             try {
                 if (livetv) {
-                    feMgr.jumpTo("livetv");
+                    feMgr.jumpTo("livetv"); //$NON-NLS-1$
                     if (!feMgr.getLoc().livetv) {
-                        Util.posterr(ctx, "Timeout entering LiveTV");
+                        Util.posterr(ctx, Messages.getString("TVRemote.1"));
                         done();
                         return;
                     }
@@ -360,7 +360,7 @@ public class TVRemote extends Remote {
                 
                 final ProgressDialog d = new ProgressDialog(this);
                 d.setIndeterminate(true);
-                d.setMessage("Loading");
+                d.setMessage(getResources().getString(R.string.loading));
                 return d;
 
             case DIALOG_NUMPAD:
@@ -381,7 +381,7 @@ public class TVRemote extends Remote {
                 
                 return new AlertDialog.Builder(ctx)
                     .setIcon(drawable.ic_menu_upload_you_tube)
-                    .setTitle("Display Guide")
+                    .setTitle(R.string.disp_guide)
                     .setAdapter(
                         new ArrayAdapter<String>(
                             ctx, R.layout.simple_list_item_1, new String[] {}
@@ -418,11 +418,11 @@ public class TVRemote extends Remote {
                 
                 return 
                     new AlertDialog.Builder(ctx)
-                        .setTitle("Leave Remote")
-                        .setMessage("Halt playback?")
-                        .setPositiveButton("Yes", cl)
-                        .setNeutralButton("No", cl)
-                        .setNegativeButton("Cancel", cl)
+                        .setTitle(R.string.leave_remote)
+                        .setMessage(R.string.halt_playback)
+                        .setPositiveButton(R.string.yes, cl)
+                        .setNeutralButton(R.string.no, cl)
+                        .setNegativeButton(R.string.cancel, cl)
                         .create();
 
         }
@@ -436,7 +436,10 @@ public class TVRemote extends Remote {
         
         if (id != DIALOG_GUIDE) return;
 
-        final String[] items = new String[] { "Here", "On " + feMgr.name() };
+        final String[] items = new String[] { 
+        		Messages.getString("TVRemote.2"), 
+        		Messages.getString("TVRemote.3") + feMgr.name() 
+        };
 
         final ListView lv = ((AlertDialog)dialog).getListView();
 
@@ -481,11 +484,11 @@ public class TVRemote extends Remote {
     /** Compose the menu */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_BUTTON, Menu.NONE, "Button Interface")
+        menu.add(Menu.NONE, MENU_BUTTON, Menu.NONE, R.string.btn_iface)
             .setIcon(drawable.ic_menu_add);
-        menu.add(Menu.NONE, MENU_GESTURE, Menu.NONE, "Gesture Interface")
+        menu.add(Menu.NONE, MENU_GESTURE, Menu.NONE, R.string.gest_iface)
             .setIcon(R.drawable.ic_menu_finger);
-        menu.add(Menu.NONE, MENU_OSDMENU, Menu.NONE, "OSD Menu")
+        menu.add(Menu.NONE, MENU_OSDMENU, Menu.NONE, R.string.osd_menu)
             .setIcon(drawable.ic_menu_more);
         return true;
     }
@@ -630,7 +633,7 @@ public class TVRemote extends Remote {
             done();
             return;
         } catch (NullPointerException e) {
-            Util.err(this, "Backend connection gone away");
+            Util.err(this, Messages.getString("TVRemote.4"));
             done();
             return;
         }

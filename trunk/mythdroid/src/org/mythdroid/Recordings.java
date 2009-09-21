@@ -69,7 +69,7 @@ public class Recordings extends MDListActivity implements
             try {
                 recordings = MythDroid.beMgr.getRecordings();
             } catch (IOException e) { 
-                Util.posterr(ctx, "Error retrieving recordings");
+                Util.posterr(ctx, Messages.getString("Recordings.0"));
                 dismissDialog(DIALOG_LOAD);
                 finish();
             }
@@ -166,7 +166,7 @@ public class Recordings extends MDListActivity implements
 
                 return 
                     new AlertDialog.Builder(this)
-                        .setTitle("Filter recordings")
+                        .setTitle(R.string.filter_rec)
                         .setAdapter(
                             new ArrayAdapter<String>(
                                 this, R.layout.simple_list_item_1, titles
@@ -193,11 +193,11 @@ public class Recordings extends MDListActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_REFRESH, Menu.NONE, "Refresh")
+        menu.add(Menu.NONE, MENU_REFRESH, Menu.NONE, R.string.refresh)
             .setIcon(R.drawable.ic_menu_refresh);
-        menu.add(Menu.NONE, MENU_FILTER, Menu.NONE, "Filter")
+        menu.add(Menu.NONE, MENU_FILTER, Menu.NONE, R.string.filter)
             .setIcon(drawable.ic_menu_search);
-        menu.add(Menu.NONE, MENU_FILTER_RESET, Menu.NONE, "Reset Filter")
+        menu.add(Menu.NONE, MENU_FILTER_RESET, Menu.NONE, R.string.reset_filter)
             .setIcon(drawable.ic_menu_revert);
         return true;
     }

@@ -85,7 +85,7 @@ public class MythDroid extends MDListActivity implements
      * (for TVRemote) and to jump to guidegrid (for NavRemote)
      */
     final public static String 
-        LIVETV = "LiveTV",      JUMPCHAN = "JUMPCHAN", 
+        LIVETV = "LiveTV",      JUMPCHAN = "JUMPCHAN",
         DONTJUMP = "DONTJUMP",  GUIDE = "GUIDE";
 
     final private static int 
@@ -95,7 +95,13 @@ public class MythDroid extends MDListActivity implements
 
     /** Entries for the main menu list */
     final private static String[] MenuItems =
-        { "Watch TV", "Recordings", "Music", "Guide", "Status" };
+        { 
+    		Messages.getString("MythDroid.7"), 
+    		Messages.getString("MythDroid.8"), 
+    		Messages.getString("MythDroid.9"), 
+    		Messages.getString("MythDroid.10"), 
+    		Messages.getString("MythDroid.11") 
+    	};
 
     /** ListAdapter containing the main menu entries */
     private ArrayAdapter<String> menuAdapter   = null;
@@ -166,11 +172,16 @@ public class MythDroid extends MDListActivity implements
         final String action = (String)list.getItemAtPosition(pos);
         Class<?> activity = null;
 
-        if      (action.equals("Watch TV"))    activity = TVRemote.class;
-        else if (action.equals("Recordings"))  activity = Recordings.class;
-        else if (action.equals("Music"))       activity = MusicRemote.class;
-        else if (action.equals("Guide"))       activity = Guide.class;
-        else if (action.equals("Status"))      activity = Status.class;
+        if      (action.equals(Messages.getString("MythDroid.7")))
+        	activity = TVRemote.class;
+        else if (action.equals(Messages.getString("MythDroid.8")))
+        	activity = Recordings.class;
+        else if (action.equals(Messages.getString("MythDroid.9")))
+        	activity = MusicRemote.class;
+        else if (action.equals(Messages.getString("MythDroid.10")))
+        	activity = Guide.class;
+        else if (action.equals(Messages.getString("MythDroid.11")))
+        	activity = Status.class;
 
         startActivity(
             new Intent().putExtra(LIVETV, true).setClass(this, activity)
@@ -185,18 +196,18 @@ public class MythDroid extends MDListActivity implements
         
         final String action = (String) adapter.getItemAtPosition(pos);
 
-        if (action.equals("Watch TV")) {
+        if (action.equals(Messages.getString("MythDroid.7"))) {
             nextActivity = TVRemote.class;
             setExtra(LIVETV);
             showDialog(FRONTEND_CHOOSER);
         }
         
-        else if (action.equals("Music")) {
+        else if (action.equals(Messages.getString("MythDroid.9"))) {
             nextActivity = MusicRemote.class;
             showDialog(FRONTEND_CHOOSER);
         }
 
-        else if (action.equals("Guide")) {
+        else if (action.equals(Messages.getString("MythDroid.10"))) {
             showDialog(DIALOG_GUIDE);
         }
 
@@ -211,7 +222,7 @@ public class MythDroid extends MDListActivity implements
             case DIALOG_GUIDE:
                 return new AlertDialog.Builder(ctx)
                     .setIcon(drawable.ic_menu_upload_you_tube)
-                    .setTitle("Display Guide")
+                    .setTitle(R.string.disp_guide)
                     .setAdapter(
                         new ArrayAdapter<String>(
                             ctx, R.layout.simple_list_item_1, new String[] {}
@@ -231,10 +242,10 @@ public class MythDroid extends MDListActivity implements
         if (id != DIALOG_GUIDE) return;
 
         final ArrayList<String> items = new ArrayList<String>();
-        items.add("Here");
+        items.add(Messages.getString("MythDroid.21"));
         if (defaultFrontend != null) 
-            items.add("On " + defaultFrontend);
-        items.add("Choose frontend");
+            items.add(Messages.getString("MythDroid.22") + defaultFrontend);
+        items.add(Messages.getString("MythDroid.23"));
 
         final ListView lv = ((AlertDialog)dialog).getListView();
         lv.setAdapter(
@@ -253,12 +264,12 @@ public class MythDroid extends MDListActivity implements
                     String item = (String)av.getItemAtPosition(pos);
                     dialog.dismiss();
 
-                    if (item.equals("Here")) {
+                    if (item.equals(Messages.getString("MythDroid.21"))) {
                         startActivity(new Intent().setClass(ctx, Guide.class));
                         return;
                     }
 
-                    else if (item.equals("Choose frontend")) {
+                    else if (item.equals(Messages.getString("MythDroid.23"))) {
                         nextActivity = NavRemote.class;
                         setExtra(GUIDE);
                         showDialog(FRONTEND_CHOOSER);
@@ -280,12 +291,12 @@ public class MythDroid extends MDListActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_SETTINGS, Menu.NONE, "Settings").setIcon(
-            drawable.ic_menu_preferences);
-        menu.add(Menu.NONE, MENU_FRONTEND, Menu.NONE, "Set Default Frontend")
+        menu.add(Menu.NONE, MENU_SETTINGS, Menu.NONE, R.string.settings)
+        	.setIcon(drawable.ic_menu_preferences);
+        menu.add(Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.set_def_fe)
             .setIcon(drawable.ic_menu_upload_you_tube);
-        menu.add(Menu.NONE, MENU_NAV, Menu.NONE, "Remote").setIcon(
-            drawable.ic_menu_compass);
+        menu.add(Menu.NONE, MENU_NAV, Menu.NONE, R.string.remote)
+        	.setIcon(drawable.ic_menu_compass);
         return true;
     }
 
@@ -344,7 +355,7 @@ public class MythDroid extends MDListActivity implements
         Cursor c = FrontendDB.getFrontends(ctx);
 
         if (c.getCount() < 1) {
-            Util.posterr(ctx, "No frontends are defined!");
+            Util.posterr(ctx, Messages.getString("MythDroid.26"));
             c.close();
             return null;
         }

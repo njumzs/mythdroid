@@ -289,17 +289,17 @@ public class MusicRemote extends Remote {
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_SHUFFLE, Menu.NONE, "Shuffle Mode")
+        menu.add(Menu.NONE, MENU_SHUFFLE, Menu.NONE, R.string.shuffle_mode)
             .setIcon(R.drawable.ic_menu_refresh);
-        menu.add(Menu.NONE, MENU_REPEAT, Menu.NONE, "Repeat Mode")
+        menu.add(Menu.NONE, MENU_REPEAT, Menu.NONE, R.string.repeat_mode)
             .setIcon(drawable.ic_menu_revert);
-        menu.add(Menu.NONE, MENU_VISUALISE, Menu.NONE, "Toggle Visualiser")
+        menu.add(Menu.NONE, MENU_VISUALISE, Menu.NONE, R.string.tog_vis)
             .setIcon(drawable.ic_menu_upload_you_tube);
-        menu.add(Menu.NONE, MENU_CHANGE_VISUAL, Menu.NONE, "Change Visualiser")
+        menu.add(Menu.NONE, MENU_CHANGE_VISUAL, Menu.NONE, R.string.chg_vis)
             .setIcon(drawable.ic_menu_slideshow);
-        menu.add(Menu.NONE, MENU_EDIT, Menu.NONE, "Playlist Editor")
+        menu.add(Menu.NONE, MENU_EDIT, Menu.NONE, R.string.pl_edit)
             .setIcon(drawable.ic_menu_edit);
-        menu.add(Menu.NONE, MENU_OSDMENU, Menu.NONE, "OSD Menu")
+        menu.add(Menu.NONE, MENU_OSDMENU, Menu.NONE, R.string.osd_menu)
             .setIcon(drawable.ic_menu_more);
         return true;
     }
@@ -381,11 +381,11 @@ public class MusicRemote extends Remote {
 
                 return 
                     new AlertDialog.Builder(ctx)
-                        .setTitle("Leave Remote")
-                        .setMessage("Halt playback?")
-                        .setPositiveButton("Yes", cl)
-                        .setNeutralButton("No", cl)
-                        .setNegativeButton("Cancel", cl)
+                        .setTitle(R.string.leave_remote)
+                        .setMessage(R.string.halt_playback)
+                        .setPositiveButton(R.string.yes, cl)
+                        .setNeutralButton(R.string.no, cl)
+                        .setNegativeButton(R.string.cancel, cl)
                         .create();
                 
         }

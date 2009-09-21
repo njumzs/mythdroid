@@ -53,9 +53,9 @@ public class FrontendList extends ListActivity implements
         );
 
         ((TextView)(hdr.findViewById(R.id.fe_name_text)))
-            .setText("Add a frontend");
+            .setText(R.string.add_fe);
         ((TextView)(hdr.findViewById(R.id.fe_addr_text)))
-            .setText("Click here to add a new frontend");
+            .setText(R.string.click_add_fe);
 
         getListView().addHeaderView(hdr);
         getListView().setPadding(0, 4, 0, 0);
@@ -65,7 +65,7 @@ public class FrontendList extends ListActivity implements
         setListAdapter(
             new SimpleCursorAdapter(
                 this, R.layout.frontend_list_item, c, 
-                new String[] { "addr", "name" }, 
+                new String[] { "addr", "name" },
                 new int[] { R.id.fe_addr_text, R.id.fe_name_text }
             )
         );
@@ -91,17 +91,17 @@ public class FrontendList extends ListActivity implements
             case ADD_DIALOG:
                 feEditor = new AlertDialog.Builder(this)
                                .setView(editor)
-                               .setPositiveButton("Save", this)
-                               .setNegativeButton("Cancel", this)
+                               .setPositiveButton(R.string.save, this)
+                               .setNegativeButton(R.string.cancel, this)
                                .create();
                 break;
                 
             case EDIT_DIALOG:
                 feEditor = new AlertDialog.Builder(this)
                                .setView(editor)
-                               .setPositiveButton("Save", this)
-                               .setNeutralButton("Delete", this)
-                               .setNegativeButton("Cancel", this)
+                               .setPositiveButton(R.string.save, this)
+                               .setNeutralButton(R.string.delete, this)
+                               .setNegativeButton(R.string.delete, this)
                                .create();
                 break;
                 
@@ -160,7 +160,7 @@ public class FrontendList extends ListActivity implements
                                   .getText().toString();
 
                 if (name.length() == 0 || addr.length() == 0) {
-                    Util.err(ctx, "Frontends must have a name and address");
+                    Util.err(ctx, Messages.getString("FrontendList.4"));
                     dialog.dismiss();
                     return;
                 }
@@ -168,7 +168,7 @@ public class FrontendList extends ListActivity implements
                 if (rowID < 1) {
                     if (!FrontendDB.insert(this, name, addr))
                         Util.err(
-                            ctx, "There is already a frontend called " + name
+                            ctx, Messages.getString("FrontendList.5") + name
                         );
                 }
                 

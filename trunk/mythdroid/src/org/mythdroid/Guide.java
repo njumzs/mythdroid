@@ -203,9 +203,9 @@ public class Guide extends MDActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_DATE, Menu.NONE, "Change Start Date")
+        menu.add(Menu.NONE, MENU_DATE, Menu.NONE, R.string.ch_start_date)
             .setIcon(drawable.ic_menu_today);
-        menu.add(Menu.NONE, MENU_TIME, Menu.NONE, "Change Start Time")
+        menu.add(Menu.NONE, MENU_TIME, Menu.NONE, R.string.ch_start_time)
             .setIcon(drawable.ic_menu_recent_history);
         return true;
     }
