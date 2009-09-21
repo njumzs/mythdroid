@@ -89,7 +89,12 @@ public class StatusRecorders extends ListActivity {
 
     private class Encoder {
 
-        private String[] states = { "Idle", "LiveTV", "?", "?", "Recording" };
+        private String[] states = { 
+        		Messages.getString("StatusRecorders.1"), 
+        		Messages.getString("StatusRecorders.2"), 
+        		"?", "?", 
+        		Messages.getString("StatusRecorders.5") 
+        };
 
         public int     id;
         public boolean local;
@@ -169,15 +174,19 @@ public class StatusRecorders extends ListActivity {
             Encoder enc = encoders.get(pos);
 
             vHolder.encoder.setText(
-                "Encoder " + enc.id + "    (" +
-                (enc.local ? "local on " + enc.hostname : "remote") + ")"
+                Messages.getString("StatusRecorders.12") + enc.id + "    (" +
+                (enc.local ? Messages.getString("StatusRecorders.14") + 
+                enc.hostname : Messages.getString("StatusRecorders.15")) + ")"
             );
             vHolder.state.setText(enc.state);
             if (enc.program != null) {
                 vHolder.program.setText(
                     enc.program.Title + " on " + enc.program.Channel
                 );
-                vHolder.endTime.setText("Ends at " + enc.program.endString());
+                vHolder.endTime.setText(
+                		Messages.getString("StatusRecorders.18") + 
+                		enc.program.endString()
+                );
                 vHolder.rec.setVisibility(View.VISIBLE);
             }
             else
@@ -203,7 +212,7 @@ public class StatusRecorders extends ListActivity {
     public Dialog onCreateDialog(int id) {
         ProgressDialog d = new ProgressDialog(this);
         d.setIndeterminate(true);
-        d.setMessage("Loading");
+        d.setMessage(getResources().getString(R.string.loading));
         return d;
     }
 

@@ -46,7 +46,12 @@ public class Status extends ListActivity {
     final static private int      DIALOG_LOAD = 0;
     final private Context         ctx         = this;
     final private static String[] StatusItems =
-    { "Recorders", "Scheduled", "Job Queue", "Backend Info" };
+    { 
+    	Messages.getString("Status.0"), 
+    	Messages.getString("Status.1"), 
+    	Messages.getString("Status.2"), 
+    	Messages.getString("Status.3") 
+    };
 
     final private Handler handler = new Handler();
             
@@ -90,10 +95,14 @@ public class Status extends ListActivity {
         final String action = (String)list.getItemAtPosition(pos);
         Class<?> activity = null;
 
-        if (action.equals("Recorders"))       activity = StatusRecorders.class;
-        else if (action.equals("Scheduled"))  activity = StatusScheduled.class;
-        else if (action.equals("Job Queue"))  activity = StatusJobs.class;
-        else if (action.equals("Backend Info")) activity = StatusBackend.class;
+        if      (action.equals(Messages.getString("Status.0")))
+        	activity = StatusRecorders.class;
+        else if (action.equals(Messages.getString("Status.1")))
+        	activity = StatusScheduled.class;
+        else if (action.equals(Messages.getString("Status.2")))
+        	activity = StatusJobs.class;
+        else if (action.equals(Messages.getString("Status.3")))
+        	activity = StatusBackend.class;
 
         startActivity(new Intent().setClass(this, activity));
 
@@ -108,7 +117,7 @@ public class Status extends ListActivity {
     public Dialog onCreateDialog(int id) {
         ProgressDialog d = new ProgressDialog(this);
         d.setIndeterminate(true);
-        d.setMessage("Loading");
+        d.setMessage(getResources().getString(R.string.loading));
         return d;
     }
 
@@ -126,7 +135,7 @@ public class Status extends ListActivity {
                 url.openConnection().getInputStream()
             );
         } catch (SAXException e) {
-            Util.err(ctx, "Status XML parse error");
+            Util.err(ctx, Messages.getString("Status.10"));
         } catch (Exception e) { Util.err(ctx, e); }
 
     }

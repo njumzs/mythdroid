@@ -177,9 +177,9 @@ public class NavRemote extends Remote implements View.OnClickListener {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_BUTTON, Menu.NONE, "Button Interface")
+        menu.add(Menu.NONE, MENU_BUTTON, Menu.NONE, R.string.btn_iface)
             .setIcon(drawable.ic_menu_add);
-        menu.add(Menu.NONE, MENU_GESTURE, Menu.NONE, "Gesture Interface")
+        menu.add(Menu.NONE, MENU_GESTURE, Menu.NONE, R.string.gest_iface)
             .setIcon(R.drawable.ic_menu_finger);
         return true;
     }

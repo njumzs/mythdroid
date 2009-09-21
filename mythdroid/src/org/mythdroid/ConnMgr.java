@@ -37,7 +37,7 @@ import android.util.Log;
 public class ConnMgr {
     
     static private IOException disconnected =
-        new IOException("We've been disconnected");
+        new IOException(Messages.getString("ConnMgr.0"));
 
     private Socket       sock = null;
     private OutputStream os   = null;
@@ -58,16 +58,16 @@ public class ConnMgr {
         try {
             sock.connect(sa, 1000);
         } catch (UnknownHostException e) {
-            throw (new IOException("Unknown Host: " + host));
+            throw (new IOException(Messages.getString("ConnMgr.1") + host));
         } catch (SocketTimeoutException e) {
             throw (
                 new IOException(
-                    "Connection to " + host + ":" + port + " failed")
+                    Messages.getString("ConnMgr.2") + host + ":" + port + Messages.getString("ConnMgr.4"))
                 );
         } catch (IOException e) {
             throw (
                 new IOException(
-                    "Connection to " + host + ":" + port + " refused")
+                    Messages.getString("ConnMgr.5") + host + ":" + port + Messages.getString("ConnMgr.7"))
                 );
         }
 
@@ -82,10 +82,10 @@ public class ConnMgr {
      */
     public void writeLine(String str) throws IOException {
 
-        if (str.endsWith("\n"))
+        if (str.endsWith("\n")) //$NON-NLS-1$
             os.write(str.getBytes());
         else {
-            str += "\n";
+            str += "\n"; //$NON-NLS-1$
             os.write(str.getBytes());
         }
 
@@ -116,7 +116,7 @@ public class ConnMgr {
         String str = list.remove(0);
 
         for (String s : list) {
-            str += "[]:[]" + s;
+            str += "[]:[]" + s; //$NON-NLS-1$
         }
 
         sendString(str);

@@ -31,7 +31,7 @@ public class Media extends MDListActivity implements
 
     /** Entries for the menu */
     final private static String[] MenuItems =
-        { "Videos", "Music", "Pictures" };
+        { Messages.getString("Media.0"), Messages.getString("Media.1"), Messages.getString("Media.2") };
     
     @Override
     public void onCreate(Bundle icicle) {
@@ -53,9 +53,9 @@ public class Media extends MDListActivity implements
         final String action = (String)list.getItemAtPosition(pos);
         Class<?> activity = null;
 
-        if      (action.equals("Videos"))      activity = Videos.class;
-        else if (action.equals("Music"))       activity = MusicRemote.class;
-        else if (action.equals("Pictures"))    activity = Gallery.class;
+        if      (action.equals(Messages.getString("Media.0")))      activity = Videos.class;
+        else if (action.equals(Messages.getString("Media.1")))       activity = MusicRemote.class;
+        else if (action.equals(Messages.getString("Media.2")))    activity = Gallery.class;
         
         startActivity(
             new Intent().setClass(this, activity)
@@ -70,7 +70,7 @@ public class Media extends MDListActivity implements
         
         final String action = (String)adapter.getItemAtPosition(pos);
       
-        if (action.equals("Music")) {
+        if (action.equals(Messages.getString("Media.1"))) {
             nextActivity = MusicRemote.class;
             showDialog(FRONTEND_CHOOSER);
             return true;

@@ -92,9 +92,9 @@ public abstract class MDListActivity extends ListActivity {
                 
                 if (d == null)
                     return new AlertDialog.Builder(this)
-                        .setTitle("Error")
-                        .setMessage("No frontends are defined!")
-                        .setPositiveButton("OK", 
+                        .setTitle(R.string.error)
+                        .setMessage(R.string.no_fes)
+                        .setPositiveButton(R.string.ok,
                             new OnClickListener() {
                                 @Override
                                 public void onClick(
@@ -114,7 +114,7 @@ public abstract class MDListActivity extends ListActivity {
             case DIALOG_LOAD:
                 final ProgressDialog prog = new ProgressDialog(this);
                 prog.setIndeterminate(true);
-                prog.setMessage("Loading");
+                prog.setMessage(getResources().getText(R.string.loading));
                 return prog;
         
         }
@@ -153,7 +153,7 @@ public abstract class MDListActivity extends ListActivity {
                 }
             )
             .setIcon(drawable.ic_menu_upload_you_tube)
-            .setTitle("Choose frontend")
+            .setTitle(R.string.ch_fe)
             .create();
 
     }

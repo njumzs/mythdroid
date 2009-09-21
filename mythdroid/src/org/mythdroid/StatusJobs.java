@@ -82,15 +82,15 @@ public class StatusJobs extends ListActivity {
     }
 
     private enum JobType {
-        NONE        (0,     "None"),
-        TRANSCODE   (1,     "Transcode"),
-        COMMFLAG    (2,     "Flag Commercials"), 
-        SYSTEM      (0xff,  "System Job"),
-        USERJOB1    (0x100, "User Job 1"),
-        USERJOB2    (0x200, "User Job 2"),
-        USERJOB3    (0x400, "User Job 3"), 
-        USERJOB4    (0x800, "User Job 4"),
-        USERJOB     (0xff00,"User Job");
+        NONE        (0,     Messages.getString("StatusJobs.0")),
+        TRANSCODE   (1,     Messages.getString("StatusJobs.1")),
+        COMMFLAG    (2,     Messages.getString("StatusJobs.2")),
+        SYSTEM      (0xff,  Messages.getString("StatusJobs.3")),
+        USERJOB1    (0x100, Messages.getString("StatusJobs.4")),
+        USERJOB2    (0x200, Messages.getString("StatusJobs.5")),
+        USERJOB3    (0x400, Messages.getString("StatusJobs.6")),
+        USERJOB4    (0x800, Messages.getString("StatusJobs.7")),
+        USERJOB     (0xff00,Messages.getString("StatusJobs.8"));
 
         private int     value;
         private String  msg;
@@ -163,7 +163,7 @@ public class StatusJobs extends ListActivity {
                             program = new Program(node);
                         else if (node.getNodeType() == Node.TEXT_NODE) {
                             name = node.getNodeValue();
-                            if (!name.startsWith("\n")) 
+                            if (!name.startsWith("\n"))
                                 comments = name;
                         }
                     }
