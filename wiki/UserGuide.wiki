@@ -16,7 +16,7 @@ The menu button brings up a menu that lets you configure !MythDroid, start the a
 
 == Recordings ==
 
-The recordings activity lists the recordings available on the backend. Short pressing a recording takes you to the Program Detail activity, where you'll be shown more information about the program and offered the chance to play or delete the recording. Long pressing a recording allows you to select a frontend on which to play the recording. 
+The recordings activity lists the recordings available on the backend. Short pressing a recording takes you to the Program Detail activity, where you'll be shown more information about the program and offered the chance to play or delete the recording. Long pressing a recording allows you to select a frontend on which to play the recording. Pressing menu will allow you to filter the recordings by program title, reset the filter or refresh the recordings list.
 
 == Nav Remote ==
 
