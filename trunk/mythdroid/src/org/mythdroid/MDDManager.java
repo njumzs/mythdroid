@@ -21,6 +21,8 @@ package org.mythdroid;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import android.os.Looper;
+
 interface MenuListener {
     public void onMenuItem(String menu, String item);
 }
@@ -55,6 +57,9 @@ public class MDDManager {
         public void run() {
             
             String line;
+            
+            Looper.prepare();
+            Looper.loop();
             
             while (cmgr.isConnected()) {
                 
