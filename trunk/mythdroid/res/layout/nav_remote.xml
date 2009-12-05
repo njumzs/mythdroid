@@ -7,51 +7,6 @@
     android:padding="8dp"
     android:background="@drawable/metal">
     
-    <ImageButton android:id="@+id/nav_enter"
-    	android:layout_width="72dp"
-    	android:layout_height="72dp"
-    	android:layout_centerInParent="true"
-    	android:layout_margin="28dp"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
-    	android:src="@drawable/btn_dial"/>
-    
-    <ImageButton android:id="@+id/nav_up"
-    	android:layout_width="72dp"
-    	android:layout_height="72dp"
-    	android:layout_above="@id/nav_enter"
-    	android:layout_alignLeft="@id/nav_enter"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
-    	android:src="@drawable/up"/>
-    
-    <ImageButton android:id="@+id/nav_left"
-    	android:layout_width="72dp"
-    	android:layout_height="72dp"
-    	android:layout_toLeftOf="@id/nav_enter"
-    	android:layout_alignTop="@id/nav_enter"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
-    	android:src="@drawable/left"/>
-    
-    <ImageButton android:id="@+id/nav_down"
-    	android:layout_width="72dp"
-    	android:layout_height="72dp"
-    	android:layout_below="@id/nav_enter"
-    	android:layout_alignLeft="@id/nav_enter"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
-    	android:src="@drawable/down"/>
-    	
-    <ImageButton android:id="@+id/nav_right"
-    	android:layout_width="72dp"
-    	android:layout_height="72dp"
-    	android:layout_toRightOf="@id/nav_enter"
-    	android:layout_alignTop="@id/nav_enter"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
-    	android:src="@drawable/right"/>
-   	
    	<ImageButton android:id="@+id/nav_back"
     	android:layout_width="72dp"
     	android:layout_height="72dp"
@@ -60,7 +15,54 @@
     	android:scaleType="fitCenter"
     	android:focusable="false"
     	android:src="@drawable/back"/>
-  	
+
+    <ImageButton android:id="@+id/nav_up"
+    	android:layout_width="58dp"
+    	android:layout_height="58dp"
+    	android:layout_below="@id/nav_back"
+    	android:layout_centerHorizontal="true"
+    	android:layout_marginTop="28dp"
+    	android:scaleType="fitCenter"
+    	android:focusable="false"
+    	android:src="@drawable/up"/>
+    	
+   	<ImageButton android:id="@+id/nav_enter"
+    	android:layout_width="58dp"
+    	android:layout_height="58dp"
+    	android:layout_alignLeft="@id/nav_up"
+    	android:layout_below="@id/nav_up"
+    	android:scaleType="fitCenter"
+    	android:focusable="false"
+    	android:src="@drawable/btn_dial"/>
+   	
+   	<ImageButton android:id="@+id/nav_left"
+    	android:layout_width="58dp"
+    	android:layout_height="58dp"
+    	android:layout_toLeftOf="@id/nav_enter"
+    	android:layout_alignTop="@id/nav_enter"
+    	android:layout_centerInParent="true"
+    	android:scaleType="fitCenter"
+    	android:focusable="false"
+    	android:src="@drawable/left"/>
+    
+    <ImageButton android:id="@+id/nav_right"
+    	android:layout_width="58dp"
+    	android:layout_height="58dp"
+    	android:layout_toRightOf="@id/nav_enter"
+    	android:layout_alignTop="@id/nav_enter"
+    	android:scaleType="fitCenter"
+    	android:focusable="false"
+    	android:src="@drawable/right"/>
+    	
+    <ImageButton android:id="@+id/nav_down"
+    	android:layout_width="58dp"
+    	android:layout_height="58dp"
+    	android:layout_alignLeft="@id/nav_enter"
+    	android:layout_below="@id/nav_enter"
+    	android:scaleType="fitCenter"
+    	android:focusable="false"
+    	android:src="@drawable/down"/>
+
    	<TextView android:id="@+id/nav_item"
    		android:layout_width="fill_parent"
    		android:layout_height="wrap_content"
@@ -78,5 +80,5 @@
    		android:focusable="false"
    		android:textColor="@color/light_grey_text"
    		android:textSize="20sp"/>
-
+	
 </RelativeLayout>
