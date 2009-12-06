@@ -17,8 +17,8 @@
     	android:src="@drawable/back"/>
 
     <ImageButton android:id="@+id/nav_up"
-    	android:layout_width="58dp"
-    	android:layout_height="58dp"
+    	android:layout_width="72dp"
+    	android:layout_height="72dp"
     	android:layout_below="@id/nav_back"
     	android:layout_centerHorizontal="true"
     	android:layout_marginTop="28dp"
@@ -27,8 +27,8 @@
     	android:src="@drawable/up"/>
     	
    	<ImageButton android:id="@+id/nav_enter"
-    	android:layout_width="58dp"
-    	android:layout_height="58dp"
+    	android:layout_width="72dp"
+    	android:layout_height="72dp"
     	android:layout_alignLeft="@id/nav_up"
     	android:layout_below="@id/nav_up"
     	android:scaleType="fitCenter"
@@ -36,8 +36,8 @@
     	android:src="@drawable/btn_dial"/>
    	
    	<ImageButton android:id="@+id/nav_left"
-    	android:layout_width="58dp"
-    	android:layout_height="58dp"
+    	android:layout_width="72dp"
+    	android:layout_height="72dp"
     	android:layout_toLeftOf="@id/nav_enter"
     	android:layout_alignTop="@id/nav_enter"
     	android:layout_centerInParent="true"
@@ -46,8 +46,8 @@
     	android:src="@drawable/left"/>
     
     <ImageButton android:id="@+id/nav_right"
-    	android:layout_width="58dp"
-    	android:layout_height="58dp"
+    	android:layout_width="72dp"
+    	android:layout_height="72dp"
     	android:layout_toRightOf="@id/nav_enter"
     	android:layout_alignTop="@id/nav_enter"
     	android:scaleType="fitCenter"
@@ -55,8 +55,8 @@
     	android:src="@drawable/right"/>
     	
     <ImageButton android:id="@+id/nav_down"
-    	android:layout_width="58dp"
-    	android:layout_height="58dp"
+    	android:layout_width="72dp"
+    	android:layout_height="72dp"
     	android:layout_alignLeft="@id/nav_enter"
     	android:layout_below="@id/nav_enter"
     	android:scaleType="fitCenter"
