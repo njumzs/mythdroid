@@ -51,7 +51,7 @@ public class MythDroid extends MDListActivity implements
     /** Debug? */
     final public static boolean debug = false;
     /** Backend protocol version */
-    final public static int protoVersion  = 40;
+    public static int protoVersion  = 0;
     /** A BackendManager representing a connected backend */
     public static BackendManager  beMgr  = null;
     /** A FrontendManager representing a connected frontend */

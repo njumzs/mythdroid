@@ -53,9 +53,9 @@ public class Media extends MDListActivity implements
         final String action = (String)list.getItemAtPosition(pos);
         Class<?> activity = null;
 
-        if      (action.equals(Messages.getString("Media.0")))      activity = Videos.class;
-        else if (action.equals(Messages.getString("Media.1")))       activity = MusicRemote.class;
-        else if (action.equals(Messages.getString("Media.2")))    activity = Gallery.class;
+        if      (action.equals(Messages.getString("Media.0")))  activity = Videos.class;
+        else if (action.equals(Messages.getString("Media.1")))  activity = MusicRemote.class;
+        else if (action.equals(Messages.getString("Media.2")))  activity = Gallery.class;
         
         startActivity(
             new Intent().setClass(this, activity)

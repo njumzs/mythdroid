@@ -58,8 +58,8 @@ public class MDDManager {
             
             String line;
             
-            Looper.prepare();
-            Looper.loop();
+            //Looper.prepare();
+            //Looper.loop();
             
             while (cmgr.isConnected()) {
                 

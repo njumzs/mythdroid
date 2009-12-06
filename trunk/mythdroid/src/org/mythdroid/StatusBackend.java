@@ -45,6 +45,8 @@ public class StatusBackend extends Activity {
         NodeList nodes = info.getChildNodes();
         int numNodes = nodes.getLength();
         String name = null;
+        String stotal = "Unknown", sused = "Unknown", sfree = "Unknown";
+        NamedNodeMap attr = null;
 
         for (int i = 0; i < numNodes; i++) {
             Node node = nodes.item(i);
@@ -58,19 +60,46 @@ public class StatusBackend extends Activity {
                 GuideNode = node;
         }
 
-        NamedNodeMap attr = StorageNode.getAttributes();
-
+        if (MythDroid.protoVersion < 50) {
+            attr = StorageNode.getAttributes();
+            stotal = attr.getNamedItem("drive_total_total").getNodeValue();
+            sused = attr.getNamedItem("drive_total_used").getNodeValue();
+            sfree = attr.getNamedItem("drive_total_free").getNodeValue();
+        }
+        else {
+            NodeList storageNodes = StorageNode.getChildNodes();
+            int numSNodes = storageNodes.getLength();
+                        
+            for (int i = 0; i < numSNodes; i++) {
+                Node node = storageNodes.item(i);
+                name = node.getNodeName();
+                if (name == null) continue;
+                if (name.equals("Group")) {
+                    attr = node.getAttributes();
+                    if (
+                        attr.getNamedItem("dir")
+                            .getNodeValue()
+                            .equals("TotalDiskSpace")
+                    )
+                        break;
+                }
+            }
+            
+            if (attr != null) {
+                stotal = attr.getNamedItem("total").getNodeValue();
+                sused = attr.getNamedItem("used").getNodeValue();
+                sfree = attr.getNamedItem("free").getNodeValue();
+            }
+        }
+        
         ((TextView)findViewById(R.id.storage_total)).setText(
-           "Total: \t\t" + 
-           attr.getNamedItem("drive_total_total").getNodeValue() + " MB"
+            "Total: \t\t" + stotal + " MB"
         );
         ((TextView)findViewById(R.id.storage_used)).setText(
-            "Used: \t\t" +
-            attr.getNamedItem("drive_total_used").getNodeValue() + " MB"
+            "Used: \t\t" + sused + " MB"
         );
         ((TextView)findViewById(R.id.storage_free)).setText(
-            "Free: \t\t" +
-            attr.getNamedItem("drive_total_free").getNodeValue() + " MB"
+            "Free: \t\t" + sfree + " MB"
         );
 
         attr = LoadNode.getAttributes();

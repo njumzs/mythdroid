@@ -223,7 +223,8 @@ class Program {
     static final private int  
         TITLE = 0,      SUBTITLE = 1,   DESC = 2,   CATEGORY = 3,   CHANID = 4, 
         CHANNEL = 6,    PATH = 8,       START = 11, END = 12,       STATUS = 21,
-        RECSTART = 26,  RECEND = 27,    TYPE = 30,  TOTAL = 46;
+        RECSTART = 26,  RECEND = 27,    TYPE = 30,  
+        TOTAL = MythDroid.protoVersion < 50 ? 46 : 47;
 
     /** Strings representing the relevant field */
     public String    Title, SubTitle, Category, Description, Channel, Path;
