@@ -50,6 +50,22 @@ public class BackendManager {
     
     private String  statusURL = null;
     private ConnMgr cmgr      = null;
+    
+    private enum protoVer {
+        FIXES21 (40),
+        FIXES22 (50),
+        TRUNK   (52);
+        
+        int ver;
+        
+        private protoVer(int ver) {
+            this.ver = ver;
+        }
+        
+        public int ver() {
+            return ver;
+        }
+    }
 
     /**
      * Constructor
@@ -62,10 +78,8 @@ public class BackendManager {
 
         if (MythDroid.debug)
             Log.d("BackendManager", "Connecting to " + host + ":6543");
-        
-        cmgr = new ConnMgr(host, 6543);
-
-        if (!announce()) throw (new IOException("Backend rejected us"));
+       
+        if (!announce(host)) throw (new IOException("Backend rejected us"));
 
     }
 
@@ -220,13 +234,24 @@ public class BackendManager {
         cmgr.disconnect();
     }
   
-    private boolean announce() throws IOException {
+    private boolean announce(String host) throws IOException {
 
-        cmgr.sendString("MYTH_PROTO_VERSION " + MythDroid.protoVersion);
-        List<String> resp = cmgr.readStringList();
+        List<String> resp;
+        
+        for (protoVer p : protoVer.values()) {
+            
+            cmgr = new ConnMgr(host, 6543);
+        
+            cmgr.sendString("MYTH_PROTO_VERSION " + p.ver());
+            resp = cmgr.readStringList();
 
-        if (!resp.get(0).equals("ACCEPT")) return false;
-
+            if (resp.get(0).equals("ACCEPT")) {
+                MythDroid.protoVersion = p.ver();
+                break;
+            }
+            
+        }
+        
         cmgr.sendString("ANN Playback " + myAddr + " 0");
         resp = cmgr.readStringList();
 
