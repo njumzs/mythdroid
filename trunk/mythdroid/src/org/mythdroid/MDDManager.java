@@ -21,8 +21,6 @@ package org.mythdroid;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import android.os.Looper;
-
 interface MenuListener {
     public void onMenuItem(String menu, String item);
 }
@@ -58,9 +56,6 @@ public class MDDManager {
             
             String line;
             
-            //Looper.prepare();
-            //Looper.loop();
-            
             while (cmgr.isConnected()) {
                 
                 try {
@@ -68,8 +63,8 @@ public class MDDManager {
                 } catch (IOException e) { break; }
                 
                 if (
-                    menuListeners.isEmpty() && 
-                    musicListeners.isEmpty() &&
+                    menuListeners.isEmpty()    && 
+                    musicListeners.isEmpty()   &&
                     channelListeners.isEmpty() &&
                     !line.equals("DONE")
                 ) {

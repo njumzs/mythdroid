@@ -212,7 +212,7 @@ public class StatusJobs extends ListActivity {
             Job j = jobs.get(pos);
 
             vHolder.title.setText(j.program.Title);
-            vHolder.type.setText(j.type.msg);
+            vHolder.type.setText(j.type.msg());
             vHolder.details.setText(
                 "Started " + MythDroid.dispFmt.format(j.startTime) +
                 " on " + j.hostname
