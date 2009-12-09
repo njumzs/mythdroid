@@ -65,8 +65,10 @@ public class FrontendList extends ListActivity implements
         setListAdapter(
             new SimpleCursorAdapter(
                 this, R.layout.frontend_list_item, c, 
-                new String[] { "addr", "name" },
-                new int[] { R.id.fe_addr_text, R.id.fe_name_text }
+                new String[] { "addr", "name", "hwaddr" },
+                new int[] { 
+                    R.id.fe_addr_text, R.id.fe_name_text, R.id.fe_hwaddr_text 
+                }
             )
         );
 
@@ -123,15 +125,20 @@ public class FrontendList extends ListActivity implements
                 CharSequence addr = ((TextView)clickedView
                                         .findViewById(R.id.fe_addr_text))
                                         .getText();
+                CharSequence hwaddr = ((TextView)clickedView
+                                        .findViewById(R.id.fe_hwaddr_text))
+                                        .getText();
                 
                 ((EditText)dialog.findViewById(R.id.fe_name)).setText(name);
                 ((EditText)dialog.findViewById(R.id.fe_addr)).setText(addr);
+                ((EditText)dialog.findViewById(R.id.fe_hwaddr)).setText(hwaddr);
                 break;
                 
             case ADD_DIALOG:
                 
                 ((EditText)dialog.findViewById(R.id.fe_name)).setText("");
                 ((EditText)dialog.findViewById(R.id.fe_addr)).setText("");
+                ((EditText)dialog.findViewById(R.id.fe_hwaddr)).setText("");
                 break;
                 
         }
@@ -155,9 +162,11 @@ public class FrontendList extends ListActivity implements
                 
                 String name = ((EditText)feEditor.findViewById(R.id.fe_name))
                                   .getText().toString();
-
                 String addr = ((EditText)feEditor.findViewById(R.id.fe_addr))
                                   .getText().toString();
+                String hwaddr = ((EditText)
+                    feEditor.findViewById(R.id.fe_hwaddr))
+                            .getText().toString();
 
                 if (name.length() == 0 || addr.length() == 0) {
                     Util.err(ctx, Messages.getString("FrontendList.4"));
@@ -166,14 +175,14 @@ public class FrontendList extends ListActivity implements
                 }
 
                 if (rowID < 1) {
-                    if (!FrontendDB.insert(this, name, addr))
+                    if (!FrontendDB.insert(this, name, addr, hwaddr))
                         Util.err(
                             ctx, Messages.getString("FrontendList.5") + name
                         );
                 }
                 
                 else
-                    FrontendDB.update(this, rowID, name, addr);
+                    FrontendDB.update(this, rowID, name, addr, hwaddr);
 
                 break;
                 

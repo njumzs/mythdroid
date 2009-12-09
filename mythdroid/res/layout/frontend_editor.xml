@@ -40,6 +40,20 @@
 			android:singleLine="true"
 			android:layout_marginTop="10dp"/>
 		
+		<TextView 
+			android:text="MAC Address:"
+			android:textSize="20sp" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:layout_marginTop="15dp"/>
+		
+		<EditText 
+			android:text="" 
+			android:id="@+id/fe_hwaddr" 
+			android:layout_width="fill_parent" 
+			android:layout_height="wrap_content"
+			android:singleLine="true"
+			android:layout_marginTop="10dp"/>
 	</LinearLayout>
 	
 </ScrollView>
