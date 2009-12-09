@@ -180,7 +180,7 @@ public abstract class MDActivity extends Activity {
 
     }
     
-    /** Create a dialog allowing user to choose default frontend */
+    /** Create a dialog allowing user to wake a frontend */
     public static Dialog wakeFrontend(final Context ctx) {
 
         final SimpleCursorAdapter ca = new SimpleCursorAdapter(
