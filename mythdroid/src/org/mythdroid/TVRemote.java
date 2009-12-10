@@ -173,9 +173,7 @@ public class TVRemote extends Remote {
             
             try {
                 if (livetv) {
-                	if (!feMgr.getLoc().livetv) {
-                		feMgr.jumpTo("livetv"); //$NON-NLS-1$
-                	}
+                    feMgr.jumpTo("livetv"); //$NON-NLS-1$
                     if (!feMgr.getLoc().livetv) {
                         Util.posterr(ctx, Messages.getString("TVRemote.1"));
                         done();

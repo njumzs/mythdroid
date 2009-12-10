@@ -24,17 +24,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 import android.util.Log;
 
@@ -58,28 +50,21 @@ public class BackendManager {
     
     private String  statusURL = null;
     private ConnMgr cmgr      = null;
-  
+
     /**
      * Constructor
      * @param host - the backend address
      * @return An initialised BackendManager 
      */
-    public BackendManager(final String host) throws Exception {
+    public BackendManager(final String host) throws IOException {
 
         statusURL = "http://" + host + ":6544";
-       
-
-        MythDroid.protoVersion = getVersion(statusURL);
 
         if (MythDroid.debug)
-            Log.d(
-                "BackendManager", 
-                "Connecting to " + host + 
-                ":6543 (ProtoVer " + MythDroid.protoVersion +")"
-             );
+            Log.d("BackendManager", "Connecting to " + host + ":6543");
         
         cmgr = new ConnMgr(host, 6543);
-               
+
         if (!announce()) throw (new IOException("Backend rejected us"));
 
     }
@@ -88,7 +73,7 @@ public class BackendManager {
      * Find a nearby master backend
      * @return An initialised BackendManager or null if we couldn't find one
      */
-    static public BackendManager locate() throws Exception {
+    static public BackendManager locate() throws IOException {
 
         final InetSocketAddress isa = new InetSocketAddress(1900);
         final DatagramSocket sock = new DatagramSocket(null);
@@ -234,27 +219,6 @@ public class BackendManager {
         cmgr.sendString("DONE");
         cmgr.disconnect();
     }
-    
-    private int getVersion(String sURL) throws Exception {
-        
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        URL url = new URL(sURL + "/xml");
-        Document doc;
-        
-        try {
-            doc = dbf.newDocumentBuilder().parse(
-                url.openConnection().getInputStream()
-            );
-        } catch (SAXException e) {
-            throw new Exception(Messages.getString("Status.10"));
-        }
-        
-        Node status = doc.getElementsByTagName("Status").item(0);
-        NamedNodeMap attr = status.getAttributes();
-        return Integer.parseInt(attr.getNamedItem("protoVer").getNodeValue());
-        
-    }
-
   
     private boolean announce() throws IOException {
 
@@ -262,7 +226,7 @@ public class BackendManager {
         List<String> resp = cmgr.readStringList();
 
         if (!resp.get(0).equals("ACCEPT")) return false;
-        
+
         cmgr.sendString("ANN Playback " + myAddr + " 0");
         resp = cmgr.readStringList();
 

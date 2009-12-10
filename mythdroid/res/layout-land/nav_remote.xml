@@ -7,49 +7,52 @@
     android:padding="8dp"
     android:background="@drawable/metal">
     
-       	<ImageButton android:id="@+id/nav_left"
+    <ImageButton android:id="@+id/nav_right"
     	android:layout_width="72dp"
     	android:layout_height="72dp"
-    	android:layout_toRightOf="@id/nav_back"
-    	android:layout_below="@id/nav_back"
-    	android:layout_marginTop="12dp"
-    	android:layout_marginLeft="16dp"
+    	android:layout_alignParentRight="true"
+    	android:layout_centerVertical="true"
+    	android:layout_marginRight="24dp"
     	android:scaleType="fitCenter"
     	android:focusable="false"
-    	android:src="@drawable/left"/>
-    	
+    	android:src="@drawable/right"/>
+    
     <ImageButton android:id="@+id/nav_enter"
     	android:layout_width="72dp"
     	android:layout_height="72dp"
-    	android:layout_toRightOf="@id/nav_left"
-    	android:layout_alignTop="@id/nav_left"
+    	android:layout_toLeftOf="@id/nav_right"
+    	android:layout_alignTop="@id/nav_right"
+    	android:layout_marginLeft="20dp"
+    	android:layout_marginRight="20dp"
+    	android:layout_marginBottom="20dp"
     	android:scaleType="fitCenter"
     	android:focusable="false"
     	android:src="@drawable/btn_dial"/>
-    	
+    
     <ImageButton android:id="@+id/nav_up"
     	android:layout_width="72dp"
     	android:layout_height="72dp"
     	android:layout_above="@id/nav_enter"
     	android:layout_alignLeft="@id/nav_enter"
-     	android:scaleType="fitCenter"
-     	android:focusable="false"
+    	android:layout_marginBottom="20dp"
+    	android:scaleType="fitCenter"
+    	android:focusable="false"
     	android:src="@drawable/up"/>
-  
-    <ImageButton android:id="@+id/nav_right"
+    
+    <ImageButton android:id="@+id/nav_left"
     	android:layout_width="72dp"
     	android:layout_height="72dp"
-    	android:layout_toRightOf="@id/nav_enter"
+    	android:layout_toLeftOf="@id/nav_enter"
     	android:layout_alignTop="@id/nav_enter"
     	android:scaleType="fitCenter"
     	android:focusable="false"
-    	android:src="@drawable/right"/>
-    	
+    	android:src="@drawable/left"/>
+    
     <ImageButton android:id="@+id/nav_down"
     	android:layout_width="72dp"
     	android:layout_height="72dp"
-    	android:layout_alignLeft="@id/nav_enter"
     	android:layout_below="@id/nav_enter"
+    	android:layout_alignLeft="@id/nav_enter"
     	android:scaleType="fitCenter"
     	android:focusable="false"
     	android:src="@drawable/down"/>

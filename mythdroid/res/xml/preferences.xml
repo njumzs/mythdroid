@@ -2,7 +2,7 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/settings">
+    <PreferenceCategory android:title="@string/host_prefs">
     
     	<EditTextPreference
     		android:key="backend"
@@ -20,18 +20,6 @@
     				android:targetPackage="org.mythdroid"/>
     				
     	</PreferenceScreen>
-    	
-    	<CheckBoxPreference
-    		android:key="osdCalls"
-    		android:title="Show calls on OSD"
-    		android:summary="Show calls on the MythTV OSD"
-    		android:defaultValue="true"/>
-    		
-    	<CheckBoxPreference
-    		android:key="osdSMS"
-    		android:title="Show SMS on OSD"
-    		android:summary="Show SMS on the MythTV OSD"
-    		android:defaultValue="true"/>
     	
     </PreferenceCategory>
     

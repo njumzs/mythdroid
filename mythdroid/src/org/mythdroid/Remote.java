@@ -21,12 +21,9 @@ package org.mythdroid;
 import java.io.IOException;
 
 import android.app.Activity;
-import android.media.AudioManager;
-import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.GestureDetector.SimpleOnGestureListener;
@@ -187,25 +184,6 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     }
 
     @Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-    }
-    
-    @Override
-	public void onOptionsMenuClosed(Menu menu) {
-		super.onOptionsMenuClosed(menu);
-		setVolumeControlStream(AudioManager.STREAM_MUSIC);
-	}
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		final boolean onPrepareOptionsMenu = super.onPrepareOptionsMenu(menu);
-		setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
-		return onPrepareOptionsMenu;
-	}
-
-	@Override
     public boolean onTouchEvent(MotionEvent me) {
         if (gDetector != null && gDetector.onTouchEvent(me)) 
             return true;
@@ -259,14 +237,6 @@ public abstract class Remote extends Activity implements View.OnClickListener {
                 case KeyEvent.KEYCODE_SHIFT_RIGHT:
                     shift = !shift;
                     break;
-                case KeyEvent.KEYCODE_VOLUME_UP:
-					feMgr.sendKey(Key.VOL_UP);
-					feMgr.sendKey(Key.VOL_UP);
-					break;
-                case KeyEvent.KEYCODE_VOLUME_DOWN:
-					feMgr.sendKey(Key.VOL_DOWN);
-					feMgr.sendKey(Key.VOL_DOWN);
-					break;
                 default:
                     int meta = (alt ? KeyEvent.META_ALT_ON : 0);
                     meta |= (shift ? KeyEvent.META_SHIFT_ON : 0);

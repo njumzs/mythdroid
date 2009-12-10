@@ -28,10 +28,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class FrontendDB {
 
     /** ints representing the columns of ID, ADDR and NAME */
-    final public static int     ID = 0, ADDR = 1, NAME = 2, HWADDR = 3;
+    final public static int     ID = 0, ADDR = 1, NAME = 2;
 
     final private static String DB_NAME        = "MythDroid.db";
-    final private static int    DB_VERSION     = 3;
+    final private static int    DB_VERSION     = 2;
     final private static String FRONTEND_TABLE = "frontends";
 
     private static SQLiteDatabase db             = null;
@@ -47,7 +47,7 @@ public class FrontendDB {
             db.execSQL(
                 "CREATE TABLE " + FRONTEND_TABLE +
                 " (_id INTEGER PRIMARY KEY AUTOINCREMENT" +
-                ", addr TEXT, name TEXT, hwaddr TEXT);"
+                ", addr TEXT, name TEXT);"
             );
         }
 
@@ -67,7 +67,7 @@ public class FrontendDB {
     public static Cursor getFrontends(Context ctx) {
         if (db == null) initDB(ctx);
         return db.rawQuery(
-            "SELECT _id, addr, name, hwaddr from " + FRONTEND_TABLE, null
+            "SELECT _id, addr, name from " + FRONTEND_TABLE, null
         );
 
     }
@@ -80,14 +80,13 @@ public class FrontendDB {
      * @return true if successful, 
      * false if a frontend with that name already existed
      */
-    public static boolean insert(Context ctx, String name, String addr, String hwaddr) {
+    public static boolean insert(Context ctx, String name, String addr) {
 
         if (db == null) initDB(ctx);
 
         final ContentValues cv = new ContentValues();
         cv.put("addr", addr.trim());
         cv.put("name", name.trim());
-        cv.put("hwaddr", hwaddr != null ? hwaddr.trim() : null);
 
         Cursor c = db.rawQuery(
             "SELECT _id from " + FRONTEND_TABLE + " WHERE name = ?", 
@@ -110,14 +109,13 @@ public class FrontendDB {
      * @param name - new name of frontend
      * @param addr - new address of frontend
      */
-    public static void update(Context ctx, long id, String name, String addr, String hwaddr) {
+    public static void update(Context ctx, long id, String name, String addr) {
 
         if (db == null) initDB(ctx);
 
         final ContentValues cv = new ContentValues();
         cv.put("addr", addr.trim());
         cv.put("name", name.trim());
-        cv.put("hwaddr", hwaddr != null ? hwaddr.trim() : null);
         db.update(
             FRONTEND_TABLE, cv, "_id = ?", new String[] { String.valueOf(id) }
         );

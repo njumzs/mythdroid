@@ -41,8 +41,7 @@ import android.widget.SimpleCursorAdapter;
 public abstract class MDListActivity extends ListActivity {
 
     /** A frontend chooser dialog */
-    final protected static int 
-        FRONTEND_CHOOSER = -1, DIALOG_LOAD = -2, WAKE_FRONTEND = -3;
+    final protected static int FRONTEND_CHOOSER = -1, DIALOG_LOAD = -2;
     final protected Context ctx = this;
     
     /** 
@@ -111,27 +110,6 @@ public abstract class MDListActivity extends ListActivity {
                 d.setOnCancelListener(cancelListener);
 
                 return d;
-                
-            case WAKE_FRONTEND:
-                final Dialog w = wakeFrontend(this);
-                
-                if (w == null)
-                    return new AlertDialog.Builder(this)
-                        .setTitle(R.string.error)
-                        .setMessage(R.string.no_fes)
-                        .setPositiveButton(R.string.ok, 
-                            new OnClickListener() {
-                                @Override
-                                public void onClick(
-                                    DialogInterface dialog, int which
-                                ) {
-                                    dialog.dismiss();
-                                }
-                            }
-                        )
-                        .create();
-                
-                return w;
 
             case DIALOG_LOAD:
                 final ProgressDialog prog = new ProgressDialog(this);
@@ -176,36 +154,6 @@ public abstract class MDListActivity extends ListActivity {
             )
             .setIcon(drawable.ic_menu_upload_you_tube)
             .setTitle(R.string.ch_fe)
-            .create();
-
-    }
-    
-    /** Create a dialog allowing user to wake a frontend */
-    public static Dialog wakeFrontend(final Context ctx) {
-
-        final SimpleCursorAdapter ca = new SimpleCursorAdapter(
-            ctx, R.layout.simple_list_item_1, FrontendDB.getFrontends(ctx),
-            new String[] { "name" }, new int[] { id.text1 }
-        );
-
-        if (ca.getCount() < 1) return null;
-
-        return new AlertDialog.Builder(ctx)
-            .setAdapter(ca,
-                new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Cursor c = ca.getCursor();
-                        c.moveToPosition(which);
-                        try {
-                            new WakeOnLan(c.getString(FrontendDB.HWADDR));
-                        } catch (Exception e) { Util.posterr(ctx, e); }
-                        dialog.dismiss();
-                    }
-                }
-            )
-            .setIcon(drawable.ic_lock_power_off)
-            .setTitle(R.string.wake_fe)
             .create();
 
     }

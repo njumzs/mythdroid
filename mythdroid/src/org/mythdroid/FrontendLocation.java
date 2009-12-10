@@ -59,8 +59,10 @@ public class FrontendLocation {
 
         if (niceLocation == null)
             niceLocation = "Unknown";
+
         else if (loc.equals("playmusic")) 
             music = true;
+        
         else if (loc.equals("musicplaylists"))
             musiceditor = true;
         

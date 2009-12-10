@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TimeZone;
+
 import android.R.drawable;
 import android.R.layout;
 import android.app.AlertDialog;
@@ -50,7 +51,7 @@ public class MythDroid extends MDListActivity implements
     /** Debug? */
     final public static boolean debug = false;
     /** Backend protocol version */
-    public static int protoVersion  = 0;
+    final public static int protoVersion  = 40;
     /** A BackendManager representing a connected backend */
     public static BackendManager  beMgr  = null;
     /** A FrontendManager representing a connected frontend */
@@ -88,7 +89,7 @@ public class MythDroid extends MDListActivity implements
         DONTJUMP = "DONTJUMP",  GUIDE = "GUIDE";
 
     final private static int 
-        MENU_SETTINGS = 0, MENU_FRONTEND = 1, MENU_NAV = 2, MENU_WAKE = 3;
+        MENU_SETTINGS = 0, MENU_FRONTEND = 1, MENU_NAV = 2;
 
     final private static int DIALOG_GUIDE  = 0, PREFS_CODE    = 0;
 
@@ -294,8 +295,6 @@ public class MythDroid extends MDListActivity implements
         	.setIcon(drawable.ic_menu_preferences);
         menu.add(Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.set_def_fe)
             .setIcon(drawable.ic_menu_upload_you_tube);
-        menu.add(Menu.NONE, MENU_WAKE, Menu.NONE, R.string.wake_fe)
-            .setIcon(drawable.ic_lock_power_off);
         menu.add(Menu.NONE, MENU_NAV, Menu.NONE, R.string.remote)
         	.setIcon(drawable.ic_menu_compass);
         return true;
@@ -312,9 +311,6 @@ public class MythDroid extends MDListActivity implements
                 return true;
             case MENU_FRONTEND:
                 showDialog(FRONTEND_CHOOSER);
-                return true;
-            case MENU_WAKE:
-                showDialog(WAKE_FRONTEND);
                 return true;
             case MENU_NAV:
                 startActivity(new Intent().setClass(this, NavRemote.class));
@@ -415,10 +411,10 @@ public class MythDroid extends MDListActivity implements
                 if (beMgr == null && backend.length() > 0) 
                     try {
                         beMgr = new BackendManager(backend);
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         Util.posterr(ctx, e);
                         beMgr = null;
-                    } 
+                    }
 
                     if (beMgr == null) {
                         ((TextView)findViewById(R.id.emptyMsg))
@@ -444,7 +440,7 @@ public class MythDroid extends MDListActivity implements
                     // Auto locate a master backend
                     try {
                         beMgr = BackendManager.locate();
-                    } catch (Exception e) { Util.posterr(ctx, e); }
+                    } catch (IOException e) { Util.posterr(ctx, e); }
                 
                     handler.post(found);
                 }
