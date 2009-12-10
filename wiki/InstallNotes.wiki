@@ -2,20 +2,9 @@
 
 ==MythTV Version==
 
-!MythDroid currently supports the MythTV 0.21-fixes branch. 
-
-==Program Guide Patch==
-
-For the program guide viewer to function correctly, you must apply [http://mythdroid.googlecode.com/files/xml-guide.patch this patch] to the MythTV 0.21 fixes source code.
-
-Once you have checked out a copy of release-0-21-fixes, apply the patch like so:
-
-{{{
-cd /path/to/release-0-21-fixes
-patch -p1 < xml-guide.patch
-}}}
-
-and then follow the normal steps to configure, build and install MythTV.
+!MythDroid 0.2 supports MythTV 0.21.
+<br>
+!MythDroid trunk supports 0.21, 0.22 and MythTV trunk.
 
 ==MythTV Configuration==
 
@@ -38,8 +27,32 @@ For mdd to function, you must ensure that the following settings in the LCD page
  * Display music artist and title (items = Artist - Title) 
  * Display channel information
 
+==MythTV 0.21 Specific Notes==
+
+For the program guide viewer to function correctly, you must apply [http://mythdroid.googlecode.com/files/xml-guide.patch this patch] to the MythTV 0.21 fixes source code.
+
+Once you have checked out a copy of release-0-21-fixes, apply the patch like so:
+
+{{{
+cd /path/to/release-0-21-fixes
+patch -p1 < xml-guide.patch
+}}}
+
+and then follow the normal steps to configure, build and install MythTV.
+
 mdd will check these settings during installation and let you know if you need to take action.
+
+==MythTV >= 0.22 Specific Notes==
+
+MythTV >= 0.22 currently has some bugs in the network control feature. Apply [http://mythdroid.googlecode.com/files/mythtv-netcontrol.patch this patch] so that !MythDroid is able to initiate recording playback properly.
 
 ==Installation==
 
-You can install !MythDroid to your device either by checking out the source code (via Eclipse with the [http://subclipse.tigris.org/ SubClipse] and [http://developer.android.com/sdk/1.5_r3/installing.html#installingplugin Android ADT] plugins), connecting your device and running !MythDroid on it or by downloading the latest [http://mythdroid.googlecode.com/files/MythDroid-0.2.apk MythDroid APK] and using adb (from the Android SDK) or an application from the Android Market to install it.
+==== !MythDroid trunk ====
+
+You can install !MythDroid trunk to your device by checking out the source code (via Eclipse with the [http://subclipse.tigris.org/ SubClipse] and [http://developer.android.com/sdk/installing.html Android ADT] plugins), connecting your device and running !MythDroid on it. The subversion URL for trunk is http://mythdroid.googlecode.com/svn/trunk/ mythdroid-read-only
+
+
+==== !MythDroid 0.2 ====
+
+Download the [http://mythdroid.googlecode.com/files/MythDroid-0.2.apk MythDroid APK] and install using adb (from the Android SDK) or an application from the Market. Alternatively check out the 0.2 source using subversion URL http://mythdroid.googlecode.com/svn/branches/0.2 mythdroid-read-only
