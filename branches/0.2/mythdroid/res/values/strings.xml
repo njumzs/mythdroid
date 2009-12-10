@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">MythDroid</string>
+	<string name="settings">Settings</string>
+	<string name="set_def_fe">Set Default Frontend</string>
+	<string name="host_prefs">Host Preferences</string>
+	<string name="no_be">No backends found</string>
+	<string name="no_be_detail">Configure one manually in settings perhaps?</string>
+	<string name="add_fe">Add a frontend</string>
+	<string name="click_add_fe">Click here to add a new frontend</string>
+	<string name="no_fes">No frontends are defined!</string>
+	<string name="ch_fe">Choose frontend</string>
+	<string name="ok">OK</string>
+	<string name="error">Error</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+	<string name="save">Save</string>
+	<string name="cancel">Cancel</string>
+	<string name="delete">Delete</string>
+	<string name="loading">Loading</string>
+	<string name="ch_start_date">Change Start Date</string>
+	<string name="ch_start_time">Change Start Time</string>
+	<string name="shuffle_mode">Shuffle Mode</string>
+	<string name="repeat_mode">Repeat Mode</string>
+	<string name="tog_vis">Toggle Visualiser</string>
+	<string name="chg_vis">Change Visualiser</string>
+	<string name="pl_edit">Playlist Editor</string>
+	<string name="osd_menu">OSD Menu</string>
+	<string name="leave_remote">Leave Remote</string>
+	<string name="halt_playback">Halt playback?</string>
+	<string name="disp_guide">Display Guide</string>
+	<string name="remote">Remote</string>
+	<string name="btn_iface">Button Interface</string>
+	<string name="gest_iface">Gesture Interface</string>
+	<string name="del_rec">Delete recording</string>
+	<string name="stop_rec">Stop recording</string>
+	<string name="sure">Are you sure?</string>
+	<string name="filter_rec">Filter recordings</string>
+	<string name="refresh">Refresh</string>
+	<string name="filter">Filter</string>
+	<string name="reset_filter">Reset Filter</string>
+</resources>
