@@ -3,7 +3,6 @@
         <string name="app_name">MythDroid</string>
         <string name="settings">Einstellungen</string>
         <string name="set_def_fe">Setze Standard Frontend</string>
-        <string name="host_prefs">Server Einstellungen</string>
         <string name="no_be">Keine Backends gefunden</string>
         <string name="no_be_detail">Einen manuell in den Einstellungen konfigurieren?</string>
         <string name="add_fe">Ein Frontend hinzufügen</string>

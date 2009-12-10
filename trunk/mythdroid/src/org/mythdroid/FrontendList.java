@@ -67,7 +67,7 @@ public class FrontendList extends ListActivity implements
                 this, R.layout.frontend_list_item, c, 
                 new String[] { "addr", "name", "hwaddr" },
                 new int[] { 
-                    R.id.fe_addr_text, R.id.fe_name_text, R.id.fe_hwaddr_text 
+                    R.id.fe_addr_text, R.id.fe_name_text, R.id.fe_hwaddr_text
                 }
             )
         );

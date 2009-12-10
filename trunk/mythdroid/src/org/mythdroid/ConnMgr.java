@@ -62,12 +62,14 @@ public class ConnMgr {
         } catch (SocketTimeoutException e) {
             throw (
                 new IOException(
-                    Messages.getString("ConnMgr.2") + host + ":" + port + Messages.getString("ConnMgr.4"))
+                    Messages.getString("ConnMgr.2") + host + ":" + port + 
+                        Messages.getString("ConnMgr.4"))
                 );
         } catch (IOException e) {
             throw (
                 new IOException(
-                    Messages.getString("ConnMgr.5") + host + ":" + port + Messages.getString("ConnMgr.7"))
+                    Messages.getString("ConnMgr.5") + host + ":" + port + 
+                        Messages.getString("ConnMgr.7"))
                 );
         }
 
