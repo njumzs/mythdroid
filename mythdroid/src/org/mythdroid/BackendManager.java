@@ -80,7 +80,8 @@ public class BackendManager {
         
         cmgr = new ConnMgr(host, 6543);
                
-        if (!announce()) throw (new IOException("Backend rejected us"));
+        if (!announce()) 
+            throw (new IOException(Messages.getString("BackendManager.0")));
 
     }
 
