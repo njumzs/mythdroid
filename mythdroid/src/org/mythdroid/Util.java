@@ -19,7 +19,11 @@
 package org.mythdroid;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.widget.Toast;
 
 final public class Util {
@@ -74,6 +78,29 @@ final public class Util {
                 }
             }
         );
+    }
+    
+    /**
+     * Create an error dialog that the user has to dismiss
+     * @param c - context
+     * @param msgId - ID for a String resource containing the error message
+     * @return - a Dialog
+     */
+    static public Dialog errDialog(final Context c, final int msgId) {
+        return new AlertDialog.Builder(c)
+        .setTitle(R.string.error)
+        .setMessage(msgId)
+        .setPositiveButton(R.string.ok, 
+            new OnClickListener() {
+                @Override
+                public void onClick(
+                    DialogInterface dialog, int which
+                ) {
+                    dialog.dismiss();
+                }
+            }
+        )
+        .create();
     }
     
 }

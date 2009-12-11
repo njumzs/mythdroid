@@ -227,7 +227,10 @@ public class MusicRemote extends Remote {
     @Override
     public void onResume() {
         super.onResume();
-        if((feMgr = MythDroid.connectFrontend(this)) == null) {
+        try {
+            feMgr = MythDroid.connectFrontend(this);
+        } catch (IOException e) {
+            Util.err(this, e);
             finish();
             return;
         }
