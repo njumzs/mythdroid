@@ -23,12 +23,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TimeZone;
 import android.R.drawable;
+import android.R.id;
 import android.R.layout;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,6 +44,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -90,7 +94,10 @@ public class MythDroid extends MDListActivity implements
     final private static int 
         MENU_SETTINGS = 0, MENU_FRONTEND = 1, MENU_NAV = 2, MENU_WAKE = 3;
 
-    final private static int DIALOG_GUIDE  = 0, PREFS_CODE    = 0;
+    final private static int 
+        DIALOG_GUIDE  = 0, WAKE_FRONTEND = 1;
+    
+    final private static int PREFS_CODE    = 0;
 
     /** Entries for the main menu list */
     final private static String[] MenuItems =
@@ -218,6 +225,7 @@ public class MythDroid extends MDListActivity implements
     public Dialog onCreateDialog(int id) {
 
         switch (id) {
+            
             case DIALOG_GUIDE:
                 return new AlertDialog.Builder(ctx)
                     .setIcon(drawable.ic_menu_upload_you_tube)
@@ -228,6 +236,15 @@ public class MythDroid extends MDListActivity implements
                         ), null
                     )
                     .create();
+            
+            case WAKE_FRONTEND:
+                final Dialog w = wakeFrontend();
+                
+                if (w == null)
+                    return Util.errDialog(ctx, R.string.no_fes);
+                
+                return w;
+                
             default:
                 return super.onCreateDialog(id);
 
@@ -330,6 +347,8 @@ public class MythDroid extends MDListActivity implements
     protected void onActivityResult(int reqCode, int resCode, Intent data) {
         super.onActivityResult(reqCode, resCode, data);
         getPreferences();
+        removeDialog(FRONTEND_CHOOSER);
+        removeDialog(WAKE_FRONTEND);
         if (beMgr == null) 
             findBackend();
     }
@@ -341,8 +360,9 @@ public class MythDroid extends MDListActivity implements
      * @param ctx - context
      * @return A FrontendManager connected to a frontend or null if there's a 
      * problem
+     * @throws IOException 
      */
-    public static FrontendManager connectFrontend(Context ctx) {
+    public static FrontendManager connectFrontend(Context ctx) throws IOException {
 
         String name = defaultFrontend;
 
@@ -364,33 +384,26 @@ public class MythDroid extends MDListActivity implements
             return null;
         }
 
-        try {
-            
-            c.moveToFirst();
+        c.moveToFirst();
 
-            if (name == null) {
-                name = c.getString(FrontendDB.NAME);
-                feMgr = new FrontendManager(name, c.getString(FrontendDB.ADDR));
-            }
-            
-            else {
-                while (!c.isAfterLast()) {
-                    String n = c.getString(FrontendDB.NAME);
-                    if (n.equals(name)) {
-                        feMgr = new FrontendManager(
-                            name, c.getString(FrontendDB.ADDR)
-                        );
-                        break;
-                    }
-                    c.moveToNext();
-                }
-            }
-            
-        } catch (IOException e) {
-            Util.err(ctx, e);
-            feMgr = null;
+        if (name == null) {
+            name = c.getString(FrontendDB.NAME);
+            feMgr = new FrontendManager(name, c.getString(FrontendDB.ADDR));
         }
-
+        
+        else {
+            while (!c.isAfterLast()) {
+                String n = c.getString(FrontendDB.NAME);
+                if (n.equals(name)) {
+                    feMgr = new FrontendManager(
+                        name, c.getString(FrontendDB.ADDR)
+                    );
+                    break;
+                }
+                c.moveToNext();
+            }
+        }
+        
         if (feMgr != null) 
             defaultFrontend = feMgr.name();
 
@@ -451,6 +464,36 @@ public class MythDroid extends MDListActivity implements
             }
        );
 
+    }
+    
+    /** Create a dialog allowing user to wake a frontend */
+    private Dialog wakeFrontend() {
+
+        final SimpleCursorAdapter ca = new SimpleCursorAdapter(
+            ctx, R.layout.simple_list_item_1, FrontendDB.getFrontends(ctx),
+            new String[] { "name" }, new int[] { id.text1 }
+        );
+
+        if (ca.getCount() < 1) return null;
+
+        return new AlertDialog.Builder(ctx)
+            .setAdapter(ca,
+                new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Cursor c = ca.getCursor();
+                        c.moveToPosition(which);
+                        try {
+                            new WakeOnLan(c.getString(FrontendDB.HWADDR));
+                        } catch (Exception e) { Util.err(ctx, e); }
+                        c.close();
+                        dialog.dismiss();
+                    }
+                }
+            )
+            .setIcon(drawable.ic_lock_power_off)
+            .setTitle(R.string.wake_fe)
+            .create();
     }
 
     private void getPreferences() {
