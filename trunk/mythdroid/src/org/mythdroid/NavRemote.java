@@ -103,7 +103,7 @@ public class NavRemote extends Remote implements View.OnClickListener {
         
         if (!calledByRemote) {
             try {
-                mddMgr = new MDDManager(MythDroid.beMgr.getAddress());
+                mddMgr = new MDDManager(MythDroid.feMgr.getAddress());
             } catch (IOException e) { mddMgr = null; }
             
             if (mddMgr != null) {
