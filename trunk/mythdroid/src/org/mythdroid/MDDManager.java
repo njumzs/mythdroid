@@ -86,6 +86,29 @@ public class MDDManager {
         }
     };
     
+    public static ArrayList<String> getCommands(String addr) throws IOException {
+        ConnMgr cmgr = new ConnMgr(addr, 16546);
+        ArrayList<String> cmds = new ArrayList<String>();
+        
+        String line = null;
+        
+        while (line == null || (!line.equals("DONE"))) {
+            line = cmgr.readLine();
+            if (!line.startsWith("COMMAND"))
+                continue;
+            cmds.add(line.substring(line.indexOf("COMMAND") + 8));
+        }
+        
+        cmgr.disconnect();
+        return cmds;
+    }
+    
+    public static void sendCommand(String addr, String cmd) throws IOException {
+        ConnMgr cmgr = new ConnMgr(addr, 16546);
+        cmgr.writeLine("COMMAND " + cmd);
+        cmgr.disconnect();
+    }
+    
     public MDDManager(String addr) throws IOException {
         cmgr = new ConnMgr(addr, 16546);
         new Thread(recvTask).start();
@@ -106,7 +129,7 @@ public class MDDManager {
     public void shutdown() throws IOException {
         cmgr.disconnect();
     }
-    
+  
     private void handleData(String line) {
         if (line.startsWith("MENU ")) 
             handleMenu(line);

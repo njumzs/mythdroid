@@ -92,10 +92,11 @@ public class MythDroid extends MDListActivity implements
         DONTJUMP = "DONTJUMP",  GUIDE = "GUIDE";
 
     final private static int 
-        MENU_SETTINGS = 0, MENU_FRONTEND = 1, MENU_NAV = 2, MENU_WAKE = 3;
+        MENU_SETTINGS = 0, MENU_FRONTEND = 1, MENU_NAV = 2,
+        MENU_WAKE = 3, MENU_MDD = 4;
 
     final private static int 
-        DIALOG_GUIDE  = 0, WAKE_FRONTEND = 1;
+        DIALOG_GUIDE  = 0, WAKE_FRONTEND = 1, MDD_COMMAND = 2;
     
     final private static int PREFS_CODE    = 0;
 
@@ -244,7 +245,15 @@ public class MythDroid extends MDListActivity implements
                     return Util.errDialog(ctx, R.string.no_fes);
                 
                 return w;
-                
+
+            case MDD_COMMAND:
+                final Dialog m = mddCommands();
+
+                if (m == null)
+                    return Util.errDialog(ctx, R.string.no_mddCmds);
+
+                return m;
+
             default:
                 return super.onCreateDialog(id);
 
@@ -315,6 +324,8 @@ public class MythDroid extends MDListActivity implements
             .setIcon(drawable.ic_lock_power_off);
         menu.add(Menu.NONE, MENU_NAV, Menu.NONE, R.string.remote)
         	.setIcon(drawable.ic_menu_compass);
+        menu.add(Menu.NONE, MENU_MDD, Menu.NONE, R.string.mddCmds)
+            .setIcon(drawable.ic_menu_agenda);
         return true;
     }
 
@@ -329,9 +340,13 @@ public class MythDroid extends MDListActivity implements
                 return true;
             case MENU_FRONTEND:
                 showDialog(FRONTEND_CHOOSER);
+                removeDialog(MDD_COMMAND);
                 return true;
             case MENU_WAKE:
                 showDialog(WAKE_FRONTEND);
+                return true;
+            case MENU_MDD:
+                showDialog(MDD_COMMAND);
                 return true;
             case MENU_NAV:
                 startActivity(new Intent().setClass(this, NavRemote.class));
@@ -494,6 +509,45 @@ public class MythDroid extends MDListActivity implements
             .setIcon(drawable.ic_lock_power_off)
             .setTitle(R.string.wake_fe)
             .create();
+    }
+    
+    private Dialog mddCommands() {
+
+        try {
+
+            final ArrayList<String> cmds = MDDManager.getCommands(
+                connectFrontend(ctx).getAddress()
+            );
+
+            if (cmds.isEmpty()) return null;
+
+            return new AlertDialog.Builder(ctx)
+                .setAdapter(
+                    new ArrayAdapter<String>(
+                        ctx, R.layout.simple_list_item_1, cmds
+                    ), 
+                    new OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                MDDManager.sendCommand(
+                                    feMgr.getAddress(),
+                                    cmds.get(which)
+                                );
+                            } catch (IOException e) { Util.posterr(ctx, e); }
+                            dialog.dismiss();
+                        }
+                    }
+                )
+                .setIcon(drawable.ic_menu_agenda)
+                .setTitle(R.string.mddCmd)
+                .create();
+
+        } catch (IOException e) { 
+            Util.err(ctx, e);
+            return null;
+        }
+        
     }
 
     private void getPreferences() {
