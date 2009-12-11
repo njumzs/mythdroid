@@ -31,7 +31,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-/** ListActivity, displays and lets user manage a list of frontends */
+/** ListActivity, displays, and lets the user manage, a list of frontends */
 public class FrontendList extends ListActivity implements
     DialogInterface.OnClickListener {
 

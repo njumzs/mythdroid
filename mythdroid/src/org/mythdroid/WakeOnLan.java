@@ -8,10 +8,14 @@ import android.util.Log;
 
 public class WakeOnLan {
 
-    private byte[] addr;
-    private byte[] buf = new byte [17 * 6];
+    static private byte[] addr;
+    static private byte[] buf = new byte [17 * 6];
     
-    public WakeOnLan(String hwaddr) throws Exception {
+    /**
+     * Send a wake on lan packet
+     * @param hwaddr - String containing the MAC address of the target
+     */
+    public static void Wake(String hwaddr) throws Exception {
         addr = parseAddr(hwaddr);
         for (int i = 0; i < 6; i++) 
             buf[i] = (byte)0xff;
@@ -33,7 +37,7 @@ public class WakeOnLan {
         sock.close();
     }
     
-    private byte[] parseAddr(String addr) throws IllegalArgumentException {
+    private static byte[] parseAddr(String addr) throws IllegalArgumentException {
         byte[] bytes = new byte[6];
         String[] hex = addr.split(":");
         if (hex.length != 6) 

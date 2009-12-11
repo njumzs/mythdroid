@@ -499,7 +499,7 @@ public class MythDroid extends MDListActivity implements
                         Cursor c = ca.getCursor();
                         c.moveToPosition(which);
                         try {
-                            new WakeOnLan(c.getString(FrontendDB.HWADDR));
+                            WakeOnLan.Wake(c.getString(FrontendDB.HWADDR));
                         } catch (Exception e) { Util.err(ctx, e); }
                         c.close();
                         dialog.dismiss();
@@ -530,7 +530,7 @@ public class MythDroid extends MDListActivity implements
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             try {
-                                MDDManager.sendCommand(
+                                MDDManager.mddCommand(
                                     feMgr.getAddress(),
                                     cmds.get(which)
                                 );

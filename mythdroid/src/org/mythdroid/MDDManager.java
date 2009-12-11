@@ -22,23 +22,53 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 interface MenuListener {
+    /**
+     * Called on receipt of MENU events
+     * @param menu - String containing the name of the menu
+     * @param item - String containing the currently selected item
+     */
     public void onMenuItem(String menu, String item);
 }
 
 interface MusicListener {
+    /**
+     * Called on receipt of MUSIC events
+     * @param artist - String containing the name of the artist
+     * @param album - String containing the name of the album
+     * @param track - String containing the name of the track
+     * @param artid - int representing the albumart id
+     */
     public void onMusic(
         String artist, String album, String track, int artid
     );
+    /**
+     * Called on receipt of MUSIC PROGRESS events
+     * @param pos - int representing the new position
+     */
     public void onProgress(int pos);
+    /**
+     * Called on MUSIC PLAYER PROPERTY events
+     * @param prop - String containing the name of the property
+     * @param value - int representing the property value
+     */
     public void onPlayerProp(String prop, int value);
 }
 
 interface ChannelListener {
+    /**
+     * Called on receipt of CHANNEL events
+     * @param channel - String containing the name of the channel
+     * @param title - String containing the title of the program
+     * @param subtitle - String containing the subtitle of the program
+     */
     public void onChannel(String channel, String title, String subtitle);
     public void onProgress(int pos);
     public void onExit();
 }
 
+/**
+ * Manage a connection to mdd
+ */
 public class MDDManager {
     
     private ConnMgr cmgr = null;
@@ -86,6 +116,11 @@ public class MDDManager {
         }
     };
     
+    /**
+     * Get a list of MDD commands from mdd
+     * @param addr - String containing address of frontend
+     * @return - ArrayList<String> containing names of MDD commands
+     */
     public static ArrayList<String> getCommands(String addr) throws IOException {
         ConnMgr cmgr = new ConnMgr(addr, 16546);
         ArrayList<String> cmds = new ArrayList<String>();
@@ -103,29 +138,53 @@ public class MDDManager {
         return cmds;
     }
     
-    public static void sendCommand(String addr, String cmd) throws IOException {
+    /**
+     * Send a MDD command to mdd
+     * @param addr - String containing address of frontend
+     * @param cmd - String containing the name of the MDD command
+     */
+    public static void mddCommand(String addr, String cmd) throws IOException {
         ConnMgr cmgr = new ConnMgr(addr, 16546);
         cmgr.writeLine("COMMAND " + cmd);
         cmgr.disconnect();
     }
     
+    /**
+     * Construct a new MDDManager
+     * @param addr - String containing address of frontend
+     */
     public MDDManager(String addr) throws IOException {
         cmgr = new ConnMgr(addr, 16546);
         new Thread(recvTask).start();
     }
     
+    /**
+     * Add a new listener for MENU events
+     * @param l - MenuListener
+     */
     public void setMenuListener(MenuListener l) {
         menuListeners.add(l);
     }
     
+    /**
+     * Add a new listener for MUSIC events
+     * @param l - MusicListener
+     */
     public void setMusicListener(MusicListener l) {
         musicListeners.add(l);
     }
     
+    /**
+     * Add a new listener for CHANNEL events
+     * @param l - ChannelListener
+     */
     public void setChannelListener(ChannelListener l) {
         channelListeners.add(l);
     }
     
+    /**
+     * Disconnect from mdd
+     */
     public void shutdown() throws IOException {
         cmgr.disconnect();
     }
