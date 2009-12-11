@@ -7,8 +7,14 @@ import android.provider.Contacts;
 import android.provider.Contacts.PeopleColumns;
 import android.telephony.PhoneNumberUtils;
 
+/** Utility methods for dealing with Contacts **/
 public final class PhoneUtil {
     
+    /**
+     * Get a contact id from a phone number
+     * @param ctx - Context
+     * @param number - String containing the phone number
+     */
     public static String idFromNumber(Context ctx, String number) {
         
         String id = null;
@@ -30,6 +36,11 @@ public final class PhoneUtil {
     
     }
     
+    /**
+     * Get a contact name from a contact id
+     * @param ctx - Context
+     * @param id - String containing the contact id
+     */
     public static String nameFromId(Context ctx, String id) {
         
         String name = null;
@@ -51,6 +62,11 @@ public final class PhoneUtil {
             
     }
     
+    /**
+     * Get a contact name from a phone number
+     * @param ctx - Context
+     * @param number - String containing the phone number
+     */
     public static String nameFromNumber(Context ctx, String number) {
      
         String id = idFromNumber(ctx, number);
