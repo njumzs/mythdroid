@@ -67,7 +67,7 @@ public class NavRemote extends Remote implements View.OnClickListener {
         super.onCreate(icicle);
         setupViews(gesture);
 
-        if (getIntent().hasExtra(MythDroid.GUIDE)) 
+        if (getIntent().hasExtra(Extras.GUIDE.toString())) 
             jumpGuide = true;
 
         String calledBy = null;
@@ -293,10 +293,10 @@ public class NavRemote extends Remote implements View.OnClickListener {
             else {
                 final Intent intent = 
                     new Intent().setClass(this, TVRemote.class)
-                                .putExtra(MythDroid.DONTJUMP, true);
+                                .putExtra(Extras.DONTJUMP.toString(), true);
                 
                 if (newLoc.livetv) 
-                    intent.putExtra(MythDroid.LIVETV, true);
+                    intent.putExtra(Extras.LIVETV.toString(), true);
                 startActivityForResult(intent, 0);
             }
         }
@@ -307,7 +307,7 @@ public class NavRemote extends Remote implements View.OnClickListener {
             startActivity(
                 new Intent()
                     .setClass(this, MusicRemote.class)
-                    .putExtra(MythDroid.DONTJUMP, true)
+                    .putExtra(Extras.DONTJUMP.toString(), true)
             );
         }
          

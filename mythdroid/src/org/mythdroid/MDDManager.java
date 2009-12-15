@@ -127,7 +127,7 @@ public class MDDManager {
         
         String line = null;
         
-        while (line == null || (!line.equals("DONE"))) {
+        while (line == null || (!line.equals("COMMANDS DONE"))) {
             line = cmgr.readLine();
             if (!line.startsWith("COMMAND"))
                 continue;
@@ -147,6 +147,26 @@ public class MDDManager {
         ConnMgr cmgr = new ConnMgr(addr, 16546);
         cmgr.writeLine("COMMAND " + cmd);
         cmgr.disconnect();
+    }
+    
+    public static ArrayList<Video> getVideos(String addr, String dir) throws IOException {
+        
+        ArrayList<Video> videos = new ArrayList<Video>();
+        ConnMgr cmgr = new ConnMgr(addr, 16546);
+        cmgr.writeLine("VIDEOLIST " + (dir == null ? "ROOT" : dir));
+        
+        String line = null;
+        
+        while (line == null || (!line.equals("VIDEOLIST DONE"))) {
+            line = cmgr.readLine();
+            if (!(line.startsWith("VIDEO ")||line.startsWith("DIRECTORY")))
+                continue;
+            videos.add(new Video(line));
+        }
+
+        cmgr.disconnect();
+        return videos;
+        
     }
     
     /**

@@ -70,6 +70,8 @@ public class MythDroid extends MDListActivity implements
 
     /** A Program representing the currently selected recording */
     public static Program curProg = null;
+    /** A Video representing the currently selected video */
+    public static Video curVid = null;
 
     /** SimpleDateFormat of yyyy-MM-dd'T'HH:mm:ss */
     final public static SimpleDateFormat dateFmt =
@@ -83,35 +85,29 @@ public class MythDroid extends MDListActivity implements
         dateFmt.setTimeZone(TimeZone.getDefault());
     }
 
-    /**
-     * Intent extras signifying LiveTV, a channel to jump to or to not jumpTo()
-     * (for TVRemote) and to jump to guidegrid (for NavRemote)
-     */
-    final public static String 
-        LIVETV = "LiveTV",      JUMPCHAN = "JUMPCHAN",
-        DONTJUMP = "DONTJUMP",  GUIDE = "GUIDE";
-
     final private static int 
         MENU_SETTINGS = 0, MENU_FRONTEND = 1, MENU_NAV = 2,
-        MENU_WAKE = 3, MENU_MDD = 4;
+        MENU_WAKE = 3,     MENU_MDD = 4;
 
     final private static int 
         DIALOG_GUIDE  = 0, WAKE_FRONTEND = 1, MDD_COMMAND = 2;
     
-    final private static int PREFS_CODE    = 0;
+    final private static int PREFS_CODE  = 0;
 
     /** Entries for the main menu list */
     final private static String[] MenuItems =
         { 
-    		Messages.getString("MythDroid.7"), 
-    		Messages.getString("MythDroid.8"), 
-    		Messages.getString("MythDroid.9"), 
-    		Messages.getString("MythDroid.10"), 
-    		Messages.getString("MythDroid.11") 
+    		Messages.getString("MythDroid.7"),    // Watch TV
+    		Messages.getString("MythDroid.8"),    // Recordings
+    		Messages.getString("MythDroid.12"),   // Videos
+    		Messages.getString("MythDroid.9"),    // Music
+    		Messages.getString("MythDroid.10"),   // Guide
+    		Messages.getString("MythDroid.11")    // Status
+    		
     	};
 
     /** ListAdapter containing the main menu entries */
-    private ArrayAdapter<String> menuAdapter   = null;
+    private ArrayAdapter<String> menuAdapter = null;
     private String backend = null;
     
     @Override
@@ -183,6 +179,8 @@ public class MythDroid extends MDListActivity implements
         	activity = TVRemote.class;
         else if (action.equals(Messages.getString("MythDroid.8")))
         	activity = Recordings.class;
+        else if (action.equals(Messages.getString("MythDroid.12")))
+            activity = Videos.class;
         else if (action.equals(Messages.getString("MythDroid.9")))
         	activity = MusicRemote.class;
         else if (action.equals(Messages.getString("MythDroid.10")))
@@ -191,7 +189,9 @@ public class MythDroid extends MDListActivity implements
         	activity = Status.class;
 
         startActivity(
-            new Intent().putExtra(LIVETV, true).setClass(this, activity)
+            new Intent().putExtra(
+                Extras.LIVETV.toString(), true
+            ).setClass(this, activity)
         );
 
     }
@@ -205,7 +205,7 @@ public class MythDroid extends MDListActivity implements
 
         if (action.equals(Messages.getString("MythDroid.7"))) {
             nextActivity = TVRemote.class;
-            setExtra(LIVETV);
+            setExtra(Extras.LIVETV.toString());
             showDialog(FRONTEND_CHOOSER);
         }
         
@@ -296,7 +296,7 @@ public class MythDroid extends MDListActivity implements
 
                     else if (item.equals(Messages.getString("MythDroid.23"))) {
                         nextActivity = NavRemote.class;
-                        setExtra(GUIDE);
+                        setExtra(Extras.GUIDE.toString());
                         showDialog(FRONTEND_CHOOSER);
                         return;
                     }
@@ -304,7 +304,7 @@ public class MythDroid extends MDListActivity implements
                     else {
                         startActivity(
                             new Intent()
-                                .putExtra(GUIDE, true)
+                                .putExtra(Extras.GUIDE.toString(), true)
                                 .setClass(ctx, NavRemote.class)
                         );
                         return;

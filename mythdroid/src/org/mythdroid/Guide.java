@@ -67,16 +67,13 @@ public class Guide extends MDActivity {
     final private static int MENU_DATE    = 0, MENU_TIME = 1;
     final private static int DIALOG_DATE  = 0, DIALOG_TIME = 1;
 
-    /** Change numHours to configure how many hours are displayed at a time
-     * Tweak colWidth to alter the visible width of the columns
-     * Tweak rowHeight to alter the visible height of rows 
-     */
+    /** Change numHours to configure how many hours are displayed at a time */
     final private static int
-        numHours = 2, colMins = 5,     colWidth = 40,      rowHeight = 60, 
-        hdrSpan = 6,  chanWidth = 100, numTimes = numHours * 60 / colMins;
-
+        numHours = 2,   colMins = 5,    hdrSpan = 6,
+        numTimes = numHours * 60 / colMins;
+    
     final private static int minutes = 60000, hours = 3600000;
-
+    
     private static Date now = null, later = null;
 
     final private Handler handler = new Handler();
@@ -93,9 +90,17 @@ public class Guide extends MDActivity {
         recordedIcon = null, willRecordIcon = null, failedIcon = null, 
         conflictIcon = null, otherIcon = null;
 
-    private String       hdrDate = null;
-    private TableLayout  tbl     = null;
-
+    private String      hdrDate = null;
+    private TableLayout tbl     = null;
+    
+    /** Scale factor for pixel values for different display densities */
+    private float       scale   = 1;
+    /**
+    * Tweak colWidth to alter the visible width of the columns
+    * Tweak rowHeight to alter the visible height of rows 
+    */   
+    private int         colWidth, rowHeight, chanWidth;
+    
     /** Get and sort the list of channels, add them to table in UI thread */
     final private Runnable getData = new Runnable() {
         @Override
@@ -142,8 +147,8 @@ public class Guide extends MDActivity {
             public void onClick(View v) {
             startActivity(
                 new Intent()
-                    .putExtra(MythDroid.LIVETV, true)
-                    .putExtra(MythDroid.JUMPCHAN,(Integer)v.getTag())
+                    .putExtra(Extras.LIVETV.toString(), true)
+                    .putExtra(Extras.JUMPCHAN.toString(),(Integer)v.getTag())
                     .setClass(ctx, TVRemote.class)
             );
         }
@@ -153,8 +158,8 @@ public class Guide extends MDActivity {
         new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                setExtra(MythDroid.LIVETV);
-                setExtra(MythDroid.JUMPCHAN, (Integer)v.getTag());
+                setExtra(Extras.LIVETV.toString());
+                setExtra(Extras.JUMPCHAN.toString(), (Integer)v.getTag());
                 nextActivity = TVRemote.class;
                 showDialog(FRONTEND_CHOOSER);
                 return true;
@@ -166,8 +171,13 @@ public class Guide extends MDActivity {
         
         super.onCreate(icicle);
         setContentView(R.layout.guide);
-
-        tbl = (TableLayout) findViewById(R.id.guide_table);
+        
+        scale = getResources().getDisplayMetrics().density;
+        colWidth  = (int)(40  * scale + 0.5f);  
+        rowHeight = (int)(60  * scale + 0.5f);
+        chanWidth = (int)(100 * scale + 0.5f);
+        
+        tbl = (TableLayout)findViewById(R.id.guide_table);
 
         rowLayout.topMargin = rowLayout.bottomMargin = chanLayout.topMargin =
             chanLayout.bottomMargin = chanLayout.leftMargin = 

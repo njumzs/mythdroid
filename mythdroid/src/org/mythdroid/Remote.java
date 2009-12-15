@@ -43,19 +43,24 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     /** Result codes for when a remote is startActivityForResult()'d */
     final protected int REMOTE_RESULT_FINISH = RESULT_FIRST_USER;
     
+    /** Scale factor for pixel values for different display densities */
+    private float scale = 1;
+    
     private boolean alt = false, shift = false;
     
     private GestureDetector gDetector;
     
     private class RemoteGestureListener extends SimpleOnGestureListener {
 
-        public float               scrollIntX           = 50, scrollIntY = 50;
+        public float scrollIntX = (int)(50 * scale + 0.5f), 
+                     scrollIntY = (int)(50 * scale + 0.5f);
 
+        final private float maxScrollSpeed = (float)(0.30 * scale + 0.5);
+        final private float minFlingSpeed  = (float)(360  * scale + 0.5);
+        final private float wobble         = (int)  (40   * scale + 0.5);
+        
         final private static int   SCROLL_LOCK_UNLOCKED = 0;
         final private static int   SCROLL_LOCK_X        = 1, SCROLL_LOCK_Y = 2;
-        final private static float maxScrollSpeed       = (float) 0.30;
-        final private static float minFlingSpeed        = (float) 360;
-        final private static float wobble               = 40;
         
         private MotionEvent        lastStart            = null;
         private float              scrollMul            = 1;
@@ -189,6 +194,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        scale = getResources().getDisplayMetrics().density;
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
     

@@ -220,7 +220,7 @@ public class MusicRemote extends Remote {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        jump = !getIntent().hasExtra(MythDroid.DONTJUMP);
+        jump = !getIntent().hasExtra(Extras.DONTJUMP.toString());
         defaultArt = getResources().getDrawable(R.drawable.mdmusic);
     }
     
