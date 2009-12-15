@@ -28,6 +28,7 @@ use IO::Select;
 use File::Copy;
 use Time::HiRes qw(usleep);
 use MythTV;
+use Sys::Hostname;
 
 sub killKids();
 sub cloneDb();
@@ -58,11 +59,19 @@ my $mythtv = MythTV->new(\{ 'connect' => 0 });
 
 install() unless ($0 =~ /mythlcdserver$/);
 
-my ($lastData, $lastMenu, $lastMusic, $lastChannel);
+my (
+    $lastData, $lastMenu, $lastMusic, $lastChannel, $data, $lcdClient, 
+    $client, $dbh, $albumartSth, $videoSth, $upnpVideoSth, $videoDir
+);
 my $lastPos = -1;
+my $size = 1024;
 
-my %forNewClient;
-my %commands;
+my (%forNewClient, %commands, %videos);
+my @videoFields = (
+    qw(
+        title subtitle director plot homepage year userrating length filename
+    )
+);
 
 readCommands();
 
@@ -90,9 +99,6 @@ my $s = IO::Select->new($lcdListen, $listen);
 my $lcdServer = connectLcdServer();
 $s->add($lcdServer);
     
-my ($data, $lcdClient, $client, $dbh, $albumartSth);
-my $size = 1024;
-
 # Connect to the database, prepare queries
 cloneDb();
 
@@ -121,7 +127,7 @@ while (my @ready = $s->can_read) {
                 foreach my $key (keys %commands) {
                     syswrite($client, "COMMAND $key\n");
                 }
-                syswrite($client, "DONE\n");
+                syswrite($client, "COMMANDS DONE\n");
                 # Send last LCD statuses 
                 foreach my $key (keys %forNewClient) {
                     syswrite($client, $forNewClient{$key});
@@ -148,6 +154,7 @@ while (my @ready = $s->can_read) {
             syswrite($lcdClient, $data);
         }
         elsif ($client && $fd == $client) {
+            $data =~ s/\r//;
             clientMsg($data);
         }
         else {
@@ -162,7 +169,6 @@ while (my @ready = $s->can_read) {
 sub cloneDb() {
 
     $dbh = $mythtv->{dbh};
-    $dbh->disconnect;
     $dbh = $dbh->clone;
 
     $albumartSth = $dbh->prepare(
@@ -170,7 +176,17 @@ sub cloneDb() {
         'LEFT JOIN music_songs ON music_albumart.directory_id ' .
         '= music_songs.directory_id LEFT JOIN music_albums on ' .
         'music_songs.album_id = music_albums.album_id WHERE ' .
-        "music_albums.album_name = ? and music_albumart.imagetype = 1"
+        'music_albums.album_name = ? and music_albumart.imagetype = 1'
+    );
+
+    $videoSth = $dbh->prepare(
+        'SELECT title, subtitle, director, plot, homepage, ' .
+        'year, userrating, length, filename FROM videometadata ' .
+        'where filename REGEXP ?'
+    );
+
+    $upnpVideoSth = $dbh->prepare(
+        'SELECT intid from upnpmedia where filepath = ?'
     );
 
 }
@@ -326,7 +342,7 @@ sub lcdMusic($) {
     my $msg = "MUSIC $artist ALBUM $album TRACK $track";
     
     unless ($albumartSth->execute($album)) {
-        clone_db();
+        cloneDb();
         $albumartSth->execute($album);
     }
 
@@ -376,7 +392,17 @@ sub lcdChannel($) {
 
     my ($chan, $title, $subtitle) = $data =~ /^"([^"]+)"\s+"([^"]+)"\s+"([^"]*)"$/;
 
-    my $msg = "CHANNEL $chan TITLE $title";
+    my $msg;
+
+    if ($chan) {
+        $msg = "CHANNEL $chan TITLE $title";
+    }
+    elsif ($title) {
+        $msg = "CHANNEL Video TITLE $title";
+    }
+    else {
+        return;
+    }
 
     $msg .= " SUBTITLE $subtitle" if $subtitle;
     
@@ -406,8 +432,11 @@ sub clientMsg($) {
 
     my $msg = shift;
 
-    if ($msg =~ /^COMMAND (.*)/) {
+    if ($msg =~ /^COMMAND (.*)$/) {
         runCommand($1);
+    }
+    elsif ($msg =~ /VIDEOLIST (.*)$/) {
+        videoList($1);
     }
 
 }
@@ -422,6 +451,62 @@ sub runCommand($) {
     }
 
     system($commands{$cmd});
+
+}
+
+sub videoList($) {
+
+    my $subdir = shift;
+
+    %videos = ();
+
+    unless ($videoDir) { 
+        $videoDir = $mythtv->backend_setting('VideoStartupDir', hostname());
+    }
+
+    my $regexp = "$videoDir/";
+
+    $regexp .= "$subdir/" unless ($subdir eq 'ROOT');
+
+    $regexp =~ s/'/\'/;
+
+    my @dirs = grep(
+        /\S+/, 
+        map { chomp; s/^$regexp//; $_ } `find -L '$regexp' -maxdepth 1 -type d`
+    );
+
+    $regexp .= '[^/]+$';
+    
+    unless ($videoSth->execute($regexp)) {
+        cloneDb();
+        $videoSth->execute($regexp);
+    }
+    
+    while (my $aref = $videoSth->fetchrow_arrayref) {
+        my $path = $aref->[8];
+        unless ($upnpVideoSth->execute($path)) {
+            cloneDb();
+            $upnpVideoSth->execute($path);
+        }
+        my $id = ($upnpVideoSth->fetchrow_arrayref)->[0];
+        my %h;
+        @h{@videoFields} = @$aref;
+        $videos{$id} = \%h;
+    }
+
+    foreach my $dir (@dirs) {
+        sendMsg("DIRECTORY $dir");
+    }
+
+    foreach my $id (keys %videos) {
+        my $msg = "VIDEO $id";
+        foreach my $f (
+            map { '||' . $videos{$id}{$_} } @videoFields
+        ) { $msg .= $f }
+        sendMsg($msg);
+    }
+
+    sendMsg("VIDEOLIST DONE");
 
 }
 
