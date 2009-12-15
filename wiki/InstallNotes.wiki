@@ -44,7 +44,7 @@ mdd will check these settings during installation and let you know if you need t
 
 ==MythTV >= 0.22 Specific Notes==
 
-MythTV >= 0.22 currently has some bugs in the network control feature. Apply [http://mythdroid.googlecode.com/files/myth-netcontrol.patch this patch] so that !MythDroid is able to initiate recording playback properly.
+MythTV >= 0.22 currently has some bugs in the network control feature. Apply [http://mythdroid.googlecode.com/files/myth-netcontrol-1.patch this patch] so that !MythDroid is able to initiate recording playback properly.
 
 ==Installation==
 
