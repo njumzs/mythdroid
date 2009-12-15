@@ -96,14 +96,16 @@ public class TVRemote extends Remote {
     final private Context    ctx          = this;
     private TextView         titleView    = null;
     private ProgressBar      pBar         = null;
-    private String           lastFilename = null,   lastTitle = null;
     private Timer            timer        = null;
-    private int              jumpChan     = -1,     lastProgress = 0;
+    private int              jumpChan     = -1,     lastProgress    = 0;
     private UpdateStatusTask updateStatus = null;
     private MDDManager       mddMgr       = null;
+    private String           lastFilename = null,   lastTitle       = null,   
+                             filename     = null,   videoTitle      = null;
+
 
     private boolean 
-        paused = false, livetv = false, jump = false, 
+        paused = false, livetv = false, jump = false,
         gesture = false, wasPaused = false;
 
     /** Run periodically to update title and progress bar */
@@ -173,9 +175,9 @@ public class TVRemote extends Remote {
             
             try {
                 if (livetv) {
-                	if (!feMgr.getLoc().livetv) {
-                		feMgr.jumpTo("livetv"); //$NON-NLS-1$
-                	}
+                	if (!feMgr.getLoc().livetv) 
+                		feMgr.jumpTo("livetv");
+                	
                     if (!feMgr.getLoc().livetv) {
                         Util.posterr(ctx, Messages.getString("TVRemote.1"));
                         done();
@@ -187,6 +189,8 @@ public class TVRemote extends Remote {
                         feMgr.playChan(jumpChan);
                     }
                 }
+                else if (filename != null)
+                    feMgr.playFile(filename);
                 else
                     feMgr.playRec(MythDroid.curProg);
             } catch (IOException e) {
@@ -204,6 +208,8 @@ public class TVRemote extends Remote {
         public void onChannel(
             final String channel, final String title, final String subtitle
         ) {
+            if (videoTitle != null)
+                return;
             handler.post(
                 new Runnable() { 
                     @Override
@@ -231,7 +237,8 @@ public class TVRemote extends Remote {
         
         @Override
         public void onExit() {
-            done();
+            if (feMgr != null && feMgr.isConnected())
+                done();
         }
         
     };
@@ -241,9 +248,15 @@ public class TVRemote extends Remote {
 
         super.onCreate(icicle);
 
-        livetv = getIntent().hasExtra(MythDroid.LIVETV);
-        jump = !getIntent().hasExtra(MythDroid.DONTJUMP);
-        jumpChan = getIntent().getIntExtra(MythDroid.JUMPCHAN, -1);
+        Intent intent = getIntent();
+        
+        livetv = intent.hasExtra(Extras.LIVETV.toString());
+        jump = !intent.hasExtra(Extras.DONTJUMP.toString());
+        if (intent.hasExtra(Extras.FILENAME.toString()))
+            filename = intent.getStringExtra(Extras.FILENAME.toString());
+        if (intent.hasExtra(Extras.TITLE.toString()))
+            videoTitle = intent.getStringExtra(Extras.TITLE.toString());
+        jumpChan = intent.getIntExtra(Extras.JUMPCHAN.toString(), -1);
         
         setResult(RESULT_OK);
         
@@ -617,7 +630,10 @@ public class TVRemote extends Remote {
             pBar.setVisibility(View.GONE);
         
         if (mddMgr != null) {
-            titleView.setText(lastTitle);    
+            if (videoTitle != null)
+                titleView.setText(videoTitle);
+            else
+                titleView.setText(lastTitle);    
             pBar.setMax(1000);
             pBar.setProgress(lastProgress);
             return;
@@ -660,7 +676,7 @@ public class TVRemote extends Remote {
             try {
                 feMgr.jumpTo(MythDroid.lastLocation);
             } catch (IOException e) {
-                Util.err(this, e);
+                Util.posterr(this, e);
             }
         }
         finish();

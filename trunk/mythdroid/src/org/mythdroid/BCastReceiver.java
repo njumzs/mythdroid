@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.gsm.SmsMessage;
 
+@SuppressWarnings("deprecation")
 public class BCastReceiver extends BroadcastReceiver {
 
     @Override

@@ -46,7 +46,7 @@ public class RecordingDetail extends MDActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.recording_detail);
-        livetv = getIntent().getBooleanExtra(MythDroid.LIVETV, false);
+        livetv = getIntent().getBooleanExtra(Extras.LIVETV.toString(), false);
         setViews();
     }
 

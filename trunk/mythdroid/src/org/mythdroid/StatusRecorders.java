@@ -232,8 +232,8 @@ public class StatusRecorders extends ListActivity {
         startActivityForResult(
             new Intent()
             .putExtra(
-                MythDroid.LIVETV, 
-                enc.state.equals(MythDroid.LIVETV) ? true : false
+                Extras.LIVETV.toString(), 
+                enc.state.equals(Extras.LIVETV.toString()) ? true : false
             )
             .setClass(this, RecordingDetail.class), 
             0

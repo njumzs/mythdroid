@@ -55,6 +55,8 @@ public abstract class MDActivity extends Activity {
     final private ArrayList<String> boolExtras = new ArrayList<String>();
     final private HashMap<String, Integer> intExtras = 
         new HashMap<String, Integer>();
+    final private HashMap<String, String> stringExtras = 
+        new HashMap<String, String>();
 
     /** Start nextActivity when the frontend dialog chooser is finished */
     protected OnDismissListener dismissListener =
@@ -69,6 +71,8 @@ public abstract class MDActivity extends Activity {
                     intent.putExtra(extra,true);
                 for (String extra : intExtras.keySet())
                     intent.putExtra(extra, intExtras.get(extra).intValue());
+                for (String extra : stringExtras.keySet())
+                    intent.putExtra(extra, stringExtras.get(extra));
                 nextActivity = null;
                 startActivity(intent);
             }
@@ -153,5 +157,9 @@ public abstract class MDActivity extends Activity {
 
     protected void setExtra(String name, int value) {
         intExtras.put(name, value);
+    }
+    
+    protected void setExtra(String name, String value) {
+        stringExtras.put(name, value);
     }
 }

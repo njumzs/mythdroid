@@ -162,6 +162,19 @@ public class FrontendManager {
         else
             return false;
     }
+    
+    /**
+     * Play a video
+     * @param file - filename of video to play
+     * @return true if starting playing ok, false otherwise
+     */
+    public synchronized boolean playFile(final String file) throws IOException {
+        cmgr.writeLine("play file " + file);
+        if (getResponse().get(0).equals("OK"))
+            return true;
+        else
+            return false;
+    }
 
     /**
      * Switch to a channel in livetv (must be in livetv to call)
