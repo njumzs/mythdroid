@@ -16,7 +16,7 @@
     		android:title="Frontends Config"
     		android:summary="Configure frontends">
     		 		
-    		<intent android:targetClass="org.mythdroid.FrontendList"
+    		<intent android:targetClass="org.mythdroid.activities.FrontendList"
     				android:targetPackage="org.mythdroid"/>
     				
     	</PreferenceScreen>

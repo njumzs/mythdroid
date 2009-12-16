@@ -29,6 +29,9 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.mythdroid.activities.MythDroid;
+import org.mythdroid.resource.Messages;
+
 import android.util.Log;
 
 /**
