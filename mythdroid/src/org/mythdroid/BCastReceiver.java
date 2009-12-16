@@ -18,6 +18,9 @@
 
 package org.mythdroid;
 
+import org.mythdroid.frontend.OSDMessage;
+import org.mythdroid.util.PhoneUtil;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

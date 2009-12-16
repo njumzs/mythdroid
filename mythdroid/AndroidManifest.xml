@@ -14,72 +14,72 @@
         	</intent-filter>
         </receiver>
       	
-        <activity android:name=".MythDroid" android:label="@string/app_name">
+        <activity android:name=".activities.MythDroid" android:label="@string/app_name">
           <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
                
-        <activity android:name=".Recordings" 
+        <activity android:name=".activities.Recordings" 
         	android:label="Recordings"
         	android:configChanges="keyboardHidden|orientation"/>
         	
-        <activity android:name=".RecordingDetail" 
+        <activity android:name=".activities.RecordingDetail" 
         	android:label="Program Details"
         	android:configChanges="keyboardHidden|orientation"/>
         	
-        <activity android:name=".Prefs" 
+        <activity android:name=".activities.Prefs" 
         	android:label="@string/app_name"/>
         	
-        <activity android:name=".FrontendList" 
+        <activity android:name=".activities.FrontendList" 
         	android:label="Frontends"/>
         	
-        <activity android:name=".Media" 
+        <activity android:name=".activities.Media" 
         	android:label="Media"
         	android:configChanges="keyboardHidden|orientation"/>
         	
-       	<activity android:name=".Videos" 
+       	<activity android:name=".activities.Videos" 
         	android:label="Videos"
         	android:configChanges="keyboardHidden|orientation"/>
         	
-       	<activity android:name=".VideoDetail" 
+       	<activity android:name=".activities.VideoDetail" 
         	android:label="Video Details"
         	android:configChanges="keyboardHidden|orientation"/>
                 	
-        <activity android:name=".Status" 
+        <activity android:name=".activities.Status" 
         	android:label="Status"
         	android:configChanges="keyboardHidden|orientation"/>
         	
-        <activity android:name=".StatusRecorders" 
+        <activity android:name=".activities.StatusRecorders" 
         	android:label="Recorder Status"
         	android:configChanges="keyboardHidden|orientation"/>
         	
-        <activity android:name=".StatusScheduled" 
+        <activity android:name=".activities.StatusScheduled" 
         	android:label="Scheduled Recordings"
         	android:configChanges="keyboardHidden|orientation"/>
         	
-		<activity android:name=".StatusJobs" 
+		<activity android:name=".activities.StatusJobs" 
         	android:label="Job Queue"
         	android:configChanges="keyboardHidden|orientation"/>
         	
-        <activity android:name=".StatusBackend" 
+        <activity android:name=".activities.StatusBackend" 
         	android:label="Backend Status"
         	android:configChanges="keyboardHidden|orientation"/>
         	
-        <activity android:name=".Guide" 
+        <activity android:name=".activities.Guide" 
         	android:theme="@android:style/Theme.NoTitleBar"
         	android:configChanges="keyboardHidden|orientation"/>
         	        	        	
-        <activity android:name=".NavRemote" 
+        <activity android:name=".remote.NavRemote" 
        		android:theme="@android:style/Theme.NoTitleBar"
        		android:configChanges="keyboardHidden|orientation"/>
        		
-        <activity android:name=".TVRemote" 
+        <activity android:name=".remote.TVRemote" 
         	android:theme="@android:style/Theme.NoTitleBar"
         	android:configChanges="keyboardHidden|orientation"/>
         	
-       	<activity android:name=".MusicRemote" 
+       	<activity android:name=".remote.MusicRemote" 
         	android:theme="@android:style/Theme.NoTitleBar"
         	android:configChanges="keyboardHidden|orientation"/>
         	

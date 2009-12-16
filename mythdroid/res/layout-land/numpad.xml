@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<org.mythdroid.NumPadLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<org.mythdroid.views.NumPadLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/numpad"
     android:paddingLeft="10px"
     android:paddingRight="10px"
@@ -77,5 +77,5 @@
             android:src="@drawable/enter"
             android:background="@drawable/btn_dial_small"/>
 
-</org.mythdroid.NumPadLayout>
+</org.mythdroid.views.NumPadLayout>
 
