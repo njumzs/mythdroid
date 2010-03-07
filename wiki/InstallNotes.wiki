@@ -12,6 +12,8 @@ You must enable the 'Enable frontend network control' option in each frontend's 
 
 ==MDD==
 
+Note: If you are using !MythDroid trunk also use the [http://mythdroid.googlecode.com/svn/trunk/mdd/mdd trunk version of mdd].
+
 [http://mythdroid.googlecode.com/files/mdd-0.1.pl mdd] is a perl program that, once installed on a frontend, provides mythdroid with extended
 functionality. This includes 'push' updates for TV remote, more detail about current location in Nav remote, song information in Music remote and video browsing / playback functionality. To install mdd, download it to a frontend and run it as root:
 
