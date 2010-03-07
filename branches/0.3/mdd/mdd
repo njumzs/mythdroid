@@ -1,0 +1,568 @@
+#!/usr/bin/perl
+
+=begin comment
+
+MythDroid: Android MythTV Remote
+Copyright (C) 2009-2010 foobum@gmail.com
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=end comment
+=cut
+
+use strict;
+use warnings;
+use IO::Socket::INET;
+use IO::Select;
+use File::Copy;
+use Time::HiRes qw(usleep);
+use MythTV;
+use Sys::Hostname;
+
+sub killKids();
+sub cloneDb();
+sub readCommands();
+sub startLcdServer($);
+sub connectLcdServer();
+sub lcdData($);
+sub lcdMenu($$);
+sub lcdMusic($);
+sub lcdMusicTracks($);
+sub lcdMusicProgress($);
+sub lcdMusicPlayer_prop($$);
+sub lcdChannel($);
+sub lcdChannelProgress($);
+sub clientMsg($);
+sub sendMsg($);
+
+my $lcdServerPort = 6545;
+my $listenPort = 16546;
+
+# Kill off the real mythlcdserver when we are killed
+$SIG{'INT'} = $SIG{'TERM'} = $SIG{'KILL'} = \&killKids; 
+sub END { killKids() }
+# Re-read mdd.conf if we are HUP'd
+$SIG{'HUP'} = \&readCommands;
+
+my $mythtv = MythTV->new(\{ 'connect' => 0 });
+
+install() unless ($0 =~ /mythlcdserver$/);
+
+my (
+    $lastData, $lastMenu, $lastMusic, $lastChannel, $data, $lcdClient, 
+    $client, $dbh, $albumartSth, $videoSth, $upnpVideoSth, $videoDir
+);
+my $lastPos = -1;
+my $size = 1024;
+
+my (%forNewClient, %commands, %videos);
+my @videoFields = (
+    qw(
+        title subtitle director plot homepage year userrating length filename
+    )
+);
+
+readCommands();
+
+startLcdServer(join(" ", @ARGV));
+
+# Listen for connections from mythfrontend
+my $lcdListen = IO::Socket::INET->new(
+    Listen => 1,
+    Proto => 'tcp',
+    ReuseAddr => 1,
+    LocalPort => $lcdServerPort
+) or die "Listen on $lcdServerPort/tcp: $!\n";
+
+# Listen for connections from MythDroid
+my $listen = IO::Socket::INET->new(
+    Listen => 1,
+    Proto => 'tcp',
+    ReuseAddr => 1,
+    LocalPort => $listenPort
+) or die "Listen on $listenPort/tcp: $!\n";
+
+my $s = IO::Select->new($lcdListen, $listen);
+
+# Connect to the real mythlcdserver
+my $lcdServer = connectLcdServer();
+$s->add($lcdServer);
+    
+# Connect to the database, prepare queries
+cloneDb();
+
+while (my @ready = $s->can_read) {
+    
+    foreach my $fd (@ready) {
+        
+        if ($fd == $lcdListen) {
+            # New connection from mythfrontend
+            if ($lcdClient = $fd->accept) {
+                $s->add($lcdClient);
+            }
+            next;
+        }
+
+        elsif ($fd == $listen) {
+            # New connection from MythDroid
+            if (defined $client) {
+                $s->remove($client);
+                $client->close;
+            }
+
+            if ($client = $fd->accept) {
+                $s->add($client);
+                # Send a list of MDD commands
+                foreach my $key (keys %commands) {
+                    syswrite($client, "COMMAND $key\n");
+                }
+                syswrite($client, "COMMANDS DONE\n");
+                # Send last LCD statuses 
+                foreach my $key (keys %forNewClient) {
+                    syswrite($client, $forNewClient{$key});
+                }
+
+            }
+            next;
+        }
+
+        unless (sysread($fd, $data, $size)) {
+            # Someone disconnected
+            $s->remove($fd);
+            $fd->close;
+            undef $client if (defined $client && ($fd == $client));
+            if ($fd == $lcdServer) {
+                # Reconnect if we lost connection to the real mythlcdserver
+                $lcdServer = connectLcdServer();
+                $s->add($lcdServer);
+            }
+            next;
+        }
+
+        if ($fd == $lcdServer) {
+            syswrite($lcdClient, $data);
+        }
+        elsif ($client && $fd == $client) {
+            $data =~ s/\r//;
+            clientMsg($data);
+        }
+        else {
+            foreach (split /\n/, $data) { lcdData($_) if length > 4 }
+            syswrite($lcdServer, $data);
+        }
+
+    }
+
+}
+
+sub cloneDb() {
+
+    $dbh = $mythtv->{dbh};
+    $dbh = $dbh->clone;
+
+    $albumartSth = $dbh->prepare(
+        'SELECT DISTINCT albumart_id from music_albumart ' .
+        'LEFT JOIN music_songs ON music_albumart.directory_id ' .
+        '= music_songs.directory_id LEFT JOIN music_albums on ' .
+        'music_songs.album_id = music_albums.album_id WHERE ' .
+        'music_albums.album_name = ? and music_albumart.imagetype = 1'
+    );
+
+    $videoSth = $dbh->prepare(
+        'SELECT title, subtitle, director, plot, homepage, ' .
+        'year, userrating, length, filename FROM videometadata ' .
+        'where filename REGEXP ?'
+    );
+
+    $upnpVideoSth = $dbh->prepare(
+        'SELECT intid from upnpmedia where filepath = ?'
+    );
+
+}
+
+sub readCommands() {
+
+    %commands = ();
+    
+    open F, '</etc/mdd.conf' or return;
+
+    my $line = 0;
+
+    while (<F>) {
+        $line++;
+        s/^\s+//;
+        s/\s+$//;
+        next if /^#/;
+        s/#.*$//;
+        my ($name, $cmd) = /(.*)=>(.*)/;
+        if (!($name && $cmd)) {
+            warn("Error parsing line $line of /etc/mdd.conf");
+            next;
+        }
+        $name =~ s/\s+$//;
+        $cmd =~ s/^\s+//;
+        $commands{$name} = $cmd;
+    }
+
+    close F;
+}
+
+sub startLcdServer($) {
+
+    my $args = shift;
+
+    $args =~ s/&$//;
+
+    system("ps ax | grep 'mythlcd ' | grep -v grep >/dev/null");
+
+    return if ($? == 0);
+
+    if ($args =~ /-p\s*(\d+)/) {
+        $lcdServerPort = $1;
+        my $p = $lcdServerPort + 1000;
+        $args =~ s/-p\s*(\d+)/-p $p/;
+    }
+    else {
+        $args .= " -p " . ($lcdServerPort + 1000);
+    }
+
+    system("mythlcd $args &");
+
+}
+
+sub connectLcdServer() {
+
+    foreach (0 .. 4) {
+    
+        $lcdServer = IO::Socket::INET->new(
+            Proto => 'tcp',
+            PeerAddr => '127.0.0.1',
+            PeerPort => $lcdServerPort + 1000
+        ) and return $lcdServer;
+
+        usleep(600000);
+        next;
+
+    }
+
+    die "Can't connect to LCD server\n"; 
+
+}
+
+sub lcdData($) {
+
+    my $data = shift;
+
+    return if (defined $lastData && $data eq $$lastData);
+
+    $lastData = \$data;
+
+    if ($data =~ s/^SWITCH_TO_MENU\s+"MYTH-([^"]+)"\s+//) {
+        lcdMenu($1, $data);
+    }
+    elsif ($data =~ s/^SWITCH_TO_MUSIC\s+//) {
+        lcdMusic($data);
+    }
+    elsif ($data =~ /^SET_MUSIC_PROGRESS.*?([\.\d]+)$/) {
+        lcdMusicProgress($1);
+    }
+    elsif ($data =~ /^SET_MUSIC_PLAYER_PROP\s+(\w+)\s+(\w+)/) {
+        lcdMusicPlayerProp($1, $2);
+    }
+    elsif ($data =~ s/^SWITCH_TO_CHANNEL\s+//) {
+        lcdChannel($data);
+    }
+    elsif ($data =~ /^SET_CHANNEL_PROGRESS\s+([\.\d]+)/) {
+        lcdChannelProgress($1);
+    }
+    elsif ($data =~ /^SWITCH_TO_TIME/) {
+        sendMsg("DONE");
+    }
+
+}
+
+sub lcdMenu($$) {
+    
+    my $menu = shift;
+    my $items = shift;
+
+    return if (defined $lastMenu && $items eq $$lastMenu);
+
+    $lastMenu = \$items;
+    undef $lastMusic;
+    undef $lastChannel;
+    $lastPos = -1;
+
+    my @menu;
+
+    my (@items) = $data =~ 
+        /"([^"]+)"\s+NOTCHECKABLE\s+(\w+)/g;
+
+    my $idx = 0;
+    my $curidx;
+    
+    while (my $item = shift @items) {
+        my $cur = shift @items;
+        push @menu, { 'item' => $item, 'cur' =>  $cur };
+        $curidx = $idx if $cur eq 'TRUE';
+        $idx++;
+    }
+
+    my $msg = "MENU $menu ITEM $menu[$curidx]->{item}";
+    
+    $forNewClient{'menu'} = $msg . "\n";
+
+    sendMsg($msg);
+
+}
+
+sub lcdMusic($) {
+
+    my $data = shift;
+    my $albumartId;
+
+    return if (defined $lastMusic && $data eq $$lastMusic);
+
+    $lastMusic = \$data;
+
+    my ($artist, $album, $track) = $data =~
+        /^"([^"]+)"\s+"([^"]+)"\s+"([^"]+)"$/;
+
+    my $msg = "MUSIC $artist ALBUM $album TRACK $track";
+    
+    unless ($albumartSth->execute($album)) {
+        cloneDb();
+        $albumartSth->execute($album);
+    }
+
+    if (my $aref = $albumartSth->fetchrow_arrayref) {
+        $albumartId = $aref->[0];
+    }
+
+    $msg .= " ARTID $albumartId" if (defined $albumartId);
+
+    $forNewClient{'music'} = $msg . "\n";
+
+    sendMsg($msg);
+
+}
+
+sub lcdMusicProgress($) {
+
+    my $pos = shift;
+
+    $pos = sprintf "%.2f", $pos;
+    
+    $pos *= 100;
+
+    return unless $pos % 2;
+    return if ($pos == $lastPos);
+    $lastPos = $pos;
+
+    sendMsg("MUSICPROGRESS $pos");
+
+}
+
+sub lcdMusicPlayerProp($$) {
+
+    my $prop = shift;
+    my $val = shift;
+
+    sendMsg("MUSICPLAYERPROP $prop $val");
+}
+
+sub lcdChannel($) {
+
+    my $data = shift; 
+
+    return if (defined $lastChannel && $data eq $$lastChannel);
+
+    $lastChannel = \$data;
+
+    my ($chan, $title, $subtitle) = $data =~ /^"([^"]+)"\s+"([^"]+)"\s+"([^"]*)"$/;
+
+    my $msg;
+
+    if ($chan) {
+        $msg = "CHANNEL $chan TITLE $title";
+    }
+    elsif ($title) {
+        $msg = "CHANNEL Video TITLE $title";
+    }
+    else {
+        return;
+    }
+
+    $msg .= " SUBTITLE $subtitle" if $subtitle;
+    
+    $forNewClient{'channel'} = $msg . "\n";
+
+    sendMsg($msg);
+
+}
+
+sub lcdChannelProgress($) {
+
+    my $pos = shift;
+
+    $pos = sprintf "%.3f", $pos;
+    
+    $pos *= 1000;
+
+    return unless $pos % 2;
+    return if ($pos == $lastPos);
+    $lastPos = $pos;
+
+    sendMsg("CHANNELPROGRESS $pos");
+
+}
+
+sub clientMsg($) {
+
+    my $msg = shift;
+
+    if ($msg =~ /^COMMAND (.*)$/) {
+        runCommand($1);
+    }
+    elsif ($msg =~ /VIDEOLIST (.*)$/) {
+        videoList($1);
+    }
+
+}
+
+sub runCommand($) {
+    
+    my $cmd = shift;
+
+    if (! exists $commands{$cmd}) {
+        warn("mdd command $cmd is not defined");
+        return;
+    }
+
+    system($commands{$cmd});
+
+}
+
+sub videoList($) {
+
+    my $subdir = shift;
+
+    %videos = ();
+
+    unless ($videoDir) { 
+        $videoDir = $mythtv->backend_setting('VideoStartupDir', hostname());
+    }
+
+    my $regexp = "$videoDir/";
+
+    $regexp .= "$subdir/" unless ($subdir eq 'ROOT');
+
+    $regexp =~ s/'/\'/;
+
+    my @dirs = grep(
+        /\S+/, 
+        map { chomp; s/^$regexp//; $_ } `find -L '$regexp' -maxdepth 1 -type d`
+    );
+
+    $regexp .= '[^/]+$';
+    
+    unless ($videoSth->execute($regexp)) {
+        cloneDb();
+        $videoSth->execute($regexp);
+    }
+    
+    while (my $aref = $videoSth->fetchrow_arrayref) {
+        my $path = $aref->[8];
+        unless ($upnpVideoSth->execute($path)) {
+            cloneDb();
+            $upnpVideoSth->execute($path);
+        }
+        my $id = ($upnpVideoSth->fetchrow_arrayref)->[0];
+        my %h;
+        @h{@videoFields} = @$aref;
+        $videos{$id} = \%h;
+    }
+
+    foreach my $dir (@dirs) {
+        sendMsg("DIRECTORY $dir");
+    }
+
+    foreach my $id (keys %videos) {
+        my $msg = "VIDEO $id";
+        foreach my $f (
+            map { '||' . $videos{$id}{$_} } @videoFields
+        ) { $msg .= $f }
+        sendMsg($msg);
+    }
+
+    sendMsg("VIDEOLIST DONE");
+
+}
+
+sub sendMsg($) {
+
+    my $msg = shift;
+
+    $msg .= "\n";
+
+    syswrite($client, $msg) if (defined $client);
+
+}
+
+sub killKids() {
+    my @ps = `ps ax | grep 'mythlcd ' | grep -v grep`;
+    foreach my $ps (@ps) {
+       if ($ps =~ /^\s*(\d+)/) {
+            kill 'TERM', $1;
+        }
+    }
+}
+
+sub install {
+
+    print "Installing mdd..\n";
+    print "Stopping mythfrontend and mythlcdserver\n";
+    system(
+        "killall mythfrontend;" .
+        "killall mythfrontend.real;" . 
+        "killall mythlcdserver"
+    );
+    my $path = (`which mythlcdserver`)[0];
+    $path =~ s/\/mythlcdserver$//;
+    chomp $path;
+    unless ((`file $path/mythlcdserver`)[0] =~ /perl/) {
+        print "cp $path/mythlcdserver -> $path/mythlcd\n";
+        copy("$path/mythlcdserver", "$path/mythlcd") or die "$!\n";
+        chmod(0755, "$path/mythlcd")or warn "chmod of $path/mythlcd failed\n";
+
+    }
+    print "cp $0 -> $path/mythlcdserver\n";
+    copy($0, "$path/mythlcdserver") or die "$!\n";
+    chmod(0755, "$path/mythlcdserver") 
+        or warn "chmod of $path/mythlcdserver failed\n";
+    print "Check settings..\n";
+    my $host = (`hostname`)[0];
+    chomp $host;
+    unless (
+        $mythtv->backend_setting('LCDEnable', $host)      &&
+        $mythtv->backend_setting('LCDShowMenu', $host)    &&
+        $mythtv->backend_setting('LCDShowMusic', $host)   &&
+        $mythtv->backend_setting('LCDShowChannel', $host) 
+    ) {
+        print "\nNOTICE: Please enable all MythTV LCD options\n";
+    }
+    print "Done - you can restart mythfrontend now..\n";
+    exit;
+
+}

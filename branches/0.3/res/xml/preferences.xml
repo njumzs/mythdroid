@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/settings">
+    
+    	<EditTextPreference
+    		android:key="backend"
+    		android:dialogTitle="Backend Address"
+    		android:title="Manual Backend Config"
+    		android:singleLine="true"
+    		android:summary="Manually configure a backend"/>
+    		
+    	<PreferenceScreen
+    		android:key="frontends"
+    		android:title="Frontends Config"
+    		android:summary="Configure frontends">
+    		 		
+    		<intent android:targetClass="org.mythdroid.activities.FrontendList"
+    				android:targetPackage="org.mythdroid"/>
+    				
+    	</PreferenceScreen>
+    	
+    	<PreferenceScreen
+    		android:key="osdsettings"
+    		android:title="OSD Settings"
+    		android:summary="Configure display of phone events on MythTV OSD">
+    		
+    	<CheckBoxPreference
+    		android:key="osdCalls"
+    		android:title="Show calls on OSD"
+    		android:summary="Show calls on the MythTV OSD"
+    		android:defaultValue="true"/>
+    		
+    	<CheckBoxPreference
+    		android:key="osdSMS"
+    		android:title="Show SMS on OSD"
+    		android:summary="Show SMS on the MythTV OSD"
+    		android:defaultValue="true"/>
+    	
+    	<CheckBoxPreference
+    		android:key="scrollSMS"
+    		android:title="Scroll SMS"
+    		android:summary="Uncheck to disable SMS scrolling"
+    		android:dependency="osdSMS"
+    		android:defaultValue="true"/>
+    		
+    	</PreferenceScreen>
+    		
+    	<ListPreference
+    		android:key="tvDefaultStyle"
+    		android:title="Default TV remote style"
+    		android:summary="Default layout for the TV remote"
+    		android:entries="@array/remoteStyles"
+    		android:entryValues="@array/remoteStyles"
+    		android:defaultValue="Button"/>
+    		
+    	<ListPreference
+    		android:key="navDefaultStyle"
+    		android:title="Default Nav remote style"
+    		android:summary="Default layout for the Nav remote"
+    		android:entries="@array/remoteStyles"
+    		android:entryValues="@array/remoteStyles"
+    		android:defaultValue="Button"/>
+    	
+    </PreferenceCategory>
+    
+</PreferenceScreen>
+            

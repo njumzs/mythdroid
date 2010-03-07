@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MythDroid</string>
+    <string name="settings">Einstellungen</string>
+    <string name="set_def_fe">Setze Standard Frontend</string>
+    <string name="no_be">Keine Backends gefunden</string>
+    <string name="no_be_detail">Einen manuell in den Einstellungen konfigurieren?</string>
+    <string name="add_fe">Ein Frontend hinzufügen</string>
+    <string name="click_add_fe">Hier klicken um ein neues Frontend hinzufügen</string>
+    <string name="no_fes">Kein Frontend eingestellt!</string>
+    <string name="ch_fe">Wähle ein Frontend</string>
+    <string name="ok">OK</string>
+    <string name="error">Fehler</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="save">Speichern</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="delete">Löschen</string>
+    <string name="loading">Geladen</string>
+    <string name="ch_start_date">Ändere Startdatum</string>
+    <string name="ch_start_time">Andere Startzeit</string>
+    <string name="shuffle_mode">Zufallsmodus</string>
+    <string name="repeat_mode">Wiederholen</string>
+    <string name="tog_vis">An-/Ausschalten Visualisierung</string>
+    <string name="chg_vis">Ändere Visualisierung</string>
+    <string name="pl_edit">Wiedergabeliste Editor</string>
+    <string name="osd_menu">OSD Menü</string>
+    <string name="leave_remote">Lasse Fernbedienung</string>
+    <string name="halt_playback">Halt playback?</string>
+    <string name="disp_guide">Zeige Fernsehprogramm</string>
+    <string name="remote">Fernbedienung</string>
+    <string name="btn_iface">Button Interface</string>
+    <string name="gest_iface">Gesten Interface</string>
+    <string name="del_rec">Lüsche Aufnahme</string>
+    <string name="stop_rec">Stoppe Aufnahme</string>
+    <string name="sure">Sind Sie sicher?</string>
+    <string name="filter_rec">Filtere Aufnahmen</string>
+    <string name="refresh">Aktualisieren</string>
+    <string name="filter">Filter</string>
+    <string name="reset_filter">Filter zurücksetzen</string>
+    <string name="wake_fe">Wecken Frontend</string>
+    <string name="mddCmd">Run MDD command</string>
+	<string name="mddCmds">MDD commands</string>
+	<string name="no_mddCmds">No MDD commands are defined</string>
+</resources>
