@@ -27,6 +27,8 @@ For mdd to function, you must ensure that the following settings in the LCD page
  * Display music artist and title (items = Artist - Title) 
  * Display channel information
 
+mdd should check these settings during installation and let you know if you need to take action.
+
 ==MythTV 0.21 Specific Notes==
 
 For the program guide viewer to function correctly, you must apply [http://mythdroid.googlecode.com/files/xml-guide.patch this patch] to the MythTV 0.21 fixes source code.
@@ -40,12 +42,10 @@ patch -p1 < xml-guide.patch
 
 and then follow the normal steps to configure, build and install MythTV.
 
-mdd will check these settings during installation and let you know if you need to take action.
-
 ==MythTV >= 0.22 Specific Notes==
 
 MythTV 0.22 has some bugs in the network control feature. Apply [http://mythdroid.googlecode.com/files/myth-netcontrol-2.patch this patch] so that !MythDroid is able to initiate recording playback properly. The bugs were fixed by MythTV
-r23381 so users of MythTV trunk >= r23381 (or 0.23 when it's released) need not apply any patches.
+rev 23381 so users of MythTV trunk >= rev 23381 (or 0.23 when it's released) need not apply any patches.
 
 ==Installation==
 
