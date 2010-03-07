@@ -13,7 +13,7 @@ You must enable the 'Enable frontend network control' option in each frontend's 
 ==MDD==
 
 [http://mythdroid.googlecode.com/files/mdd-0.1.pl mdd] is a perl program that, once installed on a frontend, provides mythdroid with extended
-functionality. This includes 'push' updates for TV remote, more detail about current location in Nav remote and song information in Music remote. To install mdd, download it to a frontend and run it as root:
+functionality. This includes 'push' updates for TV remote, more detail about current location in Nav remote, song information in Music remote and video browsing / playback functionality. To install mdd, download it to a frontend and run it as root:
 
 {{{
 perl /path/to/mdd-0.1.pl
@@ -44,7 +44,8 @@ mdd will check these settings during installation and let you know if you need t
 
 ==MythTV >= 0.22 Specific Notes==
 
-MythTV >= 0.22 currently has some bugs in the network control feature. Apply [http://mythdroid.googlecode.com/files/myth-netcontrol-2.patch this patch] so that !MythDroid is able to initiate recording playback properly.
+MythTV 0.22 has some bugs in the network control feature. Apply [http://mythdroid.googlecode.com/files/myth-netcontrol-2.patch this patch] so that !MythDroid is able to initiate recording playback properly. The bugs were fixed by MythTV
+r23381 so users of MythTV trunk >= r23381 (or 0.23 when it's released) need not apply any patches.
 
 ==Installation==
 
