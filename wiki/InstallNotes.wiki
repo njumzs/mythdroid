@@ -2,9 +2,7 @@
 
 ==MythTV Version==
 
-!MythDroid 0.2 supports MythTV 0.21.
-<br>
-!MythDroid trunk supports 0.21, 0.22 and MythTV trunk.
+!MythDroid 0.3 supports 0.21, 0.22 and MythTV trunk.
 
 ==MythTV Configuration==
 
@@ -12,13 +10,11 @@ You must enable the 'Enable frontend network control' option in each frontend's 
 
 ==MDD==
 
-Note: If you are using !MythDroid trunk also use the [http://mythdroid.googlecode.com/svn/trunk/mdd/mdd trunk version of mdd].
-
-[http://mythdroid.googlecode.com/files/mdd-0.1.pl mdd] is a perl program that, once installed on a frontend, provides mythdroid with extended
+[http://mythdroid.googlecode.com/svn/trunk/mdd/mdd mdd] is a perl program that, once installed on a frontend, provides mythdroid with extended
 functionality. This includes 'push' updates for TV remote, more detail about current location in Nav remote, song information in Music remote and video browsing / playback functionality. To install mdd, download it to a frontend and run it as root:
 
 {{{
-perl /path/to/mdd-0.1.pl
+perl /path/to/mdd
 }}}
 
 For mdd to function, you must ensure that the following settings in the LCD page under Setup -> Appearance are enabled on the frontend:
@@ -30,6 +26,12 @@ For mdd to function, you must ensure that the following settings in the LCD page
  * Display channel information
 
 mdd should check these settings during installation and let you know if you need to take action.
+
+==MythTV >= 0.22 Specific Notes==
+
+MythTV 0.22 has some bugs in the network control feature. Apply [http://mythdroid.googlecode.com/files/myth-netcontrol-2.patch this patch] so that !MythDroid is able to initiate recording playback properly. 
+
+The bugs were fixed by MythTV rev 23381 so users of MythTV trunk >= rev 23381 (or 0.23 when it's released) need not apply any patches. Yay.
 
 ==MythTV 0.21 Specific Notes==
 
@@ -44,18 +46,13 @@ patch -p1 < xml-guide.patch
 
 and then follow the normal steps to configure, build and install MythTV.
 
-==MythTV >= 0.22 Specific Notes==
-
-MythTV 0.22 has some bugs in the network control feature. Apply [http://mythdroid.googlecode.com/files/myth-netcontrol-2.patch this patch] so that !MythDroid is able to initiate recording playback properly. The bugs were fixed by MythTV
-rev 23381 so users of MythTV trunk >= rev 23381 (or 0.23 when it's released) need not apply any patches.
-
 ==Installation==
+
+==== !MythDroid 0.3 ====
+
+Download the latest [http://mythdroid.googlecode.com/files/MythDroid-0.3.apk MythDroid APK] and install using adb (from the Android SDK) or an application from the Market. Alternatively check out the 0.3 source using subversion URL http://mythdroid.googlecode.com/svn/branches/0.3 mythdroid-read-only
 
 ==== !MythDroid trunk ====
 
 You can install !MythDroid trunk to your device by checking out the source code (via Eclipse with the [http://subclipse.tigris.org/ SubClipse] and [http://developer.android.com/sdk/installing.html Android ADT] plugins), connecting your device and running !MythDroid on it. The subversion URL for trunk is http://mythdroid.googlecode.com/svn/trunk/ mythdroid-read-only
 
-
-==== !MythDroid 0.2 ====
-
-Download the [http://mythdroid.googlecode.com/files/MythDroid-0.2.apk MythDroid APK] and install using adb (from the Android SDK) or an application from the Market. Alternatively check out the 0.2 source using subversion URL http://mythdroid.googlecode.com/svn/branches/0.2 mythdroid-read-only
