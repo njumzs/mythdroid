@@ -4,7 +4,7 @@
 
 If you have wireless enabled and a MythTV backend is on the local network !MythDroid will hopefully locate it automatically and you will be presented with the main menu. See Manual Backend Configuration below if your backend is not on the local network.
 
-!MythDroid can't locate frontends automatically - you have to configure them. To do this, press the menu button and select 'Settings'. Then select 'Frontends Config' and add your frontends. !MythDroid is now ready to go.
+!MythDroid can't locate frontends automatically - you have to configure them. To do this, press the menu button and select 'Settings'. Then select 'Frontends Config' and add your frontends (a MAC address is not required unless you want to be able to Wake On LAN the frontend). !MythDroid is now ready to go.
 
 == General ==
 
@@ -12,11 +12,15 @@ For actions that could take place in several locations (like watching tv, playin
 
 == Main Menu ==
 
-The menu button brings up a menu that lets you configure !MythDroid, start the appropriate remote (depending on frontend state) or set the _default frontend_. The _default frontend_ is the frontend on which actions will take place when certain menu items or buttons are short pressed. Examples include Watch TV, playing a recording or selecting the remote entry in the Main Menu sub-menu. In most circumstances, long pressing such items will pop up a chooser allowing you to select a frontend on which to perform the activity. Doing this will automatically set the _default frontend_.
+The menu button brings up a menu that lets you configure !MythDroid, start the appropriate remote (depending on frontend state), set the _default frontend_, wake up a frontend (via Wake On LAN) or run an [MDD 'MDD command'] on a frontend. The _default frontend_ is the frontend on which actions will take place when certain menu items or buttons are short pressed. Examples include Watch TV, playing a recording or selecting the remote entry in the Main Menu pop-up menu. In most circumstances, long pressing such items will pop up a chooser allowing you to select a frontend on which to perform the activity. Doing this will automatically set the _default frontend_.
 
 == Recordings ==
 
 The recordings activity lists the recordings available on the backend. Short pressing a recording takes you to the Program Detail activity, where you'll be shown more information about the program and offered the chance to play or delete the recording. Long pressing a recording allows you to select a frontend on which to play the recording. Pressing menu will allow you to filter the recordings by program title, reset the filter or refresh the recordings list.
+
+== Videos ==
+
+If [MDD MDD] is installed on the current frontend, the videos activity allows you to browse the available videos. Short pressing a video will take you to the Video Detail activity, which shows you more information about the video and offers the opportunity to play it or open the video's TVDB entry in the browser. Short pressing the play button will play the video on the _default frontend_. Long pressing the play button will allow you to choose which frontend should play the video.
 
 == Nav Remote ==
 
@@ -29,6 +33,8 @@ The Nav Remote allows you to navigate around the MythTV interface. If you naviga
 You can also use the trackball in either interface mode.
 
 If your device has a hardware keyboard, keystrokes made on it will be passed to the relevant frontend.
+
+The default Nav remote style (gesture or standard) can be configured in !MythDroid's settings.
 
 == TV Remote ==
 
@@ -43,6 +49,8 @@ Hopefully self explanatory. The menu button gives you the choice of showing the 
 You can also use the trackball (which performs the same actions as dragging) in either interface mode.
 
 If your device has a hardware keyboard, keystrokes made on it will be passed to the relevant frontend.
+
+The default TV remote style (gesture or standard) can be configured in !MythDroid's settings.
 
 == Music Remote ==
 
@@ -61,6 +69,10 @@ Pressing the menu button allows you to enter the playlist editor, change the vis
 == Program Guide ==
 
 Pressing on a program will bring up additional details about the program. Short pressing a channel will play that channel in LiveTV on the _default frontend_. Long pressing a channel will display the frontend chooser.
+
+== Call and SMS display on MythTV OSD ==
+
+By default, information about incoming calls and SMS (including SMS content) are displayed on the On Screen Display of all frontends (if they are able to display OSD messages, i.e. they are watching tv/video playback). This can be configured in the !MythDroid settings.
 
 == Manual Backend Configuration ==
 
