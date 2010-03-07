@@ -1,5 +1,3 @@
-#summary Configuring MDD
-
 = MDD =
 
 MDD is designed to run on every frontend and 'push' a range of information that either cannot be accessed remotely by !MythDroid or that !MythDroid would otherwise have to poll for. This information includes detailed frontend location, details about currently playing programs and music (including album art), progress information, etc. 
