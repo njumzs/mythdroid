@@ -18,13 +18,17 @@
 
 package org.mythdroid.data;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.mythdroid.activities.MythDroid;
 
 import android.graphics.Bitmap;
@@ -42,7 +46,10 @@ public class Video {
     public String title, subtitle, director, plot, homepage, filename;
     public float rating;
     public int year, length, id = -1;
-      
+    static Options opts = new BitmapFactory.Options();
+
+    static { opts.inSampleSize = 8; }
+          
     public Drawable poster = null;
     
     final private static int 
@@ -54,7 +61,7 @@ public class Video {
      * @param line - A String containing a DIRECTORY or VIDEO line from MDD 
      */
     public Video(String line) {
-        
+                
         if (line.startsWith("DIRECTORY")) {
             title = line.substring(line.indexOf("DIRECTORY") + 10);
             return;
@@ -99,18 +106,21 @@ public class Video {
                 "Id=" + id 
             );
         } catch (MalformedURLException e) {}
-
-        Options opts = new BitmapFactory.Options();
-        opts.inSampleSize = 8;
         
         Bitmap bm = null;
+
         try {
-            URLConnection conn = url.openConnection();
-            conn.connect();
-            bm = BitmapFactory.decodeStream(
-                conn.getInputStream(), null, opts
-            );
-        } catch(IOException e) {}
+            HttpClient client = new DefaultHttpClient();
+            HttpResponse resp = 
+                (HttpResponse)client.execute(new HttpGet(url.toURI()));
+            if (resp.getStatusLine().getStatusCode() == 404)
+                return;
+            InputStream is = new BufferedHttpEntity(resp.getEntity())
+                .getContent(); 
+            bm = BitmapFactory.decodeStream(is, null, opts);
+            is.close();
+        } catch (Exception e) {}
+        
         if (bm == null)
             return;
         
