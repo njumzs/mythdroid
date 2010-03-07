@@ -35,7 +35,7 @@ and then follow the normal steps to configure, build and install MythTV.
 
 ==== !MythDroid 0.3 ====
 
-Download the latest [http://mythdroid.googlecode.com/files/MythDroid-0.3.1.apk MythDroid APK] and install using adb (from the Android SDK) or an application from the Market. Alternatively check out the 0.3 source using subversion URL http://mythdroid.googlecode.com/svn/branches/0.3 mythdroid-read-only
+Download the latest [http://mythdroid.googlecode.com/files/MythDroid-0.3.2.apk MythDroid APK] and install using adb (from the Android SDK) or an application from the Market. Alternatively check out the 0.3 source using subversion URL http://mythdroid.googlecode.com/svn/branches/0.3 mythdroid-read-only
 
 ==== !MythDroid trunk ====
 
