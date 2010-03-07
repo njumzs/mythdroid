@@ -108,7 +108,7 @@ public class FrontendList extends ListActivity implements
                                .setView(editor)
                                .setPositiveButton(R.string.save, this)
                                .setNeutralButton(R.string.delete, this)
-                               .setNegativeButton(R.string.delete, this)
+                               .setNegativeButton(R.string.cancel, this)
                                .create();
                 break;
                 
