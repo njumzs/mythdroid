@@ -1,0 +1,49 @@
+#summary Configuring MDD
+
+= MDD =
+
+MDD is designed to run on every frontend and 'push' a range of information that either cannot be accessed remotely by !MythDroid or that !MythDroid would otherwise have to poll for. This information includes detailed frontend location, details about currently playing programs and music (including album art), progress information, etc. 
+
+In addition MDD can run arbitary commands on frontends (see below) and allows !MythDroid to browse videos. 
+
+== Installation ==
+
+For mdd to function, you must ensure that the following settings in the LCD page under Setup -> Appearance are enabled on each frontend:
+
+ * Enable LCD device
+ * Display time
+ * Display menus
+ * Display music artist and title (items = Artist - Title) 
+ * Display channel information
+
+mdd should check these settings during installation and let you know if you need to take action.
+
+So, to install, download [http://mythdroid.googlecode.com/svn/trunk/mdd/mdd mdd] to each frontend and then:
+
+{{{
+perl /path/to/mdd
+}}}
+
+Note: You will need to reinstall mdd each time you upgrade MythTV. See the details below for the reason.
+
+== Configuration ==
+
+MDD requires no configuration. However, if you'd like to be able to run arbitary commands on frontends ('MDD commands' in !MythDroid), you'll need to define them. To do so, create /etc/mdd.conf and define one command per line, using the following format:
+
+{{{
+name of command => command to run
+}}}
+
+For example, the following allows me to put an Ubuntu frontend to sleep:
+
+{{{
+Sleep => /usr/bin/pwctrl suspend
+}}}
+
+Lines beginning with # are ignored.
+
+Commands are run as the user running mythfrontend.
+
+== Details ==
+
+MDD operates by sitting between mythfrontend and mythlcdserver (during installation the mytlcdserver is renamed to mythlcd and mdd is installed as mythlcdserver). MDD intercepts information that is sent to the LCD and makes it available to !MythDroid. Note that you don't need an LCD for this to work. 
