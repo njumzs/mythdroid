@@ -10,22 +10,7 @@ You must enable the 'Enable frontend network control' option in each frontend's 
 
 ==MDD==
 
-[http://mythdroid.googlecode.com/svn/trunk/mdd/mdd mdd] is a perl program that, once installed on a frontend, provides mythdroid with extended
-functionality. This includes 'push' updates for TV remote, more detail about current location in Nav remote, song information in Music remote and video browsing / playback functionality. To install mdd, download it to a frontend and run it as root:
-
-{{{
-perl /path/to/mdd
-}}}
-
-For mdd to function, you must ensure that the following settings in the LCD page under Setup -> Appearance are enabled on the frontend:
-
- * Enable LCD device
- * Display time
- * Display menus
- * Display music artist and title (items = Artist - Title) 
- * Display channel information
-
-mdd should check these settings during installation and let you know if you need to take action.
+MDD extends the functionality of !MythDroid signficantly. See [MDD here] for more information, including installation notes.
 
 ==MythTV >= 0.22 Specific Notes==
 
@@ -55,4 +40,3 @@ Download the latest [http://mythdroid.googlecode.com/files/MythDroid-0.3.apk Myt
 ==== !MythDroid trunk ====
 
 You can install !MythDroid trunk to your device by checking out the source code (via Eclipse with the [http://subclipse.tigris.org/ SubClipse] and [http://developer.android.com/sdk/installing.html Android ADT] plugins), connecting your device and running !MythDroid on it. The subversion URL for trunk is http://mythdroid.googlecode.com/svn/trunk/ mythdroid-read-only
-
