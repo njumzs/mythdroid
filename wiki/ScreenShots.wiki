@@ -6,5 +6,5 @@
 ||Recordings||Program Detail||Frontend Chooser||Program Guide||
 ||http://mythdroid.googlecode.com/files/Recordings.png||http://mythdroid.googlecode.com/files/RecordedDetail.png||http://mythdroid.googlecode.com/files/FrontendChooser.png||http://mythdroid.googlecode.com/files/Guide.png||
 
-||Music||
-||http://mythdroid.googlecode.com/files/MusicRemote-0.2.png||
+||Music||Videos||Video Detail||
+||http://mythdroid.googlecode.com/files/MusicRemote-0.2.png||http://mythdroid.googlecode.com/files/Videos.png||http://mythdroid.googlecode.com/files/VideoDetail.png||
