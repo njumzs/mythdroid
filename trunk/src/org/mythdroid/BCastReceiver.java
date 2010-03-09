@@ -39,6 +39,7 @@ public class BCastReceiver extends BroadcastReceiver {
             PreferenceManager.getDefaultSharedPreferences(ctx);
         final boolean showCalls = prefs.getBoolean("osdCalls", true);
         final boolean showSMS = prefs.getBoolean("osdSMS", true);
+        final boolean scrollSMS = prefs.getBoolean("scrollSMS", true);
         final String action = intent.getAction();
         String number, name = null;
         
@@ -74,11 +75,14 @@ public class BCastReceiver extends BroadcastReceiver {
             Object[] pdus = (Object[])bundle.get("pdus");
             
             try {
-                for (int i = 0; i <pdus.length; i++){
+                for (int i = 0; i < pdus.length; i++){
                     SmsMessage msg = SmsMessage.createFromPdu((byte[]) pdus[i]);
                     String m = "SMS from " + msg.getDisplayOriginatingAddress() +
                         ": " + msg.getDisplayMessageBody();
-                    OSDMessage.Scroller(m, m.length() / 9 + 8);
+                    if (scrollSMS)
+                        OSDMessage.Scroller(m, m.length() / 9 + 8);
+                    else
+                        OSDMessage.Alert(m);
                 }
             } catch (Exception e){}
                 

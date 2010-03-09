@@ -240,6 +240,11 @@ public class BackendManager {
         cmgr.disconnect();
     }
     
+    /**
+     * Get the protocol version from the backend
+     * @param sURL - string containing backend status URL
+     * @return - integer containing backend protocol version
+     */
     private int getVersion(String sURL) throws Exception {
         
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -261,6 +266,10 @@ public class BackendManager {
     }
 
   
+    /**
+     * Announce ourselves to the backend
+     * @return - true if backend accepts us, false otherwise
+     */
     private boolean announce() throws IOException {
 
         cmgr.sendString("MYTH_PROTO_VERSION " + MythDroid.protoVersion);

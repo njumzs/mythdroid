@@ -42,10 +42,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -171,7 +173,7 @@ public class TVRemote extends Remote {
         public void run() {
             if (jump)
                 dismissDialog(DIALOG_LOAD);
-            setupStatus(null);
+            setupStatus();
             if (mddMgr == null) {
                 updateStatus = new UpdateStatusTask();
                 timer.scheduleAtFixedRate(updateStatus, 8000, 8000);
@@ -277,7 +279,12 @@ public class TVRemote extends Remote {
         else
             ctrls.put(R.id.tv_rec, Key.EDIT);
         
+        final SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        gesture = prefs.getString("tvDefaultStyle", "").equals("Gesture");
+        
         setupViews(gesture);
+        listenToGestures(gesture);
         
     }
     
@@ -342,7 +349,9 @@ public class TVRemote extends Remote {
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
         setupViews(gesture);
-        setupStatus(null);
+        if (feMgr == null)
+            onResume();
+        setupStatus();
     }
 
     @Override
@@ -556,7 +565,7 @@ public class TVRemote extends Remote {
         }
 
         setupViews(gesture);
-        setupStatus(null);
+        setupStatus();
         listenToGestures(gesture);
 
         return true;
@@ -573,6 +582,10 @@ public class TVRemote extends Remote {
             return super.onKeyDown(code, event);
     }
 
+    /**
+     * Setup the interactive views
+     * @param gesture - true for 'gesture' layout, false for 'button' 
+     */
     private void setupViews(boolean gesture) {
 
         if (gesture) {
@@ -631,7 +644,10 @@ public class TVRemote extends Remote {
         removeDialog(DIALOG_NUMPAD);
     }
 
-    private void setupStatus(FrontendLocation loc) {
+    /**
+     * Setup the status widgets (progress bar, program title)
+     */
+    private void setupStatus() {
 
         titleView = (TextView)findViewById(R.id.tv_title);
         pBar = (ProgressBar)findViewById(R.id.tv_progress);
@@ -653,9 +669,10 @@ public class TVRemote extends Remote {
         
         Program prog = null;
 
+        FrontendLocation loc = null;
+        
         try {
-            if (loc == null)
-                loc = feMgr.getLoc();
+            loc = feMgr.getLoc();
             if (!loc.video) {
                 done();
                 return;
@@ -683,6 +700,9 @@ public class TVRemote extends Remote {
 
     }
     
+    /**
+     * Call finish() but jump to lastLocation first, if possible
+     */
     private void done() {
         if (feMgr != null && feMgr.isConnected() && jump) {
             try {

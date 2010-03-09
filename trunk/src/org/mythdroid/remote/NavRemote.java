@@ -32,9 +32,11 @@ import org.mythdroid.activities.MythDroid;
 
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -74,7 +76,13 @@ public class NavRemote extends Remote implements View.OnClickListener {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        
+        final SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        gesture = prefs.getString("tvDefaultStyle", "").equals("Gesture");
+        
         setupViews(gesture);
+        listenToGestures(gesture);
 
         if (getIntent().hasExtra(Extras.GUIDE.toString())) 
             jumpGuide = true;
@@ -152,7 +160,10 @@ public class NavRemote extends Remote implements View.OnClickListener {
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
         setupViews(gesture);
+        
         try {
+            if (feMgr == null)
+                onResume();
             updateLoc();
         } catch (IOException e) { ErrUtil.err(this, e); }
     }
@@ -257,6 +268,10 @@ public class NavRemote extends Remote implements View.OnClickListener {
         } catch (IOException e) { ErrUtil.err(this, e); }
     }
     
+    /**
+     * Setup the interactive views
+     * @param gesture - true for 'gesture' layout, false for 'button' 
+     */
     private void setupViews(boolean gesture) {
         setContentView(
             gesture ? R.layout.nav_gesture_remote : R.layout.nav_remote
@@ -284,6 +299,9 @@ public class NavRemote extends Remote implements View.OnClickListener {
 
     }
 
+    /**
+     * Update the frontend location display, start another remote if appropriate  
+     */
     private void updateLoc() throws IOException {
         
         if (calledByMusicRemote) return;
