@@ -83,13 +83,12 @@ public class MDDManager {
         ConnMgr cmgr = new ConnMgr(addr, 16546);
         ArrayList<String> cmds = new ArrayList<String>();
         
-        String line = null;
+        String line = cmgr.readLine();
         
-        while (line == null || (!line.equals("COMMANDS DONE"))) {
+        while (line != null && !line.equals("COMMANDS DONE")) {
+            if (line.startsWith("COMMAND"))
+                cmds.add(line.substring(line.indexOf("COMMAND") + 8));
             line = cmgr.readLine();
-            if (!line.startsWith("COMMAND"))
-                continue;
-            cmds.add(line.substring(line.indexOf("COMMAND") + 8));
         }
         
         cmgr.disconnect();

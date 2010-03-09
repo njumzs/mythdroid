@@ -21,6 +21,11 @@
     				
     	</PreferenceScreen>
     	
+    	<PreferenceScreen
+    		android:key="osdsettings"
+    		android:title="OSD Settings"
+    		android:summary="Configure display of phone events on MythTV OSD">
+    		
     	<CheckBoxPreference
     		android:key="osdCalls"
     		android:title="Show calls on OSD"
@@ -32,6 +37,31 @@
     		android:title="Show SMS on OSD"
     		android:summary="Show SMS on the MythTV OSD"
     		android:defaultValue="true"/>
+    	
+    	<CheckBoxPreference
+    		android:key="scrollSMS"
+    		android:title="Scroll SMS"
+    		android:summary="Uncheck to disable SMS scrolling"
+    		android:dependency="osdSMS"
+    		android:defaultValue="true"/>
+    		
+    	</PreferenceScreen>
+    		
+    	<ListPreference
+    		android:key="tvDefaultStyle"
+    		android:title="Default TV remote style"
+    		android:summary="Default layout for the TV remote"
+    		android:entries="@array/remoteStyles"
+    		android:entryValues="@array/remoteStyles"
+    		android:defaultValue="Button"/>
+    		
+    	<ListPreference
+    		android:key="navDefaultStyle"
+    		android:title="Default Nav remote style"
+    		android:summary="Default layout for the Nav remote"
+    		android:entries="@array/remoteStyles"
+    		android:entryValues="@array/remoteStyles"
+    		android:defaultValue="Button"/>
     	
     </PreferenceCategory>
     
