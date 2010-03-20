@@ -56,12 +56,12 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     
     private class RemoteGestureListener extends SimpleOnGestureListener {
 
-        public float scrollIntX = (int)(50 * scale + 0.5f), 
-                     scrollIntY = (int)(50 * scale + 0.5f);
+        public float scrollIntX = (int)(50 * scale), 
+                     scrollIntY = (int)(50 * scale);
 
-        final private float maxScrollSpeed = (float)(0.30 * scale + 0.5);
-        final private float minFlingSpeed  = (float)(360  * scale + 0.5);
-        final private float wobble         = (int)  (40   * scale + 0.5);
+        final private float maxScrollSpeed = (float)(0.30 * scale);
+        final private float minFlingSpeed  = (float)(360  * scale);
+        final private float wobble         = (int)  (40   * scale);
         
         final private static int   SCROLL_LOCK_UNLOCKED = 0;
         final private static int   SCROLL_LOCK_X        = 1, SCROLL_LOCK_Y = 2;
