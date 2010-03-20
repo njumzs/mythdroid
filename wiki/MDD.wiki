@@ -35,7 +35,7 @@ name of command => command to run
 For example, the following allows me to put an Ubuntu frontend to sleep:
 
 {{{
-Sleep => dbus-send --print-reply --system --dest=org.freedesktop.DeviceKit.Power /org/freedesktop/DeviceKit/Power org.freedesktop.DeviceKit.Power.Suspend
+Sleep => dbus-send --system --dest=org.freedesktop.DeviceKit.Power /org/freedesktop/DeviceKit/Power org.freedesktop.DeviceKit.Power.Suspend
 }}}
 
 Lines beginning with # are ignored.
