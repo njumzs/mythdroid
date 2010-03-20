@@ -118,7 +118,6 @@ public class MythDroid extends MDListActivity implements
     		Messages.getString("MythDroid.9"),    // Music
     		Messages.getString("MythDroid.10"),   // Guide
     		Messages.getString("MythDroid.11")    // Status
-    		
     	};
 
     /** ListAdapter containing the main menu entries */
@@ -408,14 +407,10 @@ public class MythDroid extends MDListActivity implements
 
                     if (beMgr == null) {
                         ((TextView)findViewById(R.id.emptyMsg))
-                        .setText(R.string.no_be);
+                            .setText(R.string.no_be);
                         ((TextView)findViewById(R.id.emptyDetail))
-                        .setText(R.string.no_be_detail);
-                        setListAdapter(
-                            new ArrayAdapter<String>(
-                                ctx, layout.simple_list_item_1
-                            )
-                        );
+                            .setText(R.string.no_be_detail);
+                        setListAdapter(null);
                     }
                     else
                         setListAdapter(menuAdapter);

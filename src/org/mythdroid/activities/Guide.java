@@ -218,6 +218,12 @@ public class Guide extends MDActivity {
         displayGuide(new Date());
 
     }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        channels.clear();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

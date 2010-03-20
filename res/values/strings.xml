@@ -42,4 +42,5 @@
 	<string name="mddCmd">Run MDD command</string>
 	<string name="mddCmds">MDD commands</string>
 	<string name="no_mddCmds">No MDD commands are defined</string>
+	<string name="stream_quality">Select stream quality</string>
 </resources>

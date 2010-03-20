@@ -51,6 +51,7 @@ public class RecordingDetail extends MDActivity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        addHereToFrontendChooser(VideoPlayer.class);
         setContentView(R.layout.recording_detail);
         livetv = getIntent().getBooleanExtra(Extras.LIVETV.toString(), false);
         setViews();

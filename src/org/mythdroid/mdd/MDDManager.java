@@ -106,7 +106,8 @@ public class MDDManager {
         cmgr.disconnect();
     }
     
-    public static ArrayList<Video> getVideos(String addr, String dir) throws IOException {
+    public static ArrayList<Video> 
+        getVideos(String addr, String dir) throws IOException {
         
         ArrayList<Video> videos = new ArrayList<Video>();
         ConnMgr cmgr = new ConnMgr(addr, 16546);
@@ -124,6 +125,22 @@ public class MDDManager {
         cmgr.disconnect();
         return videos;
         
+    }
+    
+    public static void 
+        streamFile(String addr, String file, int w, int h, int vb, int ab) 
+            throws IOException {
+        ConnMgr cmgr = new ConnMgr(addr, 16546);
+        cmgr.writeLine(
+            "STREAM " + w + "x" + h + " VB " + vb + " AB " + ab + " " + file
+        );
+        cmgr.disconnect();
+    }
+    
+    public static void stopStream(String addr) throws IOException {
+        ConnMgr cmgr = new ConnMgr(addr, 16546);
+        cmgr.writeLine("STOPSTREAM");
+        cmgr.disconnect();
     }
     
     /**

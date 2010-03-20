@@ -134,7 +134,7 @@ public class Videos extends MDActivity implements
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.videos);
-        
+        addHereToFrontendChooser(VideoPlayer.class);
         dirText = (TextView)findViewById(R.id.videoDir);
         lv = (ListView)findViewById(R.id.videoList);
         lv.setOnItemClickListener(this);
