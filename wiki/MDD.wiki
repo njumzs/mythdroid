@@ -16,7 +16,7 @@ For mdd to function, you must ensure that the following settings in the LCD page
 
 mdd should check these settings during installation and let you know if you need to take action.
 
-So, to install, download [http://mythdroid.googlecode.com/svn/trunk/mdd/mdd mdd] to each frontend and then:
+So, to install, download [http://mythdroid.googlecode.com/svn/trunk/mdd/mdd mdd] to the master backend and each frontend and then:
 
 {{{
 perl /path/to/mdd
