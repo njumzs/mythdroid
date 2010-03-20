@@ -123,7 +123,7 @@ public class VideoDetail extends MDActivity {
     @Override
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
-        setContentView(R.layout.recording_detail);
+        setContentView(R.layout.video_detail);
         setViews();
     }
     
