@@ -18,7 +18,6 @@
 
 package org.mythdroid.activities;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.WeakHashMap;
 
@@ -26,7 +25,6 @@ import org.mythdroid.Extras;
 import org.mythdroid.R;
 import org.mythdroid.data.Video;
 import org.mythdroid.data.VideoAdapter;
-import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.util.ErrUtil;
@@ -50,7 +48,6 @@ public class Videos extends MDActivity implements
     final private Handler handler   = new Handler();
     private Thread artThread        = null;
     private ListView lv             = null;
-    private FrontendManager feMgr   = null; 
     private ArrayList<Video> videos = null;
     private String path             = "ROOT";
     private TextView dirText        = null;
@@ -67,7 +64,9 @@ public class Videos extends MDActivity implements
         public void run() {
             
             try {
-                videos = MDDManager.getVideos(feMgr.getAddress(), path);
+                videos = MDDManager.getVideos(
+                    MythDroid.beMgr.getAddress(), path
+                );
             } catch (Exception e) {
                 ErrUtil.postErr(ctx, new Exception("Failed to connect to MDD"));
                 finish();
@@ -144,28 +143,7 @@ public class Videos extends MDActivity implements
         scale = getResources().getDisplayMetrics().density;
         
         showDialog(DIALOG_LOAD);
-      
-        try {
-            feMgr = MythDroid.connectFrontend(this);
-        } catch (IOException e) {
-            ErrUtil.err(this, e);
-            finish();
-            return;
-        }
-        
         MythDroid.wHandler.post(getVideos);
-    }
-    
-    @Override
-    public void onResume() {
-        super.onResume();
-        try {
-            feMgr = MythDroid.connectFrontend(this);
-        } catch (IOException e) {
-            ErrUtil.err(this, e);
-            finish();
-            return;
-        }
     }
     
     @Override
