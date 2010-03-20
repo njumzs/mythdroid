@@ -77,3 +77,7 @@ By default, information about incoming calls and SMS (including SMS content) are
 == Manual Backend Configuration ==
 
 You can manually configure the address of a MythTV backend in Settings, found by pressing the menu button on the Main Menu. You would have to do this if your MythTV backend is not on your local network.
+
+== Experimental Features ==
+
+Some documentation of features found in the trunk (development) version of !MythDroid can be found [ExperimentalFeatures here].
