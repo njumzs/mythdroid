@@ -1,0 +1,11 @@
+== Streaming ==
+
+Streaming of recordings and video is performed via MDD on the backend, which uses ffmpeg and vlc to transcode and stream the media. For this to work, you'll need [http://mythdroid.googlecode.com/svn/trunk/mdd/mdd MDD from trunk], ffmpeg and vlc installed on your backend.
+
+In !MythDroid, stream a recording or video by selecting "Here" from a frontend chooser (found by long pressing a recording or video or the 'play' button in a recording or video detail page).
+
+Transcoding the video requires a hefty cpu on the backend; a reasonable dual-core is probably the minimum. 
+
+No controls (except volume) are implemented - you can't pause, seek, etc. If anyone has any ideas about this, let us know.
+
+You should be able to stream any recording or video that ffmpeg can demux and decode (dvds ripped to iso won't work). If you have problems, check /tmp/ffmpeg.out and/or /tmp/vlc.out for more information. 
