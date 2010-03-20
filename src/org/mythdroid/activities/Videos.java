@@ -139,6 +139,7 @@ public class Videos extends MDActivity implements
         dirText = (TextView)findViewById(R.id.videoDir);
         lv = (ListView)findViewById(R.id.videoList);
         lv.setOnItemClickListener(this);
+        lv.setOnItemLongClickListener(this);
         
         scale = getResources().getDisplayMetrics().density;
         
@@ -195,6 +196,8 @@ public class Videos extends MDActivity implements
         AdapterView<?> adapter, View item, int pos, long itemid
     ) {
         Video video = videos.get(pos);
+        if (video.id == -1)
+            return true;
         setExtra(Extras.FILENAME.toString(), video.filename);
         setExtra(Extras.TITLE.toString(), video.title);
         nextActivity = TVRemote.class;
