@@ -46,6 +46,11 @@
        	<activity android:name=".activities.VideoDetail" 
         	android:label="Video Details"
         	android:configChanges="keyboardHidden|orientation"/>
+        	
+        <activity android:name=".activities.VideoPlayer" 
+        	android:screenOrientation="landscape"
+        	android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+        	android:configChanges="keyboardHidden|orientation"/>
                 	
         <activity android:name=".activities.Status" 
         	android:label="Status"

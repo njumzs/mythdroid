@@ -43,6 +43,7 @@ public class VideoDetail extends MDActivity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        addHereToFrontendChooser(VideoPlayer.class);
         setContentView(R.layout.video_detail);
         setViews();
     }

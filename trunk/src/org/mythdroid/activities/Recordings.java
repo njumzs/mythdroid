@@ -113,13 +113,8 @@ public class Recordings extends MDListActivity implements
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-
-        setListAdapter(
-            new ProgramAdapter(
-                this, R.layout.recording_list_item, new ArrayList<Program>()
-            )
-        );
-
+        setListAdapter(null);
+        addHereToFrontendChooser(VideoPlayer.class);
         getListView().setOnItemLongClickListener(this);
         refresh();
 
@@ -239,6 +234,7 @@ public class Recordings extends MDListActivity implements
         if (recordings != null) 
             recordings.clear();
         recordings = null;
+        setListAdapter(null);
         MythDroid.curProg = null;
     }
 

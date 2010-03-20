@@ -39,7 +39,7 @@ import android.content.DialogInterface.OnDismissListener;
 import android.database.Cursor;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 
 /** Base class for activities that display frontend choosers 
@@ -55,7 +55,7 @@ public abstract class MDActivity extends Activity {
      * The activity we are on the way to when the frontend chooser dialog
      * finishes
      */
-    protected Class<?> nextActivity = null;
+    protected Class<?> nextActivity = null, hereActivity = null;
 
     /** Extras to put in the intent passed to nextActivity */
     final private ArrayList<String> boolExtras = new ArrayList<String>();
@@ -63,16 +63,27 @@ public abstract class MDActivity extends Activity {
         new HashMap<String, Integer>();
     final private HashMap<String, String> stringExtras = 
         new HashMap<String, String>();
+    
+    private boolean onHere = false;
 
     /** Start nextActivity when the frontend dialog chooser is finished */
     protected OnDismissListener dismissListener =
         new OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                if (MythDroid.defaultFrontend == null || nextActivity == null)
+                if (
+                    (
+                        !onHere && (
+                            MythDroid.defaultFrontend == null || 
+                            nextActivity == null
+                        )
+                    ) || 
+                    (onHere && hereActivity == null)
+                )
                     return;
-                FrontendDB.close();
-                final Intent intent = new Intent().setClass(ctx, nextActivity);
+                final Intent intent = new Intent().setClass(
+                    ctx, onHere ? hereActivity : nextActivity
+                );
                 for (String extra : boolExtras)
                     intent.putExtra(extra,true);
                 for (String extra : intExtras.keySet())
@@ -80,6 +91,7 @@ public abstract class MDActivity extends Activity {
                 for (String extra : stringExtras.keySet())
                     intent.putExtra(extra, stringExtras.get(extra));
                 nextActivity = null;
+                onHere = false;
                 startActivity(intent);
             }
         };
@@ -148,12 +160,11 @@ public abstract class MDActivity extends Activity {
                 public void onItemClick(
                     AdapterView<?> av, View v, int pos, long id
                 ) {
-                    Cursor c = 
-                        ((SimpleCursorAdapter)av.getAdapter()).getCursor();
-                    c.moveToPosition(pos);
-                    MythDroid.defaultFrontend = 
-                        c.getString(FrontendDB.NAME);
-                    c.close();
+                    String fe = (String)av.getAdapter().getItem(pos);
+                    if (fe.equals("Here")) 
+                        onHere = true;
+                    else 
+                        MythDroid.defaultFrontend = fe;
                     d.dismiss();
                 }
             }
@@ -164,18 +175,45 @@ public abstract class MDActivity extends Activity {
     
     private void prepareFrontendDialog(final Dialog dialog) {
         
-        final SimpleCursorAdapter ca = new SimpleCursorAdapter(
-            ctx, R.layout.simple_list_item_1, FrontendDB.getFrontends(ctx),
-            new String[] { "name" }, new int[] { id.text1 }
-        );
-
-        if (ca.getCount() < 1) {
+        Cursor c = FrontendDB.getFrontends(ctx);
+        ArrayList<String> list = new ArrayList<String>();
+        
+        int num = c.getCount();
+        
+        if (hereActivity != null && num < 1) {
             ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
             return;
         }
-
-        ((AlertDialog)dialog).getListView().setAdapter(ca);
         
+        if (num > 0) {
+            c.moveToFirst();
+            do  {
+                list.add(c.getString(FrontendDB.NAME));
+            } while(c.moveToNext());
+        }
+        
+        c.close();
+        FrontendDB.close();
+        
+        if (hereActivity != null)
+            list.add("Here");
+        
+        ((AlertDialog)dialog).getListView().setAdapter(
+            new ArrayAdapter<String>(
+                ctx, R.layout.simple_list_item_1, id.text1, list
+            )
+        );
+        
+    }
+    
+    /**
+     * Add "Here" to the frontend chooser and call onHere in the
+     * supplied onHereListener if it's selected
+     * @param ohl - onHereListener with onHere() method to run if 
+     * "Here" is selected
+     */
+    protected void addHereToFrontendChooser(Class<?> activity) {
+        hereActivity = activity;
     }
     
     protected void setExtra(String name) {
