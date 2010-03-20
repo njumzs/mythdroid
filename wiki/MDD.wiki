@@ -1,6 +1,6 @@
 = MDD =
 
-MDD is designed to run on every frontend and 'push' a range of information that either cannot be accessed remotely by !MythDroid or that !MythDroid would otherwise have to poll for. This information includes detailed frontend location, details about currently playing programs and music (including album art), progress information, etc. 
+MDD is designed to run on the master backend and every frontend and 'push' a range of information that either cannot be accessed remotely by !MythDroid or that !MythDroid would otherwise have to poll for. This information includes detailed frontend location, details about currently playing programs and music (including album art), progress information, etc. 
 
 In addition MDD can run arbitary commands on frontends (see below) and allows !MythDroid to browse videos. 
 
