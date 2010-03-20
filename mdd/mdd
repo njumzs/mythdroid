@@ -30,7 +30,8 @@ use Time::HiRes qw(usleep);
 use MythTV;
 use Sys::Hostname;
 
-sub killKids();
+sub handleMdConn($);
+sub handleDisconnect($);
 sub cloneDb();
 sub readCommands();
 sub startLcdServer($);
@@ -45,6 +46,11 @@ sub lcdChannel($);
 sub lcdChannelProgress($);
 sub clientMsg($);
 sub sendMsg($);
+sub runCommand($);
+sub videoList($);
+sub streamFile($);
+sub stopStreaming();
+sub killKids();
 
 my $lcdServerPort = 6545;
 my $listenPort = 16546;
@@ -61,7 +67,8 @@ install() unless ($0 =~ /mythlcdserver$/);
 
 my (
     $lastData, $lastMenu, $lastMusic, $lastChannel, $data, $lcdClient, 
-    $client, $dbh, $albumartSth, $videoSth, $upnpVideoSth, $videoDir
+    $client, $dbh, $albumartSth, $videoSth, $upnpVideoSth, $recDirSth, 
+    $videoDir, $cpus, $streampid
 );
 my $lastPos = -1;
 my $size = 1024;
@@ -72,6 +79,16 @@ my @videoFields = (
         title subtitle director plot homepage year userrating length filename
     )
 );
+
+my $stream_cmd = 
+    'ffmpeg -i %FILE% -vcodec rawvideo -acodec pcm_s16le -deinterlace ' .
+    '-s %WIDTH%x%HEIGHT% -ac 2 -ar 48000 -copyts -async 100 -f asf -y - ' .
+    '2>/tmp/ffmpeg.out ' . 
+    '| /usr/bin/vlc -vvv -I dummy - --sout=\'' . 
+    '#transcode{vcodec=h264,venc=x264{no-cabac,level=30,keyint=250,' . 
+    'ref=4,bframes=0},vb=%VB%,threads=%THR%,width=%WIDTH%,height=%HEIGHT%,' .
+    'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2}' .
+    ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
 
 readCommands();
 
@@ -102,6 +119,7 @@ $s->add($lcdServer);
 # Connect to the database, prepare queries
 cloneDb();
 
+# Main Loop
 while (my @ready = $s->can_read) {
     
     foreach my $fd (@ready) {
@@ -116,52 +134,73 @@ while (my @ready = $s->can_read) {
 
         elsif ($fd == $listen) {
             # New connection from MythDroid
-            if (defined $client) {
-                $s->remove($client);
-                $client->close;
-            }
-
-            if ($client = $fd->accept) {
-                $s->add($client);
-                # Send a list of MDD commands
-                foreach my $key (keys %commands) {
-                    syswrite($client, "COMMAND $key\n");
-                }
-                syswrite($client, "COMMANDS DONE\n");
-                # Send last LCD statuses 
-                foreach my $key (keys %forNewClient) {
-                    syswrite($client, $forNewClient{$key});
-                }
-
-            }
+            handleMdConn($fd);
             next;
         }
 
         unless (sysread($fd, $data, $size)) {
             # Someone disconnected
-            $s->remove($fd);
-            $fd->close;
-            undef $client if (defined $client && ($fd == $client));
-            if ($fd == $lcdServer) {
-                # Reconnect if we lost connection to the real mythlcdserver
-                $lcdServer = connectLcdServer();
-                $s->add($lcdServer);
-            }
+            handleDisconnect($fd);
             next;
         }
 
         if ($fd == $lcdServer) {
+            # Ferry data from lcdserver -> mythfrontend
             syswrite($lcdClient, $data);
         }
         elsif ($client && $fd == $client) {
+            # From MythDroid
             $data =~ s/\r//;
             clientMsg($data);
         }
         else {
+            # Process and ferry data from mythfrontend -> lcdserver
             foreach (split /\n/, $data) { lcdData($_) if length > 4 }
             syswrite($lcdServer, $data);
         }
 
+    }
+
+}
+
+# Handle new connection from MythDroid
+sub handleMdConn($) {
+
+    my $fd = shift;
+
+    if (defined $client) {
+        $s->remove($client);
+        $client->close;
+    }
+
+    if ($client = $fd->accept) {
+        $s->add($client);
+        # Send a list of MDD commands
+        foreach my $key (keys %commands) {
+            syswrite($client, "COMMAND $key\n");
+        }
+        syswrite($client, "COMMANDS DONE\n");
+        # Send last LCD statuses 
+        foreach my $key (keys %forNewClient) {
+            syswrite($client, $forNewClient{$key});
+        }
+
+    }
+
+}
+
+sub handleDisconnect($) {
+
+    my $fd = shift;
+
+    # Someone disconnected
+    $s->remove($fd);
+    $fd->close;
+    undef $client if (defined $client && ($fd == $client));
+    if ($fd == $lcdServer) {
+        # Reconnect if we lost connection to the real mythlcdserver
+        $lcdServer = connectLcdServer();
+        $s->add($lcdServer);
     }
 
 }
@@ -186,11 +225,16 @@ sub cloneDb() {
     );
 
     $upnpVideoSth = $dbh->prepare(
-        'SELECT intid from upnpmedia where filepath = ?'
+        'SELECT intid FROM upnpmedia WHERE filepath = ?'
+    );
+
+    $recDirSth = $dbh->prepare(
+        'SELECT dirname FROM storagegroup WHERE groupname = "Default"'
     );
 
 }
 
+# Parse MDD commands from /etc/mdd.conf
 sub readCommands() {
 
     %commands = ();
@@ -428,6 +472,15 @@ sub lcdChannelProgress($) {
 
 }
 
+sub sendMsg($) {
+
+    my $msg = shift;
+    $msg .= "\n";
+    syswrite($client, $msg) if (defined $client);
+
+}
+
+
 sub clientMsg($) {
 
     my $msg = shift;
@@ -437,6 +490,12 @@ sub clientMsg($) {
     }
     elsif ($msg =~ /VIDEOLIST (.*)$/) {
         videoList($1);
+    }
+    elsif ($msg =~ /STREAM (.*)$/) {
+        streamFile($1);
+    }
+    elsif ($msg =~ /STOPSTREAM/) {
+        stopStreaming();
     }
 
 }
@@ -510,13 +569,65 @@ sub videoList($) {
 
 }
 
-sub sendMsg($) {
+sub streamFile($) {
+    
+    my $file = shift;
+    my $dir;
+    my $pat = qr/(\d+)x(\d+)\s+VB\s+(\d+)\s+AB\s+(\d+)\s+/;
 
-    my $msg = shift;
+    my ($width, $height, $vb, $ab) = $file =~ /$pat/;
+    $file =~ s/$pat//;
 
-    $msg .= "\n";
+    unless (defined $cpus) {
+        my $buf;
+        open CPUS, "</sys/devices/system/cpu/present";
+        read CPUS, $buf, 64;
+        $cpus = () = $buf =~ /(\d+)/g;
+        close CPUS;
+    }
 
-    syswrite($client, $msg) if (defined $client);
+    if ($file =~ /^myth:\/\//) {
+        unless ($recDirSth->execute()) {
+            cloneDb();
+            $recDirSth->execute();
+        }
+
+        if (my $aref = $recDirSth->fetchrow_arrayref) {
+            $dir = $aref->[0];
+        }
+    
+        $file =~ s/.*\///;
+
+        $file = $dir . $file;
+    }
+    else {
+        $file =~ s/ /\\ /g;
+    }
+
+    my $cmd = $stream_cmd;
+    $cmd =~ s/%FILE%/$file/;
+    $cmd =~ s/%VB%/$vb/;
+    $cmd =~ s/%AB%/$ab/;
+    $cmd =~ s/%THR%/$cpus/;
+    $cmd =~ s/%WIDTH%/$width/g;
+    $cmd =~ s/%HEIGHT%/$height/g;
+
+    if (($streampid = fork()) == 0) { 
+        system($cmd); 
+        exit 0;
+    }
+
+}
+
+sub stopStreaming() {
+
+    return unless $streampid;
+
+    # I'd like to setpgrp in the child but that
+    # seems to cause vlc issues :(
+    kill 'KILL', $streampid, $streampid+1, $streampid+2, $streampid+3;
+    waitpid $streampid, 0;
+    undef $streampid;
 
 }
 
@@ -534,9 +645,9 @@ sub install {
     print "Installing mdd..\n";
     print "Stopping mythfrontend and mythlcdserver\n";
     system(
-        "killall mythfrontend;" .
-        "killall mythfrontend.real;" . 
-        "killall mythlcdserver"
+        "killall mythfrontend 2>/dev/null;" .
+        "killall mythfrontend.real 2>/dev/null;" . 
+        "killall mythlcdserver 2>/dev/null"
     );
     my $path = (`which mythlcdserver`)[0];
     $path =~ s/\/mythlcdserver$//;
