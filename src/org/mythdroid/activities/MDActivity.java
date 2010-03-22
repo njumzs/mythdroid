@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import org.mythdroid.R;
 import org.mythdroid.frontend.FrontendDB;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 
 import android.R.drawable;
@@ -161,7 +162,7 @@ public abstract class MDActivity extends Activity {
                     AdapterView<?> av, View v, int pos, long id
                 ) {
                     String fe = (String)av.getAdapter().getItem(pos);
-                    if (fe.equals("Here")) 
+                    if (fe.equals(Messages.getString("MDActivity.0")))  // Here //$NON-NLS-1$
                         onHere = true;
                     else 
                         MythDroid.defaultFrontend = fe;
@@ -196,7 +197,7 @@ public abstract class MDActivity extends Activity {
         FrontendDB.close();
         
         if (hereActivity != null)
-            list.add("Here");
+            list.add(Messages.getString("MDActivity.1")); // Here //$NON-NLS-1$
         
         ((AlertDialog)dialog).getListView().setAdapter(
             new ArrayAdapter<String>(

@@ -19,6 +19,7 @@
 package org.mythdroid;
 
 import org.mythdroid.frontend.OSDMessage;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.PhoneUtil;
 
 import android.content.BroadcastReceiver;
@@ -29,6 +30,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.gsm.SmsMessage;
 
+/**
+ * A BroadcastReceiver that looks for incoming calls / SMS
+ * and displays them on the MythTV OSD
+ */
 @SuppressWarnings("deprecation")
 public class BCastReceiver extends BroadcastReceiver {
 
@@ -37,9 +42,9 @@ public class BCastReceiver extends BroadcastReceiver {
 
         final SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(ctx);
-        final boolean showCalls = prefs.getBoolean("osdCalls", true);
-        final boolean showSMS = prefs.getBoolean("osdSMS", true);
-        final boolean scrollSMS = prefs.getBoolean("scrollSMS", true);
+        final boolean showCalls = prefs.getBoolean("osdCalls", true);   //$NON-NLS-1$
+        final boolean showSMS = prefs.getBoolean("osdSMS", true);       //$NON-NLS-1$
+        final boolean scrollSMS = prefs.getBoolean("scrollSMS", true);  //$NON-NLS-1$
         final String action = intent.getAction();
         String number, name = null;
         
@@ -69,16 +74,17 @@ public class BCastReceiver extends BroadcastReceiver {
         
         else if (
             showSMS &&
-            action.equals("android.provider.Telephony.SMS_RECEIVED")
+            action.equals("android.provider.Telephony.SMS_RECEIVED") //$NON-NLS-1$
         ) {
             Bundle bundle = intent.getExtras();
-            Object[] pdus = (Object[])bundle.get("pdus");
+            Object[] pdus = (Object[])bundle.get("pdus"); //$NON-NLS-1$
             
             try {
                 for (int i = 0; i < pdus.length; i++){
                     SmsMessage msg = SmsMessage.createFromPdu((byte[]) pdus[i]);
-                    String m = "SMS from " + msg.getDisplayOriginatingAddress() +
-                        ": " + msg.getDisplayMessageBody();
+                    String m = Messages.getString("BCastReceiver.5") + // SMS from //$NON-NLS-1$ 
+                        msg.getDisplayOriginatingAddress() + 
+                        ": " + msg.getDisplayMessageBody(); //$NON-NLS-1$
                     if (scrollSMS)
                         OSDMessage.Scroller(m, m.length() / 9 + 8);
                     else

@@ -49,6 +49,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+/**
+ *  ListActivity displays status of recorders
+ */
 public class StatusRecorders extends ListActivity {
 
     final private static int REFRESH_NEEDED = Activity.RESULT_FIRST_USER;
@@ -70,7 +73,7 @@ public class StatusRecorders extends ListActivity {
             encoders.clear();
 
             NodeList encoderItems = 
-                doc.getElementsByTagName("Encoder");
+                doc.getElementsByTagName("Encoder"); //$NON-NLS-1$
 
             for (int i = 0; i < encoderItems.getLength(); i++)
                 encoders.add(new Encoder(encoderItems.item(i)));
@@ -92,7 +95,7 @@ public class StatusRecorders extends ListActivity {
             try {
                 Status.getStatus();
             } catch (SAXException e) {
-                ErrUtil.err(ctx, Messages.getString("Status.10"));
+                ErrUtil.err(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
             } catch (Exception e) { ErrUtil.err(ctx, e); }
             handler.post(refreshEncoders);
         }
@@ -101,10 +104,10 @@ public class StatusRecorders extends ListActivity {
     private class Encoder {
 
         private String[] states = { 
-        		Messages.getString("StatusRecorders.1"),  // Idle
-        		Messages.getString("StatusRecorders.2"),  // Live TV
-        		"?", "?", 
-        		Messages.getString("StatusRecorders.5")   // Recording
+        		Messages.getString("StatusRecorders.1"),  // Idle //$NON-NLS-1$
+        		Messages.getString("StatusRecorders.2"),  // Live TV //$NON-NLS-1$
+        		"?", "?",  //$NON-NLS-1$ //$NON-NLS-2$
+        		Messages.getString("StatusRecorders.5")   // Recording //$NON-NLS-1$
         };
 
         public int     id;
@@ -115,13 +118,13 @@ public class StatusRecorders extends ListActivity {
         public Encoder(Node item) {
 
             NamedNodeMap attr = item.getAttributes();
-            id = Integer.parseInt(attr.getNamedItem("id").getNodeValue());
+            id = Integer.parseInt(attr.getNamedItem("id").getNodeValue()); //$NON-NLS-1$
             local = 
-                attr.getNamedItem("local").getNodeValue().equals("1")
+                attr.getNamedItem("local").getNodeValue().equals("1") //$NON-NLS-1$ //$NON-NLS-2$
                     ? true : false;
-            hostname = attr.getNamedItem("hostname").getNodeValue();
+            hostname = attr.getNamedItem("hostname").getNodeValue(); //$NON-NLS-1$
             state = states[
-                Integer.parseInt(attr.getNamedItem("state").getNodeValue())
+                Integer.parseInt(attr.getNamedItem("state").getNodeValue()) //$NON-NLS-1$
             ];
 
             if (!item.hasChildNodes()) return;
@@ -134,7 +137,7 @@ public class StatusRecorders extends ListActivity {
             for (int i = 0; i < numNodes; i++) {
                 Node node = nodes.item(i);
                 name = node.getNodeName();
-                if (name != null && name.equals("Program")) {
+                if (name != null && name.equals("Program")) { //$NON-NLS-1$
                     ProgNode = node;
                     break;
                 }
@@ -185,17 +188,19 @@ public class StatusRecorders extends ListActivity {
             Encoder enc = encoders.get(pos);
 
             vHolder.encoder.setText(
-                Messages.getString("StatusRecorders.12") + enc.id + "    (" +
-                (enc.local ? Messages.getString("StatusRecorders.14") + 
-                enc.hostname : Messages.getString("StatusRecorders.15")) + ")"
+                Messages.getString("StatusRecorders.12") + enc.id + "    (" + //$NON-NLS-1$ //$NON-NLS-2$
+                (enc.local ? Messages.getString("StatusRecorders.14") +  //$NON-NLS-1$
+                enc.hostname : Messages.getString("StatusRecorders.15")) + ")" //$NON-NLS-1$ //$NON-NLS-2$
             );
             vHolder.state.setText(enc.state);
             if (enc.program != null) {
                 vHolder.program.setText(
-                    enc.program.Title + " on " + enc.program.Channel
+                    enc.program.Title + 
+                    Messages.getString("StatusRecorders.0") + // on //$NON-NLS-1$ 
+                    enc.program.Channel 
                 );
                 vHolder.endTime.setText(
-                		Messages.getString("StatusRecorders.18") + 
+                		Messages.getString("StatusRecorders.18") +  //$NON-NLS-1$
                 		enc.program.endString()
                 );
                 vHolder.rec.setVisibility(View.VISIBLE);

@@ -38,7 +38,7 @@ public class XMLHandler extends DefaultHandler {
         /** Name of the element */
         public String name;
         /** Text contained in the element or the empty string */
-        public String text = "";
+        public String text = ""; //$NON-NLS-1$
         /** HashMap of name -> Element */
         public HashMap<String, Element> elements = 
             new HashMap<String, Element>(16);
@@ -93,11 +93,10 @@ public class XMLHandler extends DefaultHandler {
 
             if (elem != null)
                 return elem;
-            else {
-                elem = new Element(name);
-                elements.put(name, elem);
-                return elem;
-            }
+            
+            elem = new Element(name);
+            elements.put(name, elem);
+            return elem;
 
         }
 
@@ -153,7 +152,7 @@ public class XMLHandler extends DefaultHandler {
         if (!curElem.name.equals(name)) return;
         if (curElem.text.length() > 0) {
             curElem.textListener.end(curElem.text);
-            curElem.text = "";
+            curElem.text = ""; //$NON-NLS-1$
         }
         if (curElem.endListener != null) 
             curElem.endListener.end();

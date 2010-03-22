@@ -42,7 +42,7 @@ public class FrontendManager {
      */
     public FrontendManager(String name, String host) throws IOException {
         if (MythDroid.debug) 
-            Log.d("FrontendManager", "Connecting to " + host + ":6546");
+            Log.d("FrontendManager", "Connecting to " + host + ":6546"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         cmgr = new ConnMgr(host, 6546);
         if (cmgr == null) return;
         this.name = name;
@@ -71,11 +71,10 @@ public class FrontendManager {
      * @return true if we jumped ok, false otherwise
      */
     public synchronized boolean jumpTo(final String loc) throws IOException {
-        cmgr.writeLine("jump " + loc);
-        if (getResponse().get(0).equals("OK"))
+        cmgr.writeLine("jump " + loc); //$NON-NLS-1$
+        if (getResponse().get(0).equals("OK")) //$NON-NLS-1$
             return true;
-        else
-            return false;
+        return false;
     }
 
     /**
@@ -85,11 +84,10 @@ public class FrontendManager {
      */
     public synchronized boolean jumpTo(FrontendLocation loc) throws IOException {
         if (cmgr == null || loc == null || loc.location == null) return false;
-        cmgr.writeLine("jump " + loc.location.toLowerCase());
-        if (getResponse().get(0).equals("OK"))
+        cmgr.writeLine("jump " + loc.location.toLowerCase()); //$NON-NLS-1$
+        if (getResponse().get(0).equals("OK")) //$NON-NLS-1$
             return true;
-        else
-            return false;
+        return false;
     }
 
     /**
@@ -98,11 +96,10 @@ public class FrontendManager {
      * @return true if the frontend accepted the key, false otherwise
      */
     public synchronized boolean sendKey(final Key key) throws IOException {
-        cmgr.writeLine("key " + key.str());
-        if (getResponse().get(0).equals("OK"))
+        cmgr.writeLine("key " + key.str()); //$NON-NLS-1$
+        if (getResponse().get(0).equals("OK")) //$NON-NLS-1$
             return true;
-        else
-            return false;
+        return false;
     }
 
     /**
@@ -111,11 +108,10 @@ public class FrontendManager {
      * @return true if the frontend accepted the key, false otherwise
      */
     public synchronized boolean sendKey(final String key) throws IOException {
-        cmgr.writeLine("key " + key);
-        if (getResponse().get(0).equals("OK"))
+        cmgr.writeLine("key " + key); //$NON-NLS-1$
+        if (getResponse().get(0).equals("OK")) //$NON-NLS-1$
             return true;
-        else
-            return false;
+        return false;
     }
 
     /**
@@ -123,15 +119,15 @@ public class FrontendManager {
      * @return a FrontendLocation
      */
     public synchronized FrontendLocation getLoc() throws IOException {
-        cmgr.writeLine("query loc");
+        cmgr.writeLine("query loc"); //$NON-NLS-1$
         String loc = getResponse().get(0);
 
         int i = 0;
-        while (loc.startsWith("ERROR: Timed out") && i++ < 4) {
+        while (loc.startsWith("ERROR: Timed out") && i++ < 4) { //$NON-NLS-1$
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {}
-            cmgr.writeLine("query loc");
+            cmgr.writeLine("query loc"); //$NON-NLS-1$
             loc = getResponse().get(0);
         }
 
@@ -145,11 +141,11 @@ public class FrontendManager {
      */
     public synchronized HashMap<String,String> getLocs() throws IOException {
         HashMap<String,String> locs = new HashMap<String,String>(44); 
-        cmgr.writeLine("help jump");
+        cmgr.writeLine("help jump"); //$NON-NLS-1$
         ArrayList<String> lines = getResponse();
         for (String line : lines) {
-            if (!line.matches(".*\\s+-\\s+.*")) continue;
-            String[] l = line.split(" - ");
+            if (!line.matches(".*\\s+-\\s+.*")) continue; //$NON-NLS-1$
+            String[] l = line.split(" - "); //$NON-NLS-1$
             locs.put(l[0].trim(), l[1].trim());
         }
         return locs;
@@ -161,11 +157,10 @@ public class FrontendManager {
      * @return true if starting playing ok, false otherwise
      */
     public synchronized boolean playRec(final Program prog) throws IOException {
-        cmgr.writeLine("play prog " + prog.playbackID());
-        if (getResponse().get(0).equals("OK"))
+        cmgr.writeLine("play prog " + prog.playbackID()); //$NON-NLS-1$
+        if (getResponse().get(0).equals("OK")) //$NON-NLS-1$
             return true;
-        else
-            return false;
+        return false;
     }
     
     /**
@@ -174,11 +169,10 @@ public class FrontendManager {
      * @return true if starting playing ok, false otherwise
      */
     public synchronized boolean playFile(final String file) throws IOException {
-        cmgr.writeLine("play file " + file);
-        if (getResponse().get(0).equals("OK"))
+        cmgr.writeLine("play file " + file); //$NON-NLS-1$
+        if (getResponse().get(0).equals("OK")) //$NON-NLS-1$
             return true;
-        else
-            return false;
+        return false;
     }
 
     /**
@@ -187,11 +181,10 @@ public class FrontendManager {
      * @return boolean if we switched ok, false otherwise
      */
     public synchronized boolean playChan(int chanid) throws IOException {
-        cmgr.writeLine("play chanid " + chanid);
-        if (getResponse().get(0).equals("OK"))
+        cmgr.writeLine("play chanid " + chanid); //$NON-NLS-1$
+        if (getResponse().get(0).equals("OK")) //$NON-NLS-1$
             return true;
-        else
-            return false;
+        return false;
     }
 
     /**
@@ -211,10 +204,10 @@ public class FrontendManager {
     
     private synchronized ArrayList<String> getResponse() throws IOException {
         ArrayList<String> resp = new ArrayList<String>();
-        String msg = "";
+        String msg = ""; //$NON-NLS-1$
         while (true) {
             msg = cmgr.readLine();
-            if (msg.equals("#")) break;
+            if (msg.equals("#")) break; //$NON-NLS-1$
             resp.add(msg);
         }
         return resp;

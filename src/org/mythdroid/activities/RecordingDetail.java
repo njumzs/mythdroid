@@ -24,6 +24,7 @@ import org.mythdroid.Extras;
 import org.mythdroid.R;
 import org.mythdroid.data.Program;
 import org.mythdroid.remote.TVRemote;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 
 import android.app.Activity;
@@ -40,6 +41,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+/**
+ * MDActivity showing a Recording's details
+ * Allows user to stop, delete or play the recording
+ */
 public class RecordingDetail extends MDActivity {
 
     final static private int DELETE_DIALOG = 0, STOP_DIALOG = 1;
@@ -151,9 +156,9 @@ public class RecordingDetail extends MDActivity {
         ((TextView)findViewById(R.id.rec_channel)).setText(prog.Channel);
         ((TextView)findViewById(R.id.rec_start)).setText(prog.startString());
         ((TextView)findViewById(R.id.rec_category))
-            .setText("Type: " + prog.Category);
+            .setText(Messages.getString("RecordingDetail.0") + prog.Category); // type: //$NON-NLS-1$
         ((TextView)findViewById(R.id.rec_status))
-            .setText("Status: " + prog.Status.msg());
+            .setText(Messages.getString("RecordingDetail.1") + prog.Status.msg()); // status: //$NON-NLS-1$
         ((TextView)findViewById(R.id.rec_desc)).setText(prog.Description);
 
         if (livetv) return;
@@ -172,6 +177,7 @@ public class RecordingDetail extends MDActivity {
                     }
                 );
                         
+            //$FALL-THROUGH$
             case RECORDED:
             case CURRENT:
                 final Button del = (Button) findViewById(R.id.rec_del);

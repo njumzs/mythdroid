@@ -42,6 +42,10 @@ public class Channel implements Comparable<Channel> {
      * Channel objects as they are parsed from XML
      */
     static public interface ChannelListener {
+        /**
+         * Called when a Channel has been parsed from XML
+         * @param channel - Channel object
+         */
         public void channel(Channel channel);
     }
     
@@ -56,7 +60,7 @@ public class Channel implements Comparable<Channel> {
         
         /**
          * Constructor
-         * @param context - activity context, used for toasting errors
+         * @param ctx - activity context, used for toasting errors
          * @param elem - a Channel (XMLHandler) Element
          * @param listener - A ChannelListener to call back with Channels 
          */
@@ -74,7 +78,7 @@ public class Channel implements Comparable<Channel> {
                 }
             );
 
-            final Element progElem = elem.getChild("Program");
+            final Element progElem = elem.getChild("Program"); //$NON-NLS-1$
 
             progElem.setStartElementListener(
                 new ProgramXMLParser(ctx, progElem, 
@@ -96,15 +100,28 @@ public class Channel implements Comparable<Channel> {
         @Override
         public void start(Attributes attr) {
             chan = new Channel();
-            chan.callSign = attr.getValue("callSign");
-            chan.num = attr.getValue("chanNum");
-            chan.ID = Integer.valueOf(attr.getValue("chanId"));
+            chan.callSign = attr.getValue("callSign"); //$NON-NLS-1$
+            chan.num = attr.getValue("chanNum"); //$NON-NLS-1$
+            chan.ID = Integer.valueOf(attr.getValue("chanId")); //$NON-NLS-1$
         }
 
     }
 
-    public String callSign, num;
+    /**
+     * String representing channel callsign
+     */
+    public String callSign;
+    /**
+     * String representing channel number
+     */
+    public String num;
+    /**
+     * Int representing channel ID
+     */
     public int ID;
+    /**
+     * ArrayList of Programs
+     */
     public ArrayList<Program> programs = new ArrayList<Program>();
 
     /** Construct an empty Channel */

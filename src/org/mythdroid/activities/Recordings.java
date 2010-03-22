@@ -47,6 +47,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+/**
+ * MDListActivity shows list of Recordings
+ */
 public class Recordings extends MDListActivity implements
     AdapterView.OnItemLongClickListener {
 
@@ -76,7 +79,7 @@ public class Recordings extends MDListActivity implements
             try {
                 recordings = MythDroid.beMgr.getRecordings();
             } catch (IOException e) { 
-                ErrUtil.postErr(ctx, Messages.getString("Recordings.0"));
+                ErrUtil.postErr(ctx, Messages.getString("Recordings.0")); //$NON-NLS-1$
                 dismissDialog(DIALOG_LOAD);
                 finish();
             }

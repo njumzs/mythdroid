@@ -46,6 +46,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+/**
+ * ListActivity displays upcoming/recent jobs
+ */
 public class StatusJobs extends ListActivity {
 
     private ArrayList<Job> jobs = new ArrayList<Job>(8);
@@ -86,15 +89,15 @@ public class StatusJobs extends ListActivity {
     }
 
     private enum JobType {
-        NONE        (0,     Messages.getString("StatusJobs.0")),
-        TRANSCODE   (1,     Messages.getString("StatusJobs.1")),
-        COMMFLAG    (2,     Messages.getString("StatusJobs.2")),
-        SYSTEM      (0xff,  Messages.getString("StatusJobs.3")),
-        USERJOB1    (0x100, Messages.getString("StatusJobs.4")),
-        USERJOB2    (0x200, Messages.getString("StatusJobs.5")),
-        USERJOB3    (0x400, Messages.getString("StatusJobs.6")),
-        USERJOB4    (0x800, Messages.getString("StatusJobs.7")),
-        USERJOB     (0xff00,Messages.getString("StatusJobs.8"));
+        NONE        (0,     Messages.getString("StatusJobs.0")), //$NON-NLS-1$
+        TRANSCODE   (1,     Messages.getString("StatusJobs.1")), //$NON-NLS-1$
+        COMMFLAG    (2,     Messages.getString("StatusJobs.2")), //$NON-NLS-1$
+        SYSTEM      (0xff,  Messages.getString("StatusJobs.3")), //$NON-NLS-1$
+        USERJOB1    (0x100, Messages.getString("StatusJobs.4")), //$NON-NLS-1$
+        USERJOB2    (0x200, Messages.getString("StatusJobs.5")), //$NON-NLS-1$
+        USERJOB3    (0x400, Messages.getString("StatusJobs.6")), //$NON-NLS-1$
+        USERJOB4    (0x800, Messages.getString("StatusJobs.7")), //$NON-NLS-1$
+        USERJOB     (0xff00,Messages.getString("StatusJobs.8")); //$NON-NLS-1$
 
         private int     value;
         private String  msg;
@@ -145,15 +148,15 @@ public class StatusJobs extends ListActivity {
 
                 NamedNodeMap attr = item.getAttributes();
                 startTime = MythDroid.dateFmt.parse(
-                    attr.getNamedItem("startTime").getNodeValue()
+                    attr.getNamedItem("startTime").getNodeValue() //$NON-NLS-1$
                 );
                 status = JobStatus.get(
-                    Integer.valueOf(attr.getNamedItem("status").getNodeValue())
+                    Integer.valueOf(attr.getNamedItem("status").getNodeValue()) //$NON-NLS-1$
                 );
                 type = JobType.get(
-                    Integer.valueOf(attr.getNamedItem("type").getNodeValue())
+                    Integer.valueOf(attr.getNamedItem("type").getNodeValue()) //$NON-NLS-1$
                 );
-                hostname = attr.getNamedItem("hostname").getNodeValue();
+                hostname = attr.getNamedItem("hostname").getNodeValue(); //$NON-NLS-1$
 
                 NodeList nodes = item.getChildNodes();
                 int numNodes = nodes.getLength();
@@ -163,11 +166,11 @@ public class StatusJobs extends ListActivity {
                     Node node = nodes.item(i);
                     name = node.getNodeName();
                     if (name != null) {
-                        if (name.equals("Program"))
+                        if (name.equals("Program")) //$NON-NLS-1$
                             program = new Program(node);
                         else if (node.getNodeType() == Node.TEXT_NODE) {
                             name = node.getNodeValue();
-                            if (!name.startsWith("\n"))
+                            if (!name.startsWith("\n")) //$NON-NLS-1$
                                 comments = name;
                         }
                     }
@@ -218,8 +221,9 @@ public class StatusJobs extends ListActivity {
             vHolder.title.setText(j.program.Title);
             vHolder.type.setText(j.type.msg());
             vHolder.details.setText(
-                "Started " + MythDroid.dispFmt.format(j.startTime) +
-                " on " + j.hostname
+                Messages.getString("StatusJobs.9") + // Started //$NON-NLS-1$
+                MythDroid.dispFmt.format(j.startTime) + 
+                Messages.getString("StatusJobs.25") + j.hostname // on //$NON-NLS-1$
             );
             vHolder.comments.setText(j.comments);
             
@@ -243,7 +247,7 @@ public class StatusJobs extends ListActivity {
         super.onCreate(icicle);
 
         Document doc = Status.statusDoc;
-        NodeList jobNodes = doc.getElementsByTagName("Job");
+        NodeList jobNodes = doc.getElementsByTagName("Job"); //$NON-NLS-1$
 
         for (int i = 0; i < jobNodes.getLength(); i++)
             jobs.add(new Job(jobNodes.item(i)));

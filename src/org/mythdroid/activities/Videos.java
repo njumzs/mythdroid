@@ -27,6 +27,7 @@ import org.mythdroid.data.Video;
 import org.mythdroid.data.VideoAdapter;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.remote.TVRemote;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 
 import android.content.Intent;
@@ -39,6 +40,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+/**
+ * MDActivity displays browsable list of Videos
+ */
 public class Videos extends MDActivity implements 
     ListView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     
@@ -49,7 +53,7 @@ public class Videos extends MDActivity implements
     private Thread artThread        = null;
     private ListView lv             = null;
     private ArrayList<Video> videos = null;
-    private String path             = "ROOT";
+    private String path             = "ROOT"; //$NON-NLS-1$
     private TextView dirText        = null;
     private boolean fetchingArt     = false;
     /** Scale factor for pixel values for different display densities */
@@ -68,7 +72,7 @@ public class Videos extends MDActivity implements
                     MythDroid.beMgr.getAddress(), path
                 );
             } catch (Exception e) {
-                ErrUtil.postErr(ctx, new Exception("Failed to connect to MDD"));
+                ErrUtil.postErr(ctx, new Exception("Failed to connect to MDD")); //$NON-NLS-1$
                 finish();
                 return;
             }
@@ -154,10 +158,10 @@ public class Videos extends MDActivity implements
         Video video = videos.get(pos);
         
         if (video.id == -1) {
-            if (path.equals("ROOT"))
+            if (path.equals("ROOT")) //$NON-NLS-1$
                 path = video.title;
             else
-                path += "/" + video.title;
+                path += "/" + video.title; //$NON-NLS-1$
             dirText.setText(currentDir(path));
             showDialog(DIALOG_LOAD);
             MythDroid.wHandler.post(getVideos);
@@ -188,12 +192,12 @@ public class Videos extends MDActivity implements
         
         if (code == KeyEvent.KEYCODE_BACK) {
             
-            if (path.equals("ROOT")) 
+            if (path.equals("ROOT"))  //$NON-NLS-1$
                 return super.onKeyDown(code, event);
             int slash = path.lastIndexOf('/');
             if (slash == -1) {
-                path = "ROOT";
-                dirText.setText("Videos");
+                path = "ROOT"; //$NON-NLS-1$
+                dirText.setText(Messages.getString("Videos.0")); // Videos //$NON-NLS-1$
             }
             else {
                 path = path.substring(0, slash);
@@ -213,8 +217,7 @@ public class Videos extends MDActivity implements
         int slash = path.lastIndexOf('/');
         if (slash == -1)
             return path;
-        else
-            return path.substring(slash + 1);
+        return path.substring(slash + 1);
     }
   
     

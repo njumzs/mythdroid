@@ -62,13 +62,13 @@ public class Video {
      */
     public Video(String line) {
                 
-        if (line.startsWith("DIRECTORY")) {
-            title = line.substring(line.indexOf("DIRECTORY") + 10);
+        if (line.startsWith("DIRECTORY")) { //$NON-NLS-1$
+            title = line.substring(line.indexOf("DIRECTORY") + 10); //$NON-NLS-1$
             return;
         }
         
-        List<String> fields = Arrays.asList(line.split("\\|\\|"));
-        fields.set(0, fields.get(0).replaceFirst("VIDEO ", ""));
+        List<String> fields = Arrays.asList(line.split("\\|\\|")); //$NON-NLS-1$
+        fields.set(0, fields.get(0).replaceFirst("VIDEO ", "")); //$NON-NLS-1$ //$NON-NLS-2$
                        
         id = Integer.valueOf(fields.get(ID));
         title = fields.get(TITLE);
@@ -76,11 +76,11 @@ public class Video {
         director = fields.get(DIRECTOR);
         plot = fields.get(PLOT);
         homepage = fields.get(HOMEPAGE);
-        year = fields.get(YEAR).matches("[0-9]+") ?
+        year = fields.get(YEAR).matches("[0-9]+") ? //$NON-NLS-1$
                    Integer.valueOf(fields.get(YEAR)) : 0;
-        rating = fields.get(USERRATING).matches("[0-9.]+") ?
+        rating = fields.get(USERRATING).matches("[0-9.]+") ? //$NON-NLS-1$
                    Float.parseFloat(fields.get(USERRATING)) : 0;
-        length = fields.get(LENGTH).matches("[0-9]+") ?
+        length = fields.get(LENGTH).matches("[0-9]+") ? //$NON-NLS-1$
                    Integer.valueOf(fields.get(LENGTH)) : 0;
         filename = fields.get(FILENAME);
         
@@ -102,17 +102,19 @@ public class Video {
         try {
             url = new URL(
                 MythDroid.beMgr.getStatusURL() +
-                "/Myth/GetVideoArt?" + 
-                "Id=" + id 
+                "/Myth/GetVideoArt?" +  //$NON-NLS-1$
+                "Id=" + id  //$NON-NLS-1$
             );
         } catch (MalformedURLException e) {}
+        
+        if (url == null)
+            return;
         
         Bitmap bm = null;
 
         try {
             HttpClient client = new DefaultHttpClient();
-            HttpResponse resp = 
-                (HttpResponse)client.execute(new HttpGet(url.toURI()));
+            HttpResponse resp = client.execute(new HttpGet(url.toURI()));
             if (resp.getStatusLine().getStatusCode() == 404)
                 return;
             InputStream is = new BufferedHttpEntity(resp.getEntity())

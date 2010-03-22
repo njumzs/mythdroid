@@ -34,7 +34,7 @@ public class Media extends MDListActivity implements
 
     /** Entries for the menu */
     final private static String[] MenuItems =
-        { Messages.getString("Media.0"), Messages.getString("Media.1"), Messages.getString("Media.2") };
+        { Messages.getString("Media.0"), Messages.getString("Media.1"), Messages.getString("Media.2") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     
     @Override
     public void onCreate(Bundle icicle) {
@@ -56,9 +56,9 @@ public class Media extends MDListActivity implements
         final String action = (String)list.getItemAtPosition(pos);
         Class<?> activity = null;
 
-        if      (action.equals(Messages.getString("Media.0")))  activity = Videos.class;
-        else if (action.equals(Messages.getString("Media.1")))  activity = MusicRemote.class;
-        else if (action.equals(Messages.getString("Media.2")))  activity = Gallery.class;
+        if      (action.equals(Messages.getString("Media.0")))  activity = Videos.class; //$NON-NLS-1$
+        else if (action.equals(Messages.getString("Media.1")))  activity = MusicRemote.class; //$NON-NLS-1$
+        else if (action.equals(Messages.getString("Media.2")))  activity = Gallery.class; //$NON-NLS-1$
         
         startActivity(
             new Intent().setClass(this, activity)
@@ -73,7 +73,7 @@ public class Media extends MDListActivity implements
         
         final String action = (String)adapter.getItemAtPosition(pos);
       
-        if (action.equals(Messages.getString("Media.1"))) {
+        if (action.equals(Messages.getString("Media.1"))) { //$NON-NLS-1$
             nextActivity = MusicRemote.class;
             showDialog(FRONTEND_CHOOSER);
             return true;

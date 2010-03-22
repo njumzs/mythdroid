@@ -54,7 +54,7 @@ public class MDDManager {
                     menuListeners.isEmpty()    && 
                     musicListeners.isEmpty()   &&
                     channelListeners.isEmpty() &&
-                    !line.equals("DONE")
+                    !line.equals("DONE") //$NON-NLS-1$
                 ) {
                     lineCache.add(line);
                     continue;
@@ -85,9 +85,9 @@ public class MDDManager {
         
         String line = cmgr.readLine();
         
-        while (line != null && !line.equals("COMMANDS DONE")) {
-            if (line.startsWith("COMMAND"))
-                cmds.add(line.substring(line.indexOf("COMMAND") + 8));
+        while (line != null && !line.equals("COMMANDS DONE")) { //$NON-NLS-1$
+            if (line.startsWith("COMMAND")) //$NON-NLS-1$
+                cmds.add(line.substring(line.indexOf("COMMAND") + 8)); //$NON-NLS-1$
             line = cmgr.readLine();
         }
         
@@ -102,22 +102,29 @@ public class MDDManager {
      */
     public static void mddCommand(String addr, String cmd) throws IOException {
         ConnMgr cmgr = new ConnMgr(addr, 16546);
-        cmgr.writeLine("COMMAND " + cmd);
+        cmgr.writeLine("COMMAND " + cmd); //$NON-NLS-1$
         cmgr.disconnect();
     }
     
+    /**
+     * Static method, retrieves a list of Videos
+     * @param addr - String containing IP address of MDD to retrieve video list from
+     * @param dir - String containing directory to enumerate, pass "ROOT" for the root video directory
+     * @return - ArrayList of Videos
+     * @throws IOException
+     */
     public static ArrayList<Video> 
         getVideos(String addr, String dir) throws IOException {
         
         ArrayList<Video> videos = new ArrayList<Video>();
         ConnMgr cmgr = new ConnMgr(addr, 16546);
-        cmgr.writeLine("VIDEOLIST " + (dir == null ? "ROOT" : dir));
+        cmgr.writeLine("VIDEOLIST " + (dir == null ? "ROOT" : dir)); //$NON-NLS-1$ //$NON-NLS-2$
         
         String line = null;
         
-        while (line == null || (!line.equals("VIDEOLIST DONE"))) {
+        while (line == null || (!line.equals("VIDEOLIST DONE"))) { //$NON-NLS-1$
             line = cmgr.readLine();
-            if (!(line.startsWith("VIDEO ")||line.startsWith("DIRECTORY")))
+            if (!(line.startsWith("VIDEO ")||line.startsWith("DIRECTORY"))) //$NON-NLS-1$ //$NON-NLS-2$
                 continue;
             videos.add(new Video(line));
         }
@@ -127,19 +134,32 @@ public class MDDManager {
         
     }
     
+    /**
+     * Ask MDD to stream a file, SDP will be at http://addr:5554/stream
+     * @param addr - String containing IP address of MDD
+     * @param file - String containing path to the file
+     * @param w - int representing desired width of video in pixels
+     * @param h - int representing desired height of video in pixels
+     * @param vb - int representing desired bitrate of video in kb/s
+     * @param ab - int representing desired bitrate of audio in kb/s
+     */
     public static void 
         streamFile(String addr, String file, int w, int h, int vb, int ab) 
             throws IOException {
         ConnMgr cmgr = new ConnMgr(addr, 16546);
         cmgr.writeLine(
-            "STREAM " + w + "x" + h + " VB " + vb + " AB " + ab + " " + file
+            "STREAM " + w + "x" + h + " VB " + vb + " AB " + ab + " " + file //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
         );
         cmgr.disconnect();
     }
     
+    /**
+     * Ask MDD to stop streaming the currently streaming file
+     * @param addr - String containing IP address of MDD
+     */
     public static void stopStream(String addr) throws IOException {
         ConnMgr cmgr = new ConnMgr(addr, 16546);
-        cmgr.writeLine("STOPSTREAM");
+        cmgr.writeLine("STOPSTREAM"); //$NON-NLS-1$
         cmgr.disconnect();
     }
     
@@ -184,25 +204,25 @@ public class MDDManager {
     }
   
     private void handleData(String line) {
-        if (line.startsWith("MENU ")) 
+        if (line.startsWith("MENU "))  //$NON-NLS-1$
             handleMenu(line);
-        else if (line.startsWith("MUSIC ")) 
+        else if (line.startsWith("MUSIC "))  //$NON-NLS-1$
             handleMusic(line);
-        else if (line.startsWith("MUSICPROGRESS "))
+        else if (line.startsWith("MUSICPROGRESS ")) //$NON-NLS-1$
             handleMusicProgress(line);
-        else if (line.startsWith("MUSICPLAYERPROP "))
+        else if (line.startsWith("MUSICPLAYERPROP ")) //$NON-NLS-1$
             handleMusicPlayerProp(line);
-        else if (line.startsWith("CHANNEL "))
+        else if (line.startsWith("CHANNEL ")) //$NON-NLS-1$
             handleChannel(line);
-        else if (line.startsWith("CHANNELPROGRESS "))
+        else if (line.startsWith("CHANNELPROGRESS ")) //$NON-NLS-1$
             handleChannelProgress(line);
-        else if (line.equals("DONE"))
+        else if (line.equals("DONE")) //$NON-NLS-1$
             handleDone();
     }
     
     private void handleMenu(String line) {
 
-        int itemidx = line.indexOf("ITEM");
+        int itemidx = line.indexOf("ITEM"); //$NON-NLS-1$
         String menu = line.substring(5, itemidx - 1);
         String item = line.substring(itemidx + 4);
         
@@ -217,9 +237,9 @@ public class MDDManager {
         
         String track = null;
         int artid = -1;
-        int albumidx = line.indexOf("ALBUM");
-        int trackidx = line.indexOf("TRACK");
-        int artidx = line.indexOf("ARTID");
+        int albumidx = line.indexOf("ALBUM"); //$NON-NLS-1$
+        int trackidx = line.indexOf("TRACK"); //$NON-NLS-1$
+        int artidx = line.indexOf("ARTID"); //$NON-NLS-1$
         String artist = line.substring(6, albumidx - 1);
         String album = line.substring(albumidx + 6, trackidx - 1);
         if (artidx != -1) {
@@ -235,15 +255,15 @@ public class MDDManager {
     }
     
     private void handleMusicProgress(String line) {
-        String prog = line.replace("MUSICPROGRESS ", "");
+        String prog = line.replace("MUSICPROGRESS ", ""); //$NON-NLS-1$ //$NON-NLS-2$
         for (MDDMusicListener l : musicListeners)
             l.onProgress(Integer.valueOf(prog));
     }
     
     private void handleMusicPlayerProp(String line) {
         
-        String prop = line.replace("MUSICPLAYERPROP ", "");
-        String a[] = prop.split(" ");
+        String prop = line.replace("MUSICPLAYERPROP ", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        String a[] = prop.split(" "); //$NON-NLS-1$
         for (MDDMusicListener l : musicListeners)
             l.onPlayerProp(a[0], Integer.valueOf(a[1]));
         
@@ -252,8 +272,8 @@ public class MDDManager {
     private void handleChannel(String line) {
         
         String title = null, subtitle = null;
-        int titleidx = line.indexOf("TITLE");
-        int subtitleidx = line.indexOf("SUBTITLE");
+        int titleidx = line.indexOf("TITLE"); //$NON-NLS-1$
+        int subtitleidx = line.indexOf("SUBTITLE"); //$NON-NLS-1$
         String channel = line.substring(8, titleidx - 1);
         if (subtitleidx != -1) {
             title = line.substring(titleidx + 6, subtitleidx - 1);
@@ -268,7 +288,7 @@ public class MDDManager {
     }
     
     private void handleChannelProgress(String line) {
-        String prog = line.replace("CHANNELPROGRESS ", "");
+        String prog = line.replace("CHANNELPROGRESS ", ""); //$NON-NLS-1$ //$NON-NLS-2$
         for (MDDChannelListener l : channelListeners)
             l.onProgress(Integer.valueOf(prog));
     }

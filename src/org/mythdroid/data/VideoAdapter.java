@@ -21,6 +21,7 @@ package org.mythdroid.data;
 import java.util.ArrayList;
 
 import org.mythdroid.R;
+import org.mythdroid.resource.Messages;
 
 import android.app.Activity;
 import android.content.Context;
@@ -86,8 +87,13 @@ public class VideoAdapter extends ArrayAdapter<Object> {
         Video video = videos.get(pos);
         vHolder.title.setText(video.title);
         vHolder.subtitle.setText(video.subtitle);
-        vHolder.director.setText("Directed by " + video.director);
-        vHolder.rating.setText("Rating: " + String.format("%.2f", video.rating));
+        vHolder.director.setText(
+            Messages.getString("VideoAdapter.0") + video.director // Directed by //$NON-NLS-1$
+        ); 
+        vHolder.rating.setText(
+            Messages.getString("VideoAdapter.1") + // Rating: //$NON-NLS-1$ 
+            String.format("%.2f", video.rating) //$NON-NLS-1$
+        );  
 
         if (video.id == -1) {
             vHolder.poster.setImageDrawable(folderDrawable);

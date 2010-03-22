@@ -31,6 +31,7 @@ import org.mythdroid.Extras;
 import org.mythdroid.R;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.mdd.MDDMusicListener;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.activities.MythDroid;
 import org.mythdroid.data.Key;
@@ -57,6 +58,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * Remote for music playback
+ */
 public class MusicRemote extends Remote {
 
     /** Menu entry identifiers */
@@ -159,7 +163,7 @@ public class MusicRemote extends Remote {
             final String artist, final String album, 
             final String track, final int artid
         ) {
-            final String details = artist + " ~ " + album;
+            final String details = artist + " ~ " + album; //$NON-NLS-1$
             handler.post(
                 new Runnable() {
                     public void run() {
@@ -186,21 +190,23 @@ public class MusicRemote extends Remote {
                 new Runnable() {
                     @Override
                     public void run() {
-                        if (prop.equals("SHUFFLE")) {
+                        if (prop.equals("SHUFFLE")) { //$NON-NLS-1$
                             ShuffleMode s = ShuffleMode.get(value);
                             if (shuffle != null && shuffle != s)
                                 Toast.makeText(
-                                    ctx, "Shuffle mode is " + s, 
+                                    ctx, Messages.getString("MusicRemote.2") + // Shuffle mode is //$NON-NLS-1$ 
+                                    s,  
                                     Toast.LENGTH_SHORT
                                 ).show();
                             shuffle = s;
                         }
 
-                        else if (prop.equals("REPEAT")) {
+                        else if (prop.equals("REPEAT")) { //$NON-NLS-1$
                             RepeatMode r = RepeatMode.get(value);
                             if (repeat != null && repeat != r)
                                 Toast.makeText(
-                                    ctx, "Repeat mode is " + r, 
+                                    ctx, Messages.getString("MusicRemote.4") + // Repeat mode is //$NON-NLS-1$ 
+                                    r,  
                                     Toast.LENGTH_SHORT
                                 ).show();
                             repeat = r;
@@ -254,7 +260,7 @@ public class MusicRemote extends Remote {
       
         try {
             if (jump && !feMgr.getLoc().music)  
-                feMgr.jumpTo("playmusic");
+                feMgr.jumpTo("playmusic"); //$NON-NLS-1$
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();
@@ -411,8 +417,7 @@ public class MusicRemote extends Remote {
             showDialog(DIALOG_QUIT);
             return true;
         }
-        else 
-            return super.onKeyDown(code, event);
+        return super.onKeyDown(code, event);
     }
     
     @Override
@@ -470,13 +475,15 @@ public class MusicRemote extends Remote {
         try {
             url = new URL(
                 MythDroid.beMgr.getStatusURL() +
-                "/Myth/GetAlbumArt?" + 
-                "Id=" + artid +
-                "&Width=" + artView.getWidth() +
-                "&Height=" + artView.getHeight()
+                "/Myth/GetAlbumArt?" +  //$NON-NLS-1$
+                "Id=" + artid + //$NON-NLS-1$
+                "&Width=" + artView.getWidth() + //$NON-NLS-1$
+                "&Height=" + artView.getHeight() //$NON-NLS-1$
             );
         } catch (MalformedURLException e) {}
         
+        if (url == null)
+            return null;
 
         try {
             URLConnection conn = url.openConnection();

@@ -46,6 +46,9 @@ import android.widget.AdapterView;
 import android.widget.VideoView;
 import android.widget.AdapterView.OnItemClickListener;
 
+/**
+ * MDActivity displays streamed Video
+ */
 public class VideoPlayer extends MDActivity {
     
     final private Context ctx = this;
@@ -161,11 +164,13 @@ public class VideoPlayer extends MDActivity {
         }
         
         try {
-            Thread.sleep(2500);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {}
         
+        String sdpAddr = MythDroid.beMgr.getAddress();
+        
         videoView.setVideoURI(
-            Uri.parse("rtsp://" + MythDroid.beMgr.getAddress() + ":5554/stream")
+            Uri.parse("http://" + sdpAddr + ":5554/stream") //$NON-NLS-1$ //$NON-NLS-2$
         );
         
         videoView.setOnPreparedListener(

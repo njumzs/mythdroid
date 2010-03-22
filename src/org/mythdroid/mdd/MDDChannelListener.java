@@ -18,6 +18,9 @@
 
 package org.mythdroid.mdd;
 
+/**
+ * Callbacks for MDD CHANNEL and related events
+ */
 public interface MDDChannelListener {
     /**
      * Called on receipt of CHANNEL events
@@ -26,6 +29,13 @@ public interface MDDChannelListener {
      * @param subtitle - String containing the subtitle of the program
      */
     public void onChannel(String channel, String title, String subtitle);
+    /**
+     * Called on receipt of PROGRESS events
+     * @param pos - int representing current position
+     */
     public void onProgress(int pos);
+    /**
+     * Called on receipt of EXIT event 
+     */
     public void onExit();
 }

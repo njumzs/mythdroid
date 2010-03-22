@@ -26,6 +26,7 @@ import org.mythdroid.data.Key;
 import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.mdd.MDDMenuListener;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.activities.MythDroid;
 
@@ -43,7 +44,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-public class NavRemote extends Remote implements View.OnClickListener {
+/**
+ * Remote for menu / guide navigation
+ */
+public class NavRemote extends Remote {
 
     final private static int MENU_GESTURE = 0, MENU_BUTTON = 1;
 
@@ -79,7 +83,8 @@ public class NavRemote extends Remote implements View.OnClickListener {
         
         final SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
-        gesture = prefs.getString("tvDefaultStyle", "").equals("Gesture");
+        gesture = prefs.getString("tvDefaultStyle", "") //$NON-NLS-1$ //$NON-NLS-2$
+            .equals(Messages.getString("NavRemote.0")); // Gesture //$NON-NLS-1$
         
         setupViews(gesture);
         listenToGestures(gesture);
@@ -94,9 +99,9 @@ public class NavRemote extends Remote implements View.OnClickListener {
             calledBy = caller.getShortClassName();
         
         if (calledBy != null) { 
-            if(calledBy.equals(".TVRemote"))
+            if(calledBy.equals(".TVRemote")) //$NON-NLS-1$
                 calledByTVRemote = true;
-            else if (calledBy.equals(".MusicRemote"))
+            else if (calledBy.equals(".MusicRemote")) //$NON-NLS-1$
                 calledByMusicRemote = true;
         }
         
@@ -117,7 +122,7 @@ public class NavRemote extends Remote implements View.OnClickListener {
 
         try {
             if (jumpGuide) 
-                feMgr.jumpTo("guidegrid");
+                feMgr.jumpTo("guidegrid"); //$NON-NLS-1$
             updateLoc();
         } catch (IOException e) { ErrUtil.err(this, e); }
         
@@ -310,7 +315,7 @@ public class NavRemote extends Remote implements View.OnClickListener {
 
         final FrontendLocation newLoc = feMgr.getLoc();
         locView.setText(newLoc.niceLocation);
-        itemView.setText("");
+        itemView.setText(""); //$NON-NLS-1$
 
         if (newLoc.video) {
             if (lastLoc != null) 

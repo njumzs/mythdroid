@@ -35,6 +35,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 
+/**
+ * ListActivity displays scheduled recordings
+ */
 public class StatusScheduled extends ListActivity {
 
     private ArrayList<Program> recordings = new ArrayList<Program>(10);
@@ -45,14 +48,14 @@ public class StatusScheduled extends ListActivity {
 
         Document doc = Status.statusDoc;
 
-        Node scheduled = doc.getElementsByTagName("Scheduled").item(0);
+        Node scheduled = doc.getElementsByTagName("Scheduled").item(0); //$NON-NLS-1$
 
         NodeList programs = scheduled.getChildNodes();
         int progNodes = programs.getLength();
 
         for (int i = 0; i < progNodes; i++) {
             Node prog = programs.item(i);
-            if (!prog.getNodeName().equals("Program")) continue;
+            if (!prog.getNodeName().equals("Program")) continue; //$NON-NLS-1$
             recordings.add(new Program(prog));
         }
 

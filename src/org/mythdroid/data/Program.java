@@ -56,6 +56,10 @@ public class Program {
      * Program objects as they are parsed from XML
      */
     static public interface ProgramListener {
+        /**
+         * Called when a Program is parsed from XML
+         * @param program - Program
+         */
         public void program(Program program);
     }
 
@@ -89,31 +93,31 @@ public class Program {
                 }
             });
 
-            elem.getChild("Channel").setStartElementListener(
+            elem.getChild("Channel").setStartElementListener( //$NON-NLS-1$
                 new StartElementListener() {
                     @Override
                     public void start(Attributes attr) {
-                        prog.Channel = attr.getValue("callSign");
-                        prog.ChanID = Integer.valueOf(attr.getValue("chanId"));
+                        prog.Channel = attr.getValue("callSign"); //$NON-NLS-1$
+                        prog.ChanID = Integer.valueOf(attr.getValue("chanId")); //$NON-NLS-1$
                     }
                 }
             );
 
-            elem.getChild("Recording").setStartElementListener(
+            elem.getChild("Recording").setStartElementListener( //$NON-NLS-1$
                 new StartElementListener() {
                     @Override
                     public void start(Attributes attr) {
                         try {
                             prog.RecStartTime = MythDroid.dateFmt.parse(
-                                attr.getValue("recStartTs")
+                                attr.getValue("recStartTs") //$NON-NLS-1$
                             );
                             prog.RecEndTime = MythDroid.dateFmt.parse(
-                                attr.getValue("recEndTs")
+                                attr.getValue("recEndTs") //$NON-NLS-1$
                             );
                         } catch (ParseException e) {}
 
                         prog.Status = RecStatus.get(
-                            Integer.valueOf(attr.getValue("recStatus"))
+                            Integer.valueOf(attr.getValue("recStatus")) //$NON-NLS-1$
                         );
                     }
                 }
@@ -134,16 +138,16 @@ public class Program {
         public void start(Attributes attr) {
 
             prog = new Program();
-            prog.Title = attr.getValue("title");
-            prog.SubTitle = attr.getValue("subTitle");
-            prog.Category = attr.getValue("category");
+            prog.Title = attr.getValue("title"); //$NON-NLS-1$
+            prog.SubTitle = attr.getValue("subTitle"); //$NON-NLS-1$
+            prog.Category = attr.getValue("category"); //$NON-NLS-1$
 
             try {
                 prog.StartTime = MythDroid.dateFmt.parse(
-                    attr.getValue("startTime")
+                    attr.getValue("startTime") //$NON-NLS-1$
                 );
                 prog.EndTime = MythDroid.dateFmt.parse(
-                    attr.getValue("endTime")
+                    attr.getValue("endTime") //$NON-NLS-1$
                 );
             } catch (ParseException e) { 
                 ErrUtil.postErr(ctx, e);
@@ -158,29 +162,29 @@ public class Program {
      * Enum of recording statuses, with reverse lookup by code
      */
     public enum RecStatus {
-        FAILED      (-9,    Messages.getString("Program.0")), 
-        TUNERBUSY   (-8,    Messages.getString("Program.13")),
-        LOWSPACE    (-7,    Messages.getString("Program.14")),
-        CANCELLED   (-6,    Messages.getString("Program.15")),
-        MISSED      (-5,    Messages.getString("Program.16")),
-        ABORTED     (-4,    Messages.getString("Program.17")),
-        RECORDED    (-3,    Messages.getString("Program.18")),
-        RECORDING   (-2,    Messages.getString("Program.19")),
-        WILLRECORD  (-1,    Messages.getString("Program.20")),
-        UNKNOWN     (0,     Messages.getString("Program.21")),
-        DONTRECORD  (1,     Messages.getString("Program.22")),
-        PREVIOUS    (2,     Messages.getString("Program.23")),
-        CURRENT     (3,     Messages.getString("Program.24")),
-        EARLIER     (4,     Messages.getString("Program.25")),
-        TOOMANY     (5,     Messages.getString("Program.26")),
-        NOTLISTED   (6,     Messages.getString("Program.27")),
-        CONFLICT    (7,     Messages.getString("Program.28")),
-        LATER       (8,     Messages.getString("Program.29")),
-        REPEAT      (9,     Messages.getString("Program.30")),
-        INACTIVE    (10,    Messages.getString("Program.31")),
-        NEVERRECORD (11,    Messages.getString("Program.32")),
-        OFFLINE     (12,    Messages.getString("Program.33")),
-        OTHER       (13,    Messages.getString("Program.34"));
+        FAILED      (-9,    Messages.getString("Program.0")),  //$NON-NLS-1$
+        TUNERBUSY   (-8,    Messages.getString("Program.13")), //$NON-NLS-1$
+        LOWSPACE    (-7,    Messages.getString("Program.14")), //$NON-NLS-1$
+        CANCELLED   (-6,    Messages.getString("Program.15")), //$NON-NLS-1$
+        MISSED      (-5,    Messages.getString("Program.16")), //$NON-NLS-1$
+        ABORTED     (-4,    Messages.getString("Program.17")), //$NON-NLS-1$
+        RECORDED    (-3,    Messages.getString("Program.18")), //$NON-NLS-1$
+        RECORDING   (-2,    Messages.getString("Program.19")), //$NON-NLS-1$
+        WILLRECORD  (-1,    Messages.getString("Program.20")), //$NON-NLS-1$
+        UNKNOWN     (0,     Messages.getString("Program.21")), //$NON-NLS-1$
+        DONTRECORD  (1,     Messages.getString("Program.22")), //$NON-NLS-1$
+        PREVIOUS    (2,     Messages.getString("Program.23")), //$NON-NLS-1$
+        CURRENT     (3,     Messages.getString("Program.24")), //$NON-NLS-1$
+        EARLIER     (4,     Messages.getString("Program.25")), //$NON-NLS-1$
+        TOOMANY     (5,     Messages.getString("Program.26")), //$NON-NLS-1$
+        NOTLISTED   (6,     Messages.getString("Program.27")), //$NON-NLS-1$
+        CONFLICT    (7,     Messages.getString("Program.28")), //$NON-NLS-1$
+        LATER       (8,     Messages.getString("Program.29")), //$NON-NLS-1$
+        REPEAT      (9,     Messages.getString("Program.30")), //$NON-NLS-1$
+        INACTIVE    (10,    Messages.getString("Program.31")), //$NON-NLS-1$
+        NEVERRECORD (11,    Messages.getString("Program.32")), //$NON-NLS-1$
+        OFFLINE     (12,    Messages.getString("Program.33")), //$NON-NLS-1$
+        OTHER       (13,    Messages.getString("Program.34")); //$NON-NLS-1$
 
         private int     code;
         private String  msg;
@@ -266,16 +270,16 @@ public class Program {
     public Program(Node item) {
 
         NamedNodeMap attr = item.getAttributes();
-        Title = attr.getNamedItem("title").getNodeValue();
-        SubTitle = attr.getNamedItem("subTitle").getNodeValue();
-        Category = attr.getNamedItem("category").getNodeValue();
+        Title = attr.getNamedItem("title").getNodeValue(); //$NON-NLS-1$
+        SubTitle = attr.getNamedItem("subTitle").getNodeValue(); //$NON-NLS-1$
+        Category = attr.getNamedItem("category").getNodeValue(); //$NON-NLS-1$
 
         try {
             StartTime = MythDroid.dateFmt.parse(
-                attr.getNamedItem("startTime").getNodeValue()
+                attr.getNamedItem("startTime").getNodeValue() //$NON-NLS-1$
             );
             EndTime = MythDroid.dateFmt.parse(
-                attr.getNamedItem("endTime").getNodeValue()
+                attr.getNamedItem("endTime").getNodeValue() //$NON-NLS-1$
             );
         } catch (ParseException e) {}
 
@@ -290,21 +294,21 @@ public class Program {
             Node node = nodes.item(i);
             name = node.getNodeName();
             if (name == null) continue;
-            if (ChanNode == null && name.equals("Channel"))
+            if (ChanNode == null && name.equals("Channel")) //$NON-NLS-1$
                 ChanNode = node;
-            else if (RecNode == null && name.equals("Recording"))
+            else if (RecNode == null && name.equals("Recording")) //$NON-NLS-1$
                 RecNode = node;
             else if (node.getNodeType() == Node.TEXT_NODE) {
                 name = node.getNodeValue();
-                if (!name.startsWith("\n")) Description = name;
+                if (!name.startsWith("\n")) Description = name; //$NON-NLS-1$
             }
         }
 
         if (ChanNode != null) {
             attr = ChanNode.getAttributes();
-            Channel = attr.getNamedItem("callSign").getNodeValue();
+            Channel = attr.getNamedItem("callSign").getNodeValue(); //$NON-NLS-1$
             ChanID = Integer.valueOf(
-                attr.getNamedItem("chanId").getNodeValue()
+                attr.getNamedItem("chanId").getNodeValue() //$NON-NLS-1$
             );
         }
 
@@ -312,16 +316,16 @@ public class Program {
             attr = RecNode.getAttributes();
             try {
                 RecStartTime = MythDroid.dateFmt.parse(
-                    attr.getNamedItem("recStartTs").getNodeValue()
+                    attr.getNamedItem("recStartTs").getNodeValue() //$NON-NLS-1$
                 );
                 RecEndTime = MythDroid.dateFmt.parse(
-                    attr.getNamedItem("recEndTs").getNodeValue()
+                    attr.getNamedItem("recEndTs").getNodeValue() //$NON-NLS-1$
                 );
             } catch (ParseException e) {}
 
             Status =
                      RecStatus.get(Integer.valueOf(attr.getNamedItem(
-                         "recStatus").getNodeValue()));
+                         "recStatus").getNodeValue())); //$NON-NLS-1$
         }
     }
 
@@ -333,7 +337,7 @@ public class Program {
      * @return String of form "ChanID FormattedRecStartTime"
      */
     public String playbackID() {
-        return ChanID + " " + MythDroid.dateFmt.format(RecStartTime);
+        return ChanID + " " + MythDroid.dateFmt.format(RecStartTime); //$NON-NLS-1$
     }
 
     /**
@@ -353,8 +357,8 @@ public class Program {
             final URL url =
                 new URL(
                     MythDroid.beMgr.getStatusURL() +
-                    "/Myth/GetPreviewImage?ChanId=" + ChanID +
-                    "&StartTime=" + MythDroid.dateFmt.format(RecStartTime)
+                    "/Myth/GetPreviewImage?ChanId=" + ChanID + //$NON-NLS-1$
+                    "&StartTime=" + MythDroid.dateFmt.format(RecStartTime) //$NON-NLS-1$
                 );
 
             final URLConnection conn = url.openConnection();
@@ -389,7 +393,7 @@ public class Program {
 
         list = new ArrayList<String>(TOTAL);
         for (int i = 0; i < TOTAL; i++)
-            list.add("");
+            list.add(""); //$NON-NLS-1$
 
         list.set(TITLE, Title);
         list.set(SUBTITLE, SubTitle);
@@ -397,7 +401,7 @@ public class Program {
         list.set(CATEGORY, Category);
         list.set(CHANID, String.valueOf(ChanID));
         list.set(CHANNEL, Channel);
-        list.set(PATH, Path == null ? "" : Path);
+        list.set(PATH, Path == null ? "" : Path); //$NON-NLS-1$
         list.set(START, String.valueOf(StartTime.getTime() / 1000));
         list.set(END, String.valueOf(EndTime.getTime() / 1000));
         list.set(RECSTART, String.valueOf(RecStartTime.getTime() / 1000));

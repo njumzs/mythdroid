@@ -35,6 +35,7 @@ import org.mythdroid.data.Channel.ChannelListener;
 import org.mythdroid.data.Channel.ChannelXMLParser;
 import org.mythdroid.data.XMLHandler.Element;
 import org.mythdroid.remote.TVRemote;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.xml.sax.SAXException;
 
@@ -69,8 +70,8 @@ public class Guide extends MDActivity {
     final private ArrayList<Channel> channels = new ArrayList<Channel>();
 
     final private SimpleDateFormat 
-        date  = new SimpleDateFormat("d MMM yy"),
-        time = new SimpleDateFormat("HH:mm");
+        date  = new SimpleDateFormat("d MMM yy"), //$NON-NLS-1$
+        time = new SimpleDateFormat("HH:mm"); //$NON-NLS-1$
 
     final private static int MENU_DATE    = 0, MENU_TIME = 1;
     final private static int DIALOG_DATE  = 0, DIALOG_TIME = 1;
@@ -356,10 +357,10 @@ public class Guide extends MDActivity {
 
     private void getGuideData(Date start, Date end) {
 
-        XMLHandler handler = new XMLHandler("GetProgramGuideResponse");
+        XMLHandler handler = new XMLHandler("GetProgramGuideResponse"); //$NON-NLS-1$
         Element root = handler.rootElement();
 
-        root.getChild("NumOfChannels").setTextElementListener(
+        root.getChild("NumOfChannels").setTextElementListener( //$NON-NLS-1$
             new EndTextElementListener() {
                 @Override
                 public void end(String body) {
@@ -368,9 +369,9 @@ public class Guide extends MDActivity {
             }
         );
 
-        Element chanElement = root.getChild("ProgramGuide")
-                                  .getChild("Channels")
-                                  .getChild("Channel");
+        Element chanElement = root.getChild("ProgramGuide") //$NON-NLS-1$
+                                  .getChild("Channels") //$NON-NLS-1$
+                                  .getChild("Channel"); //$NON-NLS-1$
 
         chanElement.setStartElementListener(
             new ChannelXMLParser(this, chanElement, 
@@ -387,10 +388,10 @@ public class Guide extends MDActivity {
 
             final URL url = new URL(
                 MythDroid.beMgr.getStatusURL() +
-                "/Myth/GetProgramGuide?" + 
-                "StartTime=" + MythDroid.dateFmt.format(start) +
-                "&EndTime=" + MythDroid.dateFmt.format(end) +
-                "&StartChanId=0" + "&NumOfChannels=-1" + "&Details=1"
+                "/Myth/GetProgramGuide?" +  //$NON-NLS-1$
+                "StartTime=" + MythDroid.dateFmt.format(start) + //$NON-NLS-1$
+                "&EndTime=" + MythDroid.dateFmt.format(end) + //$NON-NLS-1$
+                "&StartChanId=0" + "&NumOfChannels=-1" + "&Details=1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             );
 
             Xml.parse(
@@ -400,7 +401,7 @@ public class Guide extends MDActivity {
             );
 
         } catch (SAXException e1) {
-            ErrUtil.err(this, "Guide XML parse error");
+            ErrUtil.err(this, Messages.getString("Guide.13")); // Guide XML parse error //$NON-NLS-1$
         } catch (Exception e1) {
             ErrUtil.err(this, e1);
         }
@@ -457,7 +458,7 @@ public class Guide extends MDActivity {
         tv.setPadding(4, 4, 4, 4);
         tv.setMaxLines(2);
         tv.setTag(ch.ID);
-        tv.setText(ch.num + " " + ch.callSign);
+        tv.setText(ch.num + " " + ch.callSign); //$NON-NLS-1$
         tv.setOnClickListener(chanClickListener);
         tv.setOnLongClickListener(chanLongClickListener);
         tv.setLayoutParams(chanLayout);
@@ -475,9 +476,9 @@ public class Guide extends MDActivity {
             layout.height = rowHeight;
 
             String cat = prog.Category.toLowerCase()
-                             .replaceAll(" ", "")
-                             .replaceAll("/", "")
-                             .replaceAll("-", "");
+                             .replaceAll(" ", "") //$NON-NLS-1$ //$NON-NLS-2$
+                             .replaceAll("/", "") //$NON-NLS-1$ //$NON-NLS-2$
+                             .replaceAll("-", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
             try {
                 tv.setBackgroundColor(Category.valueOf(cat).color());
