@@ -18,10 +18,13 @@
 
 package org.mythdroid;
 
+/**
+ * Intent extras
+ */
 public enum Extras {
     LIVETV,             // (TVRemote)  We want livetv please
     JUMPCHAN,           // (TVRemote)  The channel we'd like to view
-    FILENAME,           // (TVRemote)  The filename of the video
+    FILENAME,           // (TVRemote,VideoPlayer)  The filename of the video
     TITLE,              // (TVRemote)  The title of the video
     DONTJUMP,           // (*Remote)   Don't jumpTo()
     GUIDE;              // (NavRemote) jumpTo() the program guide 

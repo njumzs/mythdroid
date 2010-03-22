@@ -26,6 +26,9 @@ import org.mythdroid.activities.MythDroid;
 
 import android.util.Log;
 
+/**
+ * Send WakeOnLan packets
+ */
 public class WakeOnLan {
 
     static private byte[] addr;
@@ -43,11 +46,11 @@ public class WakeOnLan {
             System.arraycopy(addr, 0, buf, i, 6);
         if (MythDroid.debug) 
             Log.d(
-                "WakeOnLAN", 
-                "Sending WOL packets to 255.255.255.255 " + 
-                "ports 7, 9 for MAC address " + hwaddr
+                "WakeOnLAN",  //$NON-NLS-1$
+                "Sending WOL packets to 255.255.255.255 " +  //$NON-NLS-1$
+                "ports 7, 9 for MAC address " + hwaddr //$NON-NLS-1$
             );
-        InetAddress address = InetAddress.getByName("255.255.255.255");
+        InetAddress address = InetAddress.getByName("255.255.255.255"); //$NON-NLS-1$
         DatagramPacket dgram = new DatagramPacket(buf, buf.length, address, 9);
         DatagramSocket sock = new DatagramSocket();
         sock.setBroadcast(true);
@@ -59,15 +62,15 @@ public class WakeOnLan {
     
     private static byte[] parseAddr(String addr) throws IllegalArgumentException {
         byte[] bytes = new byte[6];
-        String[] hex = addr.split(":");
+        String[] hex = addr.split(":"); //$NON-NLS-1$
         if (hex.length != 6) 
-            throw new IllegalArgumentException("Invalid MAC address");
+            throw new IllegalArgumentException("Invalid MAC address"); //$NON-NLS-1$
         try {
             for (int i = 0; i < 6; i++)
                 bytes[i] = (byte)Integer.parseInt(hex[i], 16);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                "Invalid hex digit in MAC address"
+                "Invalid hex digit in MAC address" //$NON-NLS-1$
             );
         }
         return bytes;

@@ -23,6 +23,10 @@ import org.mythdroid.R;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
+/**
+ * PreferenceActivity - the 'Settings' page
+ * Built from res.xml.preferences 
+ */
 public class Prefs extends PreferenceActivity {
 
     @Override

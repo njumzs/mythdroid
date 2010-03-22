@@ -18,6 +18,9 @@
 
 package org.mythdroid.mdd;
 
+/**
+ * Callback for MDD MENU events
+ */
 public interface MDDMenuListener {
     /**
      * Called on receipt of MENU events

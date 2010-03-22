@@ -70,7 +70,7 @@ public class FrontendList extends ListActivity implements
         setListAdapter(
             new SimpleCursorAdapter(
                 this, R.layout.frontend_list_item, c, 
-                new String[] { "addr", "name", "hwaddr" },
+                new String[] { "addr", "name", "hwaddr" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 new int[] { 
                     R.id.fe_addr_text, R.id.fe_name_text, R.id.fe_hwaddr_text
                 }
@@ -141,9 +141,9 @@ public class FrontendList extends ListActivity implements
                 
             case ADD_DIALOG:
                 
-                ((EditText)dialog.findViewById(R.id.fe_name)).setText("");
-                ((EditText)dialog.findViewById(R.id.fe_addr)).setText("");
-                ((EditText)dialog.findViewById(R.id.fe_hwaddr)).setText("");
+                ((EditText)dialog.findViewById(R.id.fe_name)).setText(""); //$NON-NLS-1$
+                ((EditText)dialog.findViewById(R.id.fe_addr)).setText(""); //$NON-NLS-1$
+                ((EditText)dialog.findViewById(R.id.fe_hwaddr)).setText(""); //$NON-NLS-1$
                 break;
                 
         }
@@ -174,7 +174,7 @@ public class FrontendList extends ListActivity implements
                         .getText().toString();
 
                 if (name.length() == 0 || addr.length() == 0) {
-                    ErrUtil.err(ctx, Messages.getString("FrontendList.4"));
+                    ErrUtil.err(ctx, Messages.getString("FrontendList.4")); //$NON-NLS-1$
                     dialog.dismiss();
                     return;
                 }
@@ -182,7 +182,7 @@ public class FrontendList extends ListActivity implements
                 if (rowID < 1) {
                     if (!FrontendDB.insert(this, name, addr, hwaddr))
                         ErrUtil.err(
-                            ctx, Messages.getString("FrontendList.5") + name
+                            ctx, Messages.getString("FrontendList.5") + name //$NON-NLS-1$
                         );
                 }
                 

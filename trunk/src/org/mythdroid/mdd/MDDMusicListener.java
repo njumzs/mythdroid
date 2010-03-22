@@ -18,6 +18,9 @@
 
 package org.mythdroid.mdd;
 
+/**
+ * Callbacks for MDD MUSIC and related events
+ */
 public interface MDDMusicListener {
     /**
      * Called on receipt of MUSIC events

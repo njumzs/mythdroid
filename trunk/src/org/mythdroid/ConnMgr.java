@@ -40,7 +40,7 @@ import android.util.Log;
 public class ConnMgr {
     
     static private IOException disconnected =
-        new IOException(Messages.getString("ConnMgr.0"));
+        new IOException(Messages.getString("ConnMgr.0")); //$NON-NLS-1$
 
     private Socket       sock = null;
     private OutputStream os   = null;
@@ -61,18 +61,18 @@ public class ConnMgr {
         try {
             sock.connect(sa, 1000);
         } catch (UnknownHostException e) {
-            throw (new IOException(Messages.getString("ConnMgr.1") + host));
+            throw (new IOException(Messages.getString("ConnMgr.1") + host)); //$NON-NLS-1$
         } catch (SocketTimeoutException e) {
             throw (
                 new IOException(
-                    Messages.getString("ConnMgr.2") + host + ":" + port + 
-                        Messages.getString("ConnMgr.4"))
+                    Messages.getString("ConnMgr.2") + host + ":" + port +  //$NON-NLS-1$ //$NON-NLS-2$
+                        Messages.getString("ConnMgr.4")) //$NON-NLS-1$
                 );
         } catch (IOException e) {
             throw (
                 new IOException(
-                    Messages.getString("ConnMgr.5") + host + ":" + port + 
-                        Messages.getString("ConnMgr.7"))
+                    Messages.getString("ConnMgr.5") + host + ":" + port +  //$NON-NLS-1$ //$NON-NLS-2$
+                        Messages.getString("ConnMgr.7")) //$NON-NLS-1$
                 );
         }
 
@@ -94,7 +94,7 @@ public class ConnMgr {
             os.write(str.getBytes());
         }
 
-        if (MythDroid.debug) Log.d("ConnMgr", "writeLine: " + str);
+        if (MythDroid.debug) Log.d("ConnMgr", "writeLine: " + str); //$NON-NLS-1$ //$NON-NLS-2$
 
     }
 
@@ -104,9 +104,9 @@ public class ConnMgr {
      */
     public void sendString(String str) throws IOException {
 
-        str = String.format("%-8d", str.length()) + str;
+        str = String.format("%-8d", str.length()) + str; //$NON-NLS-1$
 
-        if (MythDroid.debug) Log.d("ConnMgr", "sendString: " + str);
+        if (MythDroid.debug) Log.d("ConnMgr", "sendString: " + str); //$NON-NLS-1$ //$NON-NLS-2$
 
         os.write(str.getBytes());
 
@@ -147,7 +147,7 @@ public class ConnMgr {
         sb.trimToSize();
         String line = sb.toString().trim();
 
-        if (MythDroid.debug) Log.d("ConnMgr", "readLine: " + line);
+        if (MythDroid.debug) Log.d("ConnMgr", "readLine: " + line); //$NON-NLS-1$ //$NON-NLS-2$
 
         return line;
     }
@@ -171,7 +171,7 @@ public class ConnMgr {
             read += is.read(bytes, read, len - read);
         
         if (MythDroid.debug) 
-            Log.d("ConnMgr", "readBytes read " + read + " bytes");
+            Log.d("ConnMgr", "readBytes read " + read + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         
         return bytes;
     }
@@ -192,7 +192,7 @@ public class ConnMgr {
         int len = Integer.parseInt(slen.trim());
 
         bytes = readBytes(len);
-        return Arrays.asList(new String(bytes).split("\\[\\]:\\[\\]"));
+        return Arrays.asList(new String(bytes).split("\\[\\]:\\[\\]")); //$NON-NLS-1$
     }
     
     /**

@@ -27,12 +27,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 /** Manage a sqlite database of frontends */
 public class FrontendDB {
 
-    /** ints representing the columns of ID, ADDR and NAME */
+    /** ints representing the columns of ID, ADDR, NAME and HWADDR */
     final public static int     ID = 0, ADDR = 1, NAME = 2, HWADDR = 3;
 
-    final private static String DB_NAME        = "MythDroid.db";
+    final private static String DB_NAME        = "MythDroid.db"; //$NON-NLS-1$
     final private static int    DB_VERSION     = 3;
-    final private static String FRONTEND_TABLE = "frontends";
+    final private static String FRONTEND_TABLE = "frontends"; //$NON-NLS-1$
 
     private static SQLiteDatabase db             = null;
 
@@ -45,15 +45,15 @@ public class FrontendDB {
         @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(
-                "CREATE TABLE " + FRONTEND_TABLE +
-                " (_id INTEGER PRIMARY KEY AUTOINCREMENT" +
-                ", addr TEXT, name TEXT, hwaddr TEXT);"
+                "CREATE TABLE " + FRONTEND_TABLE + //$NON-NLS-1$
+                " (_id INTEGER PRIMARY KEY AUTOINCREMENT" + //$NON-NLS-1$
+                ", addr TEXT, name TEXT, hwaddr TEXT);" //$NON-NLS-1$
             );
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVer, int newVer) {
-            db.execSQL("DROP TABLE IF EXISTS " + FRONTEND_TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + FRONTEND_TABLE); //$NON-NLS-1$
             onCreate(db);
         }
 
@@ -67,7 +67,7 @@ public class FrontendDB {
     public static Cursor getFrontends(Context ctx) {
         if (db == null) initDB(ctx);
         return db.rawQuery(
-            "SELECT _id, addr, name, hwaddr from " + FRONTEND_TABLE, null
+            "SELECT _id, addr, name, hwaddr from " + FRONTEND_TABLE, null //$NON-NLS-1$
         );
 
     }
@@ -85,12 +85,12 @@ public class FrontendDB {
         if (db == null) initDB(ctx);
 
         final ContentValues cv = new ContentValues();
-        cv.put("addr", addr.trim());
-        cv.put("name", name.trim());
-        cv.put("hwaddr", hwaddr != null ? hwaddr.trim() : null);
+        cv.put("addr", addr.trim()); //$NON-NLS-1$
+        cv.put("name", name.trim()); //$NON-NLS-1$
+        cv.put("hwaddr", hwaddr != null ? hwaddr.trim() : null); //$NON-NLS-1$
 
         Cursor c = db.rawQuery(
-            "SELECT _id from " + FRONTEND_TABLE + " WHERE name = ?", 
+            "SELECT _id from " + FRONTEND_TABLE + " WHERE name = ?",  //$NON-NLS-1$ //$NON-NLS-2$
             new String[] { name.trim() }
         );
 
@@ -115,11 +115,11 @@ public class FrontendDB {
         if (db == null) initDB(ctx);
 
         final ContentValues cv = new ContentValues();
-        cv.put("addr", addr.trim());
-        cv.put("name", name.trim());
-        cv.put("hwaddr", hwaddr != null ? hwaddr.trim() : null);
+        cv.put("addr", addr.trim()); //$NON-NLS-1$
+        cv.put("name", name.trim()); //$NON-NLS-1$
+        cv.put("hwaddr", hwaddr != null ? hwaddr.trim() : null); //$NON-NLS-1$
         db.update(
-            FRONTEND_TABLE, cv, "_id = ?", new String[] { String.valueOf(id) }
+            FRONTEND_TABLE, cv, "_id = ?", new String[] { String.valueOf(id) } //$NON-NLS-1$
         );
     }
 
@@ -130,7 +130,7 @@ public class FrontendDB {
      */
     public static void delete(Context ctx, long id) {
         if (db == null) initDB(ctx);
-        db.delete(FRONTEND_TABLE, "_id = ?",
+        db.delete(FRONTEND_TABLE, "_id = ?", //$NON-NLS-1$
             new String[] { String.valueOf(id) });
     }
 

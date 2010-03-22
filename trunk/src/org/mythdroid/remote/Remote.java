@@ -59,8 +59,8 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         public float scrollIntX = (int)(50 * scale), 
                      scrollIntY = (int)(50 * scale);
 
-        final private float maxScrollSpeed = (float)(0.30 * scale);
-        final private float minFlingSpeed  = (float)(360  * scale);
+        final private float maxScrollSpeed = (float) (0.30 * scale);
+        final private float minFlingSpeed  = 360  * scale;
         final private float wobble         = (int)  (40   * scale);
         
         final private static int   SCROLL_LOCK_UNLOCKED = 0;
@@ -261,6 +261,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
                     break;
                 case KeyEvent.KEYCODE_TAB:
                     feMgr.sendKey(Key.TAB);
+                    break;
                 case KeyEvent.KEYCODE_ALT_LEFT:
                 case KeyEvent.KEYCODE_ALT_RIGHT:
                     alt = !alt;
@@ -282,8 +283,8 @@ public abstract class Remote extends Activity implements View.OnClickListener {
                     meta |= (shift ? KeyEvent.META_SHIFT_ON : 0);
                     String key = String.valueOf((char) keyMap.get(code, meta));
                     if (
-                        key.matches("\\p{Print}+") &&
-                        key.matches("\\p{ASCII}+")
+                        key.matches("\\p{Print}+") && //$NON-NLS-1$
+                        key.matches("\\p{ASCII}+") //$NON-NLS-1$
                     ) feMgr.sendKey(key);
                     if (alt) alt = false;
                     if (shift) shift = false;

@@ -18,44 +18,47 @@
 
 package org.mythdroid.data;
 
+/**
+ * Enum of keys
+ */
 public enum Key {
 
-    ZERO    ("0"), ONE  ("1"), TWO  ("2"), THREE    ("3"), FOUR ("4"),
-    FIVE    ("5"), SIX  ("6"), SEVEN("7"), EIGHT    ("8"), NINE ("9"),
+    ZERO    ("0"), ONE  ("1"), TWO  ("2"), THREE    ("3"), FOUR ("4"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+    FIVE    ("5"), SIX  ("6"), SEVEN("7"), EIGHT    ("8"), NINE ("9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
     
-    ESCAPE              ("escape"), 
-    GUIDE               ("s"),
-    VOL_UP              ("]"),
-    VOL_DOWN            ("["),
-    VOL_MUTE            ("backslash"), 
-    UP                  ("up"),
-    DOWN                ("down"),
-    LEFT                ("left"),
-    RIGHT               ("right"),
-    ENTER               ("enter"), 
-    PAUSE               ("p"),
-    RECORD              ("r"),
-    EDIT                ("e"),
-    SEEK_BACK           ("<"),
-    SEEK_FORWARD        (">"),
-    SKIP_BACK           ("left"),
-    SKIP_FORWARD        ("right"),
-    INFO                ("i"),
-    MENU                ("m"),
-    SKIP_COMMERCIAL     ("z"),
-    BACKSPACE           ("backspace"),
-    SPACE               ("space"),
-    TAB                 ("tab"),
-    MUSIC_NEXT          (">"),
-    MUSIC_PREV          ("<"),
-    MUSIC_FFWD          ("pagedown"),
-    MUSIC_REWIND        ("pageup"),
-    MUSIC_SHUFFLE       ("1"),
-    MUSIC_REPEAT        ("2"),
-    MUSIC_EDIT          ("3"),
-    MUSIC_VISUALISE     ("4"),
-    MUSIC_CHANGE_VISUAL ("6"),
-    NUMPAD              ("numpad");
+    ESCAPE              ("escape"),  //$NON-NLS-1$
+    GUIDE               ("s"), //$NON-NLS-1$
+    VOL_UP              ("]"), //$NON-NLS-1$
+    VOL_DOWN            ("["), //$NON-NLS-1$
+    VOL_MUTE            ("backslash"),  //$NON-NLS-1$
+    UP                  ("up"), //$NON-NLS-1$
+    DOWN                ("down"), //$NON-NLS-1$
+    LEFT                ("left"), //$NON-NLS-1$
+    RIGHT               ("right"), //$NON-NLS-1$
+    ENTER               ("enter"),  //$NON-NLS-1$
+    PAUSE               ("p"), //$NON-NLS-1$
+    RECORD              ("r"), //$NON-NLS-1$
+    EDIT                ("e"), //$NON-NLS-1$
+    SEEK_BACK           ("<"), //$NON-NLS-1$
+    SEEK_FORWARD        (">"), //$NON-NLS-1$
+    SKIP_BACK           ("left"), //$NON-NLS-1$
+    SKIP_FORWARD        ("right"), //$NON-NLS-1$
+    INFO                ("i"), //$NON-NLS-1$
+    MENU                ("m"), //$NON-NLS-1$
+    SKIP_COMMERCIAL     ("z"), //$NON-NLS-1$
+    BACKSPACE           ("backspace"), //$NON-NLS-1$
+    SPACE               ("space"), //$NON-NLS-1$
+    TAB                 ("tab"), //$NON-NLS-1$
+    MUSIC_NEXT          (">"), //$NON-NLS-1$
+    MUSIC_PREV          ("<"), //$NON-NLS-1$
+    MUSIC_FFWD          ("pagedown"), //$NON-NLS-1$
+    MUSIC_REWIND        ("pageup"), //$NON-NLS-1$
+    MUSIC_SHUFFLE       ("1"), //$NON-NLS-1$
+    MUSIC_REPEAT        ("2"), //$NON-NLS-1$
+    MUSIC_EDIT          ("3"), //$NON-NLS-1$
+    MUSIC_VISUALISE     ("4"), //$NON-NLS-1$
+    MUSIC_CHANGE_VISUAL ("6"), //$NON-NLS-1$
+    NUMPAD              ("numpad"); //$NON-NLS-1$
 
     private String str = null;
 
@@ -63,6 +66,10 @@ public enum Key {
         this.str = str;
     }
 
+    /**
+     * Get the associated String
+     * @return String 
+     */
     public String str() {
         return str;
     }

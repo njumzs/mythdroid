@@ -49,16 +49,16 @@ import android.util.Log;
 public class BackendManager {
 
     static final private String BACKEND_UPNP_ID =
-        "ST: urn:schemas-mythtv-org:device:MasterMediaServer:1\r\n";
+        "ST: urn:schemas-mythtv-org:device:MasterMediaServer:1\r\n"; //$NON-NLS-1$
 
     static final private String UPNP_SEARCH     =
-        "M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\n" +
-        "MAN: \"ssdp:discover\"\r\n" +
-        "MX: 2\r\n" +
-        BACKEND_UPNP_ID + "\r\n";
+        "M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\n" + //$NON-NLS-1$
+        "MAN: \"ssdp:discover\"\r\n" + //$NON-NLS-1$
+        "MX: 2\r\n" + //$NON-NLS-1$
+        BACKEND_UPNP_ID + "\r\n"; //$NON-NLS-1$
 
-    static final private String UPNP_LOCATION   = "LOCATION: http://";
-    static final private String myAddr          = "android";
+    static final private String UPNP_LOCATION   = "LOCATION: http://"; //$NON-NLS-1$
+    static final private String myAddr          = "android"; //$NON-NLS-1$
     
     private String  statusURL = null;
     private ConnMgr cmgr      = null;
@@ -66,26 +66,25 @@ public class BackendManager {
     /**
      * Constructor
      * @param host - the backend address
-     * @return An initialised BackendManager 
      */
     public BackendManager(final String host) throws Exception {
 
-        statusURL = "http://" + host + ":6544";
+        statusURL = "http://" + host + ":6544"; //$NON-NLS-1$ //$NON-NLS-2$
        
 
         MythDroid.protoVersion = getVersion(statusURL);
 
         if (MythDroid.debug)
             Log.d(
-                "BackendManager", 
-                "Connecting to " + host + 
-                ":6543 (ProtoVer " + MythDroid.protoVersion +")"
+                "BackendManager",  //$NON-NLS-1$
+                "Connecting to " + host +  //$NON-NLS-1$
+                ":6543 (ProtoVer " + MythDroid.protoVersion +")" //$NON-NLS-1$ //$NON-NLS-2$
              );
         
         cmgr = new ConnMgr(host, 6543);
                
         if (!announce()) 
-            throw (new IOException(Messages.getString("BackendManager.0")));
+            throw (new IOException(Messages.getString("BackendManager.0"))); //$NON-NLS-1$
 
     }
 
@@ -100,7 +99,7 @@ public class BackendManager {
         InetAddress addr = null;
 
         try {
-            addr = InetAddress.getByName("239.255.255.250");
+            addr = InetAddress.getByName("239.255.255.250"); //$NON-NLS-1$
         } catch (UnknownHostException e) {}
 
         final DatagramPacket pkt = new DatagramPacket(
@@ -111,21 +110,21 @@ public class BackendManager {
 
         if (MythDroid.debug)
             Log.d(
-                "BackendManager", 
-                "Sending UPNP M-SEARCH to 239.255.255.250:1900"
+                "BackendManager",  //$NON-NLS-1$
+                "Sending UPNP M-SEARCH to 239.255.255.250:1900" //$NON-NLS-1$
             );
         
         sock.setReuseAddress(true);
         sock.bind(isa);
         sock.setBroadcast(true);
-        sock.setSoTimeout(500);
+        sock.setSoTimeout(800);
         sock.send(pkt);
 
         try {
             sock.receive(rpkt);
         } catch (SocketTimeoutException e) {
             if (MythDroid.debug)
-                Log.d("BackendManager", "Timeout waiting for UPNP response");
+                Log.d("BackendManager", "Timeout waiting for UPNP response"); //$NON-NLS-1$ //$NON-NLS-2$
             return null; 
         }
         
@@ -133,12 +132,12 @@ public class BackendManager {
 
         final String msg = new String(rpkt.getData(), 0, rpkt.getLength());
         if (MythDroid.debug)
-            Log.d("BackendManager", "UPNP Response received: " + msg);
+            Log.d("BackendManager", "UPNP Response received: " + msg); //$NON-NLS-1$ //$NON-NLS-2$
         
         if (!msg.contains(BACKEND_UPNP_ID)) return null;
 
         int locIdx = msg.indexOf(UPNP_LOCATION);
-        int portIdx = msg.indexOf(":", locIdx + UPNP_LOCATION.length());
+        int portIdx = msg.indexOf(":", locIdx + UPNP_LOCATION.length()); //$NON-NLS-1$
 
         final String host = 
             msg.substring(locIdx + UPNP_LOCATION.length(), portIdx);
@@ -161,20 +160,20 @@ public class BackendManager {
      */
     public String getStatusURL() {
         if (MythDroid.debug)
-            Log.d("BackendManager", "statusURL is " + statusURL);
+            Log.d("BackendManager", "statusURL is " + statusURL); //$NON-NLS-1$ //$NON-NLS-2$
         return statusURL;
     }
 
     /**
      * Get a Program from a recording filename
-     * @param filename - the full path to the recording
+     * @param basename - the full path to the recording
      * @return A Program representing the recording
      */
     public Program getRecording(String basename) throws IOException {
 
         List<String> resp = null;
 
-        cmgr.sendString("QUERY_RECORDING BASENAME " + basename);
+        cmgr.sendString("QUERY_RECORDING BASENAME " + basename); //$NON-NLS-1$
         resp = cmgr.readStringList();
 
         return new Program(resp.subList(1, resp.size()));
@@ -190,7 +189,7 @@ public class BackendManager {
 
         List<String> resp = null;
 
-        cmgr.sendString("QUERY_RECORDINGS Play");
+        cmgr.sendString("QUERY_RECORDINGS Play"); //$NON-NLS-1$
         resp = cmgr.readStringList();
 
         int respSize = resp.size();
@@ -201,7 +200,7 @@ public class BackendManager {
             new ArrayList<Program>(respSize / numFields);
 
         for (int i = respSize - numFields; i >= 0; i -= numFields) {
-            if (!resp.get(i + typeField).equals("Default")) continue;
+            if (!resp.get(i + typeField).equals("Default")) continue; //$NON-NLS-1$
             programs.add(new Program(resp.subList(i, i + numFields)));
         }
 
@@ -215,7 +214,7 @@ public class BackendManager {
      */    
     public void stopRecording(Program prog) throws IOException {
         ArrayList<String> list = new ArrayList<String>();
-        list.add("STOP_RECORDING");
+        list.add("STOP_RECORDING"); //$NON-NLS-1$
         list.addAll(prog.stringList());
         cmgr.sendStringList(list);
         cmgr.readStringList();
@@ -228,7 +227,7 @@ public class BackendManager {
      */
     public void deleteRecording(Program prog) throws IOException {
         ArrayList<String> list = new ArrayList<String>();
-        list.add("DELETE_RECORDING");
+        list.add("DELETE_RECORDING"); //$NON-NLS-1$
         list.addAll(prog.stringList());
         cmgr.sendStringList(list);
         cmgr.readStringList();
@@ -236,7 +235,7 @@ public class BackendManager {
 
     /** Disconnect from the backend */
     public void done() throws IOException {
-        cmgr.sendString("DONE");
+        cmgr.sendString("DONE"); //$NON-NLS-1$
         cmgr.disconnect();
     }
     
@@ -248,7 +247,7 @@ public class BackendManager {
     private int getVersion(String sURL) throws Exception {
         
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        URL url = new URL(sURL + "/xml");
+        URL url = new URL(sURL + "/xml"); //$NON-NLS-1$
         Document doc;
         
         try {
@@ -256,12 +255,12 @@ public class BackendManager {
                 url.openConnection().getInputStream()
             );
         } catch (SAXException e) {
-            throw new Exception(Messages.getString("Status.10"));
+            throw new Exception(Messages.getString("Status.10")); //$NON-NLS-1$
         }
         
-        Node status = doc.getElementsByTagName("Status").item(0);
+        Node status = doc.getElementsByTagName("Status").item(0); //$NON-NLS-1$
         NamedNodeMap attr = status.getAttributes();
-        return Integer.parseInt(attr.getNamedItem("protoVer").getNodeValue());
+        return Integer.parseInt(attr.getNamedItem("protoVer").getNodeValue()); //$NON-NLS-1$
         
     }
 
@@ -272,15 +271,15 @@ public class BackendManager {
      */
     private boolean announce() throws IOException {
 
-        cmgr.sendString("MYTH_PROTO_VERSION " + MythDroid.protoVersion);
+        cmgr.sendString("MYTH_PROTO_VERSION " + MythDroid.protoVersion); //$NON-NLS-1$
         List<String> resp = cmgr.readStringList();
 
-        if (!resp.get(0).equals("ACCEPT")) return false;
+        if (!resp.get(0).equals("ACCEPT")) return false; //$NON-NLS-1$
         
-        cmgr.sendString("ANN Playback " + myAddr + " 0");
+        cmgr.sendString("ANN Playback " + myAddr + " 0"); //$NON-NLS-1$ //$NON-NLS-2$
         resp = cmgr.readStringList();
 
-        if (!resp.get(0).equals("OK")) return false;
+        if (!resp.get(0).equals("OK")) return false; //$NON-NLS-1$
 
         return true;
 

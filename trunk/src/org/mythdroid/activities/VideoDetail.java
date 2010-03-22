@@ -22,6 +22,7 @@ import org.mythdroid.Extras;
 import org.mythdroid.R;
 import org.mythdroid.data.Video;
 import org.mythdroid.remote.TVRemote;
+import org.mythdroid.resource.Messages;
 
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +36,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+/**
+ * MDActivity displays details of a Video
+ * Allows user to play the Video or view further details at TVDB
+ */
 public class VideoDetail extends MDActivity {
 
     private Video video = null;
@@ -54,13 +59,22 @@ public class VideoDetail extends MDActivity {
         ((TextView)findViewById(R.id.videoDTitle))
             .setText(video.title);
         ((TextView)findViewById(R.id.videoDDirector))
-            .setText("Directed by " + video.director);
+            .setText(Messages.getString("VideoDetail.0") + video.director); //$NON-NLS-1$
         ((TextView)findViewById(R.id.videoDRating))
-            .setText("Rating: " + String.format("%.2f", video.rating));
+            .setText(
+                Messages.getString("VideoDetail.1") + //$NON-NLS-1$ 
+                String.format("%.2f", video.rating) //$NON-NLS-1$
+            ); 
         ((TextView)findViewById(R.id.videoDYear))
-            .setText("Year: " + String.valueOf(video.year));
+            .setText(
+                Messages.getString("VideoDetail.3") + //$NON-NLS-1$ 
+                String.valueOf(video.year)
+            ); 
         ((TextView)findViewById(R.id.videoDLength))
-            .setText("Length: " + String.valueOf(video.length) + " mins");
+            .setText(
+                Messages.getString("VideoDetail.4") + //$NON-NLS-1$
+                String.valueOf(video.length) + " mins" //$NON-NLS-1$
+            ); 
         ((TextView)findViewById(R.id.videoDPlot))
             .setText(video.plot);
         if (video.subtitle.length() > 0)

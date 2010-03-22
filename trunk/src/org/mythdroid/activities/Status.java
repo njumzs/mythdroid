@@ -41,6 +41,10 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+/**
+ * ListActivity lists other Status activities
+ * Houses static method to fetch the status XML
+ */
 public class Status extends ListActivity {
 
     /** The status XML doc from the backend */
@@ -50,10 +54,10 @@ public class Status extends ListActivity {
     final private Context         ctx         = this;
     final private static String[] StatusItems =
     { 
-    	Messages.getString("Status.0"),    // Recorders
-    	Messages.getString("Status.1"),    // Scheduled
-    	Messages.getString("Status.2"),    // Job Queue
-    	Messages.getString("Status.3")     // Backend Info
+    	Messages.getString("Status.0"),    // Recorders //$NON-NLS-1$
+    	Messages.getString("Status.1"),    // Scheduled //$NON-NLS-1$
+    	Messages.getString("Status.2"),    // Job Queue //$NON-NLS-1$
+    	Messages.getString("Status.3")     // Backend Info //$NON-NLS-1$
     };
 
     final private Handler handler = new Handler();
@@ -64,7 +68,7 @@ public class Status extends ListActivity {
             try {
                 getStatus();
             } catch (SAXException e) {
-                ErrUtil.err(ctx, Messages.getString("Status.10"));
+                ErrUtil.err(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
             } catch (Exception e) { ErrUtil.err(ctx, e); }
 
             handler.post(
@@ -103,13 +107,13 @@ public class Status extends ListActivity {
         final String action = (String)list.getItemAtPosition(pos);
         Class<?> activity = null;
 
-        if      (action.equals(Messages.getString("Status.0")))
+        if      (action.equals(Messages.getString("Status.0"))) //$NON-NLS-1$
         	activity = StatusRecorders.class;
-        else if (action.equals(Messages.getString("Status.1")))
+        else if (action.equals(Messages.getString("Status.1"))) //$NON-NLS-1$
         	activity = StatusScheduled.class;
-        else if (action.equals(Messages.getString("Status.2")))
+        else if (action.equals(Messages.getString("Status.2"))) //$NON-NLS-1$
         	activity = StatusJobs.class;
-        else if (action.equals(Messages.getString("Status.3")))
+        else if (action.equals(Messages.getString("Status.3"))) //$NON-NLS-1$
         	activity = StatusBackend.class;
 
         startActivity(new Intent().setClass(this, activity));
@@ -131,13 +135,12 @@ public class Status extends ListActivity {
 
     /**
      * Get new statusDoc from the backend
-     * @param ctx
      */
     public static void getStatus() throws Exception {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
-        URL url = new URL(MythDroid.beMgr.getStatusURL() + "/xml");
+        URL url = new URL(MythDroid.beMgr.getStatusURL() + "/xml"); //$NON-NLS-1$
         statusDoc = dbf.newDocumentBuilder().parse(
             url.openConnection().getInputStream()
         );

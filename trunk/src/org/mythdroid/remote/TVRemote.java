@@ -61,6 +61,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
+/**
+ * Remote for controlling tv/recording/video playback
+ */
 public class TVRemote extends Remote {
 
     /** Menu entry identifiers */
@@ -190,10 +193,10 @@ public class TVRemote extends Remote {
             try {
                 if (livetv) {
                 	if (!feMgr.getLoc().livetv) 
-                		feMgr.jumpTo("livetv");
+                		feMgr.jumpTo("livetv"); //$NON-NLS-1$
                 	
                     if (!feMgr.getLoc().livetv) {
-                        ErrUtil.postErr(ctx, Messages.getString("TVRemote.1"));
+                        ErrUtil.postErr(ctx, Messages.getString("TVRemote.1")); //$NON-NLS-1$
                         done();
                         return;
                     }
@@ -281,7 +284,8 @@ public class TVRemote extends Remote {
         
         final SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
-        gesture = prefs.getString("tvDefaultStyle", "").equals("Gesture");
+        gesture = prefs.getString("tvDefaultStyle", "") //$NON-NLS-1$ //$NON-NLS-2$
+            .equals(Messages.getString("TVRemote.0"));  // Gesture //$NON-NLS-1$
         
         setupViews(gesture);
         listenToGestures(gesture);
@@ -476,8 +480,8 @@ public class TVRemote extends Remote {
         if (id != DIALOG_GUIDE) return;
 
         final String[] items = new String[] { 
-        		Messages.getString("TVRemote.2"), 
-        		Messages.getString("TVRemote.3") + feMgr.name() 
+        		Messages.getString("TVRemote.2"),  //$NON-NLS-1$
+        		Messages.getString("TVRemote.3") + feMgr.name()  //$NON-NLS-1$
         };
 
         final ListView lv = ((AlertDialog)dialog).getListView();
@@ -578,8 +582,7 @@ public class TVRemote extends Remote {
             showDialog(DIALOG_QUIT);
             return true;
         }
-        else 
-            return super.onKeyDown(code, event);
+        return super.onKeyDown(code, event);
     }
 
     /**
@@ -683,7 +686,7 @@ public class TVRemote extends Remote {
             done();
             return;
         } catch (NullPointerException e) {
-            ErrUtil.err(this, Messages.getString("TVRemote.4"));
+            ErrUtil.err(this, Messages.getString("TVRemote.4")); //$NON-NLS-1$
             done();
             return;
         }

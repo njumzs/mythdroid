@@ -45,33 +45,33 @@ public class FrontendLocation {
 
         location = loc;
         
-        if (MythDroid.debug) Log.d("FrontendLocation", "loc: " + loc);
+        if (MythDroid.debug) Log.d("FrontendLocation", "loc: " + loc); //$NON-NLS-1$ //$NON-NLS-2$
         
         if (locations == null && !populateLocations()) 
             return;
 
         loc = loc.toLowerCase();
 
-        if (loc.startsWith("playback "))
+        if (loc.startsWith("playback ")) //$NON-NLS-1$
             parsePlaybackLoc(loc);
-        else if (loc.startsWith("error"))
-            location = niceLocation = "Error";
+        else if (loc.startsWith("error")) //$NON-NLS-1$
+            location = niceLocation = "Error"; //$NON-NLS-1$
         else
             niceLocation = locations.get(loc);
 
         if (niceLocation == null)
-            niceLocation = "Unknown";
-        else if (loc.equals("playmusic")) 
+            niceLocation = "Unknown"; //$NON-NLS-1$
+        else if (loc.equals("playmusic"))  //$NON-NLS-1$
             music = true;
-        else if (loc.equals("musicplaylists"))
+        else if (loc.equals("musicplaylists")) //$NON-NLS-1$
             musiceditor = true;
         
         if (MythDroid.debug) 
             Log.d(
-                "FrontendLocation", 
-                "loc: " + loc + 
-                " location: " + location + 
-                " niceLocation: " + niceLocation
+                "FrontendLocation",  //$NON-NLS-1$
+                "loc: " + loc +  //$NON-NLS-1$
+                " location: " + location +  //$NON-NLS-1$
+                " niceLocation: " + niceLocation //$NON-NLS-1$
             );
 
     }
@@ -92,28 +92,28 @@ public class FrontendLocation {
     }
 
     private void parsePlaybackLoc(String loc) {
-        String[] tok = loc.split(" ");
-        niceLocation = tok[0] + " " + tok[1];
+        String[] tok = loc.split(" "); //$NON-NLS-1$
+        niceLocation = tok[0] + " " + tok[1]; //$NON-NLS-1$
         location = niceLocation;
         position = timeToInt(tok[2]);
         end = timeToInt(tok[4]);
         rate = Float.parseFloat(tok[5].substring(0, tok[5].lastIndexOf('x')));
         filename = tok[9];
         video = true;
-        if (tok[1].equals("livetv")) livetv = true;
+        if (tok[1].equals("livetv")) livetv = true; //$NON-NLS-1$
         if (MythDroid.debug) 
             Log.d(
-                "FrontendLocation", 
-                "position: " + position + 
-                " end: " + end + 
-                " rate: " + rate + 
-                " filename: " + filename + 
-                " livetv: " + livetv
+                "FrontendLocation",  //$NON-NLS-1$
+                "position: " + position +  //$NON-NLS-1$
+                " end: " + end +  //$NON-NLS-1$
+                " rate: " + rate +  //$NON-NLS-1$
+                " filename: " + filename +  //$NON-NLS-1$
+                " livetv: " + livetv //$NON-NLS-1$
             );
     }
 
     private int timeToInt(String time) {
-        String tm[] = time.split(":");
+        String tm[] = time.split(":"); //$NON-NLS-1$
         return Integer.parseInt(tm[0]) * 3600 + 
                  Integer.parseInt(tm[1]) * 60 +
                    Integer.parseInt(tm[2]);

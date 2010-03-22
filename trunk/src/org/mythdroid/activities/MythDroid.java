@@ -63,11 +63,15 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
+/**
+ * MDListActivity for the main menu
+ * Holds a number of public static members used as 'globals' 
+ */
 public class MythDroid extends MDListActivity implements
     AdapterView.OnItemLongClickListener {
 
     /** Debug? */
-    final public static boolean debug = false;
+    final public static boolean debug = true;
     /** Backend protocol version */
     public static int protoVersion  = 0;
     /** A BackendManager representing a connected backend */
@@ -81,7 +85,7 @@ public class MythDroid extends MDListActivity implements
 
     /** To remember where we were */
     public static FrontendLocation lastLocation  =
-        new FrontendLocation("MainMenu");
+        new FrontendLocation("MainMenu"); //$NON-NLS-1$
 
     /** A Program representing the currently selected recording */
     public static Program curProg = null;
@@ -90,10 +94,10 @@ public class MythDroid extends MDListActivity implements
 
     /** SimpleDateFormat of yyyy-MM-dd'T'HH:mm:ss */
     final public static SimpleDateFormat dateFmt =
-        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
     /** SimpleDateFormat of HH:mm, EEE d MMM yy */
     final public static SimpleDateFormat dispFmt =
-        new SimpleDateFormat("HH:mm, EEE d MMM yy");
+        new SimpleDateFormat("HH:mm, EEE d MMM yy"); //$NON-NLS-1$
 
     static {
         dispFmt.setTimeZone(TimeZone.getDefault());
@@ -112,12 +116,12 @@ public class MythDroid extends MDListActivity implements
     /** Entries for the main menu list */
     final private static String[] MenuItems =
         { 
-    		Messages.getString("MythDroid.7"),    // Watch TV
-    		Messages.getString("MythDroid.8"),    // Recordings
-    		Messages.getString("MythDroid.12"),   // Videos
-    		Messages.getString("MythDroid.9"),    // Music
-    		Messages.getString("MythDroid.10"),   // Guide
-    		Messages.getString("MythDroid.11")    // Status
+    		Messages.getString("MythDroid.7"),    // Watch TV   //$NON-NLS-1$
+    		Messages.getString("MythDroid.8"),    // Recordings //$NON-NLS-1$
+    		Messages.getString("MythDroid.12"),   // Videos     //$NON-NLS-1$
+    		Messages.getString("MythDroid.9"),    // Music      //$NON-NLS-1$
+    		Messages.getString("MythDroid.10"),   // Guide      //$NON-NLS-1$
+    		Messages.getString("MythDroid.11")    // Status     //$NON-NLS-1$
     	};
 
     /** ListAdapter containing the main menu entries */
@@ -138,7 +142,7 @@ public class MythDroid extends MDListActivity implements
         getPreferences();
 
         final HandlerThread hThread = new HandlerThread(
-            "worker", Process.THREAD_PRIORITY_BACKGROUND
+            "worker", Process.THREAD_PRIORITY_BACKGROUND //$NON-NLS-1$
         );
 
         hThread.setDaemon(true);
@@ -189,17 +193,17 @@ public class MythDroid extends MDListActivity implements
         final String action = (String)list.getItemAtPosition(pos);
         Class<?> activity = null;
 
-        if      (action.equals(Messages.getString("MythDroid.7")))
+        if      (action.equals(Messages.getString("MythDroid.7"))) //$NON-NLS-1$
         	activity = TVRemote.class;
-        else if (action.equals(Messages.getString("MythDroid.8")))
+        else if (action.equals(Messages.getString("MythDroid.8"))) //$NON-NLS-1$
         	activity = Recordings.class;
-        else if (action.equals(Messages.getString("MythDroid.12")))
+        else if (action.equals(Messages.getString("MythDroid.12"))) //$NON-NLS-1$
             activity = Videos.class;
-        else if (action.equals(Messages.getString("MythDroid.9")))
+        else if (action.equals(Messages.getString("MythDroid.9"))) //$NON-NLS-1$
         	activity = MusicRemote.class;
-        else if (action.equals(Messages.getString("MythDroid.10")))
+        else if (action.equals(Messages.getString("MythDroid.10"))) //$NON-NLS-1$
         	activity = Guide.class;
-        else if (action.equals(Messages.getString("MythDroid.11")))
+        else if (action.equals(Messages.getString("MythDroid.11"))) //$NON-NLS-1$
         	activity = Status.class;
 
         startActivity(
@@ -217,18 +221,18 @@ public class MythDroid extends MDListActivity implements
         
         final String action = (String) adapter.getItemAtPosition(pos);
 
-        if (action.equals(Messages.getString("MythDroid.7"))) {
+        if (action.equals(Messages.getString("MythDroid.7"))) { //$NON-NLS-1$
             nextActivity = TVRemote.class;
             setExtra(Extras.LIVETV.toString());
             showDialog(FRONTEND_CHOOSER);
         }
         
-        else if (action.equals(Messages.getString("MythDroid.9"))) {
+        else if (action.equals(Messages.getString("MythDroid.9"))) { //$NON-NLS-1$
             nextActivity = MusicRemote.class;
             showDialog(FRONTEND_CHOOSER);
         }
 
-        else if (action.equals(Messages.getString("MythDroid.10"))) {
+        else if (action.equals(Messages.getString("MythDroid.10"))) { //$NON-NLS-1$
             showDialog(DIALOG_GUIDE);
         }
 
@@ -341,17 +345,16 @@ public class MythDroid extends MDListActivity implements
         if (feMgr != null && feMgr.isConnected()) {
             if (name.equals(feMgr.name()))
                 return feMgr;
-            else
-                try {
-                    feMgr.disconnect();
-                } catch (IOException e) {}
+            try {
+                feMgr.disconnect();
+            } catch (IOException e) {}
             feMgr = null;
         }
 
         Cursor c = FrontendDB.getFrontends(ctx);
 
         if (c.getCount() < 1) {
-            ErrUtil.postErr(ctx, Messages.getString("MythDroid.26"));
+            ErrUtil.postErr(ctx, Messages.getString("MythDroid.26")); //$NON-NLS-1$
             c.close();
             return null;
         }
@@ -452,13 +455,13 @@ public class MythDroid extends MDListActivity implements
                     String item = (String)av.getItemAtPosition(pos);
                     d.dismiss();
 
-                    if (item.equals(Messages.getString("MythDroid.21"))) {  
+                    if (item.equals(Messages.getString("MythDroid.21"))) {   //$NON-NLS-1$
                         // Here
                         startActivity(new Intent().setClass(ctx, Guide.class));
                         return;
                     }
 
-                    else if (item.equals(Messages.getString("MythDroid.23"))) { 
+                    else if (item.equals(Messages.getString("MythDroid.23"))) {  //$NON-NLS-1$
                         // Choose frontend
                         nextActivity = NavRemote.class;
                         setExtra(Extras.GUIDE.toString());
@@ -484,11 +487,11 @@ public class MythDroid extends MDListActivity implements
     private void prepareGuideDialog(final Dialog dialog) {
         
         final ArrayList<String> items = new ArrayList<String>(3);
-        items.add(Messages.getString("MythDroid.21"));  // Here
+        items.add(Messages.getString("MythDroid.21"));  // Here //$NON-NLS-1$
         if (defaultFrontend != null) 
             // On <defaultFrontend>
-            items.add(Messages.getString("MythDroid.22") + defaultFrontend); 
-        items.add(Messages.getString("MythDroid.23")); // Choose frontend
+            items.add(Messages.getString("MythDroid.22") + defaultFrontend);  //$NON-NLS-1$
+        items.add(Messages.getString("MythDroid.23")); // Choose frontend //$NON-NLS-1$
 
         final ListView lv = ((AlertDialog)dialog).getListView();
         lv.setAdapter(
@@ -535,7 +538,7 @@ public class MythDroid extends MDListActivity implements
         
         final SimpleCursorAdapter ca = new SimpleCursorAdapter(
             ctx, R.layout.simple_list_item_1, FrontendDB.getFrontends(ctx),
-            new String[] { "name" }, new int[] { id.text1 }
+            new String[] { "name" }, new int[] { id.text1 } //$NON-NLS-1$
         );
 
         if (ca.getCount() < 1) {
@@ -606,7 +609,7 @@ public class MythDroid extends MDListActivity implements
     private void getPreferences() {
         final SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
-        backend = prefs.getString("backend", "");
+        backend = prefs.getString("backend", ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 }
