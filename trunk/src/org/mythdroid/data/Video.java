@@ -21,8 +21,6 @@ package org.mythdroid.data;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -67,22 +65,22 @@ public class Video {
             return;
         }
         
-        List<String> fields = Arrays.asList(line.split("\\|\\|")); //$NON-NLS-1$
-        fields.set(0, fields.get(0).replaceFirst("VIDEO ", "")); //$NON-NLS-1$ //$NON-NLS-2$
+        String[] fields = line.split("\\|\\|"); //$NON-NLS-1$
+        fields[0] = fields[0].replaceFirst("VIDEO ", ""); //$NON-NLS-1$ //$NON-NLS-2$
                        
-        id = Integer.valueOf(fields.get(ID));
-        title = fields.get(TITLE);
-        subtitle = fields.get(SUBTITLE);
-        director = fields.get(DIRECTOR);
-        plot = fields.get(PLOT);
-        homepage = fields.get(HOMEPAGE);
-        year = fields.get(YEAR).matches("[0-9]+") ? //$NON-NLS-1$
-                   Integer.valueOf(fields.get(YEAR)) : 0;
-        rating = fields.get(USERRATING).matches("[0-9.]+") ? //$NON-NLS-1$
-                   Float.parseFloat(fields.get(USERRATING)) : 0;
-        length = fields.get(LENGTH).matches("[0-9]+") ? //$NON-NLS-1$
-                   Integer.valueOf(fields.get(LENGTH)) : 0;
-        filename = fields.get(FILENAME);
+        id = Integer.valueOf(fields[ID]);
+        title = fields[TITLE];
+        subtitle = fields[SUBTITLE];
+        director = fields[DIRECTOR];
+        plot = fields[PLOT];
+        homepage = fields[HOMEPAGE];
+        year = fields[YEAR].matches("[0-9]+") ? //$NON-NLS-1$
+                   Integer.valueOf(fields[YEAR]) : 0;
+        rating = fields[USERRATING].matches("[0-9.]+") ? //$NON-NLS-1$
+                   Float.parseFloat(fields[USERRATING]) : 0;
+        length = fields[LENGTH].matches("[0-9]+") ? //$NON-NLS-1$
+                   Integer.valueOf(fields[LENGTH]) : 0;
+        filename = fields[FILENAME];
         
     }
     

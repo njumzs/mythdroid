@@ -250,7 +250,7 @@ public class MusicRemote extends Remote {
         }
         
         try {
-            mddMgr = new MDDManager(MythDroid.feMgr.getAddress());
+            mddMgr = new MDDManager(MythDroid.feMgr.addr);
         } catch (IOException e) { mddMgr = null; }
         
         setupViews();

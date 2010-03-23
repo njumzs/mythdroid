@@ -126,7 +126,7 @@ public class NavRemote extends Remote {
         
         if (!calledByRemote) {
             try {
-                mddMgr = new MDDManager(MythDroid.feMgr.getAddress());
+                mddMgr = new MDDManager(MythDroid.feMgr.addr);
             } catch (IOException e) { mddMgr = null; }
             
             if (mddMgr != null) {
@@ -312,8 +312,10 @@ public class NavRemote extends Remote {
         if (locView == null || itemView == null) return;
 
         final FrontendLocation newLoc = feMgr.getLoc();
-        locView.setText(newLoc.niceLocation);
-        itemView.setText(""); //$NON-NLS-1$
+        if (mddMgr == null || !newLoc.niceLocation.equals("Unknown")) {  //$NON-NLS-1$
+            locView.setText(newLoc.niceLocation);
+            itemView.setText(""); //$NON-NLS-1$
+        }
 
         if (newLoc.video) {
             if (lastLoc != null) 

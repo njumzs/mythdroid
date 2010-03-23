@@ -70,7 +70,7 @@ public class VideoPlayer extends MDActivity {
         super.onDestroy();
         videoView.stopPlayback();
         try {
-            MDDManager.stopStream(MythDroid.beMgr.getAddress());
+            MDDManager.stopStream(MythDroid.beMgr.addr);
         } catch (IOException e) {
             ErrUtil.err(ctx, e);
         }
@@ -156,7 +156,7 @@ public class VideoPlayer extends MDActivity {
                 path = MythDroid.curProg.Path;
                 
             MDDManager.streamFile(
-                MythDroid.beMgr.getAddress(), path, 
+                MythDroid.beMgr.addr, path, 
                 dm.widthPixels, dm.heightPixels, vb, ab
             );
         } catch (IOException e) {
@@ -168,7 +168,7 @@ public class VideoPlayer extends MDActivity {
             Thread.sleep(3000);
         } catch (InterruptedException e) {}
         
-        String sdpAddr = MythDroid.beMgr.getAddress();
+        String sdpAddr = MythDroid.beMgr.addr;
 
         // If the backend address is localhost, assume SSH port forwarding
         // We must connect to the RTSP server directly otherwise the RTP

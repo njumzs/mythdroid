@@ -21,11 +21,10 @@ package org.mythdroid.data;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.ParseException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.mythdroid.data.XMLHandler.Element;
@@ -242,25 +241,25 @@ public class Program {
     /** The channel ID */
     public int       ChanID;
 
-    private ArrayList<String> list  = null;
+    private String[] list  = null;
 
     /**
      * Construct a Program from a stringlist
      * @param list - a stringlist (e.g. from a backend)
      */
-    public Program(List<String> list) {
-        Title = list.get(TITLE);
-        SubTitle = list.get(SUBTITLE);
-        Category = list.get(CATEGORY);
-        ChanID = Integer.valueOf(list.get(CHANID));
-        Description = list.get(DESC);
-        Channel = list.get(CHANNEL);
-        Path = list.get(PATH);
-        StartTime = new Date(Long.valueOf(list.get(START)) * 1000);
-        EndTime = new Date(Long.valueOf(list.get(END)) * 1000);
-        RecStartTime = new Date(Long.valueOf(list.get(RECSTART)) * 1000);
-        RecEndTime = new Date(Long.valueOf(list.get(RECEND)) * 1000);
-        Status = RecStatus.get(Integer.valueOf(list.get(STATUS)));
+    public Program(String[] list, int off) {
+        Title = list[off+TITLE];
+        SubTitle = list[off+SUBTITLE];
+        Category = list[off+CATEGORY];
+        ChanID = Integer.valueOf(list[off+CHANID]);
+        Description = list[off+DESC];
+        Channel = list[off+CHANNEL];
+        Path = list[off+PATH];
+        StartTime = new Date(Long.valueOf(list[off+START]) * 1000);
+        EndTime = new Date(Long.valueOf(list[off+END]) * 1000);
+        RecStartTime = new Date(Long.valueOf(list[off+RECSTART]) * 1000);
+        RecEndTime = new Date(Long.valueOf(list[off+RECEND]) * 1000);
+        Status = RecStatus.get(Integer.valueOf(list[off+STATUS]));
     }
 
     /**
@@ -387,26 +386,25 @@ public class Program {
      * Flatten to a stringlist for use in backend commands
      * @return List of Strings, doesn't include stringlist separators
      */
-    public List<String> stringList() {
+    public String[] stringList() {
         
         if (list != null) return list;
 
-        list = new ArrayList<String>(TOTAL);
-        for (int i = 0; i < TOTAL; i++)
-            list.add(""); //$NON-NLS-1$
+        list = new String[TOTAL+1];
+        Arrays.fill(list, ""); //$NON-NLS-1$
 
-        list.set(TITLE, Title);
-        list.set(SUBTITLE, SubTitle);
-        list.set(DESC, Description);
-        list.set(CATEGORY, Category);
-        list.set(CHANID, String.valueOf(ChanID));
-        list.set(CHANNEL, Channel);
-        list.set(PATH, Path == null ? "" : Path); //$NON-NLS-1$
-        list.set(START, String.valueOf(StartTime.getTime() / 1000));
-        list.set(END, String.valueOf(EndTime.getTime() / 1000));
-        list.set(RECSTART, String.valueOf(RecStartTime.getTime() / 1000));
-        list.set(RECEND, String.valueOf(RecEndTime.getTime() / 1000));
-        list.set(STATUS, String.valueOf(Status.value()));
+        list[TITLE+1] = Title;
+        list[SUBTITLE+1] = SubTitle;
+        list[DESC+1] = Description;
+        list[CATEGORY+1] = Category;
+        list[CHANID+1] = String.valueOf(ChanID);
+        list[CHANNEL+1] = Channel;
+        list[PATH+1] = Path == null ? "" : Path; //$NON-NLS-1$
+        list[START+1] = String.valueOf(StartTime.getTime() / 1000);
+        list[END+1] = String.valueOf(EndTime.getTime() / 1000);
+        list[RECSTART+1] = String.valueOf(RecStartTime.getTime() / 1000);
+        list[RECEND+1] = String.valueOf(RecEndTime.getTime() / 1000);
+        list[STATUS+1] = String.valueOf(Status.value());
         return list;
         
     }
