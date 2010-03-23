@@ -42,7 +42,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -282,10 +281,9 @@ public class TVRemote extends Remote {
         else
             ctrls.put(R.id.tv_rec, Key.EDIT);
         
-        final SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
-        gesture = prefs.getString("tvDefaultStyle", "") //$NON-NLS-1$ //$NON-NLS-2$
-            .equals(Messages.getString("TVRemote.0"));  // Gesture //$NON-NLS-1$
+        gesture = PreferenceManager.getDefaultSharedPreferences(this)
+                      .getString("tvDefaultStyle", "") //$NON-NLS-1$ //$NON-NLS-2$
+                          .equals(Messages.getString("TVRemote.0")); // Gesture //$NON-NLS-1$
         
         setupViews(gesture);
         listenToGestures(gesture);

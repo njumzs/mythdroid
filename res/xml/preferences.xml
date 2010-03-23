@@ -4,12 +4,26 @@
 
     <PreferenceCategory android:title="@string/settings">
     
-    	<EditTextPreference
+    	<PreferenceScreen
     		android:key="backend"
-    		android:dialogTitle="Backend Address"
     		android:title="Manual Backend Config"
-    		android:singleLine="true"
-    		android:summary="Manually configure a backend"/>
+    		android:summary="Manually configure a backend">
+    		
+    		<EditTextPreference
+    			android:key="backendAddr"
+    			android:dialogTitle="Backend Address"
+    			android:title="Backend Address"
+    			android:singleLine="true"
+    			android:summary="Backend hostname or IP address"/>
+    			
+    		<EditTextPreference
+    			android:key="backendPublicAddr"
+    			android:dialogTitle="Backend Public Address"
+    			android:title="Backend Public Address"
+    			android:singleLine="true"
+    			android:summary="Used for streaming if connecting via SSH port forwards"/>
+    			
+    	</PreferenceScreen>
     		
     	<PreferenceScreen
     		android:key="frontends"
@@ -22,7 +36,7 @@
     	</PreferenceScreen>
     	
     	<PreferenceScreen
-    		android:key="osdsettings"
+    		android:key="osdSettings"
     		android:title="OSD Settings"
     		android:summary="Configure display of phone events on MythTV OSD">
     		

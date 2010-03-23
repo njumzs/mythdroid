@@ -46,7 +46,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -607,9 +606,9 @@ public class MythDroid extends MDListActivity implements
     }
 
     private void getPreferences() {
-        final SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
-        backend = prefs.getString("backend", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        backend = 
+            PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("backendAddr", ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 }

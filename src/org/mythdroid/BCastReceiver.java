@@ -42,11 +42,11 @@ public class BCastReceiver extends BroadcastReceiver {
 
         final SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(ctx);
-        final boolean showCalls = prefs.getBoolean("osdCalls", true);   //$NON-NLS-1$
-        final boolean showSMS = prefs.getBoolean("osdSMS", true);       //$NON-NLS-1$
-        final boolean scrollSMS = prefs.getBoolean("scrollSMS", true);  //$NON-NLS-1$
-        final String action = intent.getAction();
-        String number, name = null;
+        final boolean showCalls = prefs.getBoolean("osdCalls",  true); //$NON-NLS-1$
+        final boolean showSMS   = prefs.getBoolean("osdSMS",    true); //$NON-NLS-1$
+        final boolean scrollSMS = prefs.getBoolean("scrollSMS", true); //$NON-NLS-1$
+        final String action     = intent.getAction();
+        String number, name     = null;
         
         
         if (
