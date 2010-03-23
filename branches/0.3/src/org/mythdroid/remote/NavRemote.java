@@ -123,7 +123,7 @@ public class NavRemote extends Remote implements View.OnClickListener {
         
         if (!calledByRemote) {
             try {
-                mddMgr = new MDDManager(MythDroid.feMgr.getAddress());
+                mddMgr = new MDDManager(MythDroid.feMgr.addr);
             } catch (IOException e) { mddMgr = null; }
             
             if (mddMgr != null) {
@@ -309,8 +309,10 @@ public class NavRemote extends Remote implements View.OnClickListener {
         if (locView == null || itemView == null) return;
 
         final FrontendLocation newLoc = feMgr.getLoc();
-        locView.setText(newLoc.niceLocation);
-        itemView.setText("");
+        if (mddMgr == null || !newLoc.niceLocation.equals("Unknown")) {
+            locView.setText(newLoc.niceLocation);
+            itemView.setText("");
+        }
 
         if (newLoc.video) {
             if (lastLoc != null) 

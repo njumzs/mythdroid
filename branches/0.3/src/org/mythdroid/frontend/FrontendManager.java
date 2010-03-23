@@ -31,10 +31,10 @@ import android.util.Log;
 
 /** Manages a frontend */
 public class FrontendManager {
-
+    
+    public  String  name = null, addr = null;
     private ConnMgr cmgr = null;
-    private String  name = null;
-
+   
     /**
      * Constructor
      * @param name - name of frontend
@@ -46,15 +46,8 @@ public class FrontendManager {
         cmgr = new ConnMgr(host, 6546);
         if (cmgr == null) return;
         this.name = name;
-        getResponse();
-    }
-
-    /**
-     * Get the name of the frontend
-     * @return String containing the name
-     */
-    public String name() {
-        return name;
+        addr = host;
+        getSingleLineResponse();
     }
 
     /**
@@ -72,7 +65,7 @@ public class FrontendManager {
      */
     public synchronized boolean jumpTo(final String loc) throws IOException {
         cmgr.writeLine("jump " + loc);
-        if (getResponse().get(0).equals("OK"))
+        if (getSingleLineResponse().equals("OK")) 
             return true;
         else
             return false;
@@ -86,7 +79,7 @@ public class FrontendManager {
     public synchronized boolean jumpTo(FrontendLocation loc) throws IOException {
         if (cmgr == null || loc == null || loc.location == null) return false;
         cmgr.writeLine("jump " + loc.location.toLowerCase());
-        if (getResponse().get(0).equals("OK"))
+        if (getSingleLineResponse().equals("OK"))
             return true;
         else
             return false;
@@ -99,7 +92,7 @@ public class FrontendManager {
      */
     public synchronized boolean sendKey(final Key key) throws IOException {
         cmgr.writeLine("key " + key.str());
-        if (getResponse().get(0).equals("OK"))
+        if (getSingleLineResponse().equals("OK"))
             return true;
         else
             return false;
@@ -112,7 +105,7 @@ public class FrontendManager {
      */
     public synchronized boolean sendKey(final String key) throws IOException {
         cmgr.writeLine("key " + key);
-        if (getResponse().get(0).equals("OK"))
+        if (getSingleLineResponse().equals("OK"))
             return true;
         else
             return false;
@@ -124,7 +117,7 @@ public class FrontendManager {
      */
     public synchronized FrontendLocation getLoc() throws IOException {
         cmgr.writeLine("query loc");
-        String loc = getResponse().get(0);
+        String loc = getSingleLineResponse();
 
         int i = 0;
         while (loc.startsWith("ERROR: Timed out") && i++ < 4) {
@@ -132,7 +125,7 @@ public class FrontendManager {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {}
             cmgr.writeLine("query loc");
-            loc = getResponse().get(0);
+            loc = getSingleLineResponse();
         }
 
         return new FrontendLocation(loc);
@@ -162,7 +155,7 @@ public class FrontendManager {
      */
     public synchronized boolean playRec(final Program prog) throws IOException {
         cmgr.writeLine("play prog " + prog.playbackID());
-        if (getResponse().get(0).equals("OK"))
+        if (getSingleLineResponse().equals("OK"))
             return true;
         else
             return false;
@@ -175,7 +168,7 @@ public class FrontendManager {
      */
     public synchronized boolean playFile(final String file) throws IOException {
         cmgr.writeLine("play file " + file);
-        if (getResponse().get(0).equals("OK"))
+        if (getSingleLineResponse().equals("OK"))
             return true;
         else
             return false;
@@ -188,20 +181,12 @@ public class FrontendManager {
      */
     public synchronized boolean playChan(int chanid) throws IOException {
         cmgr.writeLine("play chanid " + chanid);
-        if (getResponse().get(0).equals("OK"))
+        if (getSingleLineResponse().equals("OK"))
             return true;
         else
             return false;
     }
 
-    /**
-     * Get the IP address of the backend
-     * @return a String containing the backend IP address
-     */
-    public String getAddress() {
-        return cmgr.getAddress();
-    }
-    
     /** Disconnect from the frontend */
     public void disconnect() throws IOException {
         if (cmgr == null) return;
@@ -210,14 +195,22 @@ public class FrontendManager {
     }
     
     private synchronized ArrayList<String> getResponse() throws IOException {
-        ArrayList<String> resp = new ArrayList<String>();
+        final ArrayList<String> resp = new ArrayList<String>(32);
         String msg = "";
         while (true) {
             msg = cmgr.readLine();
+            if (msg.length() == 0) continue;
             if (msg.equals("#")) break;
             resp.add(msg);
         }
         return resp;
+    }
+    
+    private synchronized String getSingleLineResponse() throws IOException {
+        String line = cmgr.readLine();
+        while (true) 
+            if (cmgr.readLine().equals("#")) break;
+        return line;
     }
 
 }

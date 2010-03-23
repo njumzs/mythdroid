@@ -65,7 +65,7 @@ public class Videos extends MDActivity implements
             
             try {
                 videos = MDDManager.getVideos(
-                    MythDroid.beMgr.getAddress(), path
+                    MythDroid.beMgr.addr, path
                 );
             } catch (Exception e) {
                 ErrUtil.postErr(ctx, new Exception("Failed to connect to MDD"));

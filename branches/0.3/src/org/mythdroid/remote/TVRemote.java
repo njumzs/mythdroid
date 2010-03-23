@@ -300,7 +300,7 @@ public class TVRemote extends Remote {
         }
         
         try {
-            mddMgr = new MDDManager(MythDroid.feMgr.getAddress());
+            mddMgr = new MDDManager(MythDroid.feMgr.addr);
         } catch (IOException e) { 
             mddMgr = null;
             timer = new Timer();
@@ -476,8 +476,8 @@ public class TVRemote extends Remote {
         if (id != DIALOG_GUIDE) return;
 
         final String[] items = new String[] { 
-        		Messages.getString("TVRemote.2"), 
-        		Messages.getString("TVRemote.3") + feMgr.name() 
+        		Messages.getString("TVRemote.2"),
+        		Messages.getString("TVRemote.3") + feMgr.name
         };
 
         final ListView lv = ((AlertDialog)dialog).getListView();
