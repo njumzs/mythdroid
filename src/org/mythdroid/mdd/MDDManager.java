@@ -116,7 +116,7 @@ public class MDDManager {
     public static ArrayList<Video> 
         getVideos(String addr, String dir) throws IOException {
         
-        ArrayList<Video> videos = new ArrayList<Video>();
+        ArrayList<Video> videos = new ArrayList<Video>(16);
         ConnMgr cmgr = new ConnMgr(addr, 16546);
         cmgr.writeLine("VIDEOLIST " + (dir == null ? "ROOT" : dir)); //$NON-NLS-1$ //$NON-NLS-2$
         
@@ -128,7 +128,8 @@ public class MDDManager {
                 continue;
             videos.add(new Video(line));
         }
-
+        
+        videos.trimToSize();
         cmgr.disconnect();
         return videos;
         

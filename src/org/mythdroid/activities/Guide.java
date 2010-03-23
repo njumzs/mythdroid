@@ -70,7 +70,7 @@ public class Guide extends MDActivity {
     final private ArrayList<Channel> channels = new ArrayList<Channel>();
 
     final private SimpleDateFormat 
-        date  = new SimpleDateFormat("d MMM yy"), //$NON-NLS-1$
+        date = new SimpleDateFormat("d MMM yy"), //$NON-NLS-1$
         time = new SimpleDateFormat("HH:mm"); //$NON-NLS-1$
 
     final private static int MENU_DATE    = 0, MENU_TIME = 1;
@@ -81,19 +81,17 @@ public class Guide extends MDActivity {
         numHours = 2,   colMins = 5,    hdrSpan = 6,
         numTimes = numHours * 60 / colMins;
     
-    final private static int minutes = 60000, hours = 3600000;
-    
     private static Date now = null, later = null;
 
-    final private Handler handler = new Handler();
+    final private Handler handler   = new Handler();
             
-    final private long[] times = new long[numTimes + 1];
+    final private long[]   times    = new long[numTimes + 1];
     final private String[] hdrTimes = new String[numTimes / hdrSpan];
 
     final private LayoutParams 
-        rowLayout    = new LayoutParams(),  chanLayout = new LayoutParams(), 
+        rowLayout     = new LayoutParams(), chanLayout    = new LayoutParams(), 
         hdrDateLayout = new LayoutParams(), hdrTimeLayout = new LayoutParams(), 
-        spacerLayout = new LayoutParams();
+        spacerLayout  = new LayoutParams();
 
     private Drawable 
         recordedIcon = null, willRecordIcon = null, failedIcon = null, 
@@ -223,6 +221,7 @@ public class Guide extends MDActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        tbl.removeAllViews();
         channels.clear();
     }
 
@@ -334,14 +333,14 @@ public class Guide extends MDActivity {
         nowTime = now.getTime();
         hdrDate = date.format(now);
 
-        long laterTime = nowTime + numHours * hours;
+        long laterTime = nowTime + numHours * 3600000;
         later = new Date(laterTime);
 
         int j = 1;
         // 0th column is channel name
         times[0] = 0;
         // rest are at 5 min intervals
-        for (long i = nowTime; i < laterTime; i += colMins * minutes)
+        for (long i = nowTime; i < laterTime; i += colMins * 60000)
             times[j++] = i;
 
         j = 1;
@@ -598,7 +597,7 @@ public class Guide extends MDActivity {
             }
         }
 
-        int span = (int) ((end - start) / (colMins * minutes));
+        int span = (int) ((end - start) / (colMins * 60000));
         if (span + params.column > maxcol) span = maxcol - params.column;
         params.span = span;
 
