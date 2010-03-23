@@ -185,7 +185,7 @@ public class VideoPlayer extends MDActivity {
            sdpAddr = sdpPublicAddr;
         
         videoView.setVideoURI(
-            Uri.parse("http://" + sdpAddr + ":5554/stream") //$NON-NLS-1$ //$NON-NLS-2$
+            Uri.parse("rtsp://" + sdpAddr + ":5554/stream") //$NON-NLS-1$ //$NON-NLS-2$
         );
         
         videoView.setOnPreparedListener(
