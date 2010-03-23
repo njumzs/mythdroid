@@ -27,7 +27,6 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 
@@ -48,6 +47,8 @@ import android.util.Log;
  */
 public class BackendManager {
 
+    public String addr = null;
+    
     static final private String BACKEND_UPNP_ID =
         "ST: urn:schemas-mythtv-org:device:MasterMediaServer:1\r\n";
 
@@ -87,6 +88,8 @@ public class BackendManager {
         if (!announce()) 
             throw (new IOException(Messages.getString("BackendManager.0")));
 
+        addr = host;
+        
     }
 
     /**
@@ -140,19 +143,10 @@ public class BackendManager {
         int locIdx = msg.indexOf(UPNP_LOCATION);
         int portIdx = msg.indexOf(":", locIdx + UPNP_LOCATION.length());
 
-        final String host = 
-            msg.substring(locIdx + UPNP_LOCATION.length(), portIdx);
+        return new BackendManager(
+            msg.substring(locIdx + UPNP_LOCATION.length(), portIdx)
+        );
 
-        return new BackendManager(host);
-
-    }
-    
-    /**
-     * Get the IP address of the backend
-     * @return a String containing the backend IP address
-     */
-    public String getAddress() {
-        return cmgr.getAddress();
     }
     
     /**
@@ -170,14 +164,11 @@ public class BackendManager {
      * @param filename - the full path to the recording
      * @return A Program representing the recording
      */
-    public Program getRecording(String basename) throws IOException {
-
-        List<String> resp = null;
+    public Program getRecording(final String basename) throws IOException {
 
         cmgr.sendString("QUERY_RECORDING BASENAME " + basename);
-        resp = cmgr.readStringList();
-
-        return new Program(resp.subList(1, resp.size()));
+        final String[] resp = cmgr.readStringList();
+        return new Program(resp, 1);
 
     }
 
@@ -188,12 +179,10 @@ public class BackendManager {
      */
     public ArrayList<Program> getRecordings() throws IOException {
 
-        List<String> resp = null;
-
         cmgr.sendString("QUERY_RECORDINGS Play");
-        resp = cmgr.readStringList();
+        final String[] resp = cmgr.readStringList();
 
-        int respSize = resp.size();
+        int respSize = resp.length;
         int numFields = Program.numFields();
         int typeField = Program.typeField();
 
@@ -201,8 +190,8 @@ public class BackendManager {
             new ArrayList<Program>(respSize / numFields);
 
         for (int i = respSize - numFields; i >= 0; i -= numFields) {
-            if (!resp.get(i + typeField).equals("Default")) continue;
-            programs.add(new Program(resp.subList(i, i + numFields)));
+            if (!resp[i + typeField].equals("Default")) continue;
+            programs.add(new Program(resp, i));
         }
 
         return programs;
@@ -213,10 +202,9 @@ public class BackendManager {
      * Stop an in-progress recording
      * @param prog - The Program to stop recording 
      */    
-    public void stopRecording(Program prog) throws IOException {
-        ArrayList<String> list = new ArrayList<String>();
-        list.add("STOP_RECORDING");
-        list.addAll(prog.stringList());
+    public void stopRecording(final Program prog) throws IOException {
+        final String[] list = prog.stringList();
+        list[0] = "STOP_RECORDING";
         cmgr.sendStringList(list);
         cmgr.readStringList();
     }
@@ -226,10 +214,9 @@ public class BackendManager {
      * Delete a recording
      * @param prog - The Program to delete 
      */
-    public void deleteRecording(Program prog) throws IOException {
-        ArrayList<String> list = new ArrayList<String>();
-        list.add("DELETE_RECORDING");
-        list.addAll(prog.stringList());
+    public void deleteRecording(final Program prog) throws IOException {
+        final String[] list = prog.stringList();
+        list[0]= "DELETE_RECORDING";
         cmgr.sendStringList(list);
         cmgr.readStringList();
     }
@@ -273,14 +260,12 @@ public class BackendManager {
     private boolean announce() throws IOException {
 
         cmgr.sendString("MYTH_PROTO_VERSION " + MythDroid.protoVersion);
-        List<String> resp = cmgr.readStringList();
 
-        if (!resp.get(0).equals("ACCEPT")) return false;
+        if (!cmgr.readStringList()[0].equals("ACCEPT")) return false;
         
         cmgr.sendString("ANN Playback " + myAddr + " 0");
-        resp = cmgr.readStringList();
 
-        if (!resp.get(0).equals("OK")) return false;
+        if (!cmgr.readStringList()[0].equals("OK")) return false;
 
         return true;
 

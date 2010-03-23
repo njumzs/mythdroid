@@ -340,7 +340,7 @@ public class MythDroid extends MDListActivity implements
         String name = defaultFrontend;
 
         if (feMgr != null && feMgr.isConnected()) {
-            if (name.equals(feMgr.name()))
+            if (name.equals(feMgr.name))
                 return feMgr;
             else
                 try {
@@ -378,7 +378,7 @@ public class MythDroid extends MDListActivity implements
         }
         
         if (feMgr != null) 
-            defaultFrontend = feMgr.name();
+            defaultFrontend = feMgr.name;
 
         c.close();
         FrontendDB.close();
@@ -568,7 +568,7 @@ public class MythDroid extends MDListActivity implements
                 ) {
                     try {
                         MDDManager.mddCommand(
-                            feMgr.getAddress(),
+                            feMgr.addr,
                             (String)av.getItemAtPosition(pos)
                         );
                     } catch (IOException e) { ErrUtil.postErr(ctx, e); }
@@ -587,7 +587,7 @@ public class MythDroid extends MDListActivity implements
         
         try {
             cmds = MDDManager.getCommands(
-                connectFrontend(ctx).getAddress()
+                connectFrontend(ctx).addr
             );
         } catch(IOException e) { 
             ErrUtil.err(ctx, e);

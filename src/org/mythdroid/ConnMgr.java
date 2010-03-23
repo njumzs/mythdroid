@@ -26,8 +26,6 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
 
 import org.mythdroid.activities.MythDroid;
 import org.mythdroid.resource.Messages;
@@ -36,15 +34,22 @@ import android.util.Log;
 
 /**
  * A TCP connection manager
+ * It's probably a bad idea to mix buffered and unbuffered reads 
  */
 public class ConnMgr {
     
-    static private IOException disconnected =
+    public  String       addr    = null;
+    
+    static final private IOException disconnected =
         new IOException(Messages.getString("ConnMgr.0"));
 
-    private Socket       sock = null;
-    private OutputStream os   = null;
-    private InputStream  is   = null;
+    static final private int rbufSize = 128;
+    
+    private Socket       sock    = null;
+    private OutputStream os      = null;
+    private InputStream  is      = null;
+    private int          rbufIdx = -1;
+    private byte[]       rbuf    = null;
 
     /**
      * Constructor
@@ -75,7 +80,8 @@ public class ConnMgr {
                         Messages.getString("ConnMgr.7"))
                 );
         }
-
+        
+        addr = host;
         os = sock.getOutputStream();
         is = sock.getInputStream();
 
@@ -87,10 +93,10 @@ public class ConnMgr {
      */
     public void writeLine(String str) throws IOException {
 
-        if (str.endsWith("\n")) //$NON-NLS-1$
+        if (str.endsWith("\n"))
             os.write(str.getBytes());
         else {
-            str += "\n"; //$NON-NLS-1$
+            str += "\n";
             os.write(str.getBytes());
         }
 
@@ -116,44 +122,120 @@ public class ConnMgr {
      * Separate and write a stringlist to the socket
      * @param list - List of strings to write
      */
-    public void sendStringList(List<String> list) throws IOException {
+    public void sendStringList(String[] list) throws IOException {
 
-        String str = list.remove(0);
+        String str = list[0];
 
-        for (String s : list) {
-            str += "[]:[]" + s; //$NON-NLS-1$
+        for (int i = 1; i < list.length; i++) {
+            str += "[]:[]" + list[i];
         }
 
         sendString(str);
     }
 
     /**
-     * Read a line from the socket
+     * Read a line from the socket (buffered) 
      * @return A string containing the line we read
      */
     public String readLine() throws IOException {
 
-        StringBuilder sb = new StringBuilder(32);
-
-        char c;
-
-        while (true) {
-            c = readChar();
-            sb.append(c);
-            if (c == '\n') break;
-            else if (sb.charAt(0) == '#' && c == ' ') break;
+        String line = "";
+        int r = -1;
+        
+        // Have left over buffered data?
+        if (rbufIdx > -1) 
+            line = new String(rbuf, 0, rbufIdx + 1);
+        
+        // Check for a prompt
+        if (rbufIdx >= 1 && line.charAt(0) == '#' && line.charAt(1) == ' ') {
+            // Did we consume the whole buffer?
+            if (rbufIdx > 1) {
+                // Nope
+                rbuf = line.substring(2, rbufIdx).getBytes();
+                rbufIdx -= 2;
+            }
+            else {
+                // Yep
+                rbuf = null;
+                rbufIdx = -1;
+            }
+            if (MythDroid.debug) Log.d("ConnMgr", "readLine: #");
+            return "#";
         }
+                
+        // Is there a whole line in the buffer?        
+        r = line.indexOf('\n');
+        
+        if (r != -1) {
+            // Yup, did we consume the whole buffer?
+            if (r < rbufIdx) {
+                // Nope
+                rbuf = line.substring(r + 1, rbufIdx + 1).getBytes();
+                rbufIdx -= r + 1;
+                if (MythDroid.debug) 
+                    Log.d("ConnMgr", "readLine: " + line.substring(0,r));
+                return line.substring(0, r).trim();
+            }
+            // Yup
+            rbuf = null;
+            rbufIdx = -1;
+            if (MythDroid.debug) Log.d("ConnMgr", "readLine: " + line);
+            return line.trim();    
+        }
+        
+        // We don't have a whole line buffered, read until we get one
+        while (true) {
+        
+            final byte[] buf = new byte[rbufSize];
+            
+            r = is.read(buf, 0, rbufSize);
+        
+            if (r == -1) {
+                disconnect();
+                throw disconnected;
+            }
+            
+            String extra = new String(buf, 0 , r);
+            line += extra;
+            
+            // If the buffer was empty and we got 2 bytes, check for a prompt
+            if (
+                line.length() == 2 && 
+                extra.charAt(0) == '#' && extra.charAt(1) == ' '
+            ) {
+                if (MythDroid.debug) Log.d("ConnMgr", "readLine: #");
+                return "#";
+            }
+            
+            // Got a whole line yet?
+            if (extra.indexOf('\n') != -1)
+                break;
 
-        sb.trimToSize();
-        String line = sb.toString().trim();
-
+        }
+        
+        // We've got a whole line
+        int tot = line.length() - 1;
+        r = line.indexOf('\n');
+        
+        // Are we gonna consume the whole string?
+        if (r < tot) {
+            // Nope, buffer the rest
+            rbuf = line.substring(r + 1, tot + 1).getBytes();
+            rbufIdx = tot - (r + 1);
+            if (MythDroid.debug) 
+                Log.d("ConnMgr", "readLine: " + line.substring(0,r));
+            return line.substring(0, r).trim();
+        }
+        // Yup
+        rbuf = null;
+        rbufIdx = -1;
         if (MythDroid.debug) Log.d("ConnMgr", "readLine: " + line);
-
-        return line;
+        return line.trim();
+        
     }
 
     /**
-     * Read len bytes from the socket
+     * Read len bytes from the socket (unbuffered)
      * @param len - number of bytes to read
      * @return a byte array of len bytes
      */
@@ -177,10 +259,10 @@ public class ConnMgr {
     }
 
     /**
-     * Read a stringlist from the socket
+     * Read a stringlist from the socket (unbuffered)
      * @return List of strings
      */
-    public List<String> readStringList() throws IOException {
+    public String[] readStringList() throws IOException {
 
         byte[] bytes = new byte[8];
         if (is.read(bytes, 0, 8) == -1) {
@@ -188,21 +270,12 @@ public class ConnMgr {
             throw disconnected;
         }
 
-        String slen = new String(bytes);
-        int len = Integer.parseInt(slen.trim());
+        int len = Integer.parseInt(new String(bytes).trim());
 
         bytes = readBytes(len);
-        return Arrays.asList(new String(bytes).split("\\[\\]:\\[\\]"));
+        return new String(bytes).split("\\[\\]:\\[\\]");
     }
     
-    /**
-     * Get the IP address of the remote host
-     * @return a String containing IP address
-     */
-    public String getAddress() {
-        return sock.getInetAddress().getHostAddress();
-    }
-
     /**
      * Get state of socket
      * @return true if socket is connected, false otherwise
@@ -216,15 +289,6 @@ public class ConnMgr {
      */
     public void disconnect() throws IOException {
         sock.close();
-    }
-
-    private char readChar() throws IOException {
-        int i = is.read();
-        if (i == -1) {
-            disconnect();
-            throw disconnected;
-        }
-        return (char) i;
     }
 
 }
