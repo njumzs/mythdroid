@@ -33,7 +33,6 @@ import org.mythdroid.activities.MythDroid;
 
 import android.content.ComponentName;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
@@ -80,11 +79,10 @@ public class NavRemote extends Remote {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        
-        final SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
-        gesture = prefs.getString("tvDefaultStyle", "") //$NON-NLS-1$ //$NON-NLS-2$
-            .equals(Messages.getString("NavRemote.0")); // Gesture //$NON-NLS-1$
+
+        gesture = PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("tvDefaultStyle", "") //$NON-NLS-1$ //$NON-NLS-2$
+                        .equals(Messages.getString("NavRemote.0")); // Gesture //$NON-NLS-1$
         
         setupViews(gesture);
         listenToGestures(gesture);

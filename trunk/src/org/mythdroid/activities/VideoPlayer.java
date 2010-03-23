@@ -40,6 +40,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.AdapterView;
@@ -168,6 +169,20 @@ public class VideoPlayer extends MDActivity {
         } catch (InterruptedException e) {}
         
         String sdpAddr = MythDroid.beMgr.getAddress();
+
+        // If the backend address is localhost, assume SSH port forwarding
+        // We must connect to the RTSP server directly otherwise the RTP
+        // goes astray, so use the public address for the backend if it's
+        // configured. This requires that port 5554/tcp is forwarded to the backend
+        String sdpPublicAddr = 
+            PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("backendPublicAddr", null);  //$NON-NLS-1$
+        
+        if (
+               (sdpAddr.equals("127.0.0.1") || sdpAddr.equals("localhost")) && //$NON-NLS-1$ //$NON-NLS-2$
+                sdpPublicAddr != null
+           )
+           sdpAddr = sdpPublicAddr;
         
         videoView.setVideoURI(
             Uri.parse("http://" + sdpAddr + ":5554/stream") //$NON-NLS-1$ //$NON-NLS-2$
