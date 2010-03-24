@@ -121,7 +121,7 @@ public class BackendManager {
         sock.setReuseAddress(true);
         sock.bind(isa);
         sock.setBroadcast(true);
-        sock.setSoTimeout(500);
+        sock.setSoTimeout(800);
         sock.send(pkt);
 
         try {
