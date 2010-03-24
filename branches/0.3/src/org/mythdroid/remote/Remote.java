@@ -261,6 +261,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
                     break;
                 case KeyEvent.KEYCODE_TAB:
                     feMgr.sendKey(Key.TAB);
+                    break;
                 case KeyEvent.KEYCODE_ALT_LEFT:
                 case KeyEvent.KEYCODE_ALT_RIGHT:
                     alt = !alt;
