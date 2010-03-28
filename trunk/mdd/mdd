@@ -669,7 +669,7 @@ sub streamFile($) {
 
         populateStorGroups() unless (scalar %storageGroups);
     
-        $file =~ s/.*\///;
+        $file =~ s/.*\//\//;
 
         if (exists $storageGroups{$sg}) {
             $file = $storageGroups{$sg} . $file;
