@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+   	android:layout_width="fill_parent"
+   	android:layout_height="fill_parent"
+   	android:orientation="vertical"
+   	android:paddingLeft="4dp"
+   	android:paddingRight="4dp">
+   	
+    <TextView
+		android:id="@+id/recedit_title"
+ 		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_marginTop="6dp"
+ 		android:textSize="19sp"/>
+ 	
+	<TextView
+		android:id="@+id/recedit_title_spacer"
+ 		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_toRightOf="@id/recedit_title"
+ 		android:layout_alignBottom="@id/recedit_title"
+ 		android:textSize="16sp"
+ 		android:textStyle="italic"
+ 		android:text="  -  "/>
+ 		
+ 	<TextView
+		android:id="@+id/recedit_subtitle"
+ 		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_toRightOf="@id/recedit_title_spacer"
+ 		android:layout_alignBottom="@id/recedit_title"
+ 		android:textSize="16sp"
+ 		android:textStyle="italic"/>
+ 		
+	<TextView	
+		android:id="@+id/recedit_channel"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/recedit_title"
+ 		android:layout_alignParentLeft="true"
+ 		android:textSize="16sp"/>
+ 		
+	<TextView	
+		android:id="@+id/recedit_start"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+		android:layout_alignTop="@id/recedit_channel"
+ 		android:layout_alignParentRight="true"
+		android:textSize="16sp"/>
+
+	<TextView	
+		android:id="@+id/recedit_type_text"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+		android:layout_below="@id/recedit_channel"
+ 		android:layout_alignParentLeft="true"
+		android:textSize="16sp"
+		android:layout_marginTop="5dp"
+		android:text="Recording type:"/>
+	
+	<Spinner
+		android:id="@+id/recedit_type"
+		android:layout_width="260dp"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/recedit_type_text"
+		android:layout_marginTop="3dp"/>
+
+	<TextView	
+		android:id="@+id/recedit_prio_text"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+		android:layout_below="@id/recedit_type"
+ 		android:layout_alignParentLeft="true"
+		android:textSize="16sp"
+		android:layout_marginTop="3dp"
+		android:text="Recording priority:"/>
+	
+	<Spinner
+		android:id="@+id/recedit_prio"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignLeft="@+id/recedit_type"
+		android:layout_alignRight="@+id/recedit_type"
+		android:layout_below="@id/recedit_prio_text"
+		android:layout_marginTop="3dp"/>
+		
+	<Button	
+		android:id="@+id/recedit_schedoptions"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignTop="@id/recedit_type"
+		android:layout_toRightOf="@id/recedit_type"
+		android:layout_marginLeft="20dp"
+		android:minWidth="180dp"
+		android:text="Scheduling Options"/>
+
+	<Button	
+		android:id="@+id/recedit_groupoptions"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignTop="@id/recedit_prio"
+		android:layout_toRightOf="@id/recedit_prio"
+		android:layout_marginLeft="20dp"
+		android:minWidth="180dp"
+		android:text="Group Options"/>
+
+	<Button
+		android:id="@+id/recedit_save"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:layout_centerHorizontal="true"
+		android:gravity="center"
+		android:layout_marginBottom="3dp"
+		android:text="Save"/>
+		
+
+</RelativeLayout>

@@ -84,7 +84,7 @@
  			android:id="@+id/rec_play"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
- 			android:layout_marginRight="48dp"
+ 			android:layout_marginRight="14dp"
  			android:minWidth="100dp"
  			android:visibility="gone"
   			android:text="Play"/>
@@ -94,15 +94,23 @@
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
  			android:minWidth="100dp"
+ 			android:layout_marginRight="14dp"
  			android:visibility="gone"
  			android:text="Stop Rec"/>
+ 			
+ 		<Button
+ 			android:id="@+id/rec_edit"
+ 			android:layout_width="wrap_content"
+ 			android:layout_height="wrap_content"
+ 			android:minWidth="100dp"
+ 			android:text="Schedule"/>
  			
 		<Button
  			android:id="@+id/rec_del"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
  			android:minWidth="100dp"
- 			android:layout_marginLeft="48dp"
+ 			android:layout_marginLeft="14dp"
  			android:visibility="gone"
  			android:text="Delete"/>
  			
