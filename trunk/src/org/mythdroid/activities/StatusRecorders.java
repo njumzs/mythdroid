@@ -20,7 +20,7 @@ package org.mythdroid.activities;
 
 import java.util.ArrayList;
 
-import org.mythdroid.Extras;
+import org.mythdroid.Enums.Extras;
 import org.mythdroid.R;
 import org.mythdroid.data.Program;
 import org.mythdroid.activities.RecordingDetail;

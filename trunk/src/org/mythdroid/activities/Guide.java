@@ -25,9 +25,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.mythdroid.Extras;
 import org.mythdroid.R;
-import org.mythdroid.data.Category;
+import org.mythdroid.Enums.Extras;
+import org.mythdroid.Enums.Category;
 import org.mythdroid.data.Channel;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.XMLHandler;
@@ -40,6 +40,7 @@ import org.mythdroid.util.ErrUtil;
 import org.xml.sax.SAXException;
 
 import android.R.drawable;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -66,13 +67,7 @@ import android.widget.TableRow.LayoutParams;
 /** Display a program guide */
 public class Guide extends MDActivity {
 
-    /** ArrayList of channel objects, capacity ensured during XML parsing */
-    final private ArrayList<Channel> channels = new ArrayList<Channel>();
-
-    final private SimpleDateFormat 
-        date = new SimpleDateFormat("d MMM yy"), //$NON-NLS-1$
-        time = new SimpleDateFormat("HH:mm"); //$NON-NLS-1$
-
+    final public static int  REFRESH_NEEDED = Activity.RESULT_FIRST_USER + 1;
     final private static int MENU_DATE    = 0, MENU_TIME = 1;
     final private static int DIALOG_DATE  = 0, DIALOG_TIME = 1;
 
@@ -82,6 +77,13 @@ public class Guide extends MDActivity {
         numTimes = numHours * 60 / colMins;
     
     private static Date now = null, later = null;
+    
+    /** ArrayList of channel objects, capacity ensured during XML parsing */
+    final private ArrayList<Channel> channels = new ArrayList<Channel>();
+
+    final private SimpleDateFormat 
+        date = new SimpleDateFormat("d MMM yy"), //$NON-NLS-1$
+        time = new SimpleDateFormat("HH:mm"); //$NON-NLS-1$
 
     final private Handler handler   = new Handler();
             
@@ -142,8 +144,10 @@ public class Guide extends MDActivity {
             @Override
             public void onClick(View v) {
                 MythDroid.curProg = (Program)v.getTag();
-                startActivity(
-                    new Intent().setClass(ctx, RecordingDetail.class)
+                startActivityForResult(
+                    new Intent()
+                        .putExtra(Extras.GUIDE.toString(), true)
+                        .setClass(ctx, RecordingDetail.class), 0
                 );
             }
         };
@@ -291,6 +295,12 @@ public class Guide extends MDActivity {
 
         }
 
+    }
+    
+    @Override
+    public void onActivityResult(int reqCode, int resCode, Intent data) {
+        if (resCode == REFRESH_NEEDED)
+            displayGuide(now);
     }
 
     @Override

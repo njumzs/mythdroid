@@ -160,7 +160,7 @@ public class BackendManager {
 
     /**
      * Get a Program from a recording filename
-     * @param basename - the full path to the recording
+     * @param basename - String containing the full path to the recording
      * @return A Program representing the recording
      */
     public Program getRecording(final String basename) throws IOException {
@@ -171,7 +171,6 @@ public class BackendManager {
 
     }
 
-    
     /**
      * Get a list of recordings
      * @return An ArrayList of Programs
@@ -183,13 +182,13 @@ public class BackendManager {
 
         int respSize = resp.length;
         int numFields = Program.numFields();
-        int typeField = Program.typeField();
+        int groupField = Program.recGroupField();
 
         ArrayList<Program> programs =
             new ArrayList<Program>(respSize / numFields);
 
         for (int i = respSize - numFields; i >= 0; i -= numFields) {
-            if (!resp[i + typeField].equals("Default")) continue; //$NON-NLS-1$
+            if (!resp[i + groupField].equals("Default")) continue; //$NON-NLS-1$
             programs.add(new Program(resp, i));
         }
 
@@ -217,6 +216,11 @@ public class BackendManager {
         final String[] list = prog.stringList();
         list[0]= "DELETE_RECORDING"; //$NON-NLS-1$
         cmgr.sendStringList(list);
+        cmgr.readStringList();
+    }
+    
+    public void reschedule(int recid) throws IOException {
+        cmgr.sendString("RESCHEDULE_RECORDINGS " + recid); //$NON-NLS-1$
         cmgr.readStringList();
     }
 

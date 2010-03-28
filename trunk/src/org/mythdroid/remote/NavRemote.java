@@ -20,9 +20,9 @@ package org.mythdroid.remote;
 
 import java.io.IOException;
 
-import org.mythdroid.Extras;
+import org.mythdroid.Enums.Extras;
 import org.mythdroid.R;
-import org.mythdroid.data.Key;
+import org.mythdroid.Enums.Key;
 import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.mdd.MDDMenuListener;

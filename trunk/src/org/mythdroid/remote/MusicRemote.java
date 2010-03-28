@@ -27,14 +27,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.mythdroid.Extras;
+import org.mythdroid.Enums.Extras;
 import org.mythdroid.R;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.mdd.MDDMusicListener;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.activities.MythDroid;
-import org.mythdroid.data.Key;
+import org.mythdroid.Enums.Key;
 
 import android.R.drawable;
 import android.app.AlertDialog;

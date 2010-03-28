@@ -18,7 +18,7 @@
 
 package org.mythdroid.activities;
 
-import org.mythdroid.Extras;
+import org.mythdroid.Enums.Extras;
 import org.mythdroid.R;
 import org.mythdroid.data.Video;
 import org.mythdroid.remote.TVRemote;

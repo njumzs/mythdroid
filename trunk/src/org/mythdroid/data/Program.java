@@ -23,14 +23,15 @@ import java.net.URLConnection;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.mythdroid.data.XMLHandler.Element;
-import org.mythdroid.resource.Messages;
-import org.mythdroid.util.ErrUtil;
 import org.mythdroid.activities.MythDroid;
+import org.mythdroid.data.XMLHandler.Element;
+import org.mythdroid.util.ErrUtil;
+import org.mythdroid.Enums.RecDupIn;
+import org.mythdroid.Enums.RecEpiFilter;
+import org.mythdroid.Enums.RecDupMethod;
+import org.mythdroid.Enums.RecStatus;
+import org.mythdroid.Enums.RecType;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -118,6 +119,25 @@ public class Program {
                         prog.Status = RecStatus.get(
                             Integer.valueOf(attr.getValue("recStatus")) //$NON-NLS-1$
                         );
+                        prog.RecPrio = Integer.valueOf(
+                            attr.getValue("recPriority") //$NON-NLS-1$
+                        );
+                        prog.RecGroup = attr.getValue("recGroup"); //$NON-NLS-1$
+                        prog.DupMethod = RecDupMethod.get(
+                            Integer.valueOf(attr.getValue("dupMethod")) //$NON-NLS-1$
+                        );
+                        prog.Type = RecType.get(
+                            Integer.valueOf(attr.getValue("recType")) //$NON-NLS-1$
+                        );
+                        prog.RecID = Integer.valueOf(
+                            attr.getValue("recordId") //$NON-NLS-1$
+                        );
+
+                        int dupInTemp = 
+                            Integer.valueOf(attr.getValue("dupInType")); //$NON-NLS-1$
+                        prog.DupIn = RecDupIn.get(dupInTemp & 0x0f);
+                        prog.EpiFilter = RecEpiFilter.get(dupInTemp & 0xf0);
+                        
                     }
                 }
             );
@@ -155,91 +175,32 @@ public class Program {
         }
 
     }
-
+ 
+    static final public int  
+        TITLE     = 0,  SUBTITLE  = 1,  DESC     = 2,   CATEGORY  = 3,   
+        CHANID    = 4,  CHANNEL   = 6,  PATH     = 8,   START     = 11,     
+        END       = 12, FINDID    = 15, RECPRIO  = 20,  STATUS    = 21,    
+        RECID     = 22, RECTYPE   = 23, RECDUPIN = 24,  DUPMETHOD = 25, 
+        RECSTART  = 26, RECEND    = 27, RECGROUP = 30,  SERIESID  = 33,  
+        PROGID    = 34, STORGROUP = 42, 
+        TOTAL     = MythDroid.protoVersion < 50 ? 46 : 47;
     
-    /**
-     * Enum of recording statuses, with reverse lookup by code
-     */
-    public enum RecStatus {
-        FAILED      (-9,    Messages.getString("Program.0")),  //$NON-NLS-1$
-        TUNERBUSY   (-8,    Messages.getString("Program.13")), //$NON-NLS-1$
-        LOWSPACE    (-7,    Messages.getString("Program.14")), //$NON-NLS-1$
-        CANCELLED   (-6,    Messages.getString("Program.15")), //$NON-NLS-1$
-        MISSED      (-5,    Messages.getString("Program.16")), //$NON-NLS-1$
-        ABORTED     (-4,    Messages.getString("Program.17")), //$NON-NLS-1$
-        RECORDED    (-3,    Messages.getString("Program.18")), //$NON-NLS-1$
-        RECORDING   (-2,    Messages.getString("Program.19")), //$NON-NLS-1$
-        WILLRECORD  (-1,    Messages.getString("Program.20")), //$NON-NLS-1$
-        UNKNOWN     (0,     Messages.getString("Program.21")), //$NON-NLS-1$
-        DONTRECORD  (1,     Messages.getString("Program.22")), //$NON-NLS-1$
-        PREVIOUS    (2,     Messages.getString("Program.23")), //$NON-NLS-1$
-        CURRENT     (3,     Messages.getString("Program.24")), //$NON-NLS-1$
-        EARLIER     (4,     Messages.getString("Program.25")), //$NON-NLS-1$
-        TOOMANY     (5,     Messages.getString("Program.26")), //$NON-NLS-1$
-        NOTLISTED   (6,     Messages.getString("Program.27")), //$NON-NLS-1$
-        CONFLICT    (7,     Messages.getString("Program.28")), //$NON-NLS-1$
-        LATER       (8,     Messages.getString("Program.29")), //$NON-NLS-1$
-        REPEAT      (9,     Messages.getString("Program.30")), //$NON-NLS-1$
-        INACTIVE    (10,    Messages.getString("Program.31")), //$NON-NLS-1$
-        NEVERRECORD (11,    Messages.getString("Program.32")), //$NON-NLS-1$
-        OFFLINE     (12,    Messages.getString("Program.33")), //$NON-NLS-1$
-        OTHER       (13,    Messages.getString("Program.34")); //$NON-NLS-1$
-
-        private int     code;
-        private String  msg;
-        static final private Map<Integer, RecStatus> revMap =
-            new HashMap<Integer, RecStatus>(24);
-
-        static {
-            for (RecStatus s : EnumSet.allOf(RecStatus.class))
-                revMap.put(s.value(), s);
-        }
-
-        private RecStatus(int code, String str) {
-            this.code = code;
-            this.msg = str;
-        }
-
-        
-        /**
-         * Get human readable description of status
-         * @return String containing description
-         */
-        public String msg() {
-            return msg;
-        }
-
-        /**
-         * Get integer code
-         * @return code
-         */
-        public int value() {
-            return code;
-        }
-
-        /**
-         * Reverse lookup by integer code
-         * @return RecStatus corresponding to code
-         */
-        public static RecStatus get(int value) {
-            return revMap.get(value);
-        }
-    }
-
-    static final private int  
-        TITLE = 0,      SUBTITLE = 1,   DESC = 2,   CATEGORY = 3,   CHANID = 4, 
-        CHANNEL = 6,    PATH = 8,       START = 11, END = 12,       STATUS = 21,
-        RECSTART = 26,  RECEND = 27,    TYPE = 30,  
-        TOTAL = MythDroid.protoVersion < 50 ? 46 : 47;
-
     /** Strings representing the relevant field */
-    public String    Title, SubTitle, Category, Description, Channel, Path;
+    public String       Title, SubTitle, Category, Description, Channel, Path,
+                        RecGroup, StorGroup;
     /** Dates representing the relevant field */
-    public Date      StartTime, EndTime, RecStartTime, RecEndTime;
-    /** The recording status */
-    public RecStatus Status;
-    /** The channel ID */
-    public int       ChanID;
+    public Date         StartTime, EndTime, RecStartTime, RecEndTime;
+    public RecStatus    Status = RecStatus.UNKNOWN;
+    /** The recording type */
+    public RecType      Type = RecType.NOT;
+    /** The recording duplicate search space */
+    public RecDupIn     DupIn = RecDupIn.ALL;
+    /** The recording episode filter */
+    public RecEpiFilter EpiFilter = RecEpiFilter.NONE;
+    /** The recording duplicate match method */
+    public RecDupMethod DupMethod = RecDupMethod.SUBANDDESC;
+    
+    public int          ChanID, RecID = -1, RecPrio = 0;
 
     private String[] list  = null;
 
@@ -248,18 +209,36 @@ public class Program {
      * @param list - a stringlist (e.g. from a backend)
      */
     public Program(String[] list, int off) {
-        Title = list[off+TITLE];
-        SubTitle = list[off+SUBTITLE];
-        Category = list[off+CATEGORY];
-        ChanID = Integer.valueOf(list[off+CHANID]);
-        Description = list[off+DESC];
-        Channel = list[off+CHANNEL];
-        Path = list[off+PATH];
-        StartTime = new Date(Long.valueOf(list[off+START]) * 1000);
-        EndTime = new Date(Long.valueOf(list[off+END]) * 1000);
-        RecStartTime = new Date(Long.valueOf(list[off+RECSTART]) * 1000);
-        RecEndTime = new Date(Long.valueOf(list[off+RECEND]) * 1000);
-        Status = RecStatus.get(Integer.valueOf(list[off+STATUS]));
+         
+        int dupInTemp;
+        
+        try {
+            Title         = list[off+TITLE];
+            SubTitle      = list[off+SUBTITLE];
+            Description   = list[off+DESC];
+            Category      = list[off+CATEGORY];
+            ChanID        = Integer.valueOf(list[off+CHANID]);
+            Channel       = list[off+CHANNEL];
+            Path          = list[off+PATH];
+            StartTime     = new Date(Long.valueOf(list[off+START]) * 1000);
+            EndTime       = new Date(Long.valueOf(list[off+END]) * 1000);
+            RecPrio       = Integer.valueOf(list[off+RECPRIO]);
+            Status        = RecStatus.get(Integer.valueOf(list[off+STATUS]));
+            RecID         = Integer.valueOf(list[off+RECID]);
+            Type          = RecType.get(Integer.valueOf(list[off+RECTYPE]));
+            dupInTemp     = Integer.valueOf(list[off+RECDUPIN]);
+            DupMethod 
+                     = RecDupMethod.get(Integer.valueOf(list[off+DUPMETHOD]));
+            RecStartTime  = new Date(Long.valueOf(list[off+RECSTART]) * 1000);
+            RecEndTime    = new Date(Long.valueOf(list[off+RECEND]) * 1000);
+            RecGroup      = list[off+RECGROUP];
+            StorGroup     = list[off+STORGROUP];
+            
+            DupIn         = RecDupIn.get(dupInTemp & 0x0f);
+            EpiFilter     = RecEpiFilter.get(dupInTemp & 0xf0);
+            
+        } catch (NumberFormatException e) {}
+        
     }
 
     /**
@@ -272,7 +251,6 @@ public class Program {
         Title = attr.getNamedItem("title").getNodeValue(); //$NON-NLS-1$
         SubTitle = attr.getNamedItem("subTitle").getNodeValue(); //$NON-NLS-1$
         Category = attr.getNamedItem("category").getNodeValue(); //$NON-NLS-1$
-
         try {
             StartTime = MythDroid.dateFmt.parse(
                 attr.getNamedItem("startTime").getNodeValue() //$NON-NLS-1$
@@ -322,9 +300,28 @@ public class Program {
                 );
             } catch (ParseException e) {}
 
-            Status =
-                     RecStatus.get(Integer.valueOf(attr.getNamedItem(
-                         "recStatus").getNodeValue())); //$NON-NLS-1$
+            Status = RecStatus.get(
+                Integer.valueOf(attr.getNamedItem("recStatus").getNodeValue()) //$NON-NLS-1$
+            );
+            RecPrio = Integer.valueOf(
+                attr.getNamedItem("recPriority").getNodeValue() //$NON-NLS-1$
+            );
+            RecGroup = attr.getNamedItem("recGroup").getNodeValue(); //$NON-NLS-1$
+            DupMethod = RecDupMethod.get(
+                Integer.valueOf(attr.getNamedItem("dupMethod").getNodeValue()) //$NON-NLS-1$
+            );
+            Type = RecType.get(
+                Integer.valueOf(attr.getNamedItem("recType").getNodeValue()) //$NON-NLS-1$
+            );
+            RecID = Integer.valueOf(
+                attr.getNamedItem("recordId").getNodeValue() //$NON-NLS-1$
+            );
+
+            int dupInTemp = 
+                Integer.valueOf(attr.getNamedItem("dupInType").getNodeValue()); //$NON-NLS-1$
+            DupIn = RecDupIn.get(dupInTemp & 0x0f);
+            EpiFilter = RecEpiFilter.get(dupInTemp & 0xf0);
+            
         }
     }
 
@@ -393,18 +390,19 @@ public class Program {
         list = new String[TOTAL+1];
         Arrays.fill(list, ""); //$NON-NLS-1$
 
-        list[TITLE+1] = Title;
-        list[SUBTITLE+1] = SubTitle;
-        list[DESC+1] = Description;
-        list[CATEGORY+1] = Category;
-        list[CHANID+1] = String.valueOf(ChanID);
-        list[CHANNEL+1] = Channel;
-        list[PATH+1] = Path == null ? "" : Path; //$NON-NLS-1$
-        list[START+1] = String.valueOf(StartTime.getTime() / 1000);
-        list[END+1] = String.valueOf(EndTime.getTime() / 1000);
-        list[RECSTART+1] = String.valueOf(RecStartTime.getTime() / 1000);
-        list[RECEND+1] = String.valueOf(RecEndTime.getTime() / 1000);
-        list[STATUS+1] = String.valueOf(Status.value());
+        list[TITLE+1]     =  Title;
+        list[SUBTITLE+1]  =  SubTitle;
+        list[DESC+1]      =  Description;
+        list[CATEGORY+1]  =  Category;
+        list[CHANID+1]    =  String.valueOf(ChanID);
+        list[CHANNEL+1]   =  Channel;
+        list[PATH+1]      =  Path == null ? "" : Path; //$NON-NLS-1$
+        list[START+1]     =  String.valueOf(StartTime.getTime() / 1000);
+        list[END+1]       =  String.valueOf(EndTime.getTime() / 1000);
+        list[RECSTART+1]  =  String.valueOf(RecStartTime.getTime() / 1000); 
+        list[RECEND+1]    =  String.valueOf(RecEndTime.getTime() / 1000); 
+		list[STATUS+1]    =  String.valueOf(Status.value());        
+        
         return list;
         
     }
@@ -413,8 +411,8 @@ public class Program {
      * Get index in stringlist of the TYPE field 
      * @return int index of TYPE field 
      */
-    static public int typeField() {
-        return TYPE;
+    static public int recGroupField() {
+        return RECGROUP;
     }
 
     /**

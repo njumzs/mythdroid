@@ -20,8 +20,9 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 
-import org.mythdroid.Extras;
 import org.mythdroid.R;
+import org.mythdroid.Enums.Extras;
+import org.mythdroid.Enums.RecStatus;
 import org.mythdroid.data.Program;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
@@ -48,10 +49,11 @@ import android.widget.TextView;
 public class RecordingDetail extends MDActivity {
 
     final static private int DELETE_DIALOG = 0, STOP_DIALOG = 1;
-
+    
     final private Context ctx = this;
 
-    private boolean livetv = false;
+    private boolean livetv = false, guide = false;
+    private Button stop = null;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -59,6 +61,7 @@ public class RecordingDetail extends MDActivity {
         addHereToFrontendChooser(VideoPlayer.class);
         setContentView(R.layout.recording_detail);
         livetv = getIntent().getBooleanExtra(Extras.LIVETV.toString(), false);
+        guide = getIntent().getBooleanExtra(Extras.GUIDE.toString(), false);
         setViews();
     }
 
@@ -73,6 +76,13 @@ public class RecordingDetail extends MDActivity {
         super.onConfigurationChanged(config);
         setContentView(R.layout.recording_detail);
         setViews();
+    }
+    
+    @Override
+    public void onActivityResult(int reqCode, int resCode, Intent data) {
+        if (!guide || resCode != Guide.REFRESH_NEEDED)
+            return;
+        setResult(Guide.REFRESH_NEEDED);
     }
 
     @Override
@@ -130,10 +140,14 @@ public class RecordingDetail extends MDActivity {
                                         );
                                     } catch (IOException e) {
                                         ErrUtil.err(ctx, e);
+                                        dialog.dismiss();
+                                        return;
                                     }
                                     setResult(Recordings.REFRESH_NEEDED);
+                                    stop.setVisibility(View.GONE);
+                                    MythDroid.curProg.Status = RecStatus.RECORDED;
+                                    setViews();
                                     dialog.dismiss();
-                                    finish();
                                 }
                             }
                         )
@@ -160,13 +174,25 @@ public class RecordingDetail extends MDActivity {
         ((TextView)findViewById(R.id.rec_status))
             .setText(Messages.getString("RecordingDetail.1") + prog.Status.msg()); // status: //$NON-NLS-1$
         ((TextView)findViewById(R.id.rec_desc)).setText(prog.Description);
+        
+        final Button edit = (Button) findViewById(R.id.rec_edit);
+        edit.setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivityForResult(
+                        new Intent().setClass(ctx, RecordingEdit.class), 0
+                    );
+                }
+            }
+        );
 
         if (livetv) return;
         
         switch (prog.Status) {
 
             case RECORDING:
-                final Button stop = (Button) findViewById(R.id.rec_stop);
+                stop = (Button) findViewById(R.id.rec_stop);
                 stop.setVisibility(View.VISIBLE);
                 stop.setOnClickListener(
                     new View.OnClickListener() {
@@ -180,19 +206,23 @@ public class RecordingDetail extends MDActivity {
             //$FALL-THROUGH$
             case RECORDED:
             case CURRENT:
-                final Button del = (Button) findViewById(R.id.rec_del);
-                final Button play = (Button) findViewById(R.id.rec_play);
 
-                del.setVisibility(View.VISIBLE);
-                del.setOnClickListener(
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            showDialog(DELETE_DIALOG);
+                if (!guide) {
+                    final Button del = (Button) findViewById(R.id.rec_del);
+                    del.setVisibility(View.VISIBLE);
+                
+                    del.setOnClickListener(
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showDialog(DELETE_DIALOG);
+                            }
                         }
-                    }
-                );
+                    );
+                }
 
+                final Button play = (Button) findViewById(R.id.rec_play);
+                
                 play.setVisibility(View.VISIBLE);
                 play.setOnClickListener(
                     new View.OnClickListener() {
