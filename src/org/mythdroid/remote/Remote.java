@@ -20,7 +20,7 @@ package org.mythdroid.remote;
 
 import java.io.IOException;
 
-import org.mythdroid.data.Key;
+import org.mythdroid.Enums.Key;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.util.ErrUtil;
 

@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.mythdroid.Extras;
+import org.mythdroid.Enums.Extras;
 import org.mythdroid.R;
-import org.mythdroid.data.Key;
+import org.mythdroid.Enums.Key;
 import org.mythdroid.data.Program;
 import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.mdd.MDDChannelListener;

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 import org.mythdroid.data.Program.ProgramListener;
 import org.mythdroid.data.Program.ProgramXMLParser;
-import org.mythdroid.data.Program.RecStatus;
+import org.mythdroid.Enums.RecStatus;
 import org.mythdroid.data.XMLHandler.Element;
 import org.xml.sax.Attributes;
 

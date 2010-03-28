@@ -21,7 +21,7 @@ package org.mythdroid.activities;
 import java.util.ArrayList;
 import java.util.WeakHashMap;
 
-import org.mythdroid.Extras;
+import org.mythdroid.Enums.Extras;
 import org.mythdroid.R;
 import org.mythdroid.data.Video;
 import org.mythdroid.data.VideoAdapter;

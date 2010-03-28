@@ -136,6 +136,12 @@ public class Recordings extends MDListActivity implements
     }
 
     @Override
+    public void onActivityResult(int reqCode, int resCode, Intent data) {
+        if (resCode == REFRESH_NEEDED) 
+            refresh();
+    }
+
+    @Override
     public void onListItemClick(ListView list, View item, int pos, long id) {
         MythDroid.curProg = (Program)list.getItemAtPosition(pos);
         startActivityForResult(
@@ -225,12 +231,6 @@ public class Recordings extends MDListActivity implements
 
         return false;
 
-    }
-
-    @Override
-    public void onActivityResult(int reqCode, int resCode, Intent data) {
-        if (resCode == REFRESH_NEEDED) 
-            refresh();
     }
 
     private void empty() {

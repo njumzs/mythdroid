@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.mythdroid.ConnMgr;
-import org.mythdroid.data.Key;
+import org.mythdroid.Enums.Key;
 import org.mythdroid.data.Program;
 import org.mythdroid.activities.MythDroid;
 

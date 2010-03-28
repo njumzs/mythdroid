@@ -20,10 +20,11 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 
-import org.mythdroid.Extras;
 import org.mythdroid.R;
+import org.mythdroid.Enums.Extras;
 import org.mythdroid.R.id;
 import org.mythdroid.R.layout;
+import org.mythdroid.data.Program;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.util.ErrUtil;
 
@@ -148,15 +149,25 @@ public class VideoPlayer extends MDActivity {
         
         try {
             Intent intent = getIntent();
-            String path = null;
+            String path = null, sg = null;
             
-            if (intent.hasExtra(Extras.FILENAME.toString())) 
+            if (intent.hasExtra(Extras.FILENAME.toString())) { 
                 path = getIntent().getStringExtra(Extras.FILENAME.toString());
-            else  
-                path = MythDroid.curProg.Path;
+                sg = "Default"; //$NON-NLS-1$
+            }
+            else {
+                Program prog = MythDroid.curProg;
+                path = prog.Path;
+                if (prog.StorGroup != null)
+                    sg = prog.StorGroup;
+                else
+                    sg = MDDManager.getStorageGroup(
+                        MythDroid.beMgr.addr, prog.RecID
+                    );
+            }
                 
             MDDManager.streamFile(
-                MythDroid.beMgr.addr, path, 
+                MythDroid.beMgr.addr, path, sg, 
                 dm.widthPixels, dm.heightPixels, vb, ab
             );
         } catch (IOException e) {

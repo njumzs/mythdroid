@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.mythdroid.ConnMgr;
+import org.mythdroid.Enums.RecType;
+import org.mythdroid.data.Program;
 import org.mythdroid.data.Video;
 
 /**
@@ -80,8 +82,8 @@ public class MDDManager {
      * @return - ArrayList<String> containing names of MDD commands
      */
     public static ArrayList<String> getCommands(String addr) throws IOException {
-        ConnMgr cmgr = new ConnMgr(addr, 16546);
-        ArrayList<String> cmds = new ArrayList<String>();
+        final ConnMgr cmgr = new ConnMgr(addr, 16546);
+        final ArrayList<String> cmds = new ArrayList<String>();
         
         String line = cmgr.readLine();
         
@@ -101,8 +103,7 @@ public class MDDManager {
      * @param cmd - String containing the name of the MDD command
      */
     public static void mddCommand(String addr, String cmd) throws IOException {
-        ConnMgr cmgr = new ConnMgr(addr, 16546);
-        cmgr.writeLine("COMMAND " + cmd); //$NON-NLS-1$
+        final ConnMgr cmgr = sendMsg(addr, "COMMAND " + cmd); //$NON-NLS-1$
         cmgr.disconnect();
     }
     
@@ -113,19 +114,17 @@ public class MDDManager {
      * @return - ArrayList of Videos
      * @throws IOException
      */
-    public static ArrayList<Video> 
-        getVideos(String addr, String dir) throws IOException {
+    public static ArrayList<Video> getVideos(String addr, String dir) 
+        throws IOException {
         
-        ArrayList<Video> videos = new ArrayList<Video>(16);
-        ConnMgr cmgr = new ConnMgr(addr, 16546);
-        cmgr.writeLine("VIDEOLIST " + (dir == null ? "ROOT" : dir)); //$NON-NLS-1$ //$NON-NLS-2$
+        final ArrayList<Video> videos = new ArrayList<Video>(16);
+        final ConnMgr cmgr = 
+            sendMsg(addr, "VIDEOLIST " + (dir == null ? "ROOT" : dir)); //$NON-NLS-1$ //$NON-NLS-2$
         
-        String line = null;
-        
-        while (line == null || (!line.equals("VIDEOLIST DONE"))) { //$NON-NLS-1$
-            line = cmgr.readLine();
-            if (!(line.startsWith("VIDEO ")||line.startsWith("DIRECTORY"))) //$NON-NLS-1$ //$NON-NLS-2$
-                continue;
+        while (true) {
+            String line = cmgr.readLine();
+            if (line.equals("VIDEOLIST DONE")) //$NON-NLS-1$
+                break;
             videos.add(new Video(line));
         }
         
@@ -144,12 +143,13 @@ public class MDDManager {
      * @param vb - int representing desired bitrate of video in kb/s
      * @param ab - int representing desired bitrate of audio in kb/s
      */
-    public static void 
-        streamFile(String addr, String file, int w, int h, int vb, int ab) 
-            throws IOException {
-        ConnMgr cmgr = new ConnMgr(addr, 16546);
-        cmgr.writeLine(
-            "STREAM " + w + "x" + h + " VB " + vb + " AB " + ab + " " + file //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+    public static void streamFile(
+            String addr, String file, String sg, int w, int h, int vb, int ab
+    ) throws IOException {
+        final ConnMgr cmgr = sendMsg(
+            addr,
+            "STREAM " + w + "x" + h + " VB " + vb + " AB " + ab + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ 
+            " SG " + sg + " FILE " + file  //$NON-NLS-1$ //$NON-NLS-2$
         );
         cmgr.disconnect();
     }
@@ -159,8 +159,109 @@ public class MDDManager {
      * @param addr - String containing IP address of MDD
      */
     public static void stopStream(String addr) throws IOException {
-        ConnMgr cmgr = new ConnMgr(addr, 16546);
-        cmgr.writeLine("STOPSTREAM"); //$NON-NLS-1$
+        final ConnMgr cmgr = sendMsg(addr, "STOPSTREAM"); //$NON-NLS-1$
+        cmgr.disconnect();
+    }
+    
+    /**
+     * Determine the RecType of a recording
+     * @param addr - String containing IP address of MDD
+     * @param recid - int representing RecID of recording
+     * @return - RecType
+     */
+    public static RecType getRecType(String addr, int recid) 
+        throws IOException {
+        final ConnMgr cmgr = sendMsg(addr, "RECTYPE " + recid); //$NON-NLS-1$
+        final RecType rt = RecType.get(Integer.parseInt(cmgr.readLine()));
+        cmgr.disconnect();
+        return rt;
+    }
+    
+    /**
+     * Determine the storage group of a recording
+     * @param addr - String containing IP address of MDD
+     * @param recid - int representing RecID of recording
+     * @return - String contaning recording's storage group
+     */
+    public static String getStorageGroup(String addr, int recid) throws IOException {
+        final ConnMgr cmgr = sendMsg(addr, "STORGROUP " + recid); //$NON-NLS-1$
+        String sg = cmgr.readLine();
+        cmgr.disconnect();
+        return sg;
+    }
+    
+    /**
+     * Get a list of storage groups
+     * @param addr - String containing IP address of MDD
+     * @return String[] of storage groups
+     */
+    public static String[] getStorageGroups(String addr) throws IOException {
+        final ConnMgr cmgr = sendMsg(addr, "STORGROUPS"); //$NON-NLS-1$
+        final ArrayList<String> groups = new ArrayList<String>();
+        
+        while (true) { 
+            String line = cmgr.readLine();
+            if (line.equals("STORGROUPS DONE")) //$NON-NLS-1$
+                break;
+            groups.add(line);
+        }
+        
+        cmgr.disconnect();
+        return groups.toArray(new String[groups.size()]);
+    }
+    
+    /**
+     * Get a list of recording groups
+     * @param addr - String containing IP address of MDD
+     * @return String[] of recording groups
+     */
+    public static String[] getRecGroups(String addr) throws IOException {
+        final ConnMgr cmgr = sendMsg(addr, "RECGROUPS"); //$NON-NLS-1$
+        final ArrayList<String> groups = new ArrayList<String>();
+        
+        while (true) { 
+            String line = cmgr.readLine();
+            if (line.equals("RECGROUPS DONE")) //$NON-NLS-1$
+                break;
+            groups.add(line);
+        }
+        
+        cmgr.disconnect();
+        return groups.toArray(new String[groups.size()]);
+    }
+    
+    /**
+     * Create or update a recording rule
+     * @param addr - String containing IP address of MDD 
+     * @param prog - Program the rule relates to
+     * @param updates - a list of modifications to an existing or default rule
+     * @return - int representing the RecID of the new/updated recording rule
+     */
+    public static int updateRecording(
+        String addr, Program prog, String updates
+    ) throws IOException {
+        String msg;
+        if (prog.RecID != -1) 
+            msg = "UPDATEREC " + prog.RecID + " " + updates; //$NON-NLS-1$ //$NON-NLS-2$
+        else
+            msg = "NEWREC " + prog.ChanID + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                      prog.StartTime.getTime() / 1000 + " " + updates; //$NON-NLS-1$ 
+
+        final ConnMgr cmgr = sendMsg(addr, msg);
+        int recid = Integer.parseInt(cmgr.readLine());
+        cmgr.disconnect();
+        return recid;
+    }
+    
+    /**
+     * Delete a recording rule
+     * @param addr - String containing IP address of MDD 
+     * @param recid - RecID of the rule to delete
+     * @throws IOException
+     */
+    public static void deleteRecording(String addr, int recid) 
+        throws IOException {
+        final ConnMgr cmgr = sendMsg(addr, "DELREC " + recid); //$NON-NLS-1$
         cmgr.disconnect();
     }
     
@@ -202,6 +303,22 @@ public class MDDManager {
      */
     public void shutdown() throws IOException {
         cmgr.disconnect();
+    }
+    
+    private static ConnMgr sendMsg(String addr, String msg) throws IOException {
+        final ConnMgr cmgr = new ConnMgr(addr, 16546);
+        String resp = null;
+        cmgr.writeLine(msg);
+        while (true) {
+            resp = cmgr.readLine();
+            if (resp.equals("OK")) //$NON-NLS-1$
+                return cmgr;
+            if (resp.equals("UNKNOWN")) //$NON-NLS-1$
+                throw new IOException(
+                    "MDD doesn't understand " + //$NON-NLS-1$ 
+                    msg.substring(0, msg.indexOf(' '))
+                ); 
+        }
     }
   
     private void handleData(String line) {

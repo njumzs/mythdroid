@@ -21,7 +21,7 @@ package org.mythdroid.data;
 import java.util.ArrayList;
 
 import org.mythdroid.R;
-import org.mythdroid.data.Program.RecStatus;
+import org.mythdroid.Enums.RecStatus;
 
 import android.app.Activity;
 import android.content.Context;
