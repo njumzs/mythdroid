@@ -24,6 +24,7 @@ import org.mythdroid.R;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.R.id;
 import org.mythdroid.R.layout;
+import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.util.ErrUtil;
@@ -57,6 +58,7 @@ public class VideoPlayer extends MDActivity {
     final private int DIALOG_QUALITY = 1;
     private int vb = 0, ab = 0;
     private VideoView videoView = null;
+    private BackendManager beMgr = null;
      
     @Override
     public void onCreate(Bundle icicle) {
@@ -71,9 +73,19 @@ public class VideoPlayer extends MDActivity {
         super.onDestroy();
         videoView.stopPlayback();
         try {
-            MDDManager.stopStream(MythDroid.beMgr.addr);
+            MDDManager.stopStream(beMgr.addr);
         } catch (IOException e) {
             ErrUtil.err(ctx, e);
+        }
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            beMgr = MythDroid.getBackend();
+        } catch (Exception e) {
+            ErrUtil.err(this, e);
         }
     }
     
@@ -161,13 +173,11 @@ public class VideoPlayer extends MDActivity {
                 if (prog.StorGroup != null)
                     sg = prog.StorGroup;
                 else
-                    sg = MDDManager.getStorageGroup(
-                        MythDroid.beMgr.addr, prog.RecID
-                    );
+                    sg = MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
             }
                 
             MDDManager.streamFile(
-                MythDroid.beMgr.addr, path, sg, 
+                beMgr.addr, path, sg, 
                 dm.widthPixels, dm.heightPixels, vb, ab
             );
         } catch (IOException e) {
@@ -179,7 +189,7 @@ public class VideoPlayer extends MDActivity {
             Thread.sleep(3000);
         } catch (InterruptedException e) {}
         
-        String sdpAddr = MythDroid.beMgr.addr;
+        String sdpAddr = beMgr.addr;
 
         // If the backend address is localhost, assume SSH port forwarding
         // We must connect to the RTSP server directly otherwise the RTP

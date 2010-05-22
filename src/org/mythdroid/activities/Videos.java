@@ -69,7 +69,7 @@ public class Videos extends MDActivity implements
             
             try {
                 videos = MDDManager.getVideos(
-                    MythDroid.beMgr.addr, path
+                    MythDroid.getBackend().addr, path
                 );
             } catch (Exception e) {
                 ErrUtil.postErr(ctx, new Exception("Failed to connect to MDD")); //$NON-NLS-1$
@@ -147,7 +147,7 @@ public class Videos extends MDActivity implements
         scale = getResources().getDisplayMetrics().density;
         
         showDialog(DIALOG_LOAD);
-        MythDroid.wHandler.post(getVideos);
+        MythDroid.getWorker().post(getVideos);
     }
     
     @Override
@@ -164,7 +164,7 @@ public class Videos extends MDActivity implements
                 path += "/" + video.title; //$NON-NLS-1$
             dirText.setText(currentDir(path));
             showDialog(DIALOG_LOAD);
-            MythDroid.wHandler.post(getVideos);
+            MythDroid.getWorker().post(getVideos);
             return;
         }
         
@@ -204,7 +204,7 @@ public class Videos extends MDActivity implements
                 dirText.setText(currentDir(path));
             }
             showDialog(DIALOG_LOAD);
-            MythDroid.wHandler.post(getVideos);
+            MythDroid.getWorker().post(getVideos);
             return true;
             
         }

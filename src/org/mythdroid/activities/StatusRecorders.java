@@ -265,7 +265,7 @@ public class StatusRecorders extends ListActivity {
 
     private void refresh() {
         showDialog(DIALOG_LOAD);
-        MythDroid.wHandler.post(getStatusTask);
+        MythDroid.getWorker().post(getStatusTask);
     }
 
 }

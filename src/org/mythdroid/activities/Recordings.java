@@ -18,7 +18,6 @@
 
 package org.mythdroid.activities;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -77,8 +76,8 @@ public class Recordings extends MDListActivity implements
         public void run() {
             
             try {
-                recordings = MythDroid.beMgr.getRecordings();
-            } catch (IOException e) { 
+                recordings = MythDroid.getBackend().getRecordings();
+            } catch (Exception e) { 
                 ErrUtil.postErr(ctx, Messages.getString("Recordings.0")); //$NON-NLS-1$
                 dismissDialog(DIALOG_LOAD);
                 finish();
@@ -244,7 +243,7 @@ public class Recordings extends MDListActivity implements
     private void refresh() {
         empty();
         showDialog(DIALOG_LOAD);
-        MythDroid.wHandler.post(getRecordings);
+        MythDroid.getWorker().post(getRecordings);
     }
 
 }
