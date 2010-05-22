@@ -149,6 +149,14 @@ public class BackendManager {
     }
     
     /**
+     * Get the connection state of the backend
+     * @return true if we are connected, false otherwise
+     */
+    public boolean isConnected() {
+        return (cmgr != null && cmgr.isConnected());
+    }
+    
+    /**
      * Get the URL of the status / XML service
      * @return A String containing the URL
      */

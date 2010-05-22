@@ -131,7 +131,7 @@ public class TVRemote extends Remote {
 
             try {
                 
-                final FrontendLocation loc = feMgr.getLoc();
+                final FrontendLocation loc = feMgr.getLoc(ctx);
             
                 if (!loc.video) {
                     done();
@@ -147,9 +147,9 @@ public class TVRemote extends Remote {
                             public void run() { 
                                 try {
                                     Program prog = 
-                                        MythDroid.beMgr.getRecording(name);
+                                        MythDroid.getBackend().getRecording(name);
                                     titleView.setText(prog.Title);
-                                } catch (IOException e) { 
+                                } catch (Exception e) { 
                                     ErrUtil.postErr(ctx, e); 
                                     return;
                                 }
@@ -191,16 +191,16 @@ public class TVRemote extends Remote {
             
             try {
                 if (livetv) {
-                	if (!feMgr.getLoc().livetv) 
+                	if (!feMgr.getLoc(ctx).livetv) 
                 		feMgr.jumpTo("livetv"); //$NON-NLS-1$
                 	
-                    if (!feMgr.getLoc().livetv) {
+                    if (!feMgr.getLoc(ctx).livetv) {
                         ErrUtil.postErr(ctx, Messages.getString("TVRemote.1")); //$NON-NLS-1$
                         done();
                         return;
                     }
                     if (jumpChan >= 0) { 
-                        while(feMgr.getLoc().position < 1)
+                        while(feMgr.getLoc(ctx).position < 1)
                             Thread.sleep(500);
                         feMgr.playChan(jumpChan);
                     }
@@ -294,7 +294,7 @@ public class TVRemote extends Remote {
     public void onResume() {
         super.onResume();
         try {
-            feMgr = MythDroid.connectFrontend(this);
+            feMgr = MythDroid.getFrontend(this);
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();
@@ -302,7 +302,7 @@ public class TVRemote extends Remote {
         }
         
         try {
-            mddMgr = new MDDManager(MythDroid.feMgr.addr);
+            mddMgr = new MDDManager(feMgr.addr);
         } catch (IOException e) { 
             mddMgr = null;
             timer = new Timer();
@@ -310,7 +310,7 @@ public class TVRemote extends Remote {
 
         if (jump && !wasPaused) {
             showDialog(DIALOG_LOAD);
-            MythDroid.wHandler.post(jumpRun);
+            MythDroid.getWorker().post(jumpRun);
         }
         else
             handler.post(ready);
@@ -673,18 +673,14 @@ public class TVRemote extends Remote {
         FrontendLocation loc = null;
         
         try {
-            loc = feMgr.getLoc();
+            loc = feMgr.getLoc(ctx);
             if (!loc.video) {
                 done();
                 return;
             }
-            prog = MythDroid.beMgr.getRecording(loc.filename);
-        } catch (IOException e) {
+            prog = MythDroid.getBackend().getRecording(loc.filename);
+        } catch (Exception e) {
             ErrUtil.err(this, e);
-            done();
-            return;
-        } catch (NullPointerException e) {
-            ErrUtil.err(this, Messages.getString("TVRemote.4")); //$NON-NLS-1$
             done();
             return;
         }

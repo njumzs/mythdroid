@@ -27,6 +27,7 @@ import org.mythdroid.Enums.Key;
 import org.mythdroid.data.Program;
 import org.mythdroid.activities.MythDroid;
 
+import android.content.Context;
 import android.util.Log;
 
 /** Manages a frontend */
@@ -111,7 +112,7 @@ public class FrontendManager {
      * Get the current frontend location
      * @return a FrontendLocation
      */
-    public synchronized FrontendLocation getLoc() throws IOException {
+    public synchronized FrontendLocation getLoc(Context ctx) throws IOException {
         cmgr.writeLine("query loc"); //$NON-NLS-1$
         String loc = getSingleLineResponse();
 
@@ -124,7 +125,7 @@ public class FrontendManager {
             loc = getSingleLineResponse();
         }
 
-        return new FrontendLocation(loc);
+        return new FrontendLocation(this, loc);
     }
 
     /**

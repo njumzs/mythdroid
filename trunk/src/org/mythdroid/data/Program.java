@@ -352,7 +352,7 @@ public class Program {
         try {
             final URL url =
                 new URL(
-                    MythDroid.beMgr.getStatusURL() +
+                    MythDroid.getBackend().getStatusURL() +
                     "/Myth/GetPreviewImage?ChanId=" + ChanID + //$NON-NLS-1$
                     "&StartTime=" + MythDroid.dateFmt.format(RecStartTime) //$NON-NLS-1$
                 );

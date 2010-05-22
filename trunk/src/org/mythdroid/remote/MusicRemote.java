@@ -19,7 +19,6 @@
 package org.mythdroid.remote;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.EnumSet;
@@ -242,7 +241,7 @@ public class MusicRemote extends Remote {
     public void onResume() {
         super.onResume();
         try {
-            feMgr = MythDroid.connectFrontend(this);
+            feMgr = MythDroid.getFrontend(this);
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();
@@ -250,7 +249,7 @@ public class MusicRemote extends Remote {
         }
         
         try {
-            mddMgr = new MDDManager(MythDroid.feMgr.addr);
+            mddMgr = new MDDManager(feMgr.addr);
         } catch (IOException e) { mddMgr = null; }
         
         setupViews();
@@ -259,7 +258,7 @@ public class MusicRemote extends Remote {
             mddMgr.setMusicListener(new mddListener());
       
         try {
-            if (jump && !feMgr.getLoc().music)  
+            if (jump && !feMgr.getLoc(this).music)  
                 feMgr.jumpTo("playmusic"); //$NON-NLS-1$
         } catch (IOException e) {
             ErrUtil.err(this, e);
@@ -474,13 +473,13 @@ public class MusicRemote extends Remote {
         URL url = null;
         try {
             url = new URL(
-                MythDroid.beMgr.getStatusURL() +
+                MythDroid.getBackend().getStatusURL() +
                 "/Myth/GetAlbumArt?" +  //$NON-NLS-1$
                 "Id=" + artid + //$NON-NLS-1$
                 "&Width=" + artView.getWidth() + //$NON-NLS-1$
                 "&Height=" + artView.getHeight() //$NON-NLS-1$
             );
-        } catch (MalformedURLException e) {}
+        } catch (Exception e) { url = null; }
         
         if (url == null)
             return null;

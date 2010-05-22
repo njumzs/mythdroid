@@ -51,7 +51,7 @@ public class RecordingEdit extends MDActivity {
     static public String        storGroup; 
     
     private Program prog         = MythDroid.curProg;
-    private BackendManager beMgr = MythDroid.beMgr;
+    private BackendManager beMgr = null;
     private RecType type         = prog.Type;
     private int prio             = prog.RecPrio;
     
@@ -93,6 +93,16 @@ public class RecordingEdit extends MDActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            beMgr = MythDroid.getBackend();
+        } catch (Exception e) {
+            ErrUtil.err(this, e);
+        }
     }
 
     @Override

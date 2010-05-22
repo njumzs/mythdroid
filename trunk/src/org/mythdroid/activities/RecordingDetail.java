@@ -23,6 +23,7 @@ import java.io.IOException;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Enums.RecStatus;
+import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
@@ -51,6 +52,7 @@ public class RecordingDetail extends MDActivity {
     final static private int DELETE_DIALOG = 0, STOP_DIALOG = 1;
     
     final private Context ctx = this;
+    private BackendManager beMgr = null;
 
     private boolean livetv = false, guide = false;
     private Button stop = null;
@@ -69,6 +71,16 @@ public class RecordingDetail extends MDActivity {
     public void onDestroy() {
         super.onDestroy();
         setResult(Activity.RESULT_OK);
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            beMgr = MythDroid.getBackend();
+        } catch (Exception e) {
+            ErrUtil.err(this, e);
+        }
     }
 
     @Override
@@ -108,10 +120,10 @@ public class RecordingDetail extends MDActivity {
                                 public void onClick(
                                     DialogInterface dialog, int which) {
                                     try {
-                                        MythDroid.beMgr.deleteRecording(
+                                        beMgr.deleteRecording(
                                             MythDroid.curProg
                                         );
-                                    } catch (IOException e) { 
+                                    } catch (Exception e) { 
                                         ErrUtil.err(ctx, e); 
                                     }
                                     setResult(Recordings.REFRESH_NEEDED);
@@ -135,7 +147,7 @@ public class RecordingDetail extends MDActivity {
                                     DialogInterface dialog, int which
                                 ) {
                                     try {
-                                        MythDroid.beMgr.stopRecording(
+                                        beMgr.stopRecording(
                                             MythDroid.curProg
                                         );
                                     } catch (IOException e) {

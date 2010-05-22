@@ -18,8 +18,6 @@
 
 package org.mythdroid.activities;
 
-import java.io.IOException;
-
 import org.mythdroid.R;
 
 import org.mythdroid.mdd.MDDManager;
@@ -44,9 +42,13 @@ public class RecordingEditGroups extends MDActivity {
         super.onCreate(icicle);
         setContentView(R.layout.recording_edit_groups);
         try {
-            recGroups  = MDDManager.getRecGroups(MythDroid.beMgr.addr);
-            storGroups = MDDManager.getStorageGroups(MythDroid.beMgr.addr); 
-        } catch (IOException e) {
+            recGroups  = MDDManager.getRecGroups(
+                MythDroid.getBackend().addr
+            );
+            storGroups = MDDManager.getStorageGroups(
+                MythDroid.getBackend().addr
+            ); 
+        } catch (Exception e) {
             ErrUtil.err(this, e);
             finish();
         }
