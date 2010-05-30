@@ -27,6 +27,8 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 
 
@@ -150,6 +152,14 @@ public class BackendManager {
     }
     
     /**
+     * Get the connection state of the backend
+     * @return true if we are connected, false otherwise
+     */
+    public boolean isConnected() {
+        return (cmgr != null && cmgr.isConnected());
+    }
+    
+    /**
      * Get the URL of the status / XML service
      * @return A String containing the URL
      */
@@ -193,6 +203,9 @@ public class BackendManager {
             if (!resp[i + typeField].equals("Default")) continue;
             programs.add(new Program(resp, i));
         }
+        
+        if (MythDroid.protoVersion > 56)
+            Collections.sort(programs, Collections.reverseOrder());
 
         return programs;
 

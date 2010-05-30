@@ -87,7 +87,7 @@ public class Status extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         showDialog(DIALOG_LOAD);
-        MythDroid.wHandler.post(getStatusTask);
+        MythDroid.getWorker().post(getStatusTask);
     }
 
     @Override
@@ -137,7 +137,7 @@ public class Status extends ListActivity {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
-        URL url = new URL(MythDroid.beMgr.getStatusURL() + "/xml");
+        URL url = new URL(MythDroid.getBackend().getStatusURL() + "/xml"); //$NON-NLS-1$
         statusDoc = dbf.newDocumentBuilder().parse(
             url.openConnection().getInputStream()
         );

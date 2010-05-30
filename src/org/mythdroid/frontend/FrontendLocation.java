@@ -41,13 +41,13 @@ public class FrontendLocation {
      * Constructor
      * @param loc - String describing location
      */
-    public FrontendLocation(String loc) {
+    public FrontendLocation(FrontendManager feMgr, String loc) {
 
         location = loc;
         
         if (MythDroid.debug) Log.d("FrontendLocation", "loc: " + loc);
         
-        if (locations == null && !populateLocations()) 
+        if (locations == null && !populateLocations(feMgr)) 
             return;
 
         loc = loc.toLowerCase();
@@ -76,9 +76,7 @@ public class FrontendLocation {
 
     }
 
-    private Boolean populateLocations() {
-
-        final FrontendManager feMgr = MythDroid.feMgr;
+    private Boolean populateLocations(FrontendManager feMgr) {
 
         if (feMgr == null || !feMgr.isConnected())
             return false;
