@@ -101,22 +101,24 @@ public class StatusRecorders extends ListActivity {
         }
     };
 
-    private class Encoder {
+    static final private class Encoder {
 
-        private String[] states = { 
-        		Messages.getString("StatusRecorders.1"),  // Idle //$NON-NLS-1$
-        		Messages.getString("StatusRecorders.2"),  // Live TV //$NON-NLS-1$
-        		"?", "?",  //$NON-NLS-1$ //$NON-NLS-2$
-        		Messages.getString("StatusRecorders.5")   // Recording //$NON-NLS-1$
+        private final static String[] states = { 
+            Messages.getString("StatusRecorders.1"),  // Idle //$NON-NLS-1$
+            Messages.getString("StatusRecorders.2"),  // Live TV //$NON-NLS-1$
+            "?", "?",   //$NON-NLS-1$ //$NON-NLS-2$ 
+            Messages.getString("StatusRecorders.5"),  // Recording //$NON-NLS-1$
+            "?", //$NON-NLS-1$
+            Messages.getString("StatusRecorders.5")   // Recording //$NON-NLS-1$
         };
-
+                
         public int     id;
         public boolean local;
         public String  hostname, state;
         public Program program;
 
         public Encoder(Node item) {
-
+                      
             NamedNodeMap attr = item.getAttributes();
             id = Integer.parseInt(attr.getNamedItem("id").getNodeValue()); //$NON-NLS-1$
             local = 
@@ -151,7 +153,7 @@ public class StatusRecorders extends ListActivity {
     }
 
     /** Extended ArrayAdapter, adapts encoders for a ListView */
-    private class EncoderAdapter extends ArrayAdapter<Object> {
+    final private class EncoderAdapter extends ArrayAdapter<Object> {
 
         private class ViewHolder {
             public TextView    encoder, state, program, endTime;
