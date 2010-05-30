@@ -49,7 +49,7 @@ import android.sax.StartElementListener;
  * or from XML (e.g. in Status or in the Guide). Has mostly public
  * members and a few convenience methods
  */
-public class Program {
+public class Program implements Comparable<Program> {
     
     /**
      * Implement this and pass to ProgramXMLParser to receive 
@@ -177,13 +177,27 @@ public class Program {
     }
  
     static final public int  
-        TITLE     = 0,  SUBTITLE  = 1,  DESC     = 2,   CATEGORY  = 3,   
-        CHANID    = 4,  CHANNEL   = 6,  PATH     = 8,   START     = 11,     
-        END       = 12, FINDID    = 15, RECPRIO  = 20,  STATUS    = 21,    
-        RECID     = 22, RECTYPE   = 23, RECDUPIN = 24,  DUPMETHOD = 25, 
-        RECSTART  = 26, RECEND    = 27, RECGROUP = 30,  SERIESID  = 33,  
-        PROGID    = 34, STORGROUP = 42, 
-        TOTAL     = MythDroid.protoVersion < 50 ? 46 : 47;
+        TITLE     = 0,  SUBTITLE  = 1,  DESC     = 2,   CATEGORY  = 3,
+        CHANID    = 4,  CHANNEL   = 6,  PATH     = 8,
+        START, END, FINDID, RECPRIO, STATUS, RECID, RECTYPE, RECDUPIN,
+        DUPMETHOD, RECSTART, RECEND, RECGROUP, SERIESID, PROGID, STORGROUP,
+        TOTAL;
+
+    static {
+        if (MythDroid.protoVersion < 57) {
+            START     = 11; END       = 12; FINDID    = 15; RECPRIO   = 20;
+            STATUS    = 21; RECID     = 22; RECTYPE   = 23; RECDUPIN  = 24;
+            DUPMETHOD = 25; RECSTART  = 26; RECEND    = 27; RECGROUP  = 30;
+            SERIESID  = 33; PROGID    = 34; STORGROUP = 42;
+            TOTAL     = MythDroid.protoVersion < 50 ? 46 : 47;
+        }
+        else {
+            START     = 10; END       = 11; FINDID    = 12; RECPRIO   = 17;
+            STATUS    = 18; RECID     = 19; RECTYPE   = 20; RECDUPIN  = 21;
+            DUPMETHOD = 22; RECSTART  = 23; RECEND    = 24; RECGROUP  = 26;
+            SERIESID  = 28; PROGID    = 29; STORGROUP = 36; TOTAL     = 41;
+        }
+    }
     
     /** Strings representing the relevant field */
     public String       Title, SubTitle, Category, Description, Channel, Path,
@@ -421,6 +435,15 @@ public class Program {
      */
     static public int numFields() {
         return TOTAL;
+    }
+
+    @Override
+    public int compareTo(Program another) {
+        if (StartTime.getTime() < another.StartTime.getTime())
+            return -1;
+        else if (StartTime.getTime() > another.StartTime.getTime())
+            return 1;
+        return 0;
     }
 
 }

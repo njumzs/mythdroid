@@ -27,6 +27,8 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 
 
@@ -199,6 +201,9 @@ public class BackendManager {
             if (!resp[i + groupField].equals("Default")) continue; //$NON-NLS-1$
             programs.add(new Program(resp, i));
         }
+        
+        if (MythDroid.protoVersion > 56)
+            Collections.sort(programs, Collections.reverseOrder());
 
         return programs;
 
