@@ -19,7 +19,6 @@
 package org.mythdroid.data;
 
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.http.HttpResponse;
@@ -99,11 +98,11 @@ public class Video {
         URL url = null;
         try {
             url = new URL(
-                MythDroid.beMgr.getStatusURL() +
+                MythDroid.getBackend().getStatusURL() +
                 "/Myth/GetVideoArt?" + 
                 "Id=" + id 
             );
-        } catch (MalformedURLException e) {}
+        } catch (Exception e) {}
         
         Bitmap bm = null;
 

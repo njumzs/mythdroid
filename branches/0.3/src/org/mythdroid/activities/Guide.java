@@ -349,7 +349,7 @@ public class Guide extends MDActivity {
             j += hdrSpan;
         }
 
-        MythDroid.wHandler.post(getData);
+        MythDroid.getWorker().post(getData);
 
     }
 
@@ -385,7 +385,7 @@ public class Guide extends MDActivity {
         try {
 
             final URL url = new URL(
-                MythDroid.beMgr.getStatusURL() +
+                MythDroid.getBackend().getStatusURL() +
                 "/Myth/GetProgramGuide?" + 
                 "StartTime=" + MythDroid.dateFmt.format(start) +
                 "&EndTime=" + MythDroid.dateFmt.format(end) +

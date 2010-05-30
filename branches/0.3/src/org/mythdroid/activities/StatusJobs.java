@@ -48,7 +48,7 @@ import android.widget.TextView;
 
 public class StatusJobs extends ListActivity {
 
-    private ArrayList<Job> jobs = new ArrayList<Job>(8);
+    private final ArrayList<Job> jobs = new ArrayList<Job>(8);
 
     private enum JobStatus {
         QUEUED  (1),     PENDING  (2),     STARTING (3),     RUNNING  (4),     
@@ -132,7 +132,7 @@ public class StatusJobs extends ListActivity {
         }
     }
 
-    private class Job {
+    static final private class Job {
         public Date      startTime;
         public JobStatus status;
         public JobType   type;
@@ -178,7 +178,7 @@ public class StatusJobs extends ListActivity {
     }
 
     /** Extended ArrayAdapter, adapts jobs for a ListView */
-    private class JobAdapter extends ArrayAdapter<Object> {
+    final private class JobAdapter extends ArrayAdapter<Object> {
 
         /*
          * A store for views so we don't have to call findViewById() too often
