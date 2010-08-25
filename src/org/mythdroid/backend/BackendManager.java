@@ -76,6 +76,12 @@ public class BackendManager {
        
 
         MythDroid.protoVersion = getVersion(statusURL);
+        
+        // Cope with odd protoVer resulting from mythtv r25366
+        if (MythDroid.protoVersion > 1000) {
+            MythDroid.beVersion = MythDroid.protoVersion / 1000;
+            MythDroid.protoVersion = MythDroid.protoVersion % 1000;
+        }
 
         if (MythDroid.debug)
             Log.d(
@@ -275,7 +281,10 @@ public class BackendManager {
      */
     private boolean announce() throws IOException {
 
-        cmgr.sendString("MYTH_PROTO_VERSION " + MythDroid.protoVersion); //$NON-NLS-1$
+        // Cope with odd protoVer resulting from mythtv r25366
+        int protoVer = MythDroid.beVersion * 1000 + MythDroid.protoVersion;
+        
+        cmgr.sendString("MYTH_PROTO_VERSION " + protoVer); //$NON-NLS-1$
 
         if (!cmgr.readStringList()[0].equals("ACCEPT")) return false; //$NON-NLS-1$
         
