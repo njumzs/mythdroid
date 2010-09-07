@@ -90,14 +90,30 @@ public class FrontendLocation {
     }
 
     private void parsePlaybackLoc(String loc) {
+        
         String[] tok = loc.split(" "); //$NON-NLS-1$
         niceLocation = tok[0] + " " + tok[1]; //$NON-NLS-1$
         location = niceLocation;
         position = timeToInt(tok[2]);
-        end = timeToInt(tok[4]);
-        rate = Float.parseFloat(tok[5].substring(0, tok[5].lastIndexOf('x')));
-        filename = tok[9];
+        
+        if (tok[1].equals("recorded")) { //$NON-NLS-1$
+            end = timeToInt(tok[4]);
+            rate = Float.parseFloat(tok[5].substring(0, tok[5].lastIndexOf('x')));
+            filename = tok[9];
+        }
+        else if (tok[1].equals("video")) { //$NON-NLS-1$
+            end = -1;
+            rate = Float.parseFloat(tok[3].substring(0, tok[3].lastIndexOf('x')));
+            filename = "Video"; //$NON-NLS-1$
+        }
+        else {
+            end = -1;
+            rate = -1;
+            filename = "Unknown"; //$NON-NLS-1$
+        }
+        
         video = true;
+        
         if (tok[1].equals("livetv")) livetv = true; //$NON-NLS-1$
         if (MythDroid.debug) 
             Log.d(
@@ -108,6 +124,7 @@ public class FrontendLocation {
                 " filename: " + filename +  //$NON-NLS-1$
                 " livetv: " + livetv //$NON-NLS-1$
             );
+        
     }
 
     private int timeToInt(String time) {
