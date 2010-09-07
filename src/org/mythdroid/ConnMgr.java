@@ -145,6 +145,8 @@ public class ConnMgr {
         // Have left over buffered data?
         if (rbufIdx > -1) 
             line = new String(rbuf, 0, rbufIdx + 1);
+
+        rbufIdx = line.length() - 1;
         
         // Check for a prompt
         if (rbufIdx >= 1 && line.charAt(0) == '#' && line.charAt(1) == ' ') {
