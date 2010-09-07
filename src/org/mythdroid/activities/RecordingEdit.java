@@ -70,24 +70,8 @@ public class RecordingEdit extends MDActivity {
         recGroup = prog.RecGroup;
         storGroup = prog.StorGroup;
      
-        if (prog.RecID != -1) {
-            try {
-                type = prog.Type = 
-                    MDDManager.getRecType(beMgr.addr, prog.RecID);
-                if (storGroup == null) {
-                    storGroup = prog.StorGroup =
-                        MDDManager.getStorageGroup(
-                            beMgr.addr, prog.RecID
-                        );
-                }
-            } catch (IOException e) {
-                ErrUtil.err(this, e);
-                finish();
-            }
-        }
-
         setContentView(R.layout.recording_edit);
-        setViews();
+        
     }
 
     @Override
@@ -103,6 +87,23 @@ public class RecordingEdit extends MDActivity {
         } catch (Exception e) {
             ErrUtil.err(this, e);
         }
+        
+        if (prog.RecID != -1) {
+            try {
+                type = prog.Type = 
+                    MDDManager.getRecType(beMgr.addr, prog.RecID);
+                
+                if (storGroup == null) {
+                    storGroup = prog.StorGroup =
+                        MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
+                }
+            } catch (IOException e) {
+                ErrUtil.err(this, e);
+                finish();
+            }
+        }
+        
+        setViews();
     }
 
     @Override
