@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 
 import org.mythdroid.ConnMgr;
@@ -70,7 +71,7 @@ public class BackendManager {
      * Constructor
      * @param host - the backend address
      */
-    public BackendManager(final String host) throws Exception {
+    public BackendManager(final String host) throws IOException {
 
         statusURL = "http://" + host + ":6544"; //$NON-NLS-1$ //$NON-NLS-2$
        
@@ -103,7 +104,7 @@ public class BackendManager {
      * Find a nearby master backend
      * @return An initialised BackendManager or null if we couldn't find one
      */
-    static public BackendManager locate() throws Exception {
+    static public BackendManager locate() throws IOException {
 
         final InetSocketAddress isa = new InetSocketAddress(1900);
         final DatagramSocket sock = new DatagramSocket(null);
@@ -254,7 +255,7 @@ public class BackendManager {
      * @param sURL - string containing backend status URL
      * @return - integer containing backend protocol version
      */
-    private int getVersion(String sURL) throws Exception {
+    private int getVersion(String sURL) throws IOException {
         
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         URL url = new URL(sURL + "/xml"); //$NON-NLS-1$
@@ -265,7 +266,9 @@ public class BackendManager {
                 url.openConnection().getInputStream()
             );
         } catch (SAXException e) {
-            throw new Exception(Messages.getString("Status.10")); //$NON-NLS-1$
+            throw new IOException(Messages.getString("Status.10")); //$NON-NLS-1$
+        } catch (ParserConfigurationException e) {
+            throw new IOException(Messages.getString("Status.10")); //$NON-NLS-1$
         }
         
         Node status = doc.getElementsByTagName("Status").item(0); //$NON-NLS-1$
