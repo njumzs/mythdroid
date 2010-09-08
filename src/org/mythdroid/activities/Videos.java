@@ -18,6 +18,7 @@
 
 package org.mythdroid.activities;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.WeakHashMap;
 
@@ -53,6 +54,7 @@ public class Videos extends MDActivity implements
     private Thread artThread        = null;
     private ListView lv             = null;
     private ArrayList<Video> videos = null;
+    private int viddir              = -1;
     private String path             = "ROOT"; //$NON-NLS-1$
     private TextView dirText        = null;
     private boolean fetchingArt     = false;
@@ -69,9 +71,9 @@ public class Videos extends MDActivity implements
             
             try {
                 videos = MDDManager.getVideos(
-                    MythDroid.getBackend().addr, path
+                    MythDroid.getBackend().addr, viddir, path
                 );
-            } catch (Exception e) {
+            } catch (IOException e) {
                 ErrUtil.postErr(ctx, new Exception("Failed to connect to MDD")); //$NON-NLS-1$
                 finish();
                 return;
@@ -157,14 +159,26 @@ public class Videos extends MDActivity implements
     
         Video video = videos.get(pos);
         
+        // A directory?
         if (video.id == -1) {
             if (path.equals("ROOT")) //$NON-NLS-1$
                 path = video.title;
             else
                 path += "/" + video.title; //$NON-NLS-1$
-            dirText.setText(currentDir(path));
+            
+            // If directory name has a slash must be a videodir (top level)
+            if (path.lastIndexOf('/') != -1) { 
+                path = "ROOT"; //$NON-NLS-1$
+                dirText.setText(Messages.getString("Videos.0")); //$NON-NLS-1$
+            }
+            else {
+                dirText.setText(currentDir(path));
+            }
+            
+            viddir = video.dir;
             showDialog(DIALOG_LOAD);
             MythDroid.getWorker().post(getVideos);
+            
             return;
         }
         
@@ -192,10 +206,15 @@ public class Videos extends MDActivity implements
         
         if (code == KeyEvent.KEYCODE_BACK) {
             
-            if (path.equals("ROOT"))  //$NON-NLS-1$
+            // At top level?
+            if (path.equals("ROOT") && viddir == -1)  //$NON-NLS-1$
                 return super.onKeyDown(code, event);
+            // Going to top level?
             int slash = path.lastIndexOf('/');
             if (slash == -1) {
+                // Check if we're going to list of videodirs (top top level)
+                if (path.equals("ROOT")) //$NON-NLS-1$
+                    viddir = -1;
                 path = "ROOT"; //$NON-NLS-1$
                 dirText.setText(Messages.getString("Videos.0")); // Videos //$NON-NLS-1$
             }

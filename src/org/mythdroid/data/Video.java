@@ -42,7 +42,7 @@ public class Video {
     
     public String title, subtitle, director, plot, homepage, filename;
     public float rating;
-    public int year, length, id = -1;
+    public int year, length, dir = -1, id = -1;
     static Options opts = new BitmapFactory.Options();
 
     static { opts.inSampleSize = 8; }
@@ -59,7 +59,8 @@ public class Video {
      */
     public Video(String line) {
                 
-        if (line.startsWith("DIRECTORY")) { //$NON-NLS-1$
+        if (line.matches("^[0-9-]+ DIRECTORY .+")) { //$NON-NLS-1$
+            dir   = Integer.valueOf(line.substring(0, line.indexOf(" "))); //$NON-NLS-1$
             title = line.substring(line.indexOf("DIRECTORY") + 10); //$NON-NLS-1$
             return;
         }
@@ -67,19 +68,19 @@ public class Video {
         String[] fields = line.split("\\|\\|"); //$NON-NLS-1$
         fields[0] = fields[0].replaceFirst("VIDEO ", ""); //$NON-NLS-1$ //$NON-NLS-2$
                        
-        id = Integer.valueOf(fields[ID]);
-        title = fields[TITLE];
-        subtitle = fields[SUBTITLE];
-        director = fields[DIRECTOR];
-        plot = fields[PLOT];
-        homepage = fields[HOMEPAGE];
-        year = fields[YEAR].matches("[0-9]+") ? //$NON-NLS-1$
-                   Integer.valueOf(fields[YEAR]) : 0;
-        rating = fields[USERRATING].matches("[0-9.]+") ? //$NON-NLS-1$
-                   Float.parseFloat(fields[USERRATING]) : 0;
-        length = fields[LENGTH].matches("[0-9]+") ? //$NON-NLS-1$
-                   Integer.valueOf(fields[LENGTH]) : 0;
-        filename = fields[FILENAME];
+        id          = Integer.valueOf(fields[ID]);
+        title       = fields[TITLE];
+        subtitle    = fields[SUBTITLE];
+        director    = fields[DIRECTOR];
+        plot        = fields[PLOT];
+        homepage    = fields[HOMEPAGE];
+        year        = fields[YEAR].matches("[0-9]+") ? //$NON-NLS-1$
+                          Integer.valueOf(fields[YEAR]) : 0;
+        rating      = fields[USERRATING].matches("[0-9.]+") ? //$NON-NLS-1$
+                          Float.parseFloat(fields[USERRATING]) : 0;
+        length      = fields[LENGTH].matches("[0-9]+") ? //$NON-NLS-1$
+                          Integer.valueOf(fields[LENGTH]) : 0;
+        filename    = fields[FILENAME];
         
     }
     
