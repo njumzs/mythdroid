@@ -110,16 +110,20 @@ public class MDDManager {
     /**
      * Static method, retrieves a list of Videos
      * @param addr - String containing IP address of MDD to retrieve video list from
-     * @param dir - String containing directory to enumerate, pass "ROOT" for the root video directory
+     * @param viddir - which video dir to look in (could be a : separated list in mythtv config)
+     * @param subdir - String containing directory to enumerate, pass "ROOT" for the root video directory
      * @return - ArrayList of Videos
      * @throws IOException
      */
-    public static ArrayList<Video> getVideos(String addr, String dir) 
-        throws IOException {
+    public static ArrayList<Video> 
+        getVideos(String addr, int viddir, String subdir) throws IOException {
         
         final ArrayList<Video> videos = new ArrayList<Video>(16);
+        
         final ConnMgr cmgr = 
-            sendMsg(addr, "VIDEOLIST " + (dir == null ? "ROOT" : dir)); //$NON-NLS-1$ //$NON-NLS-2$
+            sendMsg(addr, 
+                    "VIDEOLIST " + viddir + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                    (subdir == null ? "ROOT" : subdir)); //$NON-NLS-1$ 
         
         while (true) {
             String line = cmgr.readLine();

@@ -25,109 +25,61 @@ use strict;
 use warnings;
 use IO::Socket::INET;
 use IO::Select;
+use POSIX qw(setsid);
 use File::Copy;
-use Time::HiRes qw(usleep);
-use MythTV;
 use Sys::Hostname;
+use Config;
+use MDD::LCD;
+use MDD::MythDB;
 
 sub handleMdConn($);
 sub handleDisconnect($);
-sub cloneDb();
-sub prepareSth($);
 sub readCommands();
-sub startLcdServer($);
-sub connectLcdServer();
-sub lcdData($);
-sub lcdMenu($$);
-sub lcdMusic($);
-sub lcdMusicTracks($);
-sub lcdMusicProgress($);
-sub lcdMusicPlayer_prop($$);
-sub lcdChannel($);
-sub lcdChannelProgress($);
 sub clientMsg($);
 sub sendMsg($);
 sub runCommand($);
 sub videoList($);
 sub streamFile($);
 sub stopStreaming();
-sub getRecType($);
-sub getStorGroup($);
 sub getStorGroups();
 sub getRecGroups();
-sub updateRec($$);
-sub newRec($$$);
-sub delRec($);
-sub populateStorGroups();
 sub killKids();
 
 my $lcdServerPort = 6545;
-my $listenPort = 16546;
+my $listenPort    = 16546;
 
 # Kill off the real mythlcdserver when we are killed
 $SIG{'INT'} = $SIG{'TERM'} = $SIG{'KILL'} = \&killKids; 
-sub END { killKids() }
 # Re-read mdd.conf if we are HUP'd
 $SIG{'HUP'} = \&readCommands;
+sub END { killKids() }
 
-my $mythtv = MythTV->new(\{ 'connect' => 0 });
+my ($backend, $debug, $lcd, $lcdListen);
 
-install() unless ($0 =~ /mythlcdserver$/);
+# Check for and strip arguments intended for us
+foreach my $idx (0 .. $#ARGV) {
+    if ($ARGV[$idx] eq '--backend') {
+        $backend = 1;
+        delete $ARGV[$idx];
+    }
+    elsif ($ARGV[$idx] eq '--debug') {
+        $debug = 1;
+        delete $ARGV[$idx];
+    }
+}
+
+my $mythdb = MDD::MythDB->new();;
+
+# Install ourselves if necessary
+install() unless ($0 =~ /mythlcdserver$/ || $backend);
 
 my (
-    $lastData, $lastMenu, $lastMusic, $lastChannel, $data, $lcdClient,
-    $client, $dbh, $albumArtSth, $videoSth, $upnpVideoSth, $getStorGroupsSth,
-    $getRecGroupsSth, $newRecSth, $progSth, $storGroupSth, $recTypeSth,
-    $delRecSth, $videoDir, $cpus, $streampid
+    $data, $lcdClient, $lcdServer, $client, $videoDir, $cpus, $streampid
 );
-my $lastPos = -1;
+
 my $size = 1024;
 
-my (%forNewClient, %commands, %videos, %storageGroups);
-my @videoFields = (
-    qw(
-        title subtitle director plot homepage year userrating length filename
-    )
-);
-
-# SQL statements
-my $albumArtSQL = 
-    'SELECT DISTINCT albumart_id from music_albumart LEFT JOIN music_songs ' .
-    'ON music_albumart.directory_id = music_songs.directory_id LEFT JOIN ' .
-    'music_albums on music_songs.album_id = music_albums.album_id WHERE ' .
-    'music_albums.album_name = ? and music_albumart.imagetype = 1';
-
-my $videoSQL = 
-    'SELECT title, subtitle, director, plot, homepage, year, userrating, ' .
-    'length,filename FROM videometadata where filename REGEXP ?';
-    
-my $getRecGroupsSQL = 
-    'SELECT DISTINCT recgroup FROM recorded WHERE recgroup != "LiveTV" AND ' .
-    'recgroup != "Deleted" ORDER by recgroup';
-
-my $progSQL =
-    'SELECT program.chanid,UNIX_TIMESTAMP(starttime),UNIX_TIMESTAMP(endtime),' .
-    'title,subtitle,description,category,seriesid,programid,channel.callsign ' . 
-    'FROM program LEFT JOIN channel ON program.chanid = channel.chanid WHERE ' . 
-    'program.chanid = ? AND starttime = FROM_UNIXTIME(?)';
-
-my $newRecSQL = 
-    'INSERT INTO record (chanid,starttime,startdate,endtime,enddate,title,' .
-    'subtitle,description,category,seriesid,programid,station,next_record,' .
-    'last_record,last_delete,autoexpire,autocommflag) VALUES (?,' .
-    'FROM_UNIXTIME(?),FROM_UNIXTIME(?),FROM_UNIXTIME(?),FROM_UNIXTIME(?),' .
-    '?,?,?,?,?,?,?,\'00:00:00\',\'00:00:00\',\'00:00:00\',1,1)';
-
-my $updateRecSQL = 
-    'UPDATE record SET %UPDATES% where recordid = %RECID%';
-
-my $delRecSQL = 
-    'DELETE FROM record where recordid = ?';
-
-my $upnpVideoSQL     = 'SELECT intid FROM upnpmedia WHERE filepath = ?';
-my $getStorGroupsSQL = 'SELECT groupname,dirname FROM storagegroup';
-my $recTypeSQL       = 'SELECT type FROM record WHERE recordid = ?';
-my $storGroupSQL     = 'SELECT storagegroup FROM record WHERE recordid = ?';
+my (%commands, %videos, %storageGroups);
 
 # Use ffmpeg to demux and decode; VLC's TS demuxer doesn't cope with 
 # a significant proportion of dvb recordings :(
@@ -140,41 +92,62 @@ my $stream_cmd =
     'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2}' .
     ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
 
+if ($backend) {
+    # Daemonise
+    chdir '/'                 or die "Couldn't chdir() to /: $!";
+    open STDIN, '/dev/null'   or die "Couldn't open() /dev/null: $!";
+    open STDOUT,'>>/dev/null' or die "Couldn't open() /dev/null: $!";
+    open STDERR,'>>/dev/null' or die "Couldn't open() /dev/null: $!";
+    defined(my $pid = fork)   or die "Couldn't fork(): $!";
+    exit if $pid;
+    setsid                    or die "Couldn't setsid(): $!";
+    umask 0;
+}
+
+else {
+
+    $lcd = MDD::LCD->new();
+    $lcdServerPort = $lcd->start(@ARGV);
+
+    # Listen for connections from mythfrontend
+    $lcdListen = IO::Socket::INET->new(
+        Listen      => 1,
+        Proto       => 'tcp',
+        ReuseAddr   => 1,
+        LocalPort   => $lcdServerPort
+    
+    ) or die "Couldn't listen on $lcdServerPort/tcp: $!\n";
+
+}
+
 readCommands();
-
-startLcdServer(join(" ", @ARGV));
-
-# Listen for connections from mythfrontend
-my $lcdListen = IO::Socket::INET->new(
-    Listen => 1,
-    Proto => 'tcp',
-    ReuseAddr => 1,
-    LocalPort => $lcdServerPort
-) or die "Listen on $lcdServerPort/tcp: $!\n";
 
 # Listen for connections from MythDroid
 my $listen = IO::Socket::INET->new(
-    Listen => 1,
-    Proto => 'tcp',
-    ReuseAddr => 1,
-    LocalPort => $listenPort
-) or die "Listen on $listenPort/tcp: $!\n";
+    Listen      => 1,
+    Proto       => 'tcp',
+    ReuseAddr   => 1,
+    LocalPort   => $listenPort
+) or die "Couldn't listen on $listenPort/tcp: $!\n";
 
-my $s = IO::Select->new($lcdListen, $listen);
+my @handles = ( $listen );
+push @handles, $lcdListen if $lcdListen;
+my $s = IO::Select->new(@handles);
+undef @handles;
 
 # Connect to the real mythlcdserver
-my $lcdServer = connectLcdServer();
-$s->add($lcdServer);
+unless ($backend) {
+    $lcdServer = $lcd->connect();
+    die "Couldn't connect to mythlcdserver" unless $lcdServer;
+    $s->add($lcdServer);
+}
     
-# Connect to the database, prepare queries
-$dbh = cloneDb();
-
 # Main Loop
 while (my @ready = $s->can_read) {
     
     foreach my $fd (@ready) {
         
-        if ($fd == $lcdListen) {
+        if (!$backend && $fd == $lcdListen) {
             # New connection from mythfrontend
             if ($lcdClient = $fd->accept) {
                 $s->add($lcdClient);
@@ -194,7 +167,7 @@ while (my @ready = $s->can_read) {
             next;
         }
 
-        if ($fd == $lcdServer) {
+        if (!$backend && defined $lcdServer && $fd == $lcdServer) {
             # Ferry data from lcdserver -> mythfrontend
             syswrite($lcdClient, $data);
         }
@@ -203,10 +176,14 @@ while (my @ready = $s->can_read) {
             $data =~ s/\r//;
             clientMsg($data);
         }
-        else {
+        elsif (!$backend) {
             # Process and ferry data from mythfrontend -> lcdserver
-            foreach (split /\n/, $data) { lcdData($_) if length > 4 }
-            syswrite($lcdServer, $data);
+            foreach (split /\n/, $data) { 
+                print "-> LMSG: $_\n" if $debug;
+                my $msg = $lcd->command($_) if length > 4;
+                sendMsg($msg) if $msg;
+            }
+            syswrite($lcdServer, $data) if $lcdServer;
         }
 
     }
@@ -231,8 +208,8 @@ sub handleMdConn($) {
         }
         syswrite($client, "COMMANDS DONE\n");
         # Send last LCD statuses 
-        foreach my $key (keys %forNewClient) {
-            syswrite($client, $forNewClient{$key});
+        foreach my $msg ($lcd->forNewClient()) {
+            syswrite($client, $msg);
         }
 
     }
@@ -246,31 +223,15 @@ sub handleDisconnect($) {
     # Someone disconnected
     $s->remove($fd);
     $fd->close;
-    undef $client if (defined $client && ($fd == $client));
-    if ($fd == $lcdServer) {
+
+    undef $client if (defined $client && $fd == $client);
+
+    if (!$backend && defined $lcdServer && $fd == $lcdServer) {
         # Reconnect if we lost connection to the real mythlcdserver
-        $lcdServer = connectLcdServer();
+        $lcdServer = $lcd->connect();
         $s->add($lcdServer);
     }
 
-}
-
-sub cloneDb() {
-    $dbh = $mythtv->{dbh};
-    return $dbh->clone;
-}
-
-# Prepare a MySQL statement handle, pass a ref to the SQL string
-sub prepareSth($) {
-    my $sqlref = shift;
-    my $sth;
-
-    unless ($sth = $dbh->prepare($$sqlref)) {
-        $dbh = cloneDb();
-        return prepareSth($sqlref);
-    }
-
-    return $sth;
 }
 
 # Parse MDD commands from /etc/mdd.conf
@@ -301,223 +262,13 @@ sub readCommands() {
     close F;
 }
 
-sub startLcdServer($) {
-
-    my $args = shift;
-
-    $args =~ s/&$//;
-
-    system("ps ax | grep 'mythlcd ' | grep -v grep >/dev/null");
-
-    return if ($? == 0);
-
-    if ($args =~ /-p\s*(\d+)/) {
-        $lcdServerPort = $1;
-        my $p = $lcdServerPort + 1000;
-        $args =~ s/-p\s*(\d+)/-p $p/;
-    }
-    else {
-        $args .= " -p " . ($lcdServerPort + 1000);
-    }
-
-    system("mythlcd $args &");
-
-}
-
-sub connectLcdServer() {
-
-    foreach (0 .. 4) {
-    
-        $lcdServer = IO::Socket::INET->new(
-            Proto => 'tcp',
-            PeerAddr => '127.0.0.1',
-            PeerPort => $lcdServerPort + 1000
-        ) and return $lcdServer;
-
-        usleep(600000);
-        next;
-
-    }
-
-    die "Can't connect to LCD server\n"; 
-
-}
-
-# Process LCD commands
-sub lcdData($) {
-
-    my $data = shift;
-
-    return if (defined $lastData && $data eq $$lastData);
-
-    $lastData = \$data;
-
-    if ($data =~ s/^SWITCH_TO_MENU\s+"MYTH-([^"]+)"\s+//) {
-        lcdMenu($1, $data);
-    }
-    elsif ($data =~ s/^SWITCH_TO_MUSIC\s+//) {
-        lcdMusic($data);
-    }
-    elsif ($data =~ /^SET_MUSIC_PROGRESS.*?([\.\d]+)$/) {
-        lcdMusicProgress($1);
-    }
-    elsif ($data =~ /^SET_MUSIC_PLAYER_PROP\s+(\w+)\s+(\w+)/) {
-        lcdMusicPlayerProp($1, $2);
-    }
-    elsif ($data =~ s/^SWITCH_TO_CHANNEL\s+//) {
-        lcdChannel($data);
-    }
-    elsif ($data =~ /^SET_CHANNEL_PROGRESS\s+([\.\d]+)/) {
-        lcdChannelProgress($1);
-    }
-    elsif ($data =~ /^SWITCH_TO_TIME/) {
-        sendMsg("DONE");
-    }
-
-}
-
-sub lcdMenu($$) {
-    
-    my $menu = shift;
-    my $items = shift;
-
-    return if (defined $lastMenu && $items eq $$lastMenu);
-
-    $lastMenu = \$items;
-    undef $lastMusic;
-    undef $lastChannel;
-    $lastPos = -1;
-
-    my @menu;
-
-    my (@items) = $data =~ 
-        /"([^"]+)"\s+NOTCHECKABLE\s+(\w+)/g;
-
-    my $idx = 0;
-    my $curidx;
-    
-    while (my $item = shift @items) {
-        my $cur = shift @items;
-        push @menu, { 'item' => $item, 'cur' =>  $cur };
-        $curidx = $idx if $cur eq 'TRUE';
-        $idx++;
-    }
-
-    my $msg = "MENU $menu ITEM $menu[$curidx]->{item}";
-    
-    $forNewClient{'menu'} = $msg . "\n";
-
-    sendMsg($msg);
-
-}
-
-sub lcdMusic($) {
-
-    my $data = shift;
-    my $albumartId;
-
-    return if (defined $lastMusic && $data eq $$lastMusic);
-
-    $lastMusic = \$data;
-
-    my ($artist, $album, $track) = $data =~
-        /^"([^"]+)"\s+"([^"]+)"\s+"([^"]+)"$/;
-
-    my $msg = "MUSIC $artist ALBUM $album TRACK $track";
-    
-    unless ($albumArtSth && $albumArtSth->execute($album)) {
-        $albumArtSth = prepareSth(\$albumArtSQL);
-        $albumArtSth->execute($album);
-    }
-
-    if (my $aref = $albumArtSth->fetchrow_arrayref) {
-        $albumartId = $aref->[0];
-    }
-
-    $msg .= " ARTID $albumartId" if (defined $albumartId);
-
-    $forNewClient{'music'} = $msg . "\n";
-
-    sendMsg($msg);
-
-}
-
-sub lcdMusicProgress($) {
-
-    my $pos = shift;
-
-    $pos = sprintf "%.2f", $pos;
-    
-    $pos *= 100;
-
-    return unless $pos % 2;
-    return if ($pos == $lastPos);
-    $lastPos = $pos;
-
-    sendMsg("MUSICPROGRESS $pos");
-
-}
-
-sub lcdMusicPlayerProp($$) {
-
-    my $prop = shift;
-    my $val = shift;
-
-    sendMsg("MUSICPLAYERPROP $prop $val");
-}
-
-sub lcdChannel($) {
-
-    my $data = shift; 
-
-    return if (defined $lastChannel && $data eq $$lastChannel);
-
-    $lastChannel = \$data;
-
-    my ($chan, $title, $subtitle) = $data =~ /^"([^"]+)"\s+"([^"]+)"\s+"([^"]*)"$/;
-
-    my $msg;
-
-    if ($chan) {
-        $msg = "CHANNEL $chan TITLE $title";
-    }
-    elsif ($title) {
-        $msg = "CHANNEL Video TITLE $title";
-    }
-    else {
-        return;
-    }
-
-    $msg .= " SUBTITLE $subtitle" if $subtitle;
-    
-    $forNewClient{'channel'} = $msg . "\n";
-
-    sendMsg($msg);
-
-}
-
-sub lcdChannelProgress($) {
-
-    my $pos = shift;
-
-    $pos = sprintf "%.3f", $pos;
-    
-    $pos *= 1000;
-
-    return unless $pos % 2;
-    return if ($pos == $lastPos);
-    $lastPos = $pos;
-
-    sendMsg("CHANNELPROGRESS $pos");
-
-}
-
 # Send a message to the client (MythDroid)
 sub sendMsg($) {
 
     my $msg = shift;
     $msg .= "\n";
     syswrite($client, $msg) if (defined $client);
+    print "<- SMSG: $msg\n" if $debug;
 
 }
 
@@ -526,7 +277,9 @@ sub clientMsg($) {
 
     my $msg = shift;
 
-    if ($msg =~ /^COMMAND (.*)$/) {
+    print "-> CMSG: $msg\n" if $debug;
+
+    if    ($msg =~ /^COMMAND (.*)$/) {
         sendMsg("OK");
         runCommand($1);
     }
@@ -544,11 +297,11 @@ sub clientMsg($) {
     }
     elsif ($msg =~ /RECTYPE (\d+)$/) {
         sendMsg("OK");
-        getRecType($1);
+        sendMsg($mythdb->getRecType($1));
     }
     elsif ($msg =~ /STORGROUP (\d+)$/) {
         sendMsg("OK");
-        getStorGroup($1);
+        sendMsg($mythdb->getStorGroup($1));
     }
     elsif ($msg =~ /STORGROUPS/) {
         sendMsg("OK");
@@ -560,15 +313,15 @@ sub clientMsg($) {
     }
     elsif ($msg =~ /UPDATEREC (\d+) (.*)$/) {
         sendMsg("OK");
-        updateRec($1, $2);
+        sendMsg($mythdb->updateRec($1, $2));
     }
     elsif ($msg =~ /NEWREC (\d+) (\d+) (.*)$/) {
         sendMsg("OK");
-        newRec($1, $2, $3);
+        sendMsg($mythdb->newRec($1, $2, $3));
     }
     elsif ($msg =~ /DELREC (\d+)$/) {
         sendMsg("OK");
-        delRec($1);
+        $mythdb->delRec($1);
     }
     else {
         sendMsg("UNKNOWN");
@@ -590,58 +343,50 @@ sub runCommand($) {
 
 }
 
-# Get a list of videos in given directory
+# Get a list of videos in given subddirectory of VideoStartupDir
 sub videoList($) {
 
     my $subdir = shift;
 
-    %videos = ();
+    my $regex;
 
-    unless ($videoDir) { 
-        $videoDir = $mythtv->backend_setting('VideoStartupDir', hostname());
+    $videoDir = $mythdb->backend_setting('VideoStartupDir', hostname)
+        unless $videoDir;
+
+    my @videoDirs = split /:/, $videoDir;
+
+    my ($vd, $sd) = $subdir =~ /^(-?\d+)\s(.+)/;
+
+    # Top level and more than one videodir, send numbered list
+    if (scalar @videoDirs > 1 && $vd == -1 && $sd eq 'ROOT') {
+        my $i = 0;
+        foreach my $dir (@videoDirs) { sendMsg($i++ . " DIRECTORY $dir") }
+        sendMsg("VIDEOLIST DONE");
+        return;
+    }
+    # Top level but only one videodir, set viddir = -1
+    elsif (scalar @videoDirs < 2) {
+        $regex = "$videoDirs[0]/";
+        $vd = -1;
+    }
+    else {
+        $regex = "$videoDirs[$vd]/";
     }
 
-    my $regexp = "$videoDir/";
-
-    $regexp .= "$subdir/" unless ($subdir eq 'ROOT');
-
-    $regexp =~ s/'/\'/;
+    $regex .= "$sd/" unless ($sd eq 'ROOT');
+    
+    $regex =~ s/'/\'/;
 
     my @dirs = grep(
         /\S+/, 
-        map { chomp; s/^$regexp//; $_ } `find -L '$regexp' -maxdepth 1 -type d`
+        map { chomp; s/^$regex//; $_ } `find -L '$regex' -maxdepth 1 -type d`
     );
 
-    $regexp .= '[^/]+$';
-    
-    unless ($videoSth && $videoSth->execute($regexp)) {
-        $videoSth = prepareSth(\$videoSQL);
-        $videoSth->execute($regexp);
-    }
-    
-    while (my $aref = $videoSth->fetchrow_arrayref) {
-        my $path = $aref->[8];
-        unless ($upnpVideoSth && $upnpVideoSth->execute($path)) {
-            $upnpVideoSth = prepareSth(\$upnpVideoSQL);
-            $upnpVideoSth->execute($path);
-        }
-        my $id = ($upnpVideoSth->fetchrow_arrayref)->[0];
-        my %h;
-        @h{@videoFields} = @$aref;
-        $videos{$id} = \%h;
-    }
+    $regex .= '[^/]+$';
 
-    foreach my $dir (@dirs) {
-        sendMsg("DIRECTORY $dir");
-    }
+    foreach my $dir (@dirs) { sendMsg("$vd DIRECTORY $dir") }
 
-    foreach my $id (keys %videos) {
-        my $msg = "VIDEO $id";
-        foreach my $f (
-            map { '||' . $videos{$id}{$_} } @videoFields
-        ) { $msg .= $f }
-        sendMsg($msg);
-    }
+    foreach my $vid (@{ $mythdb->getVideos($regex) }) { sendMsg($vid) }
 
     sendMsg("VIDEOLIST DONE");
 
@@ -665,9 +410,12 @@ sub streamFile($) {
         close CPUS;
     }
 
+    $cpus = 1 unless $cpus;
+
     if ($file =~ /^myth:\/\//) {
 
-        populateStorGroups() unless (scalar %storageGroups);
+        %storageGroups = %{ $mythdb->getStorGroups() } 
+            unless (scalar %storageGroups);
     
         $file =~ s/.*\//\//;
 
@@ -711,48 +459,12 @@ sub stopStreaming() {
 
 }
 
-# Get the recording type from a recid
-sub getRecType($) {
-
-    my $recid = shift;
-        
-    unless ($recTypeSth && $recTypeSth->execute($recid)) {
-      $recTypeSth = prepareSth(\$recTypeSQL);
-      $recTypeSth->execute($recid);
-    }
-
-    if (my $aref = $recTypeSth->fetchrow_arrayref) {
-        sendMsg($aref->[0]);
-    }
-    else {
-        sendMsg("0");
-    }
-
-}
-
-# Get the storage group from a recid
-sub getStorGroup($) {
-
-    my $recid = shift;
-        
-    unless ($storGroupSth && $storGroupSth->execute($recid)) {
-      $storGroupSth = prepareSth(\$storGroupSQL);
-      $storGroupSth->execute($recid);
-    }
-
-    if (my $aref = $storGroupSth->fetchrow_arrayref) {
-        sendMsg($aref->[0]);
-    }
-    else {
-        sendMsg("Default");
-    }
-
-}
 
 # Get a list of storage groups
 sub getStorGroups() {
 
-    populateStorGroups() unless (scalar %storageGroups);
+    %storageGroups = %{ $mythdb->getStorGroups() } 
+        unless (scalar %storageGroups);
 
     foreach my $grp (keys %storageGroups) {
         sendMsg($grp);
@@ -764,97 +476,13 @@ sub getStorGroups() {
 
 # get a list of recording groups
 sub getRecGroups() {
-    
-    unless ($getRecGroupsSth && $getRecGroupsSth->execute()) {
-        $getRecGroupsSth = prepareSth(\$getRecGroupsSQL);
-        $getRecGroupsSth->execute();
-    }
 
-    while (my $aref = $getRecGroupsSth->fetchrow_arrayref) {
-        sendMsg($aref->[0]);
+    foreach my $rg (@{$mythdb->getRecGroups()}) {
+        sendMsg($rg);
     }
 
     sendMsg("RECGROUPS DONE");
 
-}
-
-# Update an existing recording rule
-sub updateRec($$) {
-
-    my $recid = shift;
-    my $updates = shift;
-
-    my $sql = $updateRecSQL;
-    $sql =~ s/%UPDATES%/$updates/;
-    $sql =~ s/%RECID%/$recid/;
-
-    my $rv;
-
-    unless (($rv = $dbh->do($sql))) {
-        cloneDb();
-        $rv = $dbh->do($sql);
-    }
-
-    $recid = -1 if ($rv < 1);
-
-    sendMsg($recid);
-
-}
-
-# Create a new recording rule
-sub newRec($$$) {
-    
-    my $chanid = shift;
-    my $starttime = shift;
-    my $updates = shift;
-
-    my @prog;
-    
-    unless ($progSth && $progSth->execute($chanid, $starttime)) {
-        $progSth = prepareSth(\$progSQL);
-        $progSth->execute($chanid, $starttime);
-    }
-
-    my $aref = $progSth->fetchrow_arrayref;
-
-    $prog[0] = $aref->[0];
-    $prog[1] = $prog[2] = $aref->[1];
-    $prog[3] = $prog[4] = $aref->[2];
-    push @prog, @{$aref}[3..$#{$aref}];
-
-    unless ($newRecSth && $newRecSth->execute(@prog)) {
-        $newRecSth = prepareSth(\$newRecSQL);
-        $newRecSth->execute(@prog);
-    }
-    
-    my $recid = $dbh->last_insert_id(undef,undef,undef,undef);
-
-    updateRec($recid, $updates);
-
-}
-
-# Delete a recording rule
-sub delRec($) {
-
-    my $recid = shift;
-
-    unless ($delRecSth && $delRecSth->execute($recid)) {
-        $delRecSth = prepareSth(\$delRecSQL);
-        $delRecSth->execute($recid);
-    }
-
-}
-
-# Populate the global storageGroups hash
-sub populateStorGroups() {
-    unless ($getStorGroupsSth && $getStorGroupsSth->execute()) {
-        $getStorGroupsSth = prepareSth(\$getStorGroupsSQL);
-        $getStorGroupsSth->execute();
-    }
-
-    while (my $aref = $getStorGroupsSth->fetchrow_arrayref) {
-        $storageGroups{$aref->[0]} = $aref->[1];
-    }
 }
 
 # Kill the original mythlcdserver
@@ -871,32 +499,47 @@ sub install {
 
     print "Installing mdd..\n";
     print "Stopping mythfrontend and mythlcdserver\n";
+
     system(
         "killall mythfrontend 2>/dev/null;" .
         "killall mythfrontend.real 2>/dev/null;" . 
         "killall mythlcdserver 2>/dev/null"
     );
-    my $path = (`which mythlcdserver`)[0];
-    $path =~ s/\/mythlcdserver$//;
-    chomp $path;
-    unless ((`file $path/mythlcdserver`)[0] =~ /perl/) {
-        print "cp $path/mythlcdserver -> $path/mythlcd\n";
-        copy("$path/mythlcdserver", "$path/mythlcd") or die "$!\n";
-        chmod(0755, "$path/mythlcd")or warn "chmod of $path/mythlcd failed\n";
 
+    my $dir = (`which mythlcdserver`)[0];
+    if ($dir =~ /^which:/) {
+        print "Couldn't locate mythlcdserver. Aborted\n";
+        exit;
     }
-    print "cp $0 -> $path/mythlcdserver\n";
-    copy($0, "$path/mythlcdserver") or die "$!\n";
-    chmod(0755, "$path/mythlcdserver") 
-        or warn "chmod of $path/mythlcdserver failed\n";
+    $dir =~ s/\/mythlcdserver$//;
+    chomp $dir;
+
+    my $path = "$dir/mythlcdserver";
+    my $dst  = "$dir/mythlcd"; 
+
+    unless ((`file $path`)[0] =~ /perl/) {
+        print "cp $path -> $dst\n";
+        copy($path, $dst) or die "$!\n";
+        chmod(0755, $dst) 
+            or warn "chmod of $dst failed\n";
+    }
+
+    print "cp $0 -> $path\n";
+    copy($0, $path) or die "$!\n";
+    chmod(0755, $path) 
+        or warn "chmod of $path failed\n";
+
+    # Install modules
+    mkdir($Config{vendorlib} . "/MDD");
+    copy("MDD/LCD.pm", $Config{vendorlib} . "/MDD");
+    copy("MDD/MythDB.pm", $Config{vendorlib} . "/MDD");
+
     print "Check settings..\n";
-    my $host = (`hostname`)[0];
-    chomp $host;
     unless (
-        $mythtv->backend_setting('LCDEnable', $host)      &&
-        $mythtv->backend_setting('LCDShowMenu', $host)    &&
-        $mythtv->backend_setting('LCDShowMusic', $host)   &&
-        $mythtv->backend_setting('LCDShowChannel', $host) 
+        $mythdb->backend_setting('LCDEnable', hostname)      &&
+        $mythdb->backend_setting('LCDShowMenu', hostname)    &&
+        $mythdb->backend_setting('LCDShowMusic', hostname)   &&
+        $mythdb->backend_setting('LCDShowChannel', hostname) 
     ) {
         print "\nNOTICE: Please enable all MythTV LCD options\n";
     }
