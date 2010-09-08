@@ -203,7 +203,7 @@ public class ConnMgr {
             // If the buffer was empty and we got 2 bytes, check for a prompt
             if (
                 line.length() == 2 && 
-                extra.charAt(0) == '#' && extra.charAt(1) == ' '
+                line.charAt(0) == '#' && line.charAt(1) == ' '
             ) {
                 if (MythDroid.debug) Log.d("ConnMgr", "readLine: #"); //$NON-NLS-1$ //$NON-NLS-2$
                 return "#"; //$NON-NLS-1$
