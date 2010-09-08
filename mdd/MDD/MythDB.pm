@@ -41,6 +41,9 @@ my $updateRecSQL =
 my $delRecSQL = 
     'DELETE FROM record where recordid = ?';
 
+my $settingSQL = 
+    'SELECT data FROM settings WHERE value = ? AND hostname = ?';
+
 my $upnpVideoSQL     = 'SELECT intid FROM upnpmedia WHERE filepath = ?';
 my $getStorGroupsSQL = 'SELECT groupname,dirname FROM storagegroup';
 my $recTypeSQL       = 'SELECT type FROM record WHERE recordid = ?';
@@ -55,7 +58,7 @@ my @videoFields = (
 my (
     $albumArtSth, $videoSth, $upnpVideoSth, $getStorGroupsSth,
     $getRecGroupsSth, $newRecSth, $progSth, $storGroupSth, $recTypeSth,
-    $delRecSth
+    $delRecSth, $settingSth
 );
 
 sub new {
@@ -266,9 +269,18 @@ sub getAlbumArtId($) {
 
 }
 
-sub backend_setting($$) {
-    my $self = shift;
-    return $mythtv->backend_setting(@_);
+sub setting($$) {
+
+    my $self  = shift;
+    my $value = shift;
+    my $host  = shift;
+
+    $settingSth = execute($settingSth, \$settingSQL, $value, $host);
+
+    if (my $aref = $settingSth->fetchrow_arrayref) {
+        return $aref->[0];
+    }
+        
 }
 
 return 1;

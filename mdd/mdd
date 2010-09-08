@@ -68,10 +68,8 @@ foreach my $idx (0 .. $#ARGV) {
     }
 }
 
-my $mythdb = MDD::MythDB->new();;
-
 # Install ourselves if necessary
-install() unless ($0 =~ /mythlcdserver$/ || $backend);
+install() unless ($0 =~ /mythlcdserver$/ || ($backend && $0 =~ /^\/usr\/bin/));
 
 my (
     $data, $lcdClient, $lcdServer, $client, $videoDir, $cpus, $streampid
@@ -92,7 +90,7 @@ my $stream_cmd =
     'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2}' .
     ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
 
-if ($backend) {
+if ($backend && !$debug) {
     # Daemonise
     chdir '/'                 or die "Couldn't chdir() to /: $!";
     open STDIN, '/dev/null'   or die "Couldn't open() /dev/null: $!";
@@ -104,7 +102,7 @@ if ($backend) {
     umask 0;
 }
 
-else {
+elsif (!$backend) {
 
     $lcd = MDD::LCD->new();
     $lcdServerPort = $lcd->start(@ARGV);
@@ -119,6 +117,8 @@ else {
     ) or die "Couldn't listen on $lcdServerPort/tcp: $!\n";
 
 }
+
+my $mythdb = MDD::MythDB->new();;
 
 readCommands();
 
@@ -201,12 +201,17 @@ sub handleMdConn($) {
     }
 
     if ($client = $fd->accept) {
+
         $s->add($client);
+
         # Send a list of MDD commands
         foreach my $key (keys %commands) {
             syswrite($client, "COMMAND $key\n");
         }
         syswrite($client, "COMMANDS DONE\n");
+
+        return if $backend;
+
         # Send last LCD statuses 
         foreach my $msg ($lcd->forNewClient()) {
             syswrite($client, $msg);
@@ -350,7 +355,7 @@ sub videoList($) {
 
     my $regex;
 
-    $videoDir = $mythdb->backend_setting('VideoStartupDir', hostname)
+    $videoDir = $mythdb->setting('VideoStartupDir', hostname)
         unless $videoDir;
 
     my @videoDirs = split /:/, $videoDir;
@@ -451,8 +456,7 @@ sub stopStreaming() {
 
     return unless $streampid;
 
-    # I'd like to setpgrp in the child but that
-    # seems to cause vlc issues :(
+    # I'd like to setpgrp in the child but that seems to cause vlc issues :(
     kill 'KILL', $streampid, $streampid+1, $streampid+2, $streampid+3;
     waitpid $streampid, 0;
     undef $streampid;
@@ -498,6 +502,20 @@ sub killKids() {
 sub install {
 
     print "Installing mdd..\n";
+    
+    # Install modules
+    mkdir($Config{vendorlib} . "/MDD");
+    copy("MDD/LCD.pm", $Config{vendorlib} . "/MDD");
+    copy("MDD/MythDB.pm", $Config{vendorlib} . "/MDD");
+
+    if ($backend) {
+        print "cp $0 -> /usr/bin/mdd\n";
+        copy($0, "/usr/bin/mdd");
+        chmod(0755, "/usr/bin/mdd") 
+            or warn "chmod of /usr/bin/mdd failed\n";
+        exit;
+    }
+
     print "Stopping mythfrontend and mythlcdserver\n";
 
     system(
@@ -529,17 +547,13 @@ sub install {
     chmod(0755, $path) 
         or warn "chmod of $path failed\n";
 
-    # Install modules
-    mkdir($Config{vendorlib} . "/MDD");
-    copy("MDD/LCD.pm", $Config{vendorlib} . "/MDD");
-    copy("MDD/MythDB.pm", $Config{vendorlib} . "/MDD");
-
     print "Check settings..\n";
+    my $mythdb = MDD::MythDB->new();;
     unless (
-        $mythdb->backend_setting('LCDEnable', hostname)      &&
-        $mythdb->backend_setting('LCDShowMenu', hostname)    &&
-        $mythdb->backend_setting('LCDShowMusic', hostname)   &&
-        $mythdb->backend_setting('LCDShowChannel', hostname) 
+        $mythdb->setting('LCDEnable', hostname)      &&
+        $mythdb->setting('LCDShowMenu', hostname)    &&
+        $mythdb->setting('LCDShowMusic', hostname)   &&
+        $mythdb->setting('LCDShowChannel', hostname) 
     ) {
         print "\nNOTICE: Please enable all MythTV LCD options\n";
     }
