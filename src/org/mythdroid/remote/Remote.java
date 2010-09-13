@@ -25,6 +25,7 @@ import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.util.ErrUtil;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.GestureDetector;
@@ -43,6 +44,9 @@ public abstract class Remote extends Activity implements View.OnClickListener {
 
     final private static KeyCharacterMap keyMap =
         KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
+    
+    final private static String wakeService = 
+        "org.mythdroid.remote.WakeService"; //$NON-NLS-1$
 
     /** Result codes for when a remote is startActivityForResult()'d */
     final protected int REMOTE_RESULT_FINISH = RESULT_FIRST_USER;
@@ -200,6 +204,24 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         super.onCreate(icicle);
         scale = getResources().getDisplayMetrics().density;
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        stopService(new Intent().setClassName(this, wakeService));
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        startService(new Intent().setClassName(this, wakeService));
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent().setClassName(this, wakeService));
     }
     
     @Override
