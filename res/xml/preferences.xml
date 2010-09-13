@@ -38,7 +38,7 @@
     	<PreferenceScreen
     		android:key="osdSettings"
     		android:title="OSD Settings"
-    		android:summary="Configure display of phone events on MythTV OSD">
+    		android:summary="Configure display of phone events on OSD">
     		
     	<CheckBoxPreference
     		android:key="osdCalls"
@@ -60,6 +60,12 @@
     		android:defaultValue="true"/>
     		
     	</PreferenceScreen>
+    	
+    	<CheckBoxPreference
+    		android:key="moveWake"
+    		android:title="Wake on movement"
+    		android:summary="Wake and unlock upon phone movement whilst in remotes"
+    		android:defaultValue="true"/>
     		
     	<ListPreference
     		android:key="tvDefaultStyle"

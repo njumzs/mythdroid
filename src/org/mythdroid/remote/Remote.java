@@ -28,6 +28,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.GestureDetector;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -54,7 +55,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     /** Scale factor for pixel values for different display densities */
     private float scale = 1;
     
-    private boolean alt = false, shift = false;
+    private boolean alt = false, shift = false, moveWake = true;
     
     private GestureDetector gDetector;
     
@@ -202,26 +203,31 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        scale = getResources().getDisplayMetrics().density;
+        scale    = getResources().getDisplayMetrics().density;
+        moveWake = PreferenceManager.getDefaultSharedPreferences(this)
+                       .getBoolean("moveWake", true); //$NON-NLS-1$ 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
     
     @Override
     public void onResume() {
         super.onResume();
-        stopService(new Intent().setClassName(this, wakeService));
+        if (moveWake)
+            stopService(new Intent().setClassName(this, wakeService));
     }
     
     @Override
     public void onPause() {
         super.onPause();
-        startService(new Intent().setClassName(this, wakeService));
+        if (moveWake)
+            startService(new Intent().setClassName(this, wakeService));
     }
     
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopService(new Intent().setClassName(this, wakeService));
+        if (moveWake)
+            stopService(new Intent().setClassName(this, wakeService));
     }
     
     @Override
