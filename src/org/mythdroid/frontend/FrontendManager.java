@@ -27,7 +27,6 @@ import org.mythdroid.Enums.Key;
 import org.mythdroid.data.Program;
 import org.mythdroid.activities.MythDroid;
 
-import android.content.Context;
 import android.util.Log;
 
 /** Manages a frontend */

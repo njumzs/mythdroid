@@ -340,7 +340,7 @@ public class ConnMgr {
             wifiState = wm.getWifiState();
             
             if (MythDroid.debug)
-                Log.d("ConnMgr", "Waiting for WiFi link"); //$NON-NLS-1$ //$NON-NLS-2$
+                Log.d("ConnMgr", Messages.getString("ConnMgr.3")); //$NON-NLS-1$ //$NON-NLS-2$
             
         }
         
