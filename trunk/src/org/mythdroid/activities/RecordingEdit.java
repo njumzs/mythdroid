@@ -28,6 +28,7 @@ import org.mythdroid.Enums.RecType;
 import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
 import org.mythdroid.mdd.MDDManager;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 
 import android.content.Intent;
@@ -339,7 +340,7 @@ public class RecordingEdit extends MDActivity {
         prog.RecID = recid;
         
         if (recid == -1) {
-            ErrUtil.err(this, "Failed to add/update recording"); //$NON-NLS-1$
+            ErrUtil.err(this, Messages.getString("RecordingEdit.0")); //$NON-NLS-1$
             finish();
             return;
         }
