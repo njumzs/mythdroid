@@ -252,7 +252,7 @@ public class MusicRemote extends Remote {
             mddMgr.setMusicListener(new mddListener());
       
         try {
-            if (jump && !feMgr.getLoc(this).music)  
+            if (jump && !feMgr.getLoc().music)  
                 feMgr.jumpTo("playmusic");
         } catch (IOException e) {
             ErrUtil.err(this, e);
