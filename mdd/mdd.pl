@@ -90,6 +90,9 @@ my $stream_cmd =
     'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2}' .
     ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
 
+warn("WARNING: mdd is running as root - streaming will not work\n")
+    if ($> == 0);
+
 if ($backend && !$debug) {
     # Daemonise
     chdir '/'                 or die "Couldn't chdir() to /: $!";
