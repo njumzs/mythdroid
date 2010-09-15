@@ -16,13 +16,23 @@ For mdd to function, you must ensure that the following settings in the LCD page
 
 mdd should check these settings during installation and let you know if you need to take action.
 
-So, to install, download [http://mythdroid.googlecode.com/svn/trunk/mdd/mdd mdd] to the master backend and each frontend and then:
+So, to install, checkout or download mdd to each frontend and then:
 
 {{{
-perl /path/to/mdd
+cd /path/to/mdd
+perl mdd.pl
 }}}
 
-Note: You will need to reinstall mdd each time you upgrade MythTV. See the details below for the reason.
+Note: You will need to reinstall mdd each time you upgrade MythTV. See the details below for the reason. Also note that if you run the frontend as root, mdd will run as root and streaming will fail to work.
+
+On a box that serves only as a backend:
+
+{{{
+cd /path/to/mdd
+perl mdd.pl --backend
+}}}
+
+Then run /usr/bin/mdd as a non-root user and arrange for it to be run at boot (as a non-root user). If mdd is run as root streaming will fail to work.
 
 == Configuration ==
 
