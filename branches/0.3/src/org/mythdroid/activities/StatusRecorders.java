@@ -94,6 +94,14 @@ public class StatusRecorders extends ListActivity {
             } catch (SAXException e) {
                 ErrUtil.err(ctx, Messages.getString("Status.10"));
             } catch (Exception e) { ErrUtil.err(ctx, e); }
+            
+            if (Status.statusDoc == null) {
+                dismissDialog(DIALOG_LOAD);
+                ErrUtil.postErr(ctx, Messages.getString("StatusRecorders.3")); //$NON-NLS-1$
+                finish();
+                return;
+            }
+            
             handler.post(refreshEncoders);
         }
     };
