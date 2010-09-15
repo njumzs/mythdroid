@@ -46,6 +46,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -395,7 +396,7 @@ public class MythDroid extends MDListActivity implements
 
         c.close();
         FrontendDB.close();
-
+        
         return feMgr;
 
     }

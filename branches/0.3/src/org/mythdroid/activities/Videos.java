@@ -18,6 +18,7 @@
 
 package org.mythdroid.activities;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.WeakHashMap;
 
@@ -27,6 +28,7 @@ import org.mythdroid.data.Video;
 import org.mythdroid.data.VideoAdapter;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.remote.TVRemote;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 
 import android.content.Intent;
