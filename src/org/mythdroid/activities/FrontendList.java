@@ -65,7 +65,7 @@ public class FrontendList extends ListActivity implements
         getListView().addHeaderView(hdr);
         getListView().setPadding(0, 4, 0, 0);
 
-        c = FrontendDB.getFrontends(this);
+        c = FrontendDB.getFrontends();
 
         setListAdapter(
             new SimpleCursorAdapter(
@@ -180,20 +180,20 @@ public class FrontendList extends ListActivity implements
                 }
 
                 if (rowID < 1) {
-                    if (!FrontendDB.insert(this, name, addr, hwaddr))
+                    if (!FrontendDB.insert(name, addr, hwaddr))
                         ErrUtil.err(
                             ctx, Messages.getString("FrontendList.5") + name
                         );
                 }
                 
                 else
-                    FrontendDB.update(this, rowID, name, addr, hwaddr);
+                    FrontendDB.update(rowID, name, addr, hwaddr);
 
                 break;
                 
             case AlertDialog.BUTTON_NEUTRAL:
                 
-                FrontendDB.delete(this, rowID);
+                FrontendDB.delete(rowID);
                 break;
                 
         }

@@ -18,6 +18,8 @@
 
 package org.mythdroid.frontend;
 
+import org.mythdroid.activities.MythDroid;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -61,11 +63,10 @@ public class FrontendDB {
 
     /**
      * Get a cursor listing the frontends - columns are ID, ADDR and NAME
-     * @param ctx - context
      * @return Cursor 
      */
-    public static Cursor getFrontends(Context ctx) {
-        if (db == null) initDB(ctx);
+    public static Cursor getFrontends() {
+        if (db == null) initDB();
         return db.rawQuery(
             "SELECT _id, addr, name, hwaddr from " + FRONTEND_TABLE, null
         );
@@ -74,15 +75,14 @@ public class FrontendDB {
 
     /**
      * Insert a new frontend
-     * @param ctx - context
      * @param name - name of the frontend
      * @param addr - address of the frontend
      * @return true if successful, 
      * false if a frontend with that name already existed
      */
-    public static boolean insert(Context ctx, String name, String addr, String hwaddr) {
+    public static boolean insert(String name, String addr, String hwaddr) {
 
-        if (db == null) initDB(ctx);
+        if (db == null) initDB();
 
         final ContentValues cv = new ContentValues();
         cv.put("addr", addr.trim());
@@ -105,14 +105,13 @@ public class FrontendDB {
 
     /**
      * Update a frontend record
-     * @param ctx - context
      * @param id - id of frontend record
      * @param name - new name of frontend
      * @param addr - new address of frontend
      */
-    public static void update(Context ctx, long id, String name, String addr, String hwaddr) {
+    public static void update(long id, String name, String addr, String hwaddr) {
 
-        if (db == null) initDB(ctx);
+        if (db == null) initDB();
 
         final ContentValues cv = new ContentValues();
         cv.put("addr", addr.trim());
@@ -125,11 +124,10 @@ public class FrontendDB {
 
     /**
      * Delete a frontend record
-     * @param ctx - context
      * @param id - id of frontend record
      */
-    public static void delete(Context ctx, long id) {
-        if (db == null) initDB(ctx);
+    public static void delete(long id) {
+        if (db == null) initDB();
         db.delete(FRONTEND_TABLE, "_id = ?",
             new String[] { String.valueOf(id) });
     }
@@ -141,8 +139,8 @@ public class FrontendDB {
         db = null;
     }
 
-    private static void initDB(Context ctx) {
-        db = new DBOpenHelper(ctx).getWritableDatabase();
+    private static void initDB() {
+        db = new DBOpenHelper(MythDroid.appContext).getWritableDatabase();
     }
 
 }

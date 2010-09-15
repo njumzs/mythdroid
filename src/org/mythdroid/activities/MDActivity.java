@@ -165,7 +165,7 @@ public abstract class MDActivity extends Activity {
     private void prepareFrontendDialog(final Dialog dialog) {
         
         final SimpleCursorAdapter ca = new SimpleCursorAdapter(
-            ctx, R.layout.simple_list_item_1, FrontendDB.getFrontends(ctx),
+            ctx, R.layout.simple_list_item_1, FrontendDB.getFrontends(),
             new String[] { "name" }, new int[] { id.text1 }
         );
 

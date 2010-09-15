@@ -46,7 +46,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -67,11 +67,14 @@ public class MythDroid extends MDListActivity implements
     AdapterView.OnItemLongClickListener {
 
     /** Debug? */
-    final public static boolean debug = false;
+    final public static boolean debug = true;
+    
     /** Backend protocol version */
     public static int protoVersion  = 0;
     public static int beVersion = 0;
 
+    public static Context appContext = null;
+    
     /** The name of the current default frontend */
     public static String defaultFrontend = null;
 
@@ -135,6 +138,8 @@ public class MythDroid extends MDListActivity implements
         
         super.onCreate(icicle);
 
+        appContext = getApplicationContext();
+        
         setContentView(R.layout.mainmenu);
 
         menuAdapter = new ArrayAdapter<String>(
@@ -330,17 +335,21 @@ public class MythDroid extends MDListActivity implements
         if (beMgr == null) 
             findBackend();
     }
+    
+    @Override
+    public void onConfigurationChanged(Configuration config) {
+        super.onConfigurationChanged(config);
+    }
  
      /**
      * Connect to defaultFrontend or the first frontend in the FrontendDB
      * if defaultFrontend is null, returns quickly if the defaultFrontend if
      * already connected
-     * @param ctx - context
      * @return A FrontendManager connected to a frontend or null if there's a 
      * problem
      * @throws IOException 
      */
-    public static FrontendManager getFrontend(Context ctx) throws IOException {
+    public static FrontendManager getFrontend() throws IOException {
 
         String name = defaultFrontend;
 
@@ -354,7 +363,7 @@ public class MythDroid extends MDListActivity implements
             feMgr = null;
         }
 
-        Cursor c = FrontendDB.getFrontends(ctx);
+        Cursor c = FrontendDB.getFrontends();
 
         if (c.getCount() < 1) {
             c.close();
@@ -594,7 +603,7 @@ public class MythDroid extends MDListActivity implements
     private void prepareWakeDialog(final Dialog dialog) {
         
         final SimpleCursorAdapter ca = new SimpleCursorAdapter(
-            ctx, R.layout.simple_list_item_1, FrontendDB.getFrontends(ctx),
+            ctx, R.layout.simple_list_item_1, FrontendDB.getFrontends(),
             new String[] { "name" }, new int[] { id.text1 }
         );
 
@@ -642,7 +651,7 @@ public class MythDroid extends MDListActivity implements
         
         try {
             cmds = MDDManager.getCommands(
-                getFrontend(ctx).addr
+                getFrontend().addr
             );
         } catch(IOException e) { 
             ErrUtil.err(ctx, e);
