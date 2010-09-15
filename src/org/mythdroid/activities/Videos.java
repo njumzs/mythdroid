@@ -67,8 +67,8 @@ public class Videos extends MDActivity implements
                 videos = MDDManager.getVideos(
                     MythDroid.getBackend().addr, path
                 );
-            } catch (Exception e) {
-                ErrUtil.postErr(ctx, new Exception("Failed to connect to MDD"));
+            } catch (IOException e) {
+                ErrUtil.postErr(ctx, new Exception(Messages.getString("Videos.1"))); //$NON-NLS-1$
                 finish();
                 return;
             }
