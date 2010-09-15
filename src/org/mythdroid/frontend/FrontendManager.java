@@ -198,7 +198,7 @@ public class FrontendManager {
     private synchronized ArrayList<String> getResponse() throws IOException {
         final ArrayList<String> resp = new ArrayList<String>(32);
         String msg = "";
-        while (true) {
+        while (cmgr != null) {
             msg = cmgr.readLine();
             if (msg.length() == 0) continue;
             if (msg.equals("#")) break;
@@ -209,7 +209,7 @@ public class FrontendManager {
     
     private synchronized String getSingleLineResponse() throws IOException {
         String line = cmgr.readLine();
-        while (true) 
+        while (cmgr != null) 
             if (cmgr.readLine().equals("#")) break;
         return line;
     }
