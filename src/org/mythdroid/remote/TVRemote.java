@@ -129,7 +129,7 @@ public class TVRemote extends Remote {
 
             try {
                 
-                final FrontendLocation loc = feMgr.getLoc(ctx);
+                final FrontendLocation loc = feMgr.getLoc();
             
                 if (!loc.video) {
                     done();
@@ -189,16 +189,16 @@ public class TVRemote extends Remote {
             
             try {
                 if (livetv) {
-                	if (!feMgr.getLoc(ctx).livetv) 
+                	if (!feMgr.getLoc().livetv) 
                 		feMgr.jumpTo("livetv");
                 	
-                    if (!feMgr.getLoc(ctx).livetv) {
+                    if (!feMgr.getLoc().livetv) {
                         ErrUtil.postErr(ctx, Messages.getString("TVRemote.1"));
                         done();
                         return;
                     }
                     if (jumpChan >= 0) { 
-                        while(feMgr.getLoc(ctx).position < 1)
+                        while(feMgr.getLoc().position < 1)
                             Thread.sleep(500);
                         feMgr.playChan(jumpChan);
                     }
@@ -672,7 +672,7 @@ public class TVRemote extends Remote {
         FrontendLocation loc = null;
         
         try {
-            loc = feMgr.getLoc(ctx);
+            loc = feMgr.getLoc();
             if (!loc.video) {
                 done();
                 return;

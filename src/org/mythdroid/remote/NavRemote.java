@@ -308,7 +308,7 @@ public class NavRemote extends Remote implements View.OnClickListener {
         
         if (locView == null || itemView == null) return;
 
-        final FrontendLocation newLoc = feMgr.getLoc(this);
+        final FrontendLocation newLoc = feMgr.getLoc();
         if (mddMgr == null || !newLoc.niceLocation.equals("Unknown")) {
             locView.setText(newLoc.niceLocation);
             itemView.setText("");

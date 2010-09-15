@@ -116,7 +116,7 @@ public class FrontendManager {
      * Get the current frontend location
      * @return a FrontendLocation
      */
-    public synchronized FrontendLocation getLoc(Context ctx) throws IOException {
+    public synchronized FrontendLocation getLoc() throws IOException {
         cmgr.writeLine("query loc");
         String loc = getSingleLineResponse();
 
