@@ -30,6 +30,10 @@ import java.net.UnknownHostException;
 import org.mythdroid.activities.MythDroid;
 import org.mythdroid.resource.Messages;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 
 /**
@@ -38,18 +42,19 @@ import android.util.Log;
  */
 public class ConnMgr {
     
-    public  String       addr    = null;
+    public  String        addr        = null;
     
     static final private IOException disconnected =
         new IOException(Messages.getString("ConnMgr.0"));
 
     static final private int rbufSize = 128;
     
-    private Socket       sock    = null;
-    private OutputStream os      = null;
-    private InputStream  is      = null;
-    private int          rbufIdx = -1;
-    private byte[]       rbuf    = null;
+    private Socket        sock        = null;
+    private SocketAddress sockAddr    = null;
+    private OutputStream  os          = null;
+    private InputStream   is          = null;
+    private int           rbufIdx     = -1;
+    private byte[]        rbuf        = null;
 
     /**
      * Constructor
@@ -61,30 +66,34 @@ public class ConnMgr {
         sock = new Socket();
         sock.setTcpNoDelay(true);
 
-        final SocketAddress sa = new InetSocketAddress(host, port);
+        sockAddr = new InetSocketAddress(host, port);
 
+        addr = host + ":" + port; //$NON-NLS-1$
+        
+        waitForWifi();
+        
         try {
-            sock.connect(sa, 1000);
+            sock.connect(sockAddr, 1000);
         } catch (UnknownHostException e) {
             throw (new IOException(Messages.getString("ConnMgr.1") + host));
         } catch (SocketTimeoutException e) {
             throw (
                 new IOException(
-                    Messages.getString("ConnMgr.2") + host + ":" + port + 
-                        Messages.getString("ConnMgr.4"))
+                    Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
+                        Messages.getString("ConnMgr.4")) //$NON-NLS-1$
                 );
         } catch (IOException e) {
             throw (
                 new IOException(
-                    Messages.getString("ConnMgr.5") + host + ":" + port + 
-                        Messages.getString("ConnMgr.7"))
+                    Messages.getString("ConnMgr.5") + addr +  //$NON-NLS-1$
+                        Messages.getString("ConnMgr.7")) //$NON-NLS-1$
                 );
         }
-        
-        addr = host;
+                
         os = sock.getOutputStream();
         is = sock.getInputStream();
-
+     
+        
     }
 
     /**
@@ -291,6 +300,50 @@ public class ConnMgr {
      */
     public void disconnect() throws IOException {
         sock.close();
+    }
+    
+    private void waitForWifi() {
+        
+        ConnectivityManager cm = 
+            (ConnectivityManager)MythDroid.appContext.getSystemService(
+                Context.CONNECTIVITY_SERVICE
+             );
+        
+        WifiManager wm = 
+            (WifiManager)MythDroid.appContext.getSystemService(
+                Context.WIFI_SERVICE
+            );
+        
+        NetworkInfo ninfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        
+        int i = 0;
+        int wifiState = wm.getWifiState();
+        
+        if (
+            wifiState != WifiManager.WIFI_STATE_ENABLED &&
+            wifiState != WifiManager.WIFI_STATE_ENABLING
+        )
+            return;
+        
+        while (
+            (
+                wifiState == WifiManager.WIFI_STATE_ENABLING     ||
+                ninfo.getState() == NetworkInfo.State.CONNECTING
+            ) && i++ < 10
+        ) {
+            
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {}
+            
+            ninfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            wifiState = wm.getWifiState();
+            
+            if (MythDroid.debug)
+                Log.d("ConnMgr", "Waiting for WiFi link"); //$NON-NLS-1$ //$NON-NLS-2$
+            
+        }
+        
     }
 
 }

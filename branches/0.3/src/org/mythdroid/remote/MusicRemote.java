@@ -235,7 +235,7 @@ public class MusicRemote extends Remote {
     public void onResume() {
         super.onResume();
         try {
-            feMgr = MythDroid.getFrontend(this);
+            feMgr = MythDroid.getFrontend();
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();
