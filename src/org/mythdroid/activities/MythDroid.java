@@ -357,9 +357,8 @@ public class MythDroid extends MDListActivity implements
         Cursor c = FrontendDB.getFrontends(ctx);
 
         if (c.getCount() < 1) {
-            ErrUtil.postErr(ctx, Messages.getString("MythDroid.26")); //$NON-NLS-1$
             c.close();
-            return null;
+            throw new IOException(Messages.getString("MythDroid.26")); //$NON-NLS-1$
         }
 
         c.moveToFirst();
@@ -399,9 +398,9 @@ public class MythDroid extends MDListActivity implements
      * returns quickly if a backend is already connected
      * @return A BackendManager connected to a backend or null if there's a 
      * problem
-     * @throws Exception 
+     * @throws IOException 
      */
-    public static BackendManager getBackend() throws Exception {
+    public static BackendManager getBackend() throws IOException {
         
         if (beMgr != null && beMgr.isConnected())
             return beMgr;
