@@ -30,6 +30,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 
 public class WakeService extends Service implements SensorEventListener {
 
@@ -37,6 +38,8 @@ public class WakeService extends Service implements SensorEventListener {
     final private static int wakeTime = 10000; // ms
     private SensorManager sensorMgr;
     private Sensor sensor;
+    private PowerManager pm = null;
+    private WakeLock partialLock = null;
 
     public BroadcastReceiver screenStateReceiver = new BroadcastReceiver() {
         
@@ -45,10 +48,17 @@ public class WakeService extends Service implements SensorEventListener {
             
             sensorMgr.unregisterListener(WakeService.this);
            
-            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF))  
-                sensorMgr.registerListener(
-                    WakeService.this, sensor, SensorManager.SENSOR_DELAY_NORMAL
-                );
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                if (partialLock.isHeld())
+                    partialLock.release();
+                return;
+            }
+            
+            sensorMgr.registerListener(
+                WakeService.this, sensor, SensorManager.SENSOR_DELAY_NORMAL
+            );
+
+            partialLock.acquire();
             
         }
         
@@ -67,6 +77,11 @@ public class WakeService extends Service implements SensorEventListener {
         sensorMgr.registerListener(
             this, sensor, SensorManager.SENSOR_DELAY_NORMAL
         );
+        
+        pm = (PowerManager)getSystemService(POWER_SERVICE);
+        
+        partialLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, tag);
+        partialLock.acquire();
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
@@ -78,6 +93,8 @@ public class WakeService extends Service implements SensorEventListener {
     public void onDestroy() {
         
         super.onDestroy();
+        if (partialLock.isHeld())
+            partialLock.release();
         unregisterReceiver(screenStateReceiver);
         sensorMgr.unregisterListener(this);
         
