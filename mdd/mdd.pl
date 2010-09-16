@@ -59,14 +59,18 @@ my ($backend, $debug, $lcd, $lcdListen);
 
 # Check for and strip arguments intended for us
 foreach my $idx (0 .. $#ARGV) {
+
+    next unless exists $ARGV[$idx];
+
     if ($ARGV[$idx] eq '--backend') {
         $backend = 1;
-        delete $ARGV[$idx];
+        splice @ARGV, $idx, 1;
     }
     elsif ($ARGV[$idx] eq '--debug') {
         $debug = 1;
-        delete $ARGV[$idx];
+        splice @ARGV, $idx, 1;
     }
+
 }
 
 # Install ourselves if necessary
