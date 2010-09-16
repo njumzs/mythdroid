@@ -31,6 +31,7 @@ use Sys::Hostname;
 use Config;
 use MDD::LCD;
 use MDD::MythDB;
+use MDD::Log;
 
 sub handleMdConn($);
 sub handleDisconnect($);
@@ -90,25 +91,32 @@ my $stream_cmd =
     'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2}' .
     ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
 
+my $log = MDD::Log->new('/tmp/mdd.log', $debug);
+
 warn("WARNING: mdd is running as root - streaming will not work\n")
     if ($> == 0);
 
 if ($backend && !$debug) {
-    # Daemonise
-    chdir '/'                 or die "Couldn't chdir() to /: $!";
-    open STDIN, '/dev/null'   or die "Couldn't open() /dev/null: $!";
-    open STDOUT,'>>/dev/null' or die "Couldn't open() /dev/null: $!";
-    open STDERR,'>>/dev/null' or die "Couldn't open() /dev/null: $!";
-    defined(my $pid = fork)   or die "Couldn't fork(): $!";
+    $log->dbg("Daemonise");
+    chdir '/'                 or $log->err("Couldn't chdir() to /: $!");
+    open STDIN, '/dev/null'   or $log->err("Couldn't open() /dev/null: $!");
+    open STDOUT,'>>/dev/null' or $log->err("Couldn't open() /dev/null: $!");
+    open STDERR,'>>/dev/null' or $log->err("Couldn't open() /dev/null: $!");
+    defined(my $pid = fork)   or $log->err("Couldn't fork(): $!");
     exit if $pid;
-    setsid                    or die "Couldn't setsid(): $!";
+    setsid                    or $log->err("Couldn't setsid(): $!");
     umask 0;
 }
 
 elsif (!$backend) {
 
     $lcd = MDD::LCD->new();
+
+    $log->dbg("Start LCD server with arguments: @ARGV");
+
     $lcdServerPort = $lcd->start(@ARGV);
+
+    $log->dbg("Listen on port $lcdServerPort/tcp");
 
     # Listen for connections from mythfrontend
     $lcdListen = IO::Socket::INET->new(
@@ -117,7 +125,7 @@ elsif (!$backend) {
         ReuseAddr   => 1,
         LocalPort   => $lcdServerPort
     
-    ) or die "Couldn't listen on $lcdServerPort/tcp: $!\n";
+    ) or $log->fatal("Couldn't listen on $lcdServerPort/tcp: $!");
 
 }
 
@@ -125,13 +133,15 @@ my $mythdb = MDD::MythDB->new();;
 
 readCommands();
 
+$log->dbg("Listen on port $listenPort/tcp");
+
 # Listen for connections from MythDroid
 my $listen = IO::Socket::INET->new(
     Listen      => 1,
     Proto       => 'tcp',
     ReuseAddr   => 1,
     LocalPort   => $listenPort
-) or die "Couldn't listen on $listenPort/tcp: $!\n";
+) or $log->fatal("Couldn't listen on $listenPort/tcp: $!");
 
 my @handles = ( $listen );
 push @handles, $lcdListen if $lcdListen;
@@ -140,8 +150,9 @@ undef @handles;
 
 # Connect to the real mythlcdserver
 unless ($backend) {
+    $log->dbg("Connect to real mythlcdserver");
     $lcdServer = $lcd->connect();
-    die "Couldn't connect to mythlcdserver" unless $lcdServer;
+    $log->err("Couldn't connect to mythlcdserver") unless $lcdServer;
     $s->add($lcdServer);
 }
     
@@ -151,7 +162,7 @@ while (my @ready = $s->can_read) {
     foreach my $fd (@ready) {
         
         if (!$backend && $fd == $lcdListen) {
-            # New connection from mythfrontend
+            $log->dbg("New connection from mythfrontend");
             if ($lcdClient = $fd->accept) {
                 $s->add($lcdClient);
             }
@@ -159,7 +170,7 @@ while (my @ready = $s->can_read) {
         }
 
         elsif ($fd == $listen) {
-            # New connection from MythDroid
+            $log->dbg("New connection from MythDroid");
             handleMdConn($fd);
             next;
         }
@@ -182,7 +193,7 @@ while (my @ready = $s->can_read) {
         elsif (!$backend) {
             # Process and ferry data from mythfrontend -> lcdserver
             foreach (split /\n/, $data) { 
-                print "-> LMSG: $_\n" if $debug;
+                $log->dbg("-> LMSG: $_");
                 my $msg = $lcd->command($_) if length > 4;
                 sendMsg($msg) if $msg;
             }
@@ -235,7 +246,7 @@ sub handleDisconnect($) {
     undef $client if (defined $client && $fd == $client);
 
     if (!$backend && defined $lcdServer && $fd == $lcdServer) {
-        # Reconnect if we lost connection to the real mythlcdserver
+        $log->warn("Lost connection to LCD server, reconnecting");
         $lcdServer = $lcd->connect();
         $s->add($lcdServer);
     }
@@ -259,12 +270,13 @@ sub readCommands() {
         s/#.*$//;
         my ($name, $cmd) = /(.*)=>(.*)/;
         if (!($name && $cmd)) {
-            warn("Error parsing line $line of /etc/mdd.conf");
+            $log->err("Error parsing line $line of /etc/mdd.conf, ignoring");
             next;
         }
         $name =~ s/\s+$//;
         $cmd =~ s/^\s+//;
         $commands{$name} = $cmd;
+        $log->dbg("Add MDD command $name: $cmd");
     }
 
     close F;
@@ -276,16 +288,16 @@ sub sendMsg($) {
     my $msg = shift;
     $msg .= "\n";
     syswrite($client, $msg) if (defined $client);
-    print "<- SMSG: $msg\n" if $debug;
+    $log->dbg("<- CMSG: $msg");
 
 }
 
-# Process messages from the cliet (MythDroid)
+# Process messages from the client (MythDroid)
 sub clientMsg($) {
 
     my $msg = shift;
 
-    print "-> CMSG: $msg\n" if $debug;
+    $log->dbg("-> CMSG: $msg");
 
     if    ($msg =~ /^COMMAND (.*)$/) {
         sendMsg("OK");
@@ -332,6 +344,7 @@ sub clientMsg($) {
         $mythdb->delRec($1);
     }
     else {
+        $log->err("Unknown command $msg");
         sendMsg("UNKNOWN");
     }
 
@@ -343,7 +356,7 @@ sub runCommand($) {
     my $cmd = shift;
 
     if (! exists $commands{$cmd}) {
-        warn("mdd command $cmd is not defined");
+        $log->err("mdd command $cmd is not defined");
         return;
     }
 
@@ -362,6 +375,8 @@ sub videoList($) {
         unless $videoDir;
 
     my @videoDirs = split /:/, $videoDir;
+
+    $log->dbg("VideoDirs: @videoDirs") if scalar @videoDirs;
 
     my ($vd, $sd) = $subdir =~ /^(-?\d+)\s(.+)/;
 
@@ -407,6 +422,8 @@ sub streamFile($) {
     my $dir;
     my $pat = qr/(\d+)x(\d+)\s+VB\s+(\d+)\s+AB\s+(\d+)\s+SG\s+(.+)\s+FILE\s+/;
 
+    $log->dbg("Streaming $file");
+
     my ($width, $height, $vb, $ab, $sg) = $file =~ /$pat/;
     $file =~ s/$pat//;
 
@@ -420,6 +437,8 @@ sub streamFile($) {
 
     $cpus = 1 unless $cpus;
 
+    $log->dbg("Will use $cpus threads for transcode");
+
     if ($file =~ /^myth:\/\//) {
 
         %storageGroups = %{ $mythdb->getStorGroups() } 
@@ -431,6 +450,7 @@ sub streamFile($) {
             $file = $storageGroups{$sg} . $file;
         }
         else {
+            $log->dbg("Storage Group $sg not found, assume 'Default'");
             $file = $storageGroups{'Default'} . $file;
         }
 
@@ -439,6 +459,8 @@ sub streamFile($) {
         $file =~ s/ /\\ /g;
     }
 
+    $log->dbg("Streaming - resolved path is $file");
+
     my $cmd = $stream_cmd;
     $cmd =~ s/%FILE%/$file/;
     $cmd =~ s/%VB%/$vb/;
@@ -446,6 +468,8 @@ sub streamFile($) {
     $cmd =~ s/%THR%/$cpus/;
     $cmd =~ s/%WIDTH%/$width/g;
     $cmd =~ s/%HEIGHT%/$height/g;
+
+    $log->dbg("Execute $cmd");
 
     if (($streampid = fork()) == 0) { 
         system($cmd); 
@@ -458,6 +482,8 @@ sub streamFile($) {
 sub stopStreaming() {
 
     return unless $streampid;
+
+    $log->dbg("Stop streaming");
 
     # I'd like to setpgrp in the child but that seems to cause vlc issues :(
     kill 'KILL', $streampid, $streampid+1, $streampid+2, $streampid+3;
@@ -510,6 +536,7 @@ sub install {
     mkdir($Config{vendorlib} . "/MDD");
     copy("MDD/LCD.pm", $Config{vendorlib} . "/MDD");
     copy("MDD/MythDB.pm", $Config{vendorlib} . "/MDD");
+    copy("MDD/Log.pm", $Config{vendorlib} . "/MDD");
 
     if ($backend) {
         print "cp $0 -> /usr/bin/mdd\n";
