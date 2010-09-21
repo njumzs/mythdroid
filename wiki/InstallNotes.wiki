@@ -2,7 +2,7 @@
 
 ==MythTV Version==
 
-!MythDroid 0.3 supports 0.21, 0.22 and MythTV trunk.
+!MythDroid 0.3 supports 0.21 - 0.23 and MythTV trunk.
 
 ==MythTV Configuration==
 
@@ -12,11 +12,11 @@ You must enable the 'Enable frontend network control' option in each frontend's 
 
 MDD extends the functionality of !MythDroid signficantly. See [MDD here] for more information, including installation notes.
 
-==MythTV >= 0.22 Specific Notes==
+==MythTV 0.22 Specific Notes==
 
 MythTV 0.22 has some bugs in the network control feature. Apply [http://mythdroid.googlecode.com/files/myth-netcontrol-2.patch this patch] so that !MythDroid is able to initiate recording playback properly. 
 
-The bugs were fixed by MythTV rev 23381 so users of MythTV trunk >= rev 23381 (or 0.23 when it's released) need not apply any patches. Yay.
+The bugs were fixed by MythTV rev 23381 so users of MythTV 0.23 or above need not apply any patches. 
 
 ==MythTV 0.21 Specific Notes==
 
