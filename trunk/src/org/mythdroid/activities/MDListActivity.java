@@ -47,7 +47,7 @@ import android.widget.AdapterView.OnItemClickListener;
  * and/or loading dialogs - same as MDActivity */
 public abstract class MDListActivity extends ListActivity {
 
-    /** A frontend chooser dialog */
+    /** Frontend chooser and loading dialogs */
     final protected static int 
         FRONTEND_CHOOSER = -1, DIALOG_LOAD = -2;
     final protected Context ctx = this;
@@ -121,6 +121,14 @@ public abstract class MDListActivity extends ListActivity {
                 final ProgressDialog prog = new ProgressDialog(this);
                 prog.setIndeterminate(true);
                 prog.setMessage(getResources().getText(R.string.loading));
+                prog.setOnCancelListener(
+                    new OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface arg0) {
+                            finish();
+                        }
+                    }
+                );
                 return prog;
         
         }
@@ -208,10 +216,9 @@ public abstract class MDListActivity extends ListActivity {
     }
 
     /**
-     * Add "Here" to the frontend chooser and call onHere in the
-     * supplied onHereListener if it's selected
-     * @param ohl - onHereListener with onHere() method to run if 
-     * "Here" is selected
+     * Add "Here" to the frontend chooser and start the provided
+     * activity if it's selected
+     * @param activity - the activity to start
      */
     protected void addHereToFrontendChooser(Class<?> activity) {
         hereActivity = activity;
