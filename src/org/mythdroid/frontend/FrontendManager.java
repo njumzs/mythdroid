@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.mythdroid.ConnMgr;
+import org.mythdroid.ConnMgr.onConnectListener;
 import org.mythdroid.Enums.Key;
 import org.mythdroid.data.Program;
 import org.mythdroid.activities.MythDroid;
@@ -43,11 +44,16 @@ public class FrontendManager {
     public FrontendManager(String name, String host) throws IOException {
         if (MythDroid.debug) 
             Log.d("FrontendManager", "Connecting to " + host + ":6546"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        cmgr = new ConnMgr(host, 6546);
+        cmgr = new ConnMgr(host, 6546, new onConnectListener() {
+                @Override
+                public void onConnect(ConnMgr cmgr) throws IOException {
+                    getSingleLineResponse(cmgr);
+                }
+            }
+        );
         if (cmgr == null) return;
         this.name = name;
         addr = host;
-        getSingleLineResponse();
     }
 
     /**
@@ -183,7 +189,7 @@ public class FrontendManager {
     /** Disconnect from the frontend */
     public void disconnect() throws IOException {
         if (cmgr == null) return;
-        cmgr.disconnect();
+        cmgr.dispose();
         cmgr = null;
     }
     
@@ -197,6 +203,15 @@ public class FrontendManager {
             resp.add(msg);
         }
         return resp;
+    }
+    
+    @SuppressWarnings("null")
+    private synchronized String getSingleLineResponse(ConnMgr cmgr)
+        throws IOException {
+        String line = cmgr.readLine();
+        while (cmgr != null) 
+            if (cmgr.readLine().equals("#")) break; //$NON-NLS-1$
+        return line;
     }
     
     private synchronized String getSingleLineResponse() throws IOException {

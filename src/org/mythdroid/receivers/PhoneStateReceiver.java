@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.mythdroid;
+package org.mythdroid.receivers;
 
 import org.mythdroid.frontend.OSDMessage;
 import org.mythdroid.resource.Messages;
@@ -35,7 +35,7 @@ import android.telephony.gsm.SmsMessage;
  * and displays them on the MythTV OSD
  */
 @SuppressWarnings("deprecation")
-public class BCastReceiver extends BroadcastReceiver {
+public class PhoneStateReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context ctx, Intent intent) {

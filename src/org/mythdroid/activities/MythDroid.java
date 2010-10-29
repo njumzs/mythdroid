@@ -33,6 +33,7 @@ import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.frontend.WakeOnLan;
 import org.mythdroid.mdd.MDDManager;
+import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.remote.MusicRemote;
 import org.mythdroid.remote.NavRemote;
 import org.mythdroid.remote.TVRemote;
@@ -162,6 +163,8 @@ public class MythDroid extends MDListActivity implements
 
         if (wHandler == null) 
             wHandler = new Handler(hThread.getLooper());
+        
+        new ConnectivityReceiver();
 
     }
 
@@ -413,10 +416,8 @@ public class MythDroid extends MDListActivity implements
      */
     public static BackendManager getBackend() throws IOException {
         
-        if (beMgr != null && beMgr.isConnected())
+        if (beMgr != null)
             return beMgr;
-        
-        beMgr = null;
         
         if (backend != null && backend.length() > 0)
             beMgr = new BackendManager(backend);
@@ -492,7 +493,7 @@ public class MythDroid extends MDListActivity implements
                     // Auto locate a master backend
                     try {
                         beMgr = BackendManager.locate();
-                    } catch (Exception e) { ErrUtil.postErr(ctx, e); }
+                    } catch (IOException e) { ErrUtil.postErr(ctx, e); }
                 
                     handler.post(found);
                 }
@@ -589,6 +590,7 @@ public class MythDroid extends MDListActivity implements
                         WakeOnLan.Wake(c.getString(FrontendDB.HWADDR));
                     } catch (Exception e) { ErrUtil.err(ctx, e); }
                     c.close();
+                    FrontendDB.close();
                     d.dismiss();
                 }
             }
