@@ -52,6 +52,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.sax.EndTextElementListener;
 import android.util.Xml;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -120,7 +121,9 @@ public class Guide extends MDActivity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        dismissDialog(DIALOG_LOAD);
+                        try {
+                            dismissDialog(DIALOG_LOAD);
+                        } catch (IllegalArgumentException e) {}
                         tbl.addView(getHeader());
                         // this is necessary to get proper layout
                         tbl.addView(getSpacer());
@@ -402,6 +405,9 @@ public class Guide extends MDActivity {
                 "&EndTime=" + MythDroid.dateFmt.format(end) + //$NON-NLS-1$
                 "&StartChanId=0" + "&NumOfChannels=-1" + "&Details=1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             );
+            
+            if (MythDroid.debug)
+                Log.d("Guide", "Fetching XML from " + url.toExternalForm()); //$NON-NLS-1$ //$NON-NLS-2$
 
             Xml.parse(
                 url.openConnection().getInputStream(), 
