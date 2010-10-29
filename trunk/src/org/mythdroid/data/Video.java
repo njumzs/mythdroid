@@ -43,11 +43,10 @@ public class Video {
     public String title, subtitle, director, plot, homepage, filename;
     public float rating;
     public int year, length, dir = -1, id = -1;
-    static Options opts = new BitmapFactory.Options();
-
-    static { opts.inSampleSize = 8; }
-          
     public Drawable poster = null;
+    
+    final private static Options opts = new BitmapFactory.Options();
+    static { opts.inSampleSize = 8; }
     
     final private static int 
         ID = 0, TITLE = 1, SUBTITLE = 2, DIRECTOR = 3, PLOT = 4, HOMEPAGE = 5,
