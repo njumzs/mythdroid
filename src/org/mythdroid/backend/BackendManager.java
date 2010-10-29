@@ -303,7 +303,13 @@ public class BackendManager {
         // Cope with odd protoVer resulting from mythtv r25366
         int protoVer = MythDroid.beVersion * 1000 + MythDroid.protoVersion;
         
-        cmgr.sendString("MYTH_PROTO_VERSION " + protoVer); //$NON-NLS-1$
+        String protoToken = getToken(protoVer);
+        // prefix a space for the actual request
+        if (protoToken.length() > 0) {
+        	protoToken = " " + protoToken; //$NON-NLS-1$
+        }
+
+        cmgr.sendString("MYTH_PROTO_VERSION " + protoVer + protoToken); //$NON-NLS-1$
 
         if (!cmgr.readStringList()[0].equals("ACCEPT")) return false; //$NON-NLS-1$
         
@@ -313,6 +319,26 @@ public class BackendManager {
 
         return true;
 
+    }
+
+    /**
+     * Returns the protocol token for a given protocol version.
+     * Tokens are defined in the messages.properties as:
+     * ProtoToken.<protoVer> = <token>
+     *
+     * @param protoVer - protocol version to retrieve token for
+     */
+    private String getToken(int protoVer) {
+        
+    	String key = "ProtoToken." + protoVer; //$NON-NLS-1$
+    	String token = Messages.getString(key);
+    	
+    	if (token.equals("!" + key + "!")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		token = ""; //$NON-NLS-1$
+    	}
+
+    	return token.trim();
+    	
     }
 
 }
