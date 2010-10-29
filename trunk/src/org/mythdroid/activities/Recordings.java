@@ -79,7 +79,9 @@ public class Recordings extends MDListActivity implements
                 recordings = MythDroid.getBackend().getRecordings();
             } catch (Exception e) { 
                 ErrUtil.postErr(ctx, Messages.getString("Recordings.0")); //$NON-NLS-1$
-                dismissDialog(DIALOG_LOAD);
+                try {
+                    dismissDialog(DIALOG_LOAD);
+                } catch (IllegalArgumentException e1) {}
                 finish();
             }
 
@@ -99,7 +101,9 @@ public class Recordings extends MDListActivity implements
             handler.post(
                 new Runnable() {
                     public void run() {
-                        dismissDialog(DIALOG_LOAD);
+                        try {
+                            dismissDialog(DIALOG_LOAD);
+                        } catch (IllegalArgumentException e) {}
                         setListAdapter(
                             new ProgramAdapter(
                                 ctx, R.layout.recording_list_item, recordings
