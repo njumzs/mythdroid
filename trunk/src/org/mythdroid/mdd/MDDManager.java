@@ -82,7 +82,7 @@ public class MDDManager {
      * @return - ArrayList<String> containing names of MDD commands
      */
     public static ArrayList<String> getCommands(String addr) throws IOException {
-        final ConnMgr cmgr = new ConnMgr(addr, 16546);
+        final ConnMgr cmgr = new ConnMgr(addr, 16546, null);
         final ArrayList<String> cmds = new ArrayList<String>();
         
         String line = cmgr.readLine();
@@ -93,7 +93,7 @@ public class MDDManager {
             line = cmgr.readLine();
         }
         
-        cmgr.disconnect();
+        cmgr.dispose();
         return cmds;
     }
     
@@ -104,7 +104,7 @@ public class MDDManager {
      */
     public static void mddCommand(String addr, String cmd) throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "COMMAND " + cmd); //$NON-NLS-1$
-        cmgr.disconnect();
+        cmgr.dispose();
     }
     
     /**
@@ -133,7 +133,7 @@ public class MDDManager {
         }
         
         videos.trimToSize();
-        cmgr.disconnect();
+        cmgr.dispose();
         return videos;
         
     }
@@ -155,7 +155,7 @@ public class MDDManager {
             "STREAM " + w + "x" + h + " VB " + vb + " AB " + ab + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ 
             " SG " + sg + " FILE " + file  //$NON-NLS-1$ //$NON-NLS-2$
         );
-        cmgr.disconnect();
+        cmgr.dispose();
     }
     
     /**
@@ -164,7 +164,7 @@ public class MDDManager {
      */
     public static void stopStream(String addr) throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "STOPSTREAM"); //$NON-NLS-1$
-        cmgr.disconnect();
+        cmgr.dispose();
     }
     
     /**
@@ -177,7 +177,7 @@ public class MDDManager {
         throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "RECTYPE " + recid); //$NON-NLS-1$
         final RecType rt = RecType.get(Integer.parseInt(cmgr.readLine()));
-        cmgr.disconnect();
+        cmgr.dispose();
         return rt;
     }
     
@@ -190,7 +190,7 @@ public class MDDManager {
     public static String getStorageGroup(String addr, int recid) throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "STORGROUP " + recid); //$NON-NLS-1$
         String sg = cmgr.readLine();
-        cmgr.disconnect();
+        cmgr.dispose();
         return sg;
     }
     
@@ -210,7 +210,7 @@ public class MDDManager {
             groups.add(line);
         }
         
-        cmgr.disconnect();
+        cmgr.dispose();
         return groups.toArray(new String[groups.size()]);
     }
     
@@ -230,7 +230,7 @@ public class MDDManager {
             groups.add(line);
         }
         
-        cmgr.disconnect();
+        cmgr.dispose();
         return groups.toArray(new String[groups.size()]);
     }
     
@@ -253,7 +253,7 @@ public class MDDManager {
 
         final ConnMgr cmgr = sendMsg(addr, msg);
         int recid = Integer.parseInt(cmgr.readLine());
-        cmgr.disconnect();
+        cmgr.dispose();
         return recid;
     }
     
@@ -266,7 +266,7 @@ public class MDDManager {
     public static void deleteRecording(String addr, int recid) 
         throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "DELREC " + recid); //$NON-NLS-1$
-        cmgr.disconnect();
+        cmgr.dispose();
     }
     
     /**
@@ -274,7 +274,7 @@ public class MDDManager {
      * @param addr - String containing address of frontend
      */
     public MDDManager(String addr) throws IOException {
-        cmgr = new ConnMgr(addr, 16546);
+        cmgr = new ConnMgr(addr, 16546, null);
         new Thread(recvTask).start();
     }
     
@@ -306,11 +306,11 @@ public class MDDManager {
      * Disconnect from mdd
      */
     public void shutdown() throws IOException {
-        cmgr.disconnect();
+        cmgr.dispose();
     }
     
     private static ConnMgr sendMsg(String addr, String msg) throws IOException {
-        final ConnMgr cmgr = new ConnMgr(addr, 16546);
+        final ConnMgr cmgr = new ConnMgr(addr, 16546, null);
         String resp = null;
         cmgr.writeLine(msg);
         while (true) {

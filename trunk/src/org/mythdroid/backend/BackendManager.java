@@ -25,6 +25,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +36,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.mythdroid.ConnMgr;
 import org.mythdroid.data.Program;
+import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.ConnMgr.onConnectListener;
 import org.mythdroid.activities.MythDroid;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -74,7 +77,6 @@ public class BackendManager {
     public BackendManager(final String host) throws IOException {
 
         statusURL = "http://" + host + ":6544"; //$NON-NLS-1$ //$NON-NLS-2$
-       
 
         MythDroid.protoVersion = getVersion(statusURL);
         
@@ -91,11 +93,17 @@ public class BackendManager {
                 ":6543 (ProtoVer " + MythDroid.protoVersion +")" //$NON-NLS-1$ //$NON-NLS-2$
              );
         
-        cmgr = new ConnMgr(host, 6543);
+        cmgr = new ConnMgr(host, 6543, new onConnectListener() {
+                @Override
+                public void onConnect(ConnMgr cmgr) throws IOException {
+                    if (!announce(cmgr))
+                        throw new IOException(
+                            Messages.getString("BackendManager.0") //$NON-NLS-1$)
+                        );
+                }
+            }
+        );
                
-        if (!announce()) 
-            throw (new IOException(Messages.getString("BackendManager.0"))); //$NON-NLS-1$
-
         addr = host;
         
     }
@@ -120,6 +128,8 @@ public class BackendManager {
 
         final DatagramPacket rpkt = new DatagramPacket(new byte[1024], 1024);
 
+        ConnectivityReceiver.waitForWifi(5000);
+        
         if (MythDroid.debug)
             Log.d(
                 "BackendManager",  //$NON-NLS-1$
@@ -247,7 +257,7 @@ public class BackendManager {
     /** Disconnect from the backend */
     public void done() throws IOException {
         cmgr.sendString("DONE"); //$NON-NLS-1$
-        cmgr.disconnect();
+        cmgr.dispose();
     }
     
     /**
@@ -261,10 +271,16 @@ public class BackendManager {
         URL url = new URL(sURL + "/xml"); //$NON-NLS-1$
         Document doc;
         
+        URLConnection urlConn = url.openConnection();
+        urlConn.setConnectTimeout(3000);
+        urlConn.setReadTimeout(4000);
+        
         try {
             doc = dbf.newDocumentBuilder().parse(
-                url.openConnection().getInputStream()
+                urlConn.getInputStream()
             );
+        } catch (SocketTimeoutException e) {
+            throw new IOException(Messages.getString("BackendManager.1")); //$NON-NLS-1$
         } catch (SAXException e) {
             throw new IOException(Messages.getString("Status.10")); //$NON-NLS-1$
         } catch (ParserConfigurationException e) {
@@ -282,7 +298,7 @@ public class BackendManager {
      * Announce ourselves to the backend
      * @return - true if backend accepts us, false otherwise
      */
-    private boolean announce() throws IOException {
+    private boolean announce(ConnMgr cmgr) throws IOException {
 
         // Cope with odd protoVer resulting from mythtv r25366
         int protoVer = MythDroid.beVersion * 1000 + MythDroid.protoVersion;

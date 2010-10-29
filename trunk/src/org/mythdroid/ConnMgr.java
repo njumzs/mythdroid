@@ -21,19 +21,24 @@ package org.mythdroid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.mythdroid.activities.MythDroid;
+import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
 import android.util.Log;
 
 /**
@@ -42,57 +47,65 @@ import android.util.Log;
  */
 public class ConnMgr {
     
-    public  String        addr        = null;
+    public interface onConnectListener {
+        public void onConnect(ConnMgr cmgr) throws IOException;
+    }
     
-    static final private IOException disconnected =
+    public  String                  addr             = null;
+    
+    final private static ArrayList<WeakReference<ConnMgr>> conns =
+        new ArrayList<WeakReference<ConnMgr>>(8);
+    
+    final private static IOException disconnected =
         new IOException(Messages.getString("ConnMgr.0")); //$NON-NLS-1$
 
-    static final private int rbufSize = 128;
+    final private static int        rbufSize         = 128;
     
-    private Socket        sock        = null;
-    private SocketAddress sockAddr    = null;
-    private OutputStream  os          = null;
-    private InputStream   is          = null;
-    private int           rbufIdx     = -1;
-    private byte[]        rbuf        = null;
+    private WeakReference<ConnMgr>  weakThis         = null;
+    private Socket                  sock             = null;
+    private SocketAddress           sockAddr         = null;
+    private OutputStream            os               = null;
+    private InputStream             is               = null;
+    private int                     rbufIdx          = -1;
+    private byte[]                  rbuf             = null;
+    private int                     timeout          = 1000;
+    private String                  hostname         = null;
+    private WifiLock                wifiLock         = null;
+    private boolean                 connectedReady   = false;
+    private boolean                 reconnectPending = false;
+    private byte[]                  lastSent         = null;
+    private onConnectListener       oCL              = null;
 
     /**
      * Constructor
      * @param host - String with hostname or dotted decimal IP address
      * @param port - integer port number
      */
-    public ConnMgr(String host, int port) throws IOException {
-
-        sock = new Socket();
-        sock.setTcpNoDelay(true);
+    public ConnMgr(String host, int port, onConnectListener ocl)
+        throws IOException {
 
         sockAddr = new InetSocketAddress(host, port);
-
+        
+        hostname = host;
         addr = host + ":" + port; //$NON-NLS-1$
         
-        waitForWifi();
-        
-        try {
-            sock.connect(sockAddr, 1000);
-        } catch (UnknownHostException e) {
-            throw (new IOException(Messages.getString("ConnMgr.1") + host)); //$NON-NLS-1$
-        } catch (SocketTimeoutException e) {
-            throw (
-                new IOException(
-                    Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
-                        Messages.getString("ConnMgr.4")) //$NON-NLS-1$
-                );
-        } catch (IOException e) {
-            throw (
-                new IOException(
-                    Messages.getString("ConnMgr.5") + addr +  //$NON-NLS-1$
-                        Messages.getString("ConnMgr.7")) //$NON-NLS-1$
-                );
+        oCL = ocl;
+
+        if (
+            ConnectivityReceiver.networkType() == ConnectivityManager.TYPE_WIFI
+        ) {
+            wifiLock = ((WifiManager)MythDroid.appContext
+                .getSystemService(Context.WIFI_SERVICE))
+                .createWifiLock("MythDroid"); //$NON-NLS-1$
+            wifiLock.acquire();
         }
-                
-        os = sock.getOutputStream();
-        is = sock.getInputStream();
-     
+        else 
+            timeout *= 8;
+        
+        connect(timeout);
+        
+        weakThis = new WeakReference<ConnMgr>(this);
+        synchronized(conns) { conns.add(weakThis); }
         
     }
 
@@ -103,10 +116,10 @@ public class ConnMgr {
     public void writeLine(String str) throws IOException {
 
         if (str.endsWith("\n")) //$NON-NLS-1$
-            os.write(str.getBytes());
+            write(str.getBytes());
         else {
             str += "\n"; //$NON-NLS-1$
-            os.write(str.getBytes());
+            write(str.getBytes());
         }
 
         if (MythDroid.debug) Log.d("ConnMgr", "writeLine: " + str); //$NON-NLS-1$ //$NON-NLS-2$
@@ -123,7 +136,7 @@ public class ConnMgr {
 
         if (MythDroid.debug) Log.d("ConnMgr", "sendString: " + str); //$NON-NLS-1$ //$NON-NLS-2$
 
-        os.write(str.getBytes());
+        write(str.getBytes());
 
     }
 
@@ -199,7 +212,7 @@ public class ConnMgr {
         
             final byte[] buf = new byte[rbufSize];
             
-            r = is.read(buf, 0, rbufSize);
+            r = read(buf, 0, rbufSize);
         
             if (r == -1) {
                 disconnect();
@@ -253,15 +266,25 @@ public class ConnMgr {
     public byte[] readBytes(int len) throws IOException {
 
         final byte[] bytes = new byte[len];
-        int read = is.read(bytes, 0, len);
+        int read = read(bytes, 0, len);
         
         if (read == -1) {
             disconnect();
             throw disconnected;
         }
         
-        while (read < len) 
-            read += is.read(bytes, read, len - read);
+        int got = 0;
+        
+        while (read < len) {
+            
+            if ((got = read(bytes, read, len - read)) == -1) {
+                disconnect();
+                throw disconnected;
+            }
+            
+            read += got;
+            
+        }
         
         if (MythDroid.debug) 
             Log.d("ConnMgr", "readBytes read " + read + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -276,7 +299,9 @@ public class ConnMgr {
     public String[] readStringList() throws IOException {
 
         byte[] bytes = new byte[8];
-        if (is.read(bytes, 0, 8) == -1) {
+        if (read(bytes, 0, 8) == -1) {
+            if (MythDroid.debug) 
+                Log.d("ConnMgr", "readStringList from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             disconnect();
             throw disconnected;
         }
@@ -294,56 +319,191 @@ public class ConnMgr {
     public boolean isConnected() {
         return sock.isConnected();
     }
+    
+    public void dispose() throws IOException {
+        disconnect();
+        conns.remove(weakThis);
+    }
 
-    /**
-     * disconnect the socket
-     */
-    public void disconnect() throws IOException {
-        sock.close();
+    static public void disconnectAll() throws IOException {
+        
+        synchronized(conns) {
+        
+            for (WeakReference<ConnMgr> r : conns) {
+            
+                if (r == null) 
+                    continue;
+                
+                ConnMgr c = r.get();
+                    
+                if (c == null) 
+                    continue;
+                
+                c.disconnect();
+                c.reconnectPending = true;
+                
+            }
+        
+        }
+        
     }
     
-    private void waitForWifi() {
+    static public void reconnectAll() throws IOException {
         
-        ConnectivityManager cm = 
-            (ConnectivityManager)MythDroid.appContext.getSystemService(
-                Context.CONNECTIVITY_SERVICE
-             );
+        synchronized(conns) {
+            
+            for (WeakReference<ConnMgr> r : conns) {
+            
+                if (r == null)
+                    continue;
+                
+                ConnMgr c = r.get();
+                    
+                if (c == null)
+                    continue;
+     
+                c.connect(1000);
+                
+            }
         
-        WifiManager wm = 
-            (WifiManager)MythDroid.appContext.getSystemService(
-                Context.WIFI_SERVICE
-            );
+        }
         
-        NetworkInfo ninfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+    }
+    
+    private void connect(int timeout) throws IOException {
         
-        int i = 0;
-        int wifiState = wm.getWifiState();
+        ConnectivityReceiver.waitForWifi(5000);
         
-        if (
-            wifiState != WifiManager.WIFI_STATE_ENABLED &&
-            wifiState != WifiManager.WIFI_STATE_ENABLING
-        )
+        if (MythDroid.debug)
+            Log.d("ConnMgr", "Connecting to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        if (sock != null && sock.isConnected() && connectedReady) {
+            if (MythDroid.debug)
+                Log.d("ConnMgr", addr + " is already connected"); //$NON-NLS-1$ //$NON-NLS-2$
             return;
+        }
         
-        while (
-            (
-                wifiState == WifiManager.WIFI_STATE_ENABLING     ||
-                ninfo.getState() == NetworkInfo.State.CONNECTING
-            ) && i++ < 10
-        ) {
-            
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {}
-            
-            ninfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-            wifiState = wm.getWifiState();
+        sock = new Socket();
+        sock.setTcpNoDelay(true);
+        sock.setSoTimeout(timeout);
+          
+        try {
+            sock.connect(sockAddr, timeout / 2);
+        } catch (UnknownHostException e) {
+            throw new IOException(Messages.getString("ConnMgr.1") + hostname); //$NON-NLS-1$
+        } catch (SocketTimeoutException e) {
+            throw
+                new IOException(
+                    Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
+                        Messages.getString("ConnMgr.4") //$NON-NLS-1$
+                ); 
+                
+        } catch (IOException e) {
+            throw
+                new IOException(
+                    Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
+                        Messages.getString("ConnMgr.7") //$NON-NLS-1$
+                );
+        }
+        
+        reconnectPending = false;
+                
+        os = sock.getOutputStream();
+        is = sock.getInputStream();
+        
+        if (MythDroid.debug)
+            Log.d("ConnMgr", "Connection to " + addr + " successful"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        
+        connectedReady = true;
+        
+        if (oCL != null)
+            oCL.onConnect(this);
+        
+    }
+    
+    private void disconnect() throws IOException {
+        
+        connectedReady = false;
+        
+        if (MythDroid.debug)
+            Log.d("ConnMgr", "Disconnecting from " + addr); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        if (!sock.isClosed())
+            sock.close();
+        
+        if (wifiLock != null && wifiLock.isHeld())
+            wifiLock.release();
+        
+    }
+    
+    private int read(byte[] buf, int off, int len) throws IOException {
+        
+        int ret = -1;
+        
+        try {
+            ret = is.read(buf, off, len);
+        } catch (SocketTimeoutException e) {
             
             if (MythDroid.debug)
-                Log.d("ConnMgr", Messages.getString("ConnMgr.3")); //$NON-NLS-1$ //$NON-NLS-2$
+                Log.d("ConnMgr", "Read from " + addr + " timed out"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            
+            if (!sock.isConnected() || !connectedReady) {
+                waitForConnection(timeout * 4);
+                write(lastSent);
+                return read(buf, off, len);
+            }
+            
+            throw e;
             
         }
         
+        if (ret == -1 && MythDroid.debug)
+            Log.d("ConnMgr", "read from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        
+        return ret;
+        
+    }
+    
+    private void write(byte[] buf) throws IOException {
+        
+        if (!sock.isConnected() || !connectedReady)
+            waitForConnection(timeout * 4);
+        
+        os.write(buf);
+        lastSent = buf;
+        
+    }
+    
+    private void waitForConnection(int timeout) throws IOException {
+        
+        if (!reconnectPending) {
+            connect(timeout);
+            return;
+        }
+        
+        final Thread thisThread = Thread.currentThread();
+        final Timer timer = new Timer();
+        
+        timer.schedule(
+            new TimerTask() {
+                @Override
+                public void run() {
+                    thisThread.interrupt();
+                }
+            }, timeout
+        );
+        
+        if (MythDroid.debug)
+            Log.d("ConnMgr", "Waiting for a connection to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        while (!sock.isConnected() || !connectedReady)
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                if (MythDroid.debug)
+                    Log.d("ConnMgr", "Timed out waiting for connection to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
+                break;
+            }
     }
 
 }
