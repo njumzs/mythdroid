@@ -589,6 +589,7 @@ public class MythDroid extends MDListActivity implements
                     try {
                         WakeOnLan.Wake(c.getString(FrontendDB.HWADDR));
                     } catch (Exception e) { ErrUtil.err(ctx, e); }
+                    defaultFrontend = c.getString(FrontendDB.NAME);
                     c.close();
                     FrontendDB.close();
                     d.dismiss();
