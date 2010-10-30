@@ -71,7 +71,8 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         final private static int   SCROLL_LOCK_UNLOCKED = 0;
         final private static int   SCROLL_LOCK_X        = 1, SCROLL_LOCK_Y = 2;
         
-        private MotionEvent        lastStart            = null;
+        private float              lastStartX           = 0;
+        private float              lastStartY           = 0;
         private float              scrollMul            = 1;
         private float              scrolledX            = 0, scrolledY = 0;
         private int                scrollLock           = SCROLL_LOCK_UNLOCKED;
@@ -115,7 +116,10 @@ public abstract class Remote extends Activity implements View.OnClickListener {
             MotionEvent start, MotionEvent end, float dX, float dY
         ) {
 
-            if (start != lastStart) {
+            if (
+                start.getRawX() != lastStartX ||
+                start.getRawY() != lastStartY
+            ) {
                 resetScroll(start, dX, dY, SCROLL_LOCK_UNLOCKED);
                 return true;
             }
@@ -189,8 +193,10 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         }
 
         private void resetScroll(MotionEvent start, float dX, float dY, int lock) {
-            if (start != null) 
-                lastStart = start;
+            if (start != null) {
+                lastStartX = start.getRawX();
+                lastStartY = start.getRawY();
+            }
             scrolledX = dX;
             scrolledY = dY;
             scrollMul = 1;
