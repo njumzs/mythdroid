@@ -73,6 +73,8 @@ foreach my $idx (0 .. $#ARGV) {
 
 }
 
+my $log = MDD::Log->new('/tmp/mdd.log', $debug);
+
 # Install ourselves if necessary
 install() unless ($0 =~ /mythlcdserver$/ || ($backend && $0 =~ /^\/usr\/bin/));
 
@@ -94,8 +96,6 @@ my $stream_cmd =
     'bframes=0},vb=%VB%,threads=%THR%,width=%WIDTH%,height=%HEIGHT%,' .
     'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2}' .
     ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
-
-my $log = MDD::Log->new('/tmp/mdd.log', $debug);
 
 warn("WARNING: mdd is running as root - streaming will not work\n")
     if ($> == 0);
@@ -133,7 +133,7 @@ elsif (!$backend) {
 
 }
 
-my $mythdb = MDD::MythDB->new();;
+my $mythdb = MDD::MythDB->new($log);;
 
 readCommands();
 
@@ -582,7 +582,7 @@ sub install {
         or warn "chmod of $path failed\n";
 
     print "Check settings..\n";
-    my $mythdb = MDD::MythDB->new();;
+    my $mythdb = MDD::MythDB->new($log);;
     unless (
         $mythdb->setting('LCDEnable', hostname)      &&
         $mythdb->setting('LCDShowMenu', hostname)    &&

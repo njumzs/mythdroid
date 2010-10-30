@@ -5,7 +5,7 @@ use warnings;
 use MythTV;
 
 my $mythtv = MythTV->new(\{ 'connect' => 0 });
-my $dbh;
+my ($dbh, $log);
 
 # SQL statements
 my $albumArtSQL = 
@@ -64,6 +64,7 @@ my (
 sub new {
 
     my $class = shift;
+    $log = shift;
 
     my $self = {};
 
@@ -90,7 +91,9 @@ sub execute {
             $dbh = clone();
             $sth = $dbh->prepare($$sqlref);
         }
-        $sth->execute(@args);
+        unless ($sth->execute(@args)) {
+            $log->err("SQL stmt failed: " . $sth->errstr);
+        }
     }
 
     return $sth;
@@ -106,6 +109,8 @@ sub dosql {
         $dbh = clone();
         $ret = $dbh->do($sql);
     }
+    
+    $log->err("SQL stmt failed: " . $dbh->errstr) unless $ret;
 
     return $ret;
 
@@ -124,7 +129,9 @@ sub getVideos($) {
     while (my $aref = $videoSth->fetchrow_arrayref) {
         my $path = $aref->[8];
         $upnpVideoSth = execute($upnpVideoSth, \$upnpVideoSQL, $path);
-        my $id = ($upnpVideoSth->fetchrow_arrayref)->[0];
+        my $aref = $upnpVideoSth->fetchrow_arrayref;
+        next unless $aref;
+        my $id = $aref->[0];
         my %h;
         @h{@videoFields} = @$aref;
         $videos{$id} = \%h;
@@ -148,13 +155,17 @@ sub getRecType($) {
     my $self  = shift;
     my $recid = shift;
 
+    my $ret = 0;
+
     $recTypeSth = execute($recTypeSth, \$recTypeSQL, $recid);
 
     if (my $aref = $recTypeSth->fetchrow_arrayref) {
-        return $aref->[0];
+        $ret = $aref->[0];
     }
     
-    return "0";
+    $log->dbg("getRecType($recid) = $ret");
+    
+    return $ret;
 }
 
 # Get the storage group from a recid
@@ -162,14 +173,18 @@ sub getStorGroup($) {
 
     my $self  = shift;
     my $recid = shift;
+
+    my $ret = "Default";
         
     $storGroupSth = execute($storGroupSth, \$storGroupSQL, $recid);
 
     if (my $aref = $storGroupSth->fetchrow_arrayref) {
-        return $aref->[0];
+        $ret = $aref->[0];
     }
     
-    return "Default";
+    $log->dbg("getStorGroup($recid) = $ret");
+    
+    return $ret;
 
 }
 
@@ -183,6 +198,8 @@ sub getStorGroups() {
     while (my $aref = $getStorGroupsSth->fetchrow_arrayref) {
         $storGroups{$aref->[0]} = $aref->[1];
     }
+    
+    $log->dbg("getStorGroups() found " . scalar(keys %storGroups) . " groups");
 
     return \%storGroups;
 }
@@ -197,6 +214,8 @@ sub getRecGroups() {
     while (my $aref = $getRecGroupsSth->fetchrow_arrayref) {
         push @recGroups, $aref->[0];
     }
+    
+    $log->dbg("getRecGroups() found " . scalar(@recGroups) . " groups");
 
     return \@recGroups;
 
@@ -212,6 +231,8 @@ sub updateRec($$) {
     my $sql = $updateRecSQL;
     $sql =~ s/%UPDATES%/$updates/;
     $sql =~ s/%RECID%/$recid/;
+    
+    $log->dbg("updateRec updating $recid with $updates");
 
     $recid = -1 if (dosql($sql) < 1);
 
@@ -229,18 +250,26 @@ sub newRec($$$) {
 
     my @prog;
     
+    $log->dbg("newRec $chanid $starttime $updates");
+    
     $progSth = execute($progSth, \$progSQL, $chanid, $starttime);
 
     my $aref = $progSth->fetchrow_arrayref;
+
+    return -1 unless defined $aref;
 
     $prog[0] = $aref->[0];
     $prog[1] = $prog[2] = $aref->[1];
     $prog[3] = $prog[4] = $aref->[2];
     push @prog, @{$aref}[3..$#{$aref}];
+    
+    $log->dbg("newRec prog chan $prog[0] start $prog[1] title $prog[5], prog len " . scalar @prog);
 
     $newRecSth = execute($newRecSth, \$newRecSQL, @prog);
     
     my $recid = $dbh->last_insert_id(undef,undef,undef,undef);
+    
+    $log->dbg("newRec recid = $recid");
 
     return $self->updateRec($recid, $updates);
 
@@ -251,6 +280,8 @@ sub delRec($) {
 
     my $self  = shift;
     my $recid = shift;
+    
+    $log->dbg("delRec($recid)");
 
     $delRecSth = execute($delRecSth, \$delRecSQL, $recid);
 
@@ -260,12 +291,18 @@ sub getAlbumArtId($) {
 
     my $self  = shift;
     my $album = shift;
+    
+    my $ret = undef;
 
     $albumArtSth = execute($albumArtSth, \$albumArtSQL, $album);
 
     if (my $aref = $albumArtSth->fetchrow_arrayref) {
-        return $aref->[0];
+        $ret = $aref->[0];
     }
+    
+    $log->dbg("getAlbumArtId($album) = $ret");
+
+    return $ret;
 
 }
 
@@ -275,11 +312,17 @@ sub setting($$) {
     my $value = shift;
     my $host  = shift;
 
+    my $ret = undef;
+
     $settingSth = execute($settingSth, \$settingSQL, $value, $host);
 
     if (my $aref = $settingSth->fetchrow_arrayref) {
-        return $aref->[0];
+        $ret = $aref->[0];
     }
+    
+    $log->dbg("setting($value, $host) = $ret");
+
+    return $ret;
         
 }
 
