@@ -40,6 +40,7 @@ public class WakeService extends Service implements SensorEventListener {
     private Sensor sensor;
     private PowerManager pm = null;
     private WakeLock partialLock = null;
+    private float last0 = 0, last1 = 0, last2 = 0;
 
     public BroadcastReceiver screenStateReceiver = new BroadcastReceiver() {
         
@@ -102,14 +103,21 @@ public class WakeService extends Service implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        
+       
         if (event.values[2] == 0) return;
         
-        if (Math.abs(event.values[0]) > 2 ||
-            Math.abs(event.values[1]) > 2 ||
-            event.values[2] > 12 || event.values[2] < 7) 
-            wakeUp();
-                    
+        if (last0 != 0 || last1 != 0 || last2 != 0) 
+            if (
+                Math.abs(event.values[0] - last0) > 2 ||
+                Math.abs(event.values[1] - last1) > 2 ||
+                Math.abs(event.values[2] - last2) > 2
+            )  
+                wakeUp();
+        
+        last0 = event.values[0];
+        last1 = event.values[1];
+        last2 = event.values[2];
+        
     }
 
     @Override
