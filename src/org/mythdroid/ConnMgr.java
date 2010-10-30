@@ -25,6 +25,7 @@ import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -107,6 +108,16 @@ public class ConnMgr {
         weakThis = new WeakReference<ConnMgr>(this);
         synchronized(conns) { conns.add(weakThis); }
         
+    }
+    
+    /**
+     * Set the socket timeout  
+     * @param timeout - in milliseconds
+     */
+    public void setTimeout(int timeout) {
+        try {
+            sock.setSoTimeout(timeout);
+        } catch (SocketException e) {}
     }
 
     /**

@@ -275,6 +275,8 @@ public class MDDManager {
      */
     public MDDManager(String addr) throws IOException {
         cmgr = new ConnMgr(addr, 16546, null);
+        // Wait indefinitely for messages from MDD
+        cmgr.setTimeout(0);
         new Thread(recvTask).start();
     }
     

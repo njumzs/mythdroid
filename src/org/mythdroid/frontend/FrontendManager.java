@@ -42,8 +42,10 @@ public class FrontendManager {
      * @param host - hostname or IP address of frontend
      */
     public FrontendManager(String name, String host) throws IOException {
+        
         if (MythDroid.debug) 
             Log.d("FrontendManager", "Connecting to " + host + ":6546"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        
         cmgr = new ConnMgr(host, 6546, new onConnectListener() {
                 @Override
                 public void onConnect(ConnMgr cmgr) throws IOException {
@@ -51,9 +53,15 @@ public class FrontendManager {
                 }
             }
         );
+        
         if (cmgr == null) return;
+        
+        // jump <loc> (e.g. where loc == livetv) can take a long time
+        cmgr.setTimeout(10000);
+        
         this.name = name;
         addr = host;
+        
     }
 
     /**
