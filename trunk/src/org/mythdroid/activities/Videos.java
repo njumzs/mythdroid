@@ -161,25 +161,18 @@ public class Videos extends MDActivity implements
         
         // A directory?
         if (video.id == -1) {
+            
             if (path.equals("ROOT")) //$NON-NLS-1$
                 path = video.title;
             else
                 path += "/" + video.title; //$NON-NLS-1$
             
-            // If directory name has a slash must be a videodir (top level)
-            if (path.lastIndexOf('/') != -1) { 
-                path = "ROOT"; //$NON-NLS-1$
-                dirText.setText(Messages.getString("Videos.0")); //$NON-NLS-1$
-            }
-            else {
-                dirText.setText(currentDir(path));
-            }
-            
+            dirText.setText(currentDir(path));
             viddir = video.dir;
             showDialog(DIALOG_LOAD);
             MythDroid.getWorker().post(getVideos);
-            
             return;
+            
         }
         
         MythDroid.curVid = video;
