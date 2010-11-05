@@ -98,16 +98,17 @@ public class MythDroid extends MDListActivity implements
     /** SimpleDateFormat of HH:mm, EEE d MMM yy */
     final public static SimpleDateFormat dispFmt =
         new SimpleDateFormat("HH:mm, EEE d MMM yy"); //$NON-NLS-1$
-
     static {
         dispFmt.setTimeZone(TimeZone.getDefault());
         dateFmt.setTimeZone(TimeZone.getDefault());
     }
 
+    /** Menu IDs */
     final private static int 
         MENU_SETTINGS = 0, MENU_FRONTEND = 1, MENU_NAV = 2,
         MENU_WAKE = 3,     MENU_MDD = 4;
 
+    /** Dialog IDs */
     final private static int 
         DIALOG_GUIDE  = 0, WAKE_FRONTEND = 1, MDD_COMMAND = 2;
     
@@ -172,15 +173,18 @@ public class MythDroid extends MDListActivity implements
     public void onDestroy() {
         
         super.onDestroy();
+        
         if (beMgr != null) 
             try {
                 beMgr.done();
             } catch (IOException e) { ErrUtil.err(this, e); }
         beMgr = null;
+        
         if (feMgr != null && feMgr.isConnected()) try {
             feMgr.disconnect();
         } catch (IOException e) { ErrUtil.err(this, e); }
         feMgr = null;
+        
         if (wHandler != null) 
             wHandler.getLooper().quit();
         wHandler = null;
@@ -291,6 +295,7 @@ public class MythDroid extends MDListActivity implements
        
     }
 
+    /** Populate the pop-up menu */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(Menu.NONE, MENU_SETTINGS, Menu.NONE, R.string.settings)
@@ -306,6 +311,7 @@ public class MythDroid extends MDListActivity implements
         return true;
     }
 
+    /** Handle pop-up menu item selection */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
