@@ -82,6 +82,12 @@
     		android:entries="@array/remoteStyles"
     		android:entryValues="@array/remoteStyles"
     		android:defaultValue="Button"/>
+    		
+    	<CheckBoxPreference android:key="acra.disable"
+        	android:title="Disable error reporting"
+        	android:summaryOn="Error reporting is disabled"
+        	android:summaryOff="Error reporting is enabled"
+        	android:defaultValue="false"/>
     	
     </PreferenceCategory>
     
