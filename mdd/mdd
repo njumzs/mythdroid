@@ -488,9 +488,9 @@ sub videoList($) {
             cloneDb();
             $upnpVideoSth->execute($path);
         }
-        my $aref = $upnpVideoSth->fetchrow_arrayref;
-        next unless $aref;
-        my $id = $aref->[0];
+        my $upnparef = $upnpVideoSth->fetchrow_arrayref;
+        next unless $upnparef;
+        my $id = $upnparef->[0];
         my %h;
         @h{@videoFields} = @$aref;
         $videos{$id} = \%h;
