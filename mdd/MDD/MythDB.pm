@@ -129,9 +129,9 @@ sub getVideos($) {
     while (my $aref = $videoSth->fetchrow_arrayref) {
         my $path = $aref->[8];
         $upnpVideoSth = execute($upnpVideoSth, \$upnpVideoSQL, $path);
-        my $aref = $upnpVideoSth->fetchrow_arrayref;
-        next unless $aref;
-        my $id = $aref->[0];
+        my $upnparef = $upnpVideoSth->fetchrow_arrayref;
+        next unless $upnparef;
+        my $id = $upnparef->[0];
         my %h;
         @h{@videoFields} = @$aref;
         $videos{$id} = \%h;
