@@ -47,7 +47,7 @@ sub start {
         $args .= " -p " . ($self->{PORT} + 1000);
     }
 
-    system("mythlcd $args &");
+    if (fork() == 0) { while(1) { system("mythlcd $args") } }
 
     return $self->{PORT};
 
