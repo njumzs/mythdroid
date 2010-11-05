@@ -17,6 +17,9 @@ import android.net.NetworkInfo.State;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+/**
+ * Broadcast receiver for ConnectivityManager.CONNECTIVITY_ACTION events
+ */
 public class ConnectivityReceiver extends BroadcastReceiver {
 
     static private boolean connected = false;
@@ -32,6 +35,10 @@ public class ConnectivityReceiver extends BroadcastReceiver {
             Context.WIFI_SERVICE
         );
     
+    /**
+     * Register a new ConnectivityReceiver to monitor and act upon 
+     * connectivity changes
+     */
     public ConnectivityReceiver() {
         
         final NetworkInfo info = cm.getActiveNetworkInfo();
@@ -67,6 +74,9 @@ public class ConnectivityReceiver extends BroadcastReceiver {
                 " state " + state //$NON-NLS-1$
             );
         
+        /*
+         * Ignore irrelevant connectivity changes
+         */
         if (
             connected &&
             netType == ConnectivityManager.TYPE_WIFI &&
@@ -80,6 +90,9 @@ public class ConnectivityReceiver extends BroadcastReceiver {
         )
             return;
 
+        /*
+         * We've lost connectivity - disconnect all
+         */
         if (state == State.DISCONNECTED) {
            
             try {
@@ -93,6 +106,10 @@ public class ConnectivityReceiver extends BroadcastReceiver {
         if (state != State.CONNECTED)
             return;
         
+        /*
+         * We've regained connectivity - attempt to reconnect
+         */
+        
         netType = type;
         connected = true;
             
@@ -102,10 +119,18 @@ public class ConnectivityReceiver extends BroadcastReceiver {
               
     }
     
+    /**
+     * Get the current network type (WiFi or mobile)
+     * @return - ConnectivityManager.TYPE_WIFI or ConnectivityManager.TYPE_MOBILE
+     */
     public static int networkType() {
         return netType;
     }
     
+    /**
+     * If a WiFi connection is being established wait for it to complete
+     * @param timeout - maximum wait time in milliseconds
+     */
     public static void waitForWifi(int timeout) {
         
         NetworkInfo winfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);

@@ -48,33 +48,50 @@ import android.util.Log;
  */
 public class ConnMgr {
     
+    /** A callback called upon a successful connection */
     public interface onConnectListener {
         public void onConnect(ConnMgr cmgr) throws IOException;
     }
     
+    /** The address of the remote host in '<host>:<port>' form */
     public  String                  addr             = null;
     
+    /** An array of weak references to current connections */
     final private static ArrayList<WeakReference<ConnMgr>> conns =
         new ArrayList<WeakReference<ConnMgr>>(8);
     
+    /** An IOException with a message that we've been disconnected */
     final private static IOException disconnected =
         new IOException(Messages.getString("ConnMgr.0")); //$NON-NLS-1$
 
+    /** Receive buffer size */
     final private static int        rbufSize         = 128;
-    
+    /** A weak reference to ourself */
     private WeakReference<ConnMgr>  weakThis         = null;
+    /** Our socket */
     private Socket                  sock             = null;
+    /** The sockaddr of the remote host */
     private SocketAddress           sockAddr         = null;
+    /** Our outputstream */
     private OutputStream            os               = null;
+    /** Our inputstream */
     private InputStream             is               = null;
+    /** Current index into receive buffer */
     private int                     rbufIdx          = -1;
+    /** Our receive buffer */
     private byte[]                  rbuf             = null;
+    /** Default socket timeout for connect and read */
     private int                     timeout          = 1000;
+    /** Hostname of the remote host */
     private String                  hostname         = null;
     private WifiLock                wifiLock         = null;
+    /** Are we connected and ready for IO? */
     private boolean                 connectedReady   = false;
+    /** Is a reconnect pending due to connectivity changes? */
     private boolean                 reconnectPending = false;
+    /** The most recently transmitted message */
     private byte[]                  lastSent         = null;
+    /** contains our onConnect callback if there is one */
     private onConnectListener       oCL              = null;
 
     /**
@@ -92,6 +109,10 @@ public class ConnMgr {
         
         oCL = ocl;
 
+        /* 
+         * Increase default socket timeout if we're not on WiFi 
+         *  Grab a WifiLock if we are
+         */
         if (
             ConnectivityReceiver.networkType() == ConnectivityManager.TYPE_WIFI
         ) {
@@ -336,6 +357,9 @@ public class ConnMgr {
         conns.remove(weakThis);
     }
 
+    /**
+     * Disconnect all currently connected connections
+     */
     static public void disconnectAll() throws IOException {
         
         synchronized(conns) {
@@ -359,6 +383,9 @@ public class ConnMgr {
         
     }
     
+    /**
+     * Reconnect all disconnected connections
+     */
     static public void reconnectAll() throws IOException {
         
         synchronized(conns) {
@@ -381,6 +408,10 @@ public class ConnMgr {
         
     }
     
+    /**
+     * Connect to the remote host
+     * @param timeout - connect timeout in milliseconds
+     */
     private void connect(int timeout) throws IOException {
         
         ConnectivityReceiver.waitForWifi(5000);
@@ -432,6 +463,9 @@ public class ConnMgr {
         
     }
     
+    /**
+     * Disconnect
+     */
     private void disconnect() throws IOException {
         
         connectedReady = false;
@@ -485,6 +519,10 @@ public class ConnMgr {
         
     }
     
+    /**
+     * Wait for a connection to be established
+     * @param timeout - maximum wait time in milliseconds
+     */
     private void waitForConnection(int timeout) throws IOException {
         
         if (!reconnectPending) {

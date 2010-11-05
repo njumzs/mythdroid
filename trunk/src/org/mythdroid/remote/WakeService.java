@@ -32,6 +32,10 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
+/**
+ * A service that listens for accelerometer sensor events and wakes
+ * the device if the device is moved 
+ */
 public class WakeService extends Service implements SensorEventListener {
 
     final private static String tag   = "MythDroid";  //$NON-NLS-1$
@@ -42,6 +46,10 @@ public class WakeService extends Service implements SensorEventListener {
     private WakeLock partialLock = null;
     private float last0 = 0, last1 = 0, last2 = 0;
 
+    /**
+     * Re-register the sensor event listener when the screen is turned off
+     * to work around a bug in Android
+     */
     public BroadcastReceiver screenStateReceiver = new BroadcastReceiver() {
         
         @Override
