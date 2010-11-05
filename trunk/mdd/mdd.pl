@@ -538,8 +538,11 @@ sub install {
     
     # Install modules
     mkdir($Config{vendorlib} . "/MDD");
+    print "cp MDD/LCD.pm -> $Config{vendorlib}/MDD\n";
     copy("MDD/LCD.pm", $Config{vendorlib} . "/MDD");
+    print "cp MDD/MythDB.pm -> $Config{vendorlib}/MDD\n";
     copy("MDD/MythDB.pm", $Config{vendorlib} . "/MDD");
+    print "cp MDD/Log.pm -> $Config{vendorlib}/MDD\n";
     copy("MDD/Log.pm", $Config{vendorlib} . "/MDD");
 
     if ($backend) {
@@ -555,7 +558,7 @@ sub install {
     system(
         "killall mythfrontend 2>/dev/null;" .
         "killall mythfrontend.real 2>/dev/null;" . 
-        "killall mythlcdserver 2>/dev/null"
+        "killall -9 mythlcdserver 2>/dev/null"
     );
 
     my $dir = (`which mythlcdserver`)[0];
