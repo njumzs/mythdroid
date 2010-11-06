@@ -97,7 +97,11 @@ my $stream_cmd =
     'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2}' .
     ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
 
-warn("WARNING: mdd is running as root - streaming will not work\n")
+# Change euid/uid
+my @pwent = getpwnam 'mdd';
+if (@pwent) { $< = $> = $pwent[2] }
+
+$log->warn("WARNING: mdd is running as root - streaming will not work\n")
     if ($> == 0);
 
 if ($backend && !$debug) {
@@ -524,27 +528,81 @@ sub getRecGroups() {
 
 # Kill the original mythlcdserver
 sub killKids() {
-    my @ps = `ps ax | grep 'mythlcd ' | grep -v grep`;
+    my @ps = `ps ax | grep 'mythlc[d]'`;
     foreach my $ps (@ps) {
-       if ($ps =~ /^\s*(\d+)/) {
-            kill 'TERM', $1;
+        if ($ps =~ /^\s*(\d+)/) {
+            next if ($1 == $$);
+            kill 'KILL', $1;
         }
     }
 }
 
-sub install {
+sub create_user_account() {
 
-    print "Installing mdd..\n";
+    my $user = 'mdd';
+
+    if (getpwnam $user) { return }
+
+    print "Creating mdd user account..\n";
+
+    system("useradd -d /dev/null -c 'Added by MDD' -U $user");
+
+}
+
+
+sub install_modules() {
+
+    my @mods = (qw(LCD MythDB Log));
     
     # Install modules
     mkdir($Config{vendorlib} . "/MDD");
-    print "cp MDD/LCD.pm -> $Config{vendorlib}/MDD\n";
-    copy("MDD/LCD.pm", $Config{vendorlib} . "/MDD");
-    print "cp MDD/MythDB.pm -> $Config{vendorlib}/MDD\n";
-    copy("MDD/MythDB.pm", $Config{vendorlib} . "/MDD");
-    print "cp MDD/Log.pm -> $Config{vendorlib}/MDD\n";
-    copy("MDD/Log.pm", $Config{vendorlib} . "/MDD");
+    foreach my $mod (@mods) {
+        print "cp MDD/$mod.pm -> $Config{vendorlib}/MDD\n";
+        copy("MDD/$mod.pm", $Config{vendorlib} . "/MDD");
+    }
 
+}
+
+sub get_install_dir() {
+    
+    my $dir = (`which mythlcdserver`)[0];
+
+    if ($dir =~ /^which:/) {
+        print "Couldn't locate mythlcdserver. Aborted\n";
+        exit;
+    }
+
+    $dir =~ s/\/mythlcdserver$//;
+    chomp $dir;
+    return $dir;
+
+}
+
+sub check_lcd_settings() {
+
+    print "Check LCD settings..\n";
+    my $mythdb = MDD::MythDB->new($log);;
+    unless (
+        $mythdb->setting('LCDEnable', hostname)      &&
+        $mythdb->setting('LCDShowMenu', hostname)    &&
+        $mythdb->setting('LCDShowMusic', hostname)   &&
+        $mythdb->setting('LCDShowChannel', hostname) 
+    ) {
+        print "\nNOTICE: Please enable all MythTV LCD options\n";
+    }
+
+}
+
+
+
+sub install {
+
+    print "Installing mdd..\n";
+
+    create_user_account();
+
+    install_modules();
+    
     if ($backend) {
         print "cp $0 -> /usr/bin/mdd\n";
         copy($0, "/usr/bin/mdd");
@@ -561,13 +619,7 @@ sub install {
         "killall -9 mythlcdserver 2>/dev/null"
     );
 
-    my $dir = (`which mythlcdserver`)[0];
-    if ($dir =~ /^which:/) {
-        print "Couldn't locate mythlcdserver. Aborted\n";
-        exit;
-    }
-    $dir =~ s/\/mythlcdserver$//;
-    chomp $dir;
+    my $dir = get_install_dir();
 
     my $path = "$dir/mythlcdserver";
     my $dst  = "$dir/mythlcd"; 
@@ -584,16 +636,8 @@ sub install {
     chmod(0755, $path) 
         or warn "chmod of $path failed\n";
 
-    print "Check settings..\n";
-    my $mythdb = MDD::MythDB->new($log);;
-    unless (
-        $mythdb->setting('LCDEnable', hostname)      &&
-        $mythdb->setting('LCDShowMenu', hostname)    &&
-        $mythdb->setting('LCDShowMusic', hostname)   &&
-        $mythdb->setting('LCDShowChannel', hostname) 
-    ) {
-        print "\nNOTICE: Please enable all MythTV LCD options\n";
-    }
+    check_lcd_settings();
+
     print "Done - you can restart mythfrontend now..\n";
     exit;
 
