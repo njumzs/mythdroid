@@ -2,7 +2,7 @@
 
 MDD is designed to run on the master backend and every frontend and 'push' a range of information that either cannot be accessed remotely by !MythDroid or that !MythDroid would otherwise have to poll for. This information includes detailed frontend location, details about currently playing programs and music (including album art), progress information, etc. 
 
-In addition MDD can run arbitary commands on frontends (see below) and allows !MythDroid to browse videos. 
+In addition MDD can run arbitary commands on frontends (see below) and allows !MythDroid to browse videos and schedule recordings. 
 
 == Installation ==
 
@@ -23,7 +23,7 @@ cd /path/to/mdd
 perl mdd.pl
 }}}
 
-Note: You will need to reinstall mdd each time you upgrade MythTV. See the details below for the reason. Also note that if you run the frontend as root, mdd will run as root and streaming will fail to work.
+Note: You will need to reinstall mdd each time you upgrade MythTV. See the details below for the reason. 
 
 On a box that serves only as a backend:
 
@@ -32,7 +32,7 @@ cd /path/to/mdd
 perl mdd.pl --backend
 }}}
 
-Then run /usr/bin/mdd as a non-root user and arrange for it to be run at boot (as a non-root user). If mdd is run as root streaming will fail to work.
+Then run /usr/bin/mdd and arrange for it to be run at boot.
 
 == Configuration ==
 
@@ -50,7 +50,7 @@ Sleep => dbus-send --system --dest=org.freedesktop.DeviceKit.Power /org/freedesk
 
 Lines beginning with # are ignored.
 
-Commands are run as the user running mythfrontend.
+Commands are run as the user running mythfrontend or as the 'mdd' user if mdd is run as root.
 
 == Details ==
 
