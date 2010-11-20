@@ -114,9 +114,13 @@ public class StatusRecorders extends ListActivity {
         private final static String[] states = { 
             Messages.getString("StatusRecorders.1"),  // Idle //$NON-NLS-1$
             Messages.getString("StatusRecorders.2"),  // Live TV //$NON-NLS-1$
-            "?", "?",   //$NON-NLS-1$ //$NON-NLS-2$ 
+            "?", "?", //$NON-NLS-1$ //$NON-NLS-2$ 
             Messages.getString("StatusRecorders.5"),  // Recording //$NON-NLS-1$
             "?", //$NON-NLS-1$
+            Messages.getString("StatusRecorders.5"),  // Recording //$NON-NLS-1$
+            // Cope with new but irrelevant TVStates (e.g. 'Watching BD') by 
+            // padding with 'Recording' states
+            Messages.getString("StatusRecorders.5"),  // Recording //$NON-NLS-1$
             Messages.getString("StatusRecorders.5")   // Recording //$NON-NLS-1$
         };
                 
