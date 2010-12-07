@@ -165,7 +165,7 @@ public class MythDroid extends MDListActivity implements
         if (wHandler == null) 
             wHandler = new Handler(hThread.getLooper());
         
-        new ConnectivityReceiver();
+        new ConnectivityReceiver(this);
 
     }
 
