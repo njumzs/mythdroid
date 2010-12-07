@@ -24,22 +24,16 @@ public class ConnectivityReceiver extends BroadcastReceiver {
 
     static private boolean connected = false;
     static private int netType = -1;
-    
-    static final private ConnectivityManager cm = 
-        (ConnectivityManager)MythDroid.appContext.getSystemService(
-            Context.CONNECTIVITY_SERVICE
-        );
-    
-    static final private WifiManager wm = 
-        (WifiManager)MythDroid.appContext.getSystemService(
-            Context.WIFI_SERVICE
-        );
-    
+
     /**
      * Register a new ConnectivityReceiver to monitor and act upon 
      * connectivity changes
      */
-    public ConnectivityReceiver() {
+    public ConnectivityReceiver(Context ctx) {
+        
+        ConnectivityManager cm = 
+            (ConnectivityManager)
+                ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
         
         final NetworkInfo info = cm.getActiveNetworkInfo();
         
@@ -131,7 +125,15 @@ public class ConnectivityReceiver extends BroadcastReceiver {
      * If a WiFi connection is being established wait for it to complete
      * @param timeout - maximum wait time in milliseconds
      */
-    public static void waitForWifi(int timeout) {
+    public static void waitForWifi(Context ctx, int timeout) {
+        
+        ConnectivityManager cm = 
+            (ConnectivityManager)
+                ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+        
+        WifiManager wm =
+            (WifiManager)
+                ctx.getSystemService(Context.WIFI_SERVICE);
         
         NetworkInfo winfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         

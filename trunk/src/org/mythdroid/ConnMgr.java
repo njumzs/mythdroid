@@ -414,7 +414,7 @@ public class ConnMgr {
      */
     private void connect(int timeout) throws IOException {
         
-        ConnectivityReceiver.waitForWifi(5000);
+        ConnectivityReceiver.waitForWifi(MythDroid.appContext, 5000);
         
         if (MythDroid.debug)
             Log.d("ConnMgr", "Connecting to " + addr); //$NON-NLS-1$ //$NON-NLS-2$

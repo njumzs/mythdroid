@@ -128,7 +128,7 @@ public class BackendManager {
 
         final DatagramPacket rpkt = new DatagramPacket(new byte[1024], 1024);
 
-        ConnectivityReceiver.waitForWifi(5000);
+        ConnectivityReceiver.waitForWifi(MythDroid.appContext, 5000);
         
         if (MythDroid.debug)
             Log.d(
