@@ -6,4 +6,4 @@ On a box that is used only as a backend, as root:
 
     # perl mdd.pl --backend
 
-    Then run /usr/bin/mdd as a non-root user and arrange for it to be run at boot (as a non-root user).
+    Then run /usr/bin/mdd and arrange for it to be run at boot.
