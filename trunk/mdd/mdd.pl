@@ -33,6 +33,7 @@ use MDD::LCD;
 use MDD::MythDB;
 use MDD::Log;
 
+sub usage();
 sub handleMdConn($);
 sub handleDisconnect($);
 sub readCommands();
@@ -55,18 +56,21 @@ $SIG{'INT'} = $SIG{'TERM'} = $SIG{'KILL'} = \&killKids;
 $SIG{'HUP'} = \&readCommands;
 sub END { killKids() }
 
-my ($backend, $debug, $lcd, $lcdListen);
+my ($backend, $debug);
 
 # Check for and strip arguments intended for us
 foreach my $idx (0 .. $#ARGV) {
 
     next unless exists $ARGV[$idx];
 
-    if ($ARGV[$idx] eq '--backend') {
+    if ($ARGV[$idx] eq '-h' || $ARGV[$idx] eq '--help') {
+        usage();
+    }
+    elsif ($ARGV[$idx] eq '-b' || $ARGV[$idx] eq '--backend') {
         $backend = 1;
         splice @ARGV, $idx, 1;
     }
-    elsif ($ARGV[$idx] eq '--debug') {
+    elsif ($ARGV[$idx] eq '-d' || $ARGV[$idx] eq '--debug') {
         $debug = 1;
         splice @ARGV, $idx, 1;
     }
@@ -79,7 +83,8 @@ my $log = MDD::Log->new('/tmp/mdd.log', $debug);
 install() unless ($0 =~ /mythlcdserver$/ || ($backend && $0 =~ /^\/usr\/bin/));
 
 my (
-    $data, $lcdClient, $lcdServer, $client, $videoDir, $cpus, $streampid
+    $data, $lcdClient, $lcdServer, $lcdListen, $lcd, $client, $videoDir,
+    $cpus, $streampid, $mythdb
 );
 
 my $size = 1024;
@@ -96,6 +101,34 @@ my $stream_cmd =
     'bframes=0},vb=%VB%,threads=%THR%,width=%WIDTH%,height=%HEIGHT%,' .
     'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2}' .
     ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
+
+# List of regex to match messages we might get from MythDroid
+# and refs to subroutines that will handle them
+my @clientMsgs = (
+    { regex => qr/^COMMAND (.*)$/,   proc => sub { runCommand($1) }      },
+    { regex => qr/^VIDEOLIST (.*)$/, proc => sub { videoList($1) }       },
+    { regex => qr/^STREAM (.*)$/,    proc => sub { streamFile($1) }      },
+    { regex => qr/^STOPSTREAM$/,     proc => \&stopStreaming             },
+    { regex => qr/^STORGROUPS$/,     proc => \&getStorGroups             },
+    { regex => qr/^RECGROUPS$/,      proc => \&getRecGroups              },
+    { regex => qr/^DELREC (\d+)$/,   proc => sub { $mythdb->delRec($1) } },
+    {
+        regex => qr/^RECTYPE (\d+)$/,  
+        proc  => sub { sendMsg($mythdb->getRecType($1))     }
+    },
+    { 
+        regex => qr/^STORGROUP (\d+)$/,  
+        proc  => sub { sendMsg($mythdb->getStorGroup($1))   }
+    },
+    {
+        regex => qr/^UPDATEREC (\d+) (.*)$/, 
+        proc  => sub { sendMsg($mythdb->updateRec($1, $2))  }
+    },
+    {
+        regex => qr/^NEWREC (\d+) (\d+) (.*)$/,
+        proc  => sub { sendMsg($mythdb->newRec($1, $2, $3)) }
+    },
+); 
 
 # Change euid/uid
 my @pwent = getpwnam 'mdd';
@@ -137,7 +170,7 @@ elsif (!$backend) {
 
 }
 
-my $mythdb = MDD::MythDB->new($log);;
+$mythdb = MDD::MythDB->new($log);;
 
 readCommands();
 
@@ -212,6 +245,35 @@ while (my @ready = $s->can_read) {
 
 }
 
+sub usage() {
+
+    print <<EOF;
+
+MDD - MythDroid Daemon
+
+Usage:
+
+    --help    [-h]      - Show this message
+    --backend [-b]      - Backend-only mode
+    --debug   [-d]      - Debug mode
+
+Backend-only mode should be used on systems that serve only as a backend. 
+MDD will detach from the terminal and run as a daemon in backend mode.
+
+Debug mode will result in debug information being output to the logfile 
+(/tmp/mdd.log). It will also cause MDD to run in the foreground even
+in backend-only mode.
+
+MDD will install itself if run from a non-installed location - i.e. from a
+location that is not /usr/bin/ for backend-only mode or 
+\$PREFIX/bin/mythlcdserver otherwise.
+
+EOF
+
+    exit 0;
+
+}
+
 # Handle new connection from MythDroid
 sub handleMdConn($) {
 
@@ -222,24 +284,18 @@ sub handleMdConn($) {
         $client->close;
     }
 
-    if ($client = $fd->accept) {
+    return unless ($client = $fd->accept);
 
-        $s->add($client);
+    $s->add($client);
 
-        # Send a list of MDD commands
-        foreach my $key (keys %commands) {
-            syswrite($client, "COMMAND $key\n");
-        }
-        syswrite($client, "COMMANDS DONE\n");
+    # Send a list of MDD commands
+    map { syswrite($client, "COMMAND $_\n") } (keys %commands);
+    syswrite($client, "COMMANDS DONE\n");
 
-        return if $backend;
+    return if $backend;
 
-        # Send last LCD statuses 
-        foreach my $msg ($lcd->forNewClient()) {
-            syswrite($client, $msg);
-        }
-
-    }
+    # Send last LCD statuses 
+    map { syswrite($client, $_) } ($lcd->forNewClient());
 
 }
 
@@ -307,54 +363,16 @@ sub clientMsg($) {
 
     $log->dbg("-> CMSG: $msg");
 
-    if    ($msg =~ /^COMMAND (.*)$/) {
-        sendMsg("OK");
-        runCommand($1);
-    }
-    elsif ($msg =~ /VIDEOLIST (.*)$/) {
-        sendMsg("OK");
-        videoList($1);
-    }
-    elsif ($msg =~ /STREAM (.*)$/) {
-        sendMsg("OK");
-        streamFile($1);
-    }
-    elsif ($msg =~ /STOPSTREAM/) {
-        sendMsg("OK");
-        stopStreaming();
-    }
-    elsif ($msg =~ /RECTYPE (\d+)$/) {
-        sendMsg("OK");
-        sendMsg($mythdb->getRecType($1));
-    }
-    elsif ($msg =~ /STORGROUP (\d+)$/) {
-        sendMsg("OK");
-        sendMsg($mythdb->getStorGroup($1));
-    }
-    elsif ($msg =~ /STORGROUPS/) {
-        sendMsg("OK");
-        getStorGroups();
-    }
-    elsif ($msg =~ /RECGROUPS/) {
-        sendMsg("OK");
-        getRecGroups();
-    }
-    elsif ($msg =~ /UPDATEREC (\d+) (.*)$/) {
-        sendMsg("OK");
-        sendMsg($mythdb->updateRec($1, $2));
-    }
-    elsif ($msg =~ /NEWREC (\d+) (\d+) (.*)$/) {
-        sendMsg("OK");
-        sendMsg($mythdb->newRec($1, $2, $3));
-    }
-    elsif ($msg =~ /DELREC (\d+)$/) {
-        sendMsg("OK");
-        $mythdb->delRec($1);
-    }
-    else {
-        $log->err("Unknown command $msg");
-        sendMsg("UNKNOWN");
-    }
+    map { 
+        if ($msg =~ $_->{regex}) { 
+            sendMsg("OK"); 
+            $_->{proc}();
+            return;
+        } 
+    } @clientMsgs;
+
+    $log->err("Unknown command $msg");
+    sendMsg("UNKNOWN");
 
 }
 
@@ -391,7 +409,7 @@ sub videoList($) {
     # Top level and more than one videodir, send numbered list
     if (scalar @videoDirs > 1 && $vd == -1 && $sd eq 'ROOT') {
         my $i = 0;
-        foreach my $dir (@videoDirs) { sendMsg($i++ . " DIRECTORY $dir") }
+        map { sendMsg($i++ . " DIRECTORY $_") } @videoDirs;
         sendMsg("VIDEOLIST DONE");
         return;
     }
@@ -415,9 +433,8 @@ sub videoList($) {
 
     $regex .= '[^/]+$';
 
-    foreach my $dir (@dirs) { sendMsg("$vd DIRECTORY $dir") }
-
-    foreach my $vid (@{ $mythdb->getVideos($regex) }) { sendMsg($vid) }
+    map { sendMsg("$vd DIRECTORY $_") } @dirs;
+    map { sendMsg($_) } (@{ $mythdb->getVideos($regex) });
 
     sendMsg("VIDEOLIST DONE");
 
@@ -507,9 +524,7 @@ sub getStorGroups() {
     %storageGroups = %{ $mythdb->getStorGroups() } 
         unless (scalar %storageGroups);
 
-    foreach my $grp (keys %storageGroups) {
-        sendMsg($grp);
-    }
+    map { sendMsg($_) } (keys %storageGroups);
 
     sendMsg("STORGROUPS DONE");
 
@@ -518,9 +533,7 @@ sub getStorGroups() {
 # get a list of recording groups
 sub getRecGroups() {
 
-    foreach my $rg (@{$mythdb->getRecGroups()}) {
-        sendMsg($rg);
-    }
+    map { sendMsg($_) } (@{$mythdb->getRecGroups()});
 
     sendMsg("RECGROUPS DONE");
 
