@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/settings">
+    
+    	<PreferenceScreen
+    		android:key="backend"
+    		android:title="Manual Backend Config"
+    		android:summary="Manually configure a backend">
+    		
+    		<EditTextPreference
+    			android:key="backendAddr"
+    			android:dialogTitle="Backend Address"
+    			android:title="Backend Address"
+    			android:singleLine="true"
+    			android:summary="Backend hostname or IP address"/>
+    			
+    		<EditTextPreference
+    			android:key="backendPublicAddr"
+    			android:dialogTitle="Backend Public Address"
+    			android:title="Backend Public Address"
+    			android:singleLine="true"
+    			android:summary="Used for streaming if connecting via SSH port forwards"/>
+    			
+    	</PreferenceScreen>
+    		
+    	<PreferenceScreen
+    		android:key="frontends"
+    		android:title="Frontends Config"
+    		android:summary="Configure frontends">
+    		 		
+    		<intent android:targetClass="org.mythdroid.activities.FrontendList"
+    				android:targetPackage="org.mythdroid"/>
+    				
+    	</PreferenceScreen>
+    	
+    	<PreferenceScreen
+    		android:key="osdSettings"
+    		android:title="OSD Settings"
+    		android:summary="Configure display of phone events on OSD">
+    		
+    	<CheckBoxPreference
+    		android:key="osdCalls"
+    		android:title="Show calls on OSD"
+    		android:summary="Show calls on the MythTV OSD"
+    		android:defaultValue="true"/>
+    		
+    	<CheckBoxPreference
+    		android:key="osdSMS"
+    		android:title="Show SMS on OSD"
+    		android:summary="Show SMS on the MythTV OSD"
+    		android:defaultValue="true"/>
+    	
+    	<CheckBoxPreference
+    		android:key="scrollSMS"
+    		android:title="Scroll SMS"
+    		android:summary="Uncheck to disable SMS scrolling"
+    		android:dependency="osdSMS"
+    		android:defaultValue="true"/>
+    		
+    	</PreferenceScreen>
+    	
+    	<CheckBoxPreference
+    		android:key="moveWake"
+    		android:title="Wake on movement"
+    		android:summary="Wake and unlock upon phone movement whilst in remotes"
+    		android:defaultValue="true"/>
+    		
+    	<ListPreference
+    		android:key="tvDefaultStyle"
+    		android:title="Default TV remote style"
+    		android:summary="Default layout for the TV remote"
+    		android:entries="@array/remoteStyles"
+    		android:entryValues="@array/remoteStyles"
+    		android:defaultValue="Button"/>
+    		
+    	<ListPreference
+    		android:key="navDefaultStyle"
+    		android:title="Default Nav remote style"
+    		android:summary="Default layout for the Nav remote"
+    		android:entries="@array/remoteStyles"
+    		android:entryValues="@array/remoteStyles"
+    		android:defaultValue="Button"/>
+    		
+    	<CheckBoxPreference android:key="acra.disable"
+        	android:title="Disable error reporting"
+        	android:summaryOn="Error reporting is disabled"
+        	android:summaryOff="Error reporting is enabled"
+        	android:defaultValue="false"/>
+    	
+    </PreferenceCategory>
+    
+</PreferenceScreen>
+            
