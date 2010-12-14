@@ -97,9 +97,9 @@ public class NavRemote extends Remote {
             calledBy = caller.getShortClassName();
         
         if (calledBy != null) { 
-            if(calledBy.equals(".TVRemote")) //$NON-NLS-1$
+            if(calledBy.endsWith(".TVRemote")) //$NON-NLS-1$
                 calledByTVRemote = true;
-            else if (calledBy.equals(".MusicRemote")) //$NON-NLS-1$
+            else if (calledBy.endsWith(".MusicRemote")) //$NON-NLS-1$
                 calledByMusicRemote = true;
         }
         
