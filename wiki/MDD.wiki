@@ -19,7 +19,8 @@ mdd should check these settings during installation and let you know if you need
 So, to install, checkout or download mdd to each frontend and then:
 
 {{{
-cd /path/to/mdd
+tar zxf mdd-0.4.tgz
+cd mdd
 perl mdd.pl
 }}}
 
@@ -28,7 +29,8 @@ Note: You will need to reinstall mdd each time you upgrade MythTV. See the detai
 On a box that serves only as a backend:
 
 {{{
-cd /path/to/mdd
+tar zxf mdd-0.4.tgz
+cd mdd
 perl mdd.pl --backend
 }}}
 
