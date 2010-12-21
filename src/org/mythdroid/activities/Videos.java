@@ -97,7 +97,9 @@ public class Videos extends MDActivity implements
                         fetchingArt = true;
                         artThread = new Thread(fetchArt);
                         artThread.start();
-                        dismissDialog(DIALOG_LOAD);
+                        try {
+                            dismissDialog(DIALOG_LOAD);
+                        } catch (IllegalArgumentException e1) {}
                     }
                 }
             );
