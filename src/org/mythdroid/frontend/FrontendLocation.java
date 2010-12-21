@@ -128,10 +128,17 @@ public class FrontendLocation {
     }
 
     private int timeToInt(String time) {
+        
         String tm[] = time.split(":"); //$NON-NLS-1$
+        
+        if (tm.length == 2)
+            return Integer.parseInt(tm[0]) * 60 +
+                     Integer.parseInt(tm[1]);
+        
         return Integer.parseInt(tm[0]) * 3600 + 
                  Integer.parseInt(tm[1]) * 60 +
                    Integer.parseInt(tm[2]);
+        
     }
 
 }
