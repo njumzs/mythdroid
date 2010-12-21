@@ -184,7 +184,7 @@ public abstract class MDListActivity extends ListActivity {
     
     private void prepareFrontendDialog(final Dialog dialog) {
         
-        Cursor c = FrontendDB.getFrontends();
+        Cursor c = FrontendDB.getFrontends(this);
         ArrayList<String> list = new ArrayList<String>();
         
         int num = c.getCount();
