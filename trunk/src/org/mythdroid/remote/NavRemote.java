@@ -111,7 +111,7 @@ public class NavRemote extends Remote {
     public void onResume() {
         super.onResume();
         try {
-            feMgr = MythDroid.getFrontend();
+            feMgr = MythDroid.getFrontend(this);
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();

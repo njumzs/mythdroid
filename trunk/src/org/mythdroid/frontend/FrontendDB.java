@@ -18,8 +18,6 @@
 
 package org.mythdroid.frontend;
 
-import org.mythdroid.activities.MythDroid;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -65,8 +63,10 @@ public class FrontendDB {
      * Get a cursor listing the frontends - columns are ID, ADDR and NAME
      * @return Cursor 
      */
-    public static Cursor getFrontends() {
-        if (db == null) initDB();
+    public static Cursor getFrontends(Context ctx) {
+        
+        if (db == null) initDB(ctx);
+        
         return db.rawQuery(
             "SELECT _id, addr, name, hwaddr from " + FRONTEND_TABLE, null //$NON-NLS-1$
         );
@@ -80,9 +80,11 @@ public class FrontendDB {
      * @return true if successful, 
      * false if a frontend with that name already existed
      */
-    public static boolean insert(String name, String addr, String hwaddr) {
+    public static boolean insert(
+        Context ctx, String name, String addr, String hwaddr
+    ) {
 
-        if (db == null) initDB();
+        if (db == null) initDB(ctx);
 
         final ContentValues cv = new ContentValues();
         cv.put("addr", addr.trim()); //$NON-NLS-1$
@@ -109,9 +111,11 @@ public class FrontendDB {
      * @param name - new name of frontend
      * @param addr - new address of frontend
      */
-    public static void update(long id, String name, String addr, String hwaddr) {
+    public static void update(
+        Context ctx, long id, String name, String addr, String hwaddr
+    ) {
 
-        if (db == null) initDB();
+        if (db == null) initDB(ctx);
 
         final ContentValues cv = new ContentValues();
         cv.put("addr", addr.trim()); //$NON-NLS-1$
@@ -126,8 +130,8 @@ public class FrontendDB {
      * Delete a frontend record
      * @param id - id of frontend record
      */
-    public static void delete(long id) {
-        if (db == null) initDB();
+    public static void delete(Context ctx, long id) {
+        if (db == null) initDB(ctx);
         db.delete(FRONTEND_TABLE, "_id = ?", //$NON-NLS-1$
             new String[] { String.valueOf(id) });
     }
@@ -139,8 +143,8 @@ public class FrontendDB {
         db = null;
     }
 
-    private static void initDB() {
-        db = new DBOpenHelper(MythDroid.appContext).getWritableDatabase();
+    private static void initDB(Context ctx) {
+        db = new DBOpenHelper(ctx).getWritableDatabase();
     }
 
 }
