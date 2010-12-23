@@ -165,7 +165,8 @@ public class MusicRemote extends Remote {
             final String details = artist + " ~ " + album; //$NON-NLS-1$
             handler.post(
                 new Runnable() {
-                    public void run() {
+                    @Override
+					public void run() {
                         titleView.setText(track);
                         detailView.setText(details);
                         if (artid != -1)
