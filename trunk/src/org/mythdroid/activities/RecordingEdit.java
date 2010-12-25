@@ -53,8 +53,8 @@ public class RecordingEdit extends MDActivity {
     
     private Program prog         = MythDroid.curProg;
     private BackendManager beMgr = null;
-    private RecType type         = prog.Type;
-    private int prio             = prog.RecPrio;
+    private RecType type;
+    private int prio;
     
     private Button  save, schedOptions, groupOptions;
     private Spinner prioSpinner;
@@ -64,6 +64,14 @@ public class RecordingEdit extends MDActivity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        
+        if (prog == null) {
+        	finish();
+        	return;
+        }
+        
+        type = prog.Type;
+        prio = prog.RecPrio;
         
         dupMethod = prog.DupMethod;
         dupIn = prog.DupIn;
