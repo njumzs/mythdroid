@@ -98,17 +98,27 @@ public class FrontendLocation {
         
         if (tok[1].equals("recorded")) { //$NON-NLS-1$
             end = timeToInt(tok[4]);
-            rate = Float.parseFloat(tok[5].substring(0, tok[5].lastIndexOf('x')));
+            if (tok[5].equals("pause")) //$NON-NLS-1$
+            	rate = 0;
+            else
+            	rate = Float.parseFloat(
+            			tok[5].substring(0, tok[5].lastIndexOf('x'))
+            	);
             filename = tok[9];
         }
         else if (tok[1].equals("video")) { //$NON-NLS-1$
             end = -1;
-            rate = Float.parseFloat(tok[3].substring(0, tok[3].lastIndexOf('x')));
+            if (tok[3].equals("pause")) //$NON-NLS-1$
+            	rate = 0;
+            else
+                rate = Float.parseFloat(
+                		tok[3].substring(0, tok[3].lastIndexOf('x'))
+                );
             filename = "Video"; //$NON-NLS-1$
         }
         else {
+        	rate = loc.contains("pause") ? 0 : -1; //$NON-NLS-1$
             end = -1;
-            rate = -1;
             filename = "Unknown"; //$NON-NLS-1$
         }
         
