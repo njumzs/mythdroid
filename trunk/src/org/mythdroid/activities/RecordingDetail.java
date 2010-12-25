@@ -175,6 +175,11 @@ public class RecordingDetail extends MDActivity {
     private void setViews() {
 
         final Program prog = MythDroid.curProg;
+        if (prog == null) { 
+        	finish();
+        	return;
+        }
+        
         ((ImageView)findViewById(R.id.rec_thumb))
             .setImageBitmap(prog.previewImage());
         ((TextView)findViewById(R.id.rec_title)).setText(prog.Title);
