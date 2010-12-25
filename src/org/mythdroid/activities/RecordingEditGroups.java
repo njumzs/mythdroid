@@ -52,6 +52,12 @@ public class RecordingEditGroups extends MDActivity {
             ErrUtil.err(this, e);
             finish();
         }
+        
+        if (recGroups == null || storGroups == null) {
+        	finish();
+        	return;
+        }
+        
         setViews();
     }
 
