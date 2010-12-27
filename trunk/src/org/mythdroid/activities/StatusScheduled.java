@@ -46,6 +46,8 @@ public class StatusScheduled extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
+        if (Status.statusDoc == null) Status.getStatus(this);
+        
         Document doc = Status.statusDoc;
 
         Node scheduled = doc.getElementsByTagName("Scheduled").item(0); //$NON-NLS-1$

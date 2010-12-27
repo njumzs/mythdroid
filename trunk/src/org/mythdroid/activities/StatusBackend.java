@@ -43,7 +43,10 @@ public class StatusBackend extends Activity {
         super.onCreate(icicle);
         setContentView(R.layout.status_backend);
 
+        if (Status.statusDoc == null) Status.getStatus(this);
+        
         Document doc = Status.statusDoc;
+        
         Node info = doc.getElementsByTagName("MachineInfo").item(0); //$NON-NLS-1$
 
         Node StorageNode = null, LoadNode = null, GuideNode = null;

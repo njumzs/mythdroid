@@ -246,6 +246,8 @@ public class StatusJobs extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
+        if (Status.statusDoc == null) Status.getStatus(this);
+        
         Document doc = Status.statusDoc;
         NodeList jobNodes = doc.getElementsByTagName("Job"); //$NON-NLS-1$
 
