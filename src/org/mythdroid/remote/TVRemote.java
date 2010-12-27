@@ -178,6 +178,7 @@ public class TVRemote extends Remote {
             setupStatus();
             if (mddMgr == null) {
                 updateStatus = new UpdateStatusTask();
+                if (timer == null) timer = new Timer();
                 timer.scheduleAtFixedRate(updateStatus, 8000, 8000);
             }
             else
