@@ -30,7 +30,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import android.R.layout;
 import android.app.Activity;
@@ -92,12 +91,7 @@ public class StatusRecorders extends ListActivity {
     final private Runnable getStatusTask = new Runnable() {
         @Override
         public void run() {
-            try {
-                Status.getStatus();
-            } catch (SAXException e) {
-                ErrUtil.err(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
-            } catch (Exception e) { ErrUtil.err(ctx, e); }
-            
+            Status.getStatus(ctx);
             if (Status.statusDoc == null) {
                 dismissDialog(DIALOG_LOAD);
                 ErrUtil.postErr(ctx, Messages.getString("StatusRecorders.3")); //$NON-NLS-1$

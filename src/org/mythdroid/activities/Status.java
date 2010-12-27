@@ -65,12 +65,7 @@ public class Status extends ListActivity {
     final private Runnable getStatusTask = new Runnable() {
         @Override
         public void run() {
-            try {
-                getStatus();
-            } catch (SAXException e) {
-                ErrUtil.err(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
-            } catch (Exception e) { ErrUtil.err(ctx, e); }
-
+        	getStatus(ctx);
             handler.post(
                 new Runnable() {
                     @Override
@@ -136,14 +131,17 @@ public class Status extends ListActivity {
     /**
      * Get new statusDoc from the backend
      */
-    public static void getStatus() throws Exception {
+    public static void getStatus(Context ctx) {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        URL url = new URL(MythDroid.getBackend().getStatusURL() + "/xml"); //$NON-NLS-1$
-        statusDoc = dbf.newDocumentBuilder().parse(
-            url.openConnection().getInputStream()
-        );
+        try {
+            URL url = new URL(MythDroid.getBackend().getStatusURL() + "/xml"); //$NON-NLS-1$
+            statusDoc = dbf.newDocumentBuilder().parse(
+                url.openConnection().getInputStream()
+            );
+        } catch (SAXException e) {
+            ErrUtil.err(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
+        } catch (Exception e) { ErrUtil.err(ctx, e); }
 
     }
 
