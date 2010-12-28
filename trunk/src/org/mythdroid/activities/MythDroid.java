@@ -491,6 +491,8 @@ public class MythDroid extends MDListActivity implements
 
             }
         };
+        
+        if (wHandler == null) wHandler = getWorker();
 
         wHandler.post(
             new Runnable() {
