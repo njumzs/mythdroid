@@ -120,10 +120,12 @@ public class FrontendList extends ListActivity implements
     @Override
     public void onPrepareDialog(int id, Dialog dialog) {
         
-        switch (id) {
+    	switch (id) {
             
             case EDIT_DIALOG:
                 
+            	if (clickedView == null) return;
+            	
                 CharSequence name = ((TextView)clickedView
                                         .findViewById(R.id.fe_name_text))
                                         .getText();
