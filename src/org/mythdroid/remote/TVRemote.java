@@ -302,6 +302,12 @@ public class TVRemote extends Remote {
             return;
         }
         
+        if (feMgr == null) {
+        	ErrUtil.err(this, Messages.getString("TVRemote.5")); //$NON-NLS-1$
+        	finish();
+        	return;
+        }
+        
         try {
             mddMgr = new MDDManager(feMgr.addr);
         } catch (IOException e) { 

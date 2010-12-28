@@ -117,6 +117,12 @@ public class NavRemote extends Remote {
             finish();
             return;
         }
+        
+        if (feMgr == null) {
+        	ErrUtil.err(this, Messages.getString("TVRemote.5")); //$NON-NLS-1$
+        	finish();
+        	return;
+        }
 
         try {
             if (jumpGuide) 
