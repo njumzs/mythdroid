@@ -26,6 +26,7 @@ import org.mythdroid.ConnMgr;
 import org.mythdroid.ConnMgr.onConnectListener;
 import org.mythdroid.Enums.Key;
 import org.mythdroid.data.Program;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.activities.MythDroid;
 
 import android.util.Log;
@@ -223,6 +224,8 @@ public class FrontendManager {
     }
     
     private synchronized String getSingleLineResponse() throws IOException {
+    	if (cmgr == null) 
+    		throw new IOException(Messages.getString("FrontendManager.0")); //$NON-NLS-1$
         String line = cmgr.readLine();
         while (cmgr != null) 
             if (cmgr.readLine().equals("#")) break; //$NON-NLS-1$

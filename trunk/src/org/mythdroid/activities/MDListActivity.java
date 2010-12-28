@@ -147,6 +147,13 @@ public abstract class MDListActivity extends ListActivity {
                 super.onPrepareDialog(id, dialog);
         }
     }
+    
+    @Override
+    public void onResume() {
+    	super.onResume();
+    	if (MythDroid.appContext == null)
+        	MythDroid.appContext = getApplicationContext();
+    }
 
     @Override
     public void onDestroy() {
