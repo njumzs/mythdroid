@@ -129,7 +129,10 @@ public class TVRemote extends Remote {
         @Override
         public void run() {
 
-            try {
+            if (feMgr == null || !feMgr.isConnected())
+            	return;
+        	
+        	try {
                 
                 final FrontendLocation loc = feMgr.getLoc();
             
