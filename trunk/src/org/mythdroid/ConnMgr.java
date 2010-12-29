@@ -348,7 +348,7 @@ public class ConnMgr {
      * @return true if socket is connected, false otherwise
      */
     public boolean isConnected() {
-        return sock.isConnected();
+        return sock.isConnected() && connectedReady;
     }
     
     public void dispose() throws IOException {
@@ -550,7 +550,8 @@ public class ConnMgr {
             } catch (InterruptedException e) {
                 if (Globals.debug)
                     Log.d("ConnMgr", "Timed out waiting for connection to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
-                break;
+                connectedReady = false;
+                throw new IOException(Messages.getString("ConnMgr.3") + addr); //$NON-NLS-1$
             }
     }
 
