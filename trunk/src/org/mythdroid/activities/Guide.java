@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Enums.Category;
@@ -146,7 +147,7 @@ public class Guide extends MDActivity {
         new OnClickListener() {
             @Override
             public void onClick(View v) {
-                MythDroid.curProg = (Program)v.getTag();
+                Globals.curProg = (Program)v.getTag();
                 startActivityForResult(
                     new Intent()
                         .putExtra(Extras.GUIDE.toString(), true)
@@ -363,7 +364,7 @@ public class Guide extends MDActivity {
             j += hdrSpan;
         }
 
-        MythDroid.getWorker().post(getData);
+        Globals.getWorker().post(getData);
 
     }
 
@@ -399,14 +400,14 @@ public class Guide extends MDActivity {
         try {
 
             final URL url = new URL(
-                MythDroid.getBackend().getStatusURL() +
+                Globals.getBackend().getStatusURL() +
                 "/Myth/GetProgramGuide?" +  //$NON-NLS-1$
-                "StartTime=" + MythDroid.dateFmt.format(start) + //$NON-NLS-1$
-                "&EndTime=" + MythDroid.dateFmt.format(end) + //$NON-NLS-1$
+                "StartTime=" + Globals.dateFmt.format(start) + //$NON-NLS-1$
+                "&EndTime="  + Globals.dateFmt.format(end)   + //$NON-NLS-1$
                 "&StartChanId=0" + "&NumOfChannels=-1" + "&Details=1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             );
             
-            if (MythDroid.debug)
+            if (Globals.debug)
                 Log.d("Guide", "Fetching XML from " + url.toExternalForm()); //$NON-NLS-1$ //$NON-NLS-2$
 
             Xml.parse(

@@ -21,7 +21,7 @@ package org.mythdroid.remote;
 import java.io.IOException;
 
 import org.mythdroid.Enums.Key;
-import org.mythdroid.activities.MythDroid;
+import org.mythdroid.Globals;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.util.ErrUtil;
 
@@ -219,8 +219,8 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        if (MythDroid.appContext == null)
-        	MythDroid.appContext = getApplicationContext();
+        if (Globals.appContext == null)
+        	Globals.appContext = getApplicationContext();
         if (moveWake)
             stopService(new Intent().setClassName(this, wakeService));
     }

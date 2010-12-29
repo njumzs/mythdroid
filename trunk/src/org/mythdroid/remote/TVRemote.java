@@ -24,6 +24,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.mythdroid.Enums.Extras;
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Key;
 import org.mythdroid.data.Program;
@@ -33,7 +34,6 @@ import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.activities.Guide;
-import org.mythdroid.activities.MythDroid;
 
 import android.R.drawable;
 import android.app.AlertDialog;
@@ -147,7 +147,7 @@ public class TVRemote extends Remote {
                             public void run() { 
                                 try {
                                     Program prog = 
-                                        MythDroid.getBackend().getRecording(name);
+                                        Globals.getBackend().getRecording(name);
                                     titleView.setText(prog.Title);
                                 } catch (Exception e) { 
                                     ErrUtil.postErr(ctx, e); 
@@ -209,7 +209,7 @@ public class TVRemote extends Remote {
                 else if (filename != null)
                     feMgr.playFile(filename);
                 else
-                    feMgr.playRec(MythDroid.curProg);
+                    feMgr.playRec(Globals.curProg);
             } catch (IOException e) {
                 ErrUtil.postErr(ctx, e);
             } catch (InterruptedException e) {}
@@ -295,7 +295,7 @@ public class TVRemote extends Remote {
     public void onResume() {
         super.onResume();
         try {
-            feMgr = MythDroid.getFrontend(this);
+            feMgr = Globals.getFrontend(this);
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();
@@ -317,7 +317,7 @@ public class TVRemote extends Remote {
 
         if (jump && !wasPaused) {
             showDialog(DIALOG_LOAD);
-            MythDroid.getWorker().post(jumpRun);
+            Globals.getWorker().post(jumpRun);
         }
         else
             handler.post(ready);
@@ -685,7 +685,7 @@ public class TVRemote extends Remote {
                 done();
                 return;
             }
-            prog = MythDroid.getBackend().getRecording(loc.filename);
+            prog = Globals.getBackend().getRecording(loc.filename);
         } catch (Exception e) {
             ErrUtil.err(this, e);
             done();
@@ -710,7 +710,7 @@ public class TVRemote extends Remote {
     private void done() {
         if (feMgr != null && feMgr.isConnected() && jump) {
             try {
-                feMgr.jumpTo(MythDroid.lastLocation);
+                feMgr.jumpTo(Globals.lastLocation);
             } catch (IOException e) {
                 ErrUtil.postErr(this, e);
             }

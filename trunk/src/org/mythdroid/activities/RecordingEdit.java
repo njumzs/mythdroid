@@ -20,6 +20,7 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.RecDupIn;
 import org.mythdroid.Enums.RecDupMethod;
@@ -51,7 +52,7 @@ public class RecordingEdit extends MDActivity {
     static public String        recGroup;
     static public String        storGroup; 
     
-    private Program prog         = MythDroid.curProg;
+    private Program prog         = null;
     private BackendManager beMgr = null;
     private RecType type;
     private int prio;
@@ -65,10 +66,9 @@ public class RecordingEdit extends MDActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         
-        if (prog == null) {
-        	finish();
-        	return;
-        }
+        prog = Globals.curProg;
+        if (prog == null) 
+        	ErrUtil.err(this, Messages.getString("RecordingEdit.1")); //$NON-NLS-1$
         
         type = prog.Type;
         prio = prog.RecPrio;
@@ -92,7 +92,7 @@ public class RecordingEdit extends MDActivity {
     public void onResume() {
         super.onResume();
         try {
-            beMgr = MythDroid.getBackend();
+            beMgr = Globals.getBackend();
         } catch (Exception e) {
             ErrUtil.err(this, e);
         }

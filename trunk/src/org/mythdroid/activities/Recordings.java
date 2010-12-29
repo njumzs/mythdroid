@@ -21,6 +21,7 @@ package org.mythdroid.activities;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
@@ -76,7 +77,7 @@ public class Recordings extends MDListActivity implements
         public void run() {
             
             try {
-                recordings = MythDroid.getBackend().getRecordings();
+                recordings = Globals.getBackend().getRecordings();
             } catch (Exception e) { 
                 ErrUtil.postErr(ctx, Messages.getString("Recordings.0")); //$NON-NLS-1$
                 try {
@@ -147,7 +148,7 @@ public class Recordings extends MDListActivity implements
 
     @Override
     public void onListItemClick(ListView list, View item, int pos, long id) {
-        MythDroid.curProg = (Program)list.getItemAtPosition(pos);
+        Globals.curProg = (Program)list.getItemAtPosition(pos);
         startActivityForResult(
             new Intent().setClass(this, RecordingDetail.class), 0
         );
@@ -157,7 +158,7 @@ public class Recordings extends MDListActivity implements
     public boolean onItemLongClick(
         AdapterView<?> adapter, View item, int pos, long itemid
     ) {
-        MythDroid.curProg = (Program)adapter.getItemAtPosition(pos);
+        Globals.curProg = (Program)adapter.getItemAtPosition(pos);
         nextActivity = TVRemote.class;
         showDialog(FRONTEND_CHOOSER);
         return true;
@@ -242,13 +243,13 @@ public class Recordings extends MDListActivity implements
             recordings.clear();
         recordings = null;
         setListAdapter(null);
-        MythDroid.curProg = null;
+        Globals.curProg = null;
     }
 
     private void refresh() {
         empty();
         showDialog(DIALOG_LOAD);
-        MythDroid.getWorker().post(getRecordings);
+        Globals.getWorker().post(getRecordings);
     }
 
 }

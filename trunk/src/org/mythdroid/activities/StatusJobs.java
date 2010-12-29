@@ -24,6 +24,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.Program;
 import org.mythdroid.resource.Messages;
@@ -147,7 +148,7 @@ public class StatusJobs extends ListActivity {
             try {
 
                 NamedNodeMap attr = item.getAttributes();
-                startTime = MythDroid.dateFmt.parse(
+                startTime = Globals.dateFmt.parse(
                     attr.getNamedItem("startTime").getNodeValue() //$NON-NLS-1$
                 );
                 status = JobStatus.get(
@@ -222,7 +223,7 @@ public class StatusJobs extends ListActivity {
             vHolder.type.setText(j.type.msg());
             vHolder.details.setText(
                 Messages.getString("StatusJobs.9") + // Started //$NON-NLS-1$
-                MythDroid.dispFmt.format(j.startTime) + 
+                Globals.dispFmt.format(j.startTime) + 
                 Messages.getString("StatusJobs.25") + j.hostname // on //$NON-NLS-1$
             );
             vHolder.comments.setText(j.comments);
@@ -260,7 +261,7 @@ public class StatusJobs extends ListActivity {
 
     @Override
     public void onListItemClick(ListView list, View item, int pos, long id) {
-        MythDroid.curProg = ((Job)list.getItemAtPosition(pos)).program;
+        Globals.curProg = ((Job)list.getItemAtPosition(pos)).program;
         startActivity(new Intent().setClass(this, RecordingDetail.class));
     }
 

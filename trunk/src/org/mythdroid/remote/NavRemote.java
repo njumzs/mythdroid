@@ -21,6 +21,7 @@ package org.mythdroid.remote;
 import java.io.IOException;
 
 import org.mythdroid.Enums.Extras;
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Key;
 import org.mythdroid.frontend.FrontendLocation;
@@ -28,7 +29,6 @@ import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.mdd.MDDMenuListener;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
-import org.mythdroid.activities.MythDroid;
 
 
 import android.content.ComponentName;
@@ -111,7 +111,7 @@ public class NavRemote extends Remote {
     public void onResume() {
         super.onResume();
         try {
-            feMgr = MythDroid.getFrontend(this);
+            feMgr = Globals.getFrontend(this);
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();
@@ -325,7 +325,7 @@ public class NavRemote extends Remote {
 
         if (newLoc.video) {
             if (lastLoc != null) 
-                MythDroid.lastLocation = lastLoc;
+                Globals.lastLocation = lastLoc;
             if (calledByRemote)
                 finish();
             else {
@@ -341,7 +341,7 @@ public class NavRemote extends Remote {
         
         else if (newLoc.music) {
             if (lastLoc != null)
-                MythDroid.lastLocation = lastLoc;
+                Globals.lastLocation = lastLoc;
             startActivity(
                 new Intent()
                     .setClass(this, MusicRemote.class)
