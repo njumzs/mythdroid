@@ -28,6 +28,7 @@ import org.mythdroid.R.layout;
 import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
 import org.mythdroid.mdd.MDDManager;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 
 import android.R.drawable;
@@ -170,6 +171,11 @@ public class VideoPlayer extends MDActivity {
             }
             else {
                 Program prog = Globals.curProg;
+                if (prog == null) {
+                	ErrUtil.err(this, Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
+                	finish();
+                	return;
+                }
                 path = prog.Path;
                 if (prog.StorGroup != null)
                     sg = prog.StorGroup;
@@ -184,6 +190,7 @@ public class VideoPlayer extends MDActivity {
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();
+            return;
         }
         
         try {
