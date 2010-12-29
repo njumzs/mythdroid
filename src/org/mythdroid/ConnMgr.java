@@ -196,7 +196,7 @@ public class ConnMgr {
         int r = -1;
         
         // Have left over buffered data?
-        if (rbufIdx > -1) 
+        if (rbufIdx > -1 && rbuf.length >= rbufIdx + 1) 
             line = new String(rbuf, 0, rbufIdx + 1);
 
         rbufIdx = line.length() - 1;
