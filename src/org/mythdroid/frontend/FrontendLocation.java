@@ -21,7 +21,7 @@ package org.mythdroid.frontend;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.mythdroid.activities.MythDroid;
+import org.mythdroid.Globals;
 
 import android.util.Log;
 
@@ -45,7 +45,7 @@ public class FrontendLocation {
 
         location = loc;
         
-        if (MythDroid.debug) Log.d("FrontendLocation", "loc: " + loc); //$NON-NLS-1$ //$NON-NLS-2$
+        if (Globals.debug) Log.d("FrontendLocation", "loc: " + loc); //$NON-NLS-1$ //$NON-NLS-2$
         
         if (locations == null && !populateLocations(feMgr)) 
             return;
@@ -66,7 +66,7 @@ public class FrontendLocation {
         else if (loc.equals("musicplaylists")) //$NON-NLS-1$
             musiceditor = true;
         
-        if (MythDroid.debug) 
+        if (Globals.debug) 
             Log.d(
                 "FrontendLocation",  //$NON-NLS-1$
                 "loc: " + loc +  //$NON-NLS-1$
@@ -125,7 +125,7 @@ public class FrontendLocation {
         video = true;
         
         if (tok[1].equals("livetv")) livetv = true; //$NON-NLS-1$
-        if (MythDroid.debug) 
+        if (Globals.debug) 
             Log.d(
                 "FrontendLocation",  //$NON-NLS-1$
                 "position: " + position +  //$NON-NLS-1$

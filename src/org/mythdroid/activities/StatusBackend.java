@@ -20,6 +20,7 @@ package org.mythdroid.activities;
 
 import java.util.Date;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.resource.Messages;
 import org.w3c.dom.Document;
@@ -71,7 +72,7 @@ public class StatusBackend extends Activity {
         }
 
         if (StorageNode != null) {
-            if (MythDroid.protoVersion < 50) {
+            if (Globals.protoVersion < 50) {
                 attr = StorageNode.getAttributes();
                 stotal = attr.getNamedItem("drive_total_total").getNodeValue(); //$NON-NLS-1$
                 sused = attr.getNamedItem("drive_total_used").getNodeValue(); //$NON-NLS-1$
@@ -137,7 +138,7 @@ public class StatusBackend extends Activity {
             Date when = null;
 
             try {
-                when = MythDroid.dateFmt.parse(
+                when = Globals.dateFmt.parse(
                     attr.getNamedItem("guideThru").getNodeValue() //$NON-NLS-1$
                 );
             } catch (Exception e) {}
@@ -145,7 +146,7 @@ public class StatusBackend extends Activity {
             ((TextView)findViewById(R.id.guide_length)).setText(
                 attr.getNamedItem("guideDays").getNodeValue() +  //$NON-NLS-1$
                 Messages.getString("StatusBackend.30") + // days (until //$NON-NLS-1$ 
-                MythDroid.dispFmt.format(when) + ")" //$NON-NLS-1$
+                Globals.dispFmt.format(when) + ")" //$NON-NLS-1$
             );
             ((TextView)findViewById(R.id.guide_last)).setText(
                 Messages.getString("StatusBackend.32") + // Last run:  //$NON-NLS-1$

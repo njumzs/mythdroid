@@ -21,6 +21,7 @@ package org.mythdroid.activities;
 import java.util.ArrayList;
 
 import org.mythdroid.Enums.Extras;
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.Program;
 import org.mythdroid.activities.RecordingDetail;
@@ -247,7 +248,7 @@ public class StatusRecorders extends ListActivity {
 
         if (enc.program == null) return;
 
-        MythDroid.curProg = enc.program;
+        Globals.curProg = enc.program;
         startActivityForResult(
             new Intent()
             .putExtra(
@@ -273,7 +274,7 @@ public class StatusRecorders extends ListActivity {
 
     private void refresh() {
         showDialog(DIALOG_LOAD);
-        MythDroid.getWorker().post(getStatusTask);
+        Globals.getWorker().post(getStatusTask);
     }
 
 }

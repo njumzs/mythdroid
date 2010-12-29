@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.WeakHashMap;
 
 import org.mythdroid.Enums.Extras;
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.Video;
 import org.mythdroid.data.VideoAdapter;
@@ -71,7 +72,7 @@ public class Videos extends MDActivity implements
             
             try {
                 videos = MDDManager.getVideos(
-                    MythDroid.getBackend().addr, viddir, path
+                    Globals.getBackend().addr, viddir, path
                 );
             } catch (IOException e) {
                 ErrUtil.postErr(ctx, new Exception(Messages.getString("Videos.1"))); //$NON-NLS-1$
@@ -152,7 +153,7 @@ public class Videos extends MDActivity implements
         scale = getResources().getDisplayMetrics().density;
         
         showDialog(DIALOG_LOAD);
-        MythDroid.getWorker().post(getVideos);
+        Globals.getWorker().post(getVideos);
     }
     
     @Override
@@ -173,12 +174,12 @@ public class Videos extends MDActivity implements
             dirText.setText(currentDir(path));
             viddir = video.dir;
             showDialog(DIALOG_LOAD);
-            MythDroid.getWorker().post(getVideos);
+            Globals.getWorker().post(getVideos);
             return;
             
         }
         
-        MythDroid.curVid = video;
+        Globals.curVid = video;
         startActivity(new Intent().setClass(this, VideoDetail.class));
         
     }
@@ -219,7 +220,7 @@ public class Videos extends MDActivity implements
                 dirText.setText(currentDir(path));
             }
             showDialog(DIALOG_LOAD);
-            MythDroid.getWorker().post(getVideos);
+            Globals.getWorker().post(getVideos);
             return true;
             
         }

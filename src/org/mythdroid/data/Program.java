@@ -24,7 +24,6 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.mythdroid.activities.MythDroid;
 import org.mythdroid.data.XMLHandler.Element;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.Enums.RecDupIn;
@@ -32,6 +31,7 @@ import org.mythdroid.Enums.RecEpiFilter;
 import org.mythdroid.Enums.RecDupMethod;
 import org.mythdroid.Enums.RecStatus;
 import org.mythdroid.Enums.RecType;
+import org.mythdroid.Globals;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -108,10 +108,10 @@ public class Program implements Comparable<Program> {
                     @Override
                     public void start(Attributes attr) {
                         try {
-                            prog.RecStartTime = MythDroid.dateFmt.parse(
+                            prog.RecStartTime = Globals.dateFmt.parse(
                                 attr.getValue("recStartTs") //$NON-NLS-1$
                             );
-                            prog.RecEndTime = MythDroid.dateFmt.parse(
+                            prog.RecEndTime = Globals.dateFmt.parse(
                                 attr.getValue("recEndTs") //$NON-NLS-1$
                             );
                         } catch (ParseException e) {}
@@ -162,10 +162,10 @@ public class Program implements Comparable<Program> {
             prog.Category = attr.getValue("category"); //$NON-NLS-1$
 
             try {
-                prog.StartTime = MythDroid.dateFmt.parse(
+                prog.StartTime = Globals.dateFmt.parse(
                     attr.getValue("startTime") //$NON-NLS-1$
                 );
-                prog.EndTime = MythDroid.dateFmt.parse(
+                prog.EndTime = Globals.dateFmt.parse(
                     attr.getValue("endTime") //$NON-NLS-1$
                 );
             } catch (ParseException e) { 
@@ -184,12 +184,12 @@ public class Program implements Comparable<Program> {
         TOTAL;
 
     static {
-        if (MythDroid.protoVersion < 57) {
+        if (Globals.protoVersion < 57) {
             START     = 11; END       = 12; FINDID    = 15; RECPRIO   = 20;
             STATUS    = 21; RECID     = 22; RECTYPE   = 23; RECDUPIN  = 24;
             DUPMETHOD = 25; RECSTART  = 26; RECEND    = 27; RECGROUP  = 30;
             SERIESID  = 33; PROGID    = 34; STORGROUP = 42;
-            TOTAL     = MythDroid.protoVersion < 50 ? 46 : 47;
+            TOTAL     = Globals.protoVersion < 50 ? 46 : 47;
         }
         else {
             START     = 10; END       = 11; FINDID    = 12; RECPRIO   = 17;
@@ -266,10 +266,10 @@ public class Program implements Comparable<Program> {
         SubTitle = attr.getNamedItem("subTitle").getNodeValue(); //$NON-NLS-1$
         Category = attr.getNamedItem("category").getNodeValue(); //$NON-NLS-1$
         try {
-            StartTime = MythDroid.dateFmt.parse(
+            StartTime = Globals.dateFmt.parse(
                 attr.getNamedItem("startTime").getNodeValue() //$NON-NLS-1$
             );
-            EndTime = MythDroid.dateFmt.parse(
+            EndTime = Globals.dateFmt.parse(
                 attr.getNamedItem("endTime").getNodeValue() //$NON-NLS-1$
             );
         } catch (ParseException e) {}
@@ -306,10 +306,10 @@ public class Program implements Comparable<Program> {
         if (RecNode != null) {
             attr = RecNode.getAttributes();
             try {
-                RecStartTime = MythDroid.dateFmt.parse(
+                RecStartTime = Globals.dateFmt.parse(
                     attr.getNamedItem("recStartTs").getNodeValue() //$NON-NLS-1$
                 );
-                RecEndTime = MythDroid.dateFmt.parse(
+                RecEndTime = Globals.dateFmt.parse(
                     attr.getNamedItem("recEndTs").getNodeValue() //$NON-NLS-1$
                 );
             } catch (ParseException e) {}
@@ -347,7 +347,7 @@ public class Program implements Comparable<Program> {
      * @return String of form "ChanID FormattedRecStartTime"
      */
     public String playbackID() {
-        return ChanID + " " + MythDroid.dateFmt.format(RecStartTime); //$NON-NLS-1$
+        return ChanID + " " + Globals.dateFmt.format(RecStartTime); //$NON-NLS-1$
     }
 
     /**
@@ -366,9 +366,9 @@ public class Program implements Comparable<Program> {
         try {
             final URL url =
                 new URL(
-                    MythDroid.getBackend().getStatusURL() +
+                    Globals.getBackend().getStatusURL() +
                     "/Myth/GetPreviewImage?ChanId=" + ChanID + //$NON-NLS-1$
-                    "&StartTime=" + MythDroid.dateFmt.format(RecStartTime) //$NON-NLS-1$
+                    "&StartTime=" + Globals.dateFmt.format(RecStartTime) //$NON-NLS-1$
                 );
 
             final URLConnection conn = url.openConnection();
@@ -382,7 +382,7 @@ public class Program implements Comparable<Program> {
      * @return String of format "12:00, Mon 1 Jan 09"
      */
     public String startString() {
-        return MythDroid.dispFmt.format(StartTime);
+        return Globals.dispFmt.format(StartTime);
     }
 
     /**
@@ -390,7 +390,7 @@ public class Program implements Comparable<Program> {
      * @return String of format "12:00, Mon 1 Jan 09"
      */
     public String endString() {
-        return MythDroid.dispFmt.format(EndTime);
+        return Globals.dispFmt.format(EndTime);
     }
 
     /**

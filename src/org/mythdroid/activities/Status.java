@@ -22,6 +22,7 @@ import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
@@ -86,7 +87,7 @@ public class Status extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         showDialog(DIALOG_LOAD);
-        MythDroid.getWorker().post(getStatusTask);
+        Globals.getWorker().post(getStatusTask);
     }
 
     @Override
@@ -135,7 +136,7 @@ public class Status extends ListActivity {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
-            URL url = new URL(MythDroid.getBackend().getStatusURL() + "/xml"); //$NON-NLS-1$
+            URL url = new URL(Globals.getBackend().getStatusURL() + "/xml"); //$NON-NLS-1$
             statusDoc = dbf.newDocumentBuilder().parse(
                 url.openConnection().getInputStream()
             );

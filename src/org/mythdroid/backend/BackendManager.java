@@ -35,11 +35,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 
 import org.mythdroid.ConnMgr;
+import org.mythdroid.Globals;
 import org.mythdroid.data.Program;
 import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.ConnMgr.onConnectListener;
-import org.mythdroid.activities.MythDroid;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -78,19 +78,19 @@ public class BackendManager {
 
         statusURL = "http://" + host + ":6544"; //$NON-NLS-1$ //$NON-NLS-2$
 
-        MythDroid.protoVersion = getVersion(statusURL);
+        Globals.protoVersion = getVersion(statusURL);
         
         // Cope with odd protoVer resulting from mythtv r25366
-        if (MythDroid.protoVersion > 1000) {
-            MythDroid.beVersion = MythDroid.protoVersion / 1000;
-            MythDroid.protoVersion = MythDroid.protoVersion % 1000;
+        if (Globals.protoVersion > 1000) {
+            Globals.beVersion = Globals.protoVersion / 1000;
+            Globals.protoVersion = Globals.protoVersion % 1000;
         }
 
-        if (MythDroid.debug)
+        if (Globals.debug)
             Log.d(
                 "BackendManager",  //$NON-NLS-1$
                 "Connecting to " + host +  //$NON-NLS-1$
-                ":6543 (ProtoVer " + MythDroid.protoVersion +")" //$NON-NLS-1$ //$NON-NLS-2$
+                ":6543 (ProtoVer " + Globals.protoVersion +")" //$NON-NLS-1$ //$NON-NLS-2$
              );
         
         cmgr = new ConnMgr(host, 6543, new onConnectListener() {
@@ -128,9 +128,9 @@ public class BackendManager {
 
         final DatagramPacket rpkt = new DatagramPacket(new byte[1024], 1024);
 
-        ConnectivityReceiver.waitForWifi(MythDroid.appContext, 5000);
+        ConnectivityReceiver.waitForWifi(Globals.appContext, 5000);
         
-        if (MythDroid.debug)
+        if (Globals.debug)
             Log.d(
                 "BackendManager",  //$NON-NLS-1$
                 "Sending UPNP M-SEARCH to 239.255.255.250:1900" //$NON-NLS-1$
@@ -145,7 +145,7 @@ public class BackendManager {
         try {
             sock.receive(rpkt);
         } catch (SocketTimeoutException e) {
-            if (MythDroid.debug)
+            if (Globals.debug)
                 Log.d("BackendManager", "Timeout waiting for UPNP response"); //$NON-NLS-1$ //$NON-NLS-2$
             return null; 
         }
@@ -153,7 +153,7 @@ public class BackendManager {
         sock.close();
 
         final String msg = new String(rpkt.getData(), 0, rpkt.getLength());
-        if (MythDroid.debug)
+        if (Globals.debug)
             Log.d("BackendManager", "UPNP Response received: " + msg); //$NON-NLS-1$ //$NON-NLS-2$
         
         if (!msg.contains(BACKEND_UPNP_ID)) return null;
@@ -180,7 +180,7 @@ public class BackendManager {
      * @return A String containing the URL
      */
     public String getStatusURL() {
-        if (MythDroid.debug)
+        if (Globals.debug)
             Log.d("BackendManager", "statusURL is " + statusURL); //$NON-NLS-1$ //$NON-NLS-2$
         return statusURL;
     }
@@ -192,9 +192,14 @@ public class BackendManager {
      */
     public Program getRecording(final String basename) throws IOException {
 
-        cmgr.sendString("QUERY_RECORDING BASENAME " + basename); //$NON-NLS-1$
-        final String[] resp = cmgr.readStringList();
-        return new Program(resp, 1);
+        if (basename.equalsIgnoreCase("Unknown")) { //$NON-NLS-1$
+        	Program prog = new Program();
+        	prog.Title = "Unknown"; //$NON-NLS-1$
+        	return prog;
+        }
+    	
+    	cmgr.sendString("QUERY_RECORDING BASENAME " + basename); //$NON-NLS-1$
+        return new Program(cmgr.readStringList(), 1);
 
     }
 
@@ -219,7 +224,7 @@ public class BackendManager {
             programs.add(new Program(resp, i));
         }
         
-        if (MythDroid.protoVersion > 56)
+        if (Globals.protoVersion > 56)
             Collections.sort(programs, Collections.reverseOrder());
 
         return programs;
@@ -301,7 +306,7 @@ public class BackendManager {
     private boolean announce(ConnMgr cmgr) throws IOException {
 
         // Cope with odd protoVer resulting from mythtv r25366
-        int protoVer = MythDroid.beVersion * 1000 + MythDroid.protoVersion;
+        int protoVer = Globals.beVersion * 1000 + Globals.protoVersion;
         
         String protoToken = getToken(protoVer);
         // prefix a space for the actual request

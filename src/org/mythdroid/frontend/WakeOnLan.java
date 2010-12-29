@@ -22,7 +22,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import org.mythdroid.activities.MythDroid;
+import org.mythdroid.Globals;
 
 import android.util.Log;
 
@@ -44,7 +44,7 @@ public class WakeOnLan {
             buf[i] = (byte)0xff;
         for (int i = 6; i < buf.length; i += 6)
             System.arraycopy(addr, 0, buf, i, 6);
-        if (MythDroid.debug) 
+        if (Globals.debug) 
             Log.d(
                 "WakeOnLAN",  //$NON-NLS-1$
                 "Sending WOL packets to 255.255.255.255 " +  //$NON-NLS-1$

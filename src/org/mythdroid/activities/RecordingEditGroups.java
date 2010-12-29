@@ -18,9 +18,11 @@
 
 package org.mythdroid.activities;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 
 import org.mythdroid.mdd.MDDManager;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 
 import android.app.Activity;
@@ -43,10 +45,10 @@ public class RecordingEditGroups extends MDActivity {
         setContentView(R.layout.recording_edit_groups);
         try {
             recGroups  = MDDManager.getRecGroups(
-                MythDroid.getBackend().addr
+                Globals.getBackend().addr
             );
             storGroups = MDDManager.getStorageGroups(
-                MythDroid.getBackend().addr
+                Globals.getBackend().addr
             ); 
         } catch (Exception e) {
             ErrUtil.err(this, e);
@@ -54,6 +56,7 @@ public class RecordingEditGroups extends MDActivity {
         }
         
         if (recGroups == null || storGroups == null) {
+        	ErrUtil.err(this, Messages.getString("RecordingEditGroups.0")); //$NON-NLS-1$
         	finish();
         	return;
         }

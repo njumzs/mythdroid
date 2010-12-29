@@ -19,18 +19,12 @@
 package org.mythdroid.activities;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.TimeZone;
 
 import org.mythdroid.Enums.Extras;
+import org.mythdroid.Globals;
 import org.mythdroid.R;
-import org.mythdroid.backend.BackendManager;
-import org.mythdroid.data.Program;
-import org.mythdroid.data.Video;
 import org.mythdroid.frontend.FrontendDB;
-import org.mythdroid.frontend.FrontendLocation;
-import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.frontend.WakeOnLan;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.receivers.ConnectivityReceiver;
@@ -45,14 +39,10 @@ import android.R.id;
 import android.R.layout;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Process;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -70,38 +60,6 @@ import android.widget.AdapterView.OnItemClickListener;
  */
 public class MythDroid extends MDListActivity implements
     AdapterView.OnItemLongClickListener {
-
-    /** Debug? */
-    final public static boolean debug = true;
-    
-    /** Backend protocol version */
-    public static int protoVersion  = 0;
-    public static int beVersion = 0;
-
-    public static Context appContext = null;
-    
-    /** The name of the current default frontend */
-    public static String defaultFrontend = null;
-
-    /** To remember where we were */
-    public static FrontendLocation lastLocation =
-    	new FrontendLocation(null, "MainMenu"); //$NON-NLS-1$
-
-    /** A Program representing the currently selected recording */
-    public static Program curProg = null;
-    /** A Video representing the currently selected video */
-    public static Video curVid = null;
-
-    /** SimpleDateFormat of yyyy-MM-dd'T'HH:mm:ss */
-    final public static SimpleDateFormat dateFmt =
-        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
-    /** SimpleDateFormat of HH:mm, EEE d MMM yy */
-    final public static SimpleDateFormat dispFmt =
-        new SimpleDateFormat("HH:mm, EEE d MMM yy"); //$NON-NLS-1$
-    static {
-        dispFmt.setTimeZone(TimeZone.getDefault());
-        dateFmt.setTimeZone(TimeZone.getDefault());
-    }
 
     /** Menu IDs */
     final private static int 
@@ -125,25 +83,16 @@ public class MythDroid extends MDListActivity implements
     		Messages.getString("MythDroid.11")    // Status     //$NON-NLS-1$
     	};
 
-    /** A BackendManager representing a connected backend */
-    private static BackendManager  beMgr  = null;
-    /** A FrontendManager representing a connected frontend */
-    private static FrontendManager feMgr  = null;
-    /** A handler for the worker thread */
-    private static Handler wHandler = null;
-
-    /** Backend address from preferences */
-    private static String backend = null;
-
     /** ListAdapter containing the main menu entries */
     private ArrayAdapter<String> menuAdapter = null;
 
+    
     @Override
     public void onCreate(Bundle icicle) {
         
         super.onCreate(icicle);
 
-        appContext = getApplicationContext();
+        Globals.appContext = getApplicationContext();
         
         setContentView(R.layout.mainmenu);
 
@@ -152,18 +101,6 @@ public class MythDroid extends MDListActivity implements
         );
 
         getPreferences();
-
-        final HandlerThread hThread = new HandlerThread(
-            "worker", Process.THREAD_PRIORITY_BACKGROUND //$NON-NLS-1$
-        );
-
-        hThread.setDaemon(true);
-        hThread.start();
-
-        while (!hThread.isAlive()) {}
-
-        if (wHandler == null) 
-            wHandler = new Handler(hThread.getLooper());
         
         new ConnectivityReceiver(this);
 
@@ -174,20 +111,15 @@ public class MythDroid extends MDListActivity implements
         
         super.onDestroy();
         
-        if (beMgr != null) 
-            try {
-                beMgr.done();
-            } catch (IOException e) { ErrUtil.err(this, e); }
-        beMgr = null;
+        try {
+			Globals.destroyBackend();
+			Globals.destroyFrontend();
+		} catch (IOException e) {
+			ErrUtil.err(this, e);
+		}
         
-        if (feMgr != null && feMgr.isConnected()) try {
-            feMgr.disconnect();
-        } catch (IOException e) { ErrUtil.err(this, e); }
-        feMgr = null;
+        Globals.destroyWorker();
         
-        if (wHandler != null) 
-            wHandler.getLooper().quit();
-        wHandler = null;
         
     }
     
@@ -196,12 +128,21 @@ public class MythDroid extends MDListActivity implements
         
         super.onResume();
         getListView().setOnItemLongClickListener(this);
-        
-        if (beMgr != null) 
-            setListAdapter(menuAdapter);
-        else
-            findBackend();
-        
+  
+        try {
+			if (Globals.getBackend() == null) {
+				((TextView)findViewById(R.id.emptyMsg))
+                	.setText(R.string.no_be);
+				((TextView)findViewById(R.id.emptyDetail))
+                	.setText(R.string.no_be_detail);
+				setListAdapter(null);
+			}
+			else
+				setListAdapter(menuAdapter);
+		} catch (IOException e) {
+			ErrUtil.err(this, e);
+		}
+
     }
 
     @Override
@@ -344,8 +285,11 @@ public class MythDroid extends MDListActivity implements
     protected void onActivityResult(int reqCode, int resCode, Intent data) {
         super.onActivityResult(reqCode, resCode, data);
         getPreferences();
-        if (beMgr == null) 
-            findBackend();
+        try {
+        	Globals.getBackend();
+		} catch (IOException e) {
+			ErrUtil.err(this, e);
+		}
     }
     
     @Override
@@ -353,162 +297,6 @@ public class MythDroid extends MDListActivity implements
         super.onConfigurationChanged(config);
     }
  
-     /**
-     * Connect to defaultFrontend or the first frontend in the FrontendDB
-     * if defaultFrontend is null, returns quickly if the defaultFrontend if
-     * already connected
-     * @return A FrontendManager connected to a frontend or null if there's a 
-     * problem
-     * @throws IOException 
-     */
-    public static FrontendManager getFrontend(Context ctx) throws IOException {
-
-        String name = defaultFrontend;
-
-        if (feMgr != null && feMgr.isConnected()) {
-            if (name.equals(feMgr.name))
-                return feMgr;
-            try {
-                feMgr.disconnect();
-            } catch (IOException e) {}
-            feMgr = null;
-        }
-
-        Cursor c = FrontendDB.getFrontends(ctx);
-
-        if (c.getCount() < 1) {
-            c.close();
-            throw new IOException(Messages.getString("MythDroid.26")); //$NON-NLS-1$
-        }
-
-        c.moveToFirst();
-
-        if (name == null) {
-            name = c.getString(FrontendDB.NAME);
-            feMgr = new FrontendManager(name, c.getString(FrontendDB.ADDR));
-        }
-
-        else {
-            while (!c.isAfterLast()) {
-                String n = c.getString(FrontendDB.NAME);
-                if (n.equals(name)) {
-                    feMgr = new FrontendManager(
-                        name, c.getString(FrontendDB.ADDR)
-                    );
-                    break;
-                }
-                c.moveToNext();
-            }
-        }
-        
-        if (feMgr != null) 
-            defaultFrontend = feMgr.name;
-
-        c.close();
-        FrontendDB.close();
-
-        return feMgr;
-
-    }
-    
-    /**
-     * Connect to a backend. 
-     * 
-     * Connect to a specific backend if so configured or locate one otherwise
-     * returns quickly if a backend is already connected
-     * @return A BackendManager connected to a backend or null if there's a 
-     * problem
-     * @throws IOException 
-     */
-    public static BackendManager getBackend() throws IOException {
-        
-        if (beMgr != null)
-            return beMgr;
-        
-        if (backend != null && backend.length() > 0)
-            beMgr = new BackendManager(backend);
-        if (beMgr == null)
-            beMgr = BackendManager.locate();
-        
-        return beMgr;
-        
-    }
-    
-    /**
-     * Get a Handler for the worker thread
-     * 
-     * @return a Handler for the worker thread
-     */
-    public static Handler getWorker() {
-        
-        if (wHandler != null)
-            return wHandler;
-        
-        final HandlerThread hThread = new HandlerThread(
-            "worker", Process.THREAD_PRIORITY_BACKGROUND //$NON-NLS-1$
-        );
-
-        hThread.setDaemon(true);
-        hThread.start();
-
-        while (!hThread.isAlive()) {}
-
-        if (wHandler == null) 
-            wHandler = new Handler(hThread.getLooper());
-        
-        return wHandler;
-    }
-
-    /** Locate and connect to a backend */
-    private void findBackend() {
-
-        if (beMgr != null && beMgr.isConnected()) 
-            return;
-
-        final Handler handler = new Handler();
-        
-        final Runnable found = new Runnable() {
-            @Override
-            public void run() {
-
-                if (beMgr == null && backend != null && backend.length() > 0)
-                    try {
-                        beMgr = new BackendManager(backend);
-                    } catch (Exception e) {
-                        ErrUtil.postErr(ctx, e);
-                        beMgr = null;
-                    } 
-
-                    if (beMgr == null) {
-                        ((TextView)findViewById(R.id.emptyMsg))
-                            .setText(R.string.no_be);
-                        ((TextView)findViewById(R.id.emptyDetail))
-                            .setText(R.string.no_be_detail);
-                        setListAdapter(null);
-                    }
-                    else
-                        setListAdapter(menuAdapter);
-
-            }
-        };
-        
-        if (wHandler == null) wHandler = getWorker();
-
-        wHandler.post(
-            new Runnable() {
-                @Override
-                public void run() {
-                    // Auto locate a master backend
-                    try {
-                        beMgr = BackendManager.locate();
-                    } catch (IOException e) { ErrUtil.postErr(ctx, e); }
-                
-                    handler.post(found);
-                }
-            }
-       );
-
-    }
     
     private Dialog createGuideDialog() {
         
@@ -561,9 +349,11 @@ public class MythDroid extends MDListActivity implements
         
         final ArrayList<String> items = new ArrayList<String>(3);
         items.add(Messages.getString("MythDroid.21"));  // Here //$NON-NLS-1$
-        if (defaultFrontend != null) 
+        if (Globals.defaultFrontend != null) 
             // On <defaultFrontend>
-            items.add(Messages.getString("MythDroid.22") + defaultFrontend);  //$NON-NLS-1$
+            items.add(
+            	Messages.getString("MythDroid.22") + Globals.defaultFrontend //$NON-NLS-1$
+            );  
         items.add(Messages.getString("MythDroid.23")); // Choose frontend //$NON-NLS-1$
 
         final ListView lv = ((AlertDialog)dialog).getListView();
@@ -597,7 +387,7 @@ public class MythDroid extends MDListActivity implements
                     try {
                         WakeOnLan.Wake(c.getString(FrontendDB.HWADDR));
                     } catch (Exception e) { ErrUtil.err(ctx, e); }
-                    defaultFrontend = c.getString(FrontendDB.NAME);
+                    Globals.defaultFrontend = c.getString(FrontendDB.NAME);
                     c.close();
                     FrontendDB.close();
                     d.dismiss();
@@ -641,7 +431,7 @@ public class MythDroid extends MDListActivity implements
                 ) {
                     try {
                         MDDManager.mddCommand(
-                            feMgr.addr,
+                            Globals.getFrontend(ctx).addr,
                             (String)av.getItemAtPosition(pos)
                         );
                     } catch (IOException e) { ErrUtil.postErr(ctx, e); }
@@ -660,7 +450,7 @@ public class MythDroid extends MDListActivity implements
         
         try {
             cmds = MDDManager.getCommands(
-                getFrontend(this).addr
+                Globals.getFrontend(this).addr
             );
         } catch(IOException e) { 
             ErrUtil.err(ctx, e);
@@ -682,7 +472,7 @@ public class MythDroid extends MDListActivity implements
     }
 
     private void getPreferences() {
-        backend = 
+        Globals.backend = 
             PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("backendAddr", ""); //$NON-NLS-1$ //$NON-NLS-2$
     }

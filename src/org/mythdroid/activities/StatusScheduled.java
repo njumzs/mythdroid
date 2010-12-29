@@ -20,6 +20,7 @@ package org.mythdroid.activities;
 
 import java.util.ArrayList;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.ProgramAdapter;
@@ -68,7 +69,7 @@ public class StatusScheduled extends ListActivity {
 
     @Override
     public void onListItemClick(ListView list, View item, int pos, long id) {
-        MythDroid.curProg = (Program) list.getItemAtPosition(pos);
+        Globals.curProg = (Program) list.getItemAtPosition(pos);
         startActivity(new Intent().setClass(this, RecordingDetail.class));
     }
 

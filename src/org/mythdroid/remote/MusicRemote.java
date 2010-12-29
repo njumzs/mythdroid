@@ -27,12 +27,12 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.mythdroid.Enums.Extras;
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.mdd.MDDMusicListener;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
-import org.mythdroid.activities.MythDroid;
 import org.mythdroid.Enums.Key;
 
 import android.R.drawable;
@@ -242,7 +242,7 @@ public class MusicRemote extends Remote {
     public void onResume() {
         super.onResume();
         try {
-            feMgr = MythDroid.getFrontend(this);
+            feMgr = Globals.getFrontend(this);
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();
@@ -385,7 +385,7 @@ public class MusicRemote extends Remote {
                         try {
                             switch(which) {
                                 case Dialog.BUTTON_POSITIVE: 
-                                    feMgr.jumpTo(MythDroid.lastLocation);
+                                    feMgr.jumpTo(Globals.lastLocation);
                                     break;
                                 case Dialog.BUTTON_NEUTRAL:
                                     feMgr.sendKey(Key.ESCAPE);
@@ -480,7 +480,7 @@ public class MusicRemote extends Remote {
         URL url = null;
         try {
             url = new URL(
-                MythDroid.getBackend().getStatusURL() +
+                Globals.getBackend().getStatusURL() +
                 "/Myth/GetAlbumArt?" +  //$NON-NLS-1$
                 "Id=" + artid + //$NON-NLS-1$
                 "&Width=" + artView.getWidth() + //$NON-NLS-1$
