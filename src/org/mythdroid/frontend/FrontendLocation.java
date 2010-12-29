@@ -96,15 +96,16 @@ public class FrontendLocation {
         location = niceLocation;
         position = timeToInt(tok[2]);
         
-        if (tok[1].equals("recorded")) { //$NON-NLS-1$
+        if (tok[1].equals("recorded") || tok[1].equals("livetv")) { //$NON-NLS-1$ //$NON-NLS-2$
             end = timeToInt(tok[4]);
             if (tok[5].equals("pause")) //$NON-NLS-1$
             	rate = 0;
             else
             	rate = Float.parseFloat(
-            			tok[5].substring(0, tok[5].lastIndexOf('x'))
+            		tok[5].substring(0, tok[5].lastIndexOf('x'))
             	);
             filename = tok[9];
+            if (tok[1].equals("livetv")) livetv = true; //$NON-NLS-1$
         }
         else if (tok[1].equals("video")) { //$NON-NLS-1$
             end = -1;
@@ -112,19 +113,18 @@ public class FrontendLocation {
             	rate = 0;
             else
                 rate = Float.parseFloat(
-                		tok[3].substring(0, tok[3].lastIndexOf('x'))
+                	tok[3].substring(0, tok[3].lastIndexOf('x'))
                 );
             filename = "Video"; //$NON-NLS-1$
         }
         else {
         	rate = loc.contains("pause") ? 0 : -1; //$NON-NLS-1$
-            end = -1;
-            filename = "Unknown"; //$NON-NLS-1$
+        	end = -1;
+        	filename = "Unknown"; //$NON-NLS-1$
         }
         
         video = true;
         
-        if (tok[1].equals("livetv")) livetv = true; //$NON-NLS-1$
         if (Globals.debug) 
             Log.d(
                 "FrontendLocation",  //$NON-NLS-1$

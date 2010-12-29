@@ -85,7 +85,9 @@ public class MythDroid extends MDListActivity implements
 
     /** ListAdapter containing the main menu entries */
     private ArrayAdapter<String> menuAdapter = null;
-
+    
+    /** ConnectivityReceiver instance */
+    ConnectivityReceiver crecv = null;
     
     @Override
     public void onCreate(Bundle icicle) {
@@ -102,7 +104,7 @@ public class MythDroid extends MDListActivity implements
 
         getPreferences();
         
-        new ConnectivityReceiver(this);
+        crecv = new ConnectivityReceiver(Globals.appContext);
 
     }
 
@@ -120,6 +122,7 @@ public class MythDroid extends MDListActivity implements
         
         Globals.destroyWorker();
         
+        crecv.dispose(Globals.appContext);
         
     }
     

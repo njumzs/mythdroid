@@ -114,6 +114,14 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     }
     
     /**
+     * Unregister the broadcast receiver
+     * @param ctx - Context to unregister from
+     */
+    public void dispose(Context ctx) {
+    	ctx.unregisterReceiver(this);
+    }
+    
+    /**
      * Get the current network type (WiFi or mobile)
      * @return - ConnectivityManager.TYPE_WIFI or ConnectivityManager.TYPE_MOBILE
      */

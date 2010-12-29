@@ -65,22 +65,7 @@ public class RecordingEdit extends MDActivity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        
-        prog = Globals.curProg;
-        if (prog == null) 
-        	ErrUtil.err(this, Messages.getString("RecordingEdit.1")); //$NON-NLS-1$
-        
-        type = prog.Type;
-        prio = prog.RecPrio;
-        
-        dupMethod = prog.DupMethod;
-        dupIn = prog.DupIn;
-        epiFilter = prog.EpiFilter;
-        recGroup = prog.RecGroup;
-        storGroup = prog.StorGroup;
-     
         setContentView(R.layout.recording_edit);
-        
     }
 
     @Override
@@ -90,12 +75,38 @@ public class RecordingEdit extends MDActivity {
     
     @Override
     public void onResume() {
+    	
         super.onResume();
         try {
             beMgr = Globals.getBackend();
         } catch (Exception e) {
             ErrUtil.err(this, e);
         }
+        
+        try {
+        	new MDDManager(beMgr.addr);
+        } catch (IOException e) {
+        	ErrUtil.err(
+        		this, Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
+        	); 
+        	finish();
+        	return;
+        }
+        
+        prog = Globals.curProg;
+        if (prog == null) {
+        	finish();
+        	return;
+        }
+        
+        type = prog.Type;
+        prio = prog.RecPrio;
+        
+        dupMethod = prog.DupMethod;
+        dupIn = prog.DupIn;
+        epiFilter = prog.EpiFilter;
+        recGroup = prog.RecGroup;
+        storGroup = prog.StorGroup;
         
         if (prog.RecID != -1) {
             try {
@@ -113,6 +124,7 @@ public class RecordingEdit extends MDActivity {
         }
         
         setViews();
+        
     }
 
     @Override
@@ -125,6 +137,7 @@ public class RecordingEdit extends MDActivity {
     @Override
     protected void onActivityResult(int reqCode, int resCode, Intent data) {
         super.onActivityResult(reqCode, resCode, data);
+        if (prog == null || recGroup == null || storGroup == null) return;
         if (
             dupMethod == prog.DupMethod && dupIn == prog.DupIn && 
             epiFilter == prog.EpiFilter && recGroup.equals(prog.RecGroup) &&

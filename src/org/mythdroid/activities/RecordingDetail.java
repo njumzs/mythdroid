@@ -64,13 +64,8 @@ public class RecordingDetail extends MDActivity {
         super.onCreate(icicle);
         addHereToFrontendChooser(VideoPlayer.class);
         setContentView(R.layout.recording_detail);
-        prog = Globals.curProg;
-        if (prog == null)
-        	ErrUtil.err(this, Messages.getString("RecordingDetail.2")); //$NON-NLS-1$
-
         livetv = getIntent().getBooleanExtra(Extras.LIVETV.toString(), false);
         guide = getIntent().getBooleanExtra(Extras.GUIDE.toString(), false);
-        setViews();
     }
 
     @Override
@@ -87,6 +82,12 @@ public class RecordingDetail extends MDActivity {
         } catch (Exception e) {
             ErrUtil.err(this, e);
         }
+        prog = Globals.curProg;
+        if (prog == null) {
+        	finish();
+        	return;
+        }
+        setViews();
     }
 
     @Override
