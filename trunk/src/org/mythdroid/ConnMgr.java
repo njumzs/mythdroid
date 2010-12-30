@@ -58,10 +58,6 @@ public class ConnMgr {
     /** An array of weak references to current connections */
     final private static ArrayList<WeakReference<ConnMgr>> conns =
         new ArrayList<WeakReference<ConnMgr>>(8);
-    
-    /** An IOException with a message that we've been disconnected */
-    final private static IOException disconnected =
-        new IOException(Messages.getString("ConnMgr.0")); //$NON-NLS-1$
 
     /** Receive buffer size */
     final private static int        rbufSize         = 128;
@@ -92,6 +88,8 @@ public class ConnMgr {
     private byte[]                  lastSent         = null;
     /** contains our onConnect callback if there is one */
     private onConnectListener       oCL              = null;
+    /** An IOException with a message that we've been disconnected */
+    private IOException 			disconnected 	 = null; 
 
     /**
      * Constructor
@@ -106,11 +104,13 @@ public class ConnMgr {
         hostname = host;
         addr = host + ":" + port; //$NON-NLS-1$
         
+        disconnected = new IOException(Messages.getString("ConnMgr.0") + addr); //$NON-NLS-1$
+        
         oCL = ocl;
 
         /* 
          * Increase default socket timeout if we're not on WiFi 
-         *  Grab a WifiLock if we are
+         * Grab a WifiLock if we are
          */
         if (
             ConnectivityReceiver.networkType() == ConnectivityManager.TYPE_WIFI
@@ -365,14 +365,9 @@ public class ConnMgr {
         
             for (WeakReference<ConnMgr> r : conns) {
             
-                if (r == null) 
-                    continue;
-                
+                if (r == null) continue;
                 ConnMgr c = r.get();
-                    
-                if (c == null) 
-                    continue;
-                
+                if (c == null) continue;
                 c.disconnect();
                 c.reconnectPending = true;
                 
@@ -391,14 +386,9 @@ public class ConnMgr {
             
             for (WeakReference<ConnMgr> r : conns) {
             
-                if (r == null)
-                    continue;
-                
+                if (r == null) continue;
                 ConnMgr c = r.get();
-                    
-                if (c == null)
-                    continue;
-     
+                if (c == null) continue;
                 c.connect(1000);
                 
             }
