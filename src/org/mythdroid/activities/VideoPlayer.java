@@ -88,6 +88,7 @@ public class VideoPlayer extends MDActivity {
             beMgr = Globals.getBackend();
         } catch (Exception e) {
             ErrUtil.err(this, e);
+            finish();
         }
     }
     
