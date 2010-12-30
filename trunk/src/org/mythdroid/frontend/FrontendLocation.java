@@ -45,8 +45,6 @@ public class FrontendLocation {
 
         location = loc;
         
-        if (Globals.debug) Log.d("FrontendLocation", "loc: " + loc); //$NON-NLS-1$ //$NON-NLS-2$
-        
         if (locations == null && !populateLocations(feMgr)) 
             return;
 

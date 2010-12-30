@@ -310,9 +310,8 @@ public class BackendManager {
         
         String protoToken = getToken(protoVer);
         // prefix a space for the actual request
-        if (protoToken.length() > 0) {
+        if (protoToken.length() > 0)
         	protoToken = " " + protoToken; //$NON-NLS-1$
-        }
 
         cmgr.sendString("MYTH_PROTO_VERSION " + protoVer + protoToken); //$NON-NLS-1$
 

@@ -61,13 +61,12 @@ public class Globals {
     private static FrontendManager feMgr  = null;
     /** A handler for the worker thread */
     private static Handler wHandler = null;
-
-    
   
     /**
      * Connect to defaultFrontend or the first frontend in the FrontendDB
      * if defaultFrontend is null, returns quickly if the defaultFrontend if
      * already connected
+     * @param ctx - a Context
      * @return A FrontendManager connected to a frontend or null if there's a 
      * problem
      * @throws IOException 
@@ -171,6 +170,7 @@ public class Globals {
             wHandler = new Handler(hThread.getLooper());
         
         return wHandler;
+        
     }
     
     public static void destroyFrontend() throws IOException {
