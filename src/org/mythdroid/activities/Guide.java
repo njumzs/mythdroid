@@ -122,21 +122,55 @@ public class Guide extends MDActivity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        try {
+                        
+                    	try {
                             dismissDialog(DIALOG_LOAD);
                         } catch (IllegalArgumentException e) {}
+                        
                         tbl.addView(getHeader());
                         // this is necessary to get proper layout
                         tbl.addView(getSpacer());
 
-                        int i = 0;
-                        for (Channel ch : channels) {
-                            if (i++ == 7) {
+                        int j = 0;
+                        int maxChan = channels.size() - 1;
+                        
+                        for (int i = 0; i < maxChan; i++) {
+                        	
+                        	Channel current = channels.get(i);
+                        	                        	
+                        	if (current.num.length() == 0)	continue;
+                        	
+                        	/* 
+                        	 * MythTV 0.24 sometimes splits programs amongst 
+                        	 * channels with different ids but the same num
+                        	 * and callsign.. :/
+                        	 */
+                        	if (i < maxChan - 1) {
+                        		
+                        		Channel next = channels.get(i+1);
+                        	
+                        		if (
+                        			current.num.equals(next.num) &&
+                        			current.callSign.equals(next.callSign)
+                        		) {
+                        			next.programs.addAll(current.programs);
+                        			continue;
+                        		}
+                        		
+                        	}
+                        	
+                            if (j++ == 7) {
                                 tbl.addView(getHeader());
-                                i = 0;
+                                j = 0;
                             }
-                            tbl.addView(getRowFromChannel(ch));
+                            
+                            // This became necessary in either android 2.2 or MythTV 0.24
+                            Collections.sort(current.programs);
+                            
+                            tbl.addView(getRowFromChannel(current));
+                            
                         }
+                        
                     }
                 }
            );
@@ -485,7 +519,10 @@ public class Guide extends MDActivity {
 
         for (Program prog : ch.programs) {
 
-            tv = new TextView(this);
+            if (prog.StartTime.equals(later))
+            	continue;
+            
+        	tv = new TextView(this);
             layout = new LayoutParams(this, null);
             layout.topMargin = layout.bottomMargin = 
                 layout.leftMargin = layout.rightMargin = 1;
