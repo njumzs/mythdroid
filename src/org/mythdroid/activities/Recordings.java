@@ -102,7 +102,7 @@ public class Recordings extends MDListActivity implements
             handler.post(
                 new Runnable() {
                     @Override
-					public void run() {
+                public void run() {
                         try {
                             dismissDialog(DIALOG_LOAD);
                         } catch (IllegalArgumentException e) {}

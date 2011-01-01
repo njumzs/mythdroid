@@ -123,7 +123,7 @@ public class Guide extends MDActivity {
                     @Override
                     public void run() {
                         
-                    	try {
+                        try {
                             dismissDialog(DIALOG_LOAD);
                         } catch (IllegalArgumentException e) {}
                         
@@ -135,30 +135,30 @@ public class Guide extends MDActivity {
                         int maxChan = channels.size() - 1;
                         
                         for (int i = 0; i < maxChan; i++) {
-                        	
-                        	Channel current = channels.get(i);
-                        	                        	
-                        	if (current.num.length() == 0)	continue;
-                        	
-                        	/* 
-                        	 * MythTV 0.24 sometimes splits programs amongst 
-                        	 * channels with different ids but the same num
-                        	 * and callsign.. :/
-                        	 */
-                        	if (i < maxChan - 1) {
-                        		
-                        		Channel next = channels.get(i+1);
-                        	
-                        		if (
-                        			current.num.equals(next.num) &&
-                        			current.callSign.equals(next.callSign)
-                        		) {
-                        			next.programs.addAll(current.programs);
-                        			continue;
-                        		}
-                        		
-                        	}
-                        	
+                            
+                            Channel current = channels.get(i);
+                                                        
+                            if (current.num.length() == 0)    continue;
+                            
+                            /* 
+                             * MythTV 0.24 sometimes splits programs amongst 
+                             * channels with different ids but the same num
+                             * and callsign.. :/
+                             */
+                            if (i < maxChan - 1) {
+                                
+                                Channel next = channels.get(i+1);
+                            
+                                if (
+                                    current.num.equals(next.num) &&
+                                    current.callSign.equals(next.callSign)
+                                ) {
+                                    next.programs.addAll(current.programs);
+                                    continue;
+                                }
+                                
+                            }
+                            
                             if (j++ == 7) {
                                 tbl.addView(getHeader());
                                 j = 0;
@@ -520,9 +520,9 @@ public class Guide extends MDActivity {
         for (Program prog : ch.programs) {
 
             if (prog.StartTime.equals(later))
-            	continue;
+                continue;
             
-        	tv = new TextView(this);
+            tv = new TextView(this);
             layout = new LayoutParams(this, null);
             layout.topMargin = layout.bottomMargin = 
                 layout.leftMargin = layout.rightMargin = 1;

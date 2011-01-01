@@ -19,8 +19,8 @@ import android.os.HandlerThread;
 import android.os.Process;
 
 public class Globals {
-	
-	 /** Debug? */
+    
+     /** Debug? */
     final public static boolean debug = true;
     
     /** Backend protocol version */
@@ -37,7 +37,7 @@ public class Globals {
 
     /** To remember where we were */
     public static FrontendLocation lastLocation =
-    	new FrontendLocation(null, "MainMenu"); //$NON-NLS-1$
+        new FrontendLocation(null, "MainMenu"); //$NON-NLS-1$
 
     /** A Program representing the currently selected recording */
     public static Program curProg = null;
@@ -136,10 +136,10 @@ public class Globals {
             return beMgr;
         
         if (backend != null && backend.length() > 0)
-        	try {
-        		beMgr = new BackendManager(backend);
-        	} catch(IOException e) {}
-        	
+            try {
+                beMgr = new BackendManager(backend);
+            } catch(IOException e) {}
+            
         if (beMgr == null)
             beMgr = BackendManager.locate();
         
@@ -174,19 +174,19 @@ public class Globals {
     }
     
     public static void destroyFrontend() throws IOException {
-    	 if (feMgr != null && feMgr.isConnected())
+         if (feMgr != null && feMgr.isConnected())
              feMgr.disconnect();
          feMgr = null;
     }
     
     public static void destroyBackend() throws IOException {
-    	if (beMgr != null) 
+        if (beMgr != null) 
             beMgr.done();
         beMgr = null;
     }
     
     public static void destroyWorker() {
-    	if (wHandler != null) 
+        if (wHandler != null) 
             wHandler.getLooper().quit();
         wHandler = null;
     }

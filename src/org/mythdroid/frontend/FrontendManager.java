@@ -224,8 +224,8 @@ public class FrontendManager {
     }
     
     private synchronized String getSingleLineResponse() throws IOException {
-    	if (cmgr == null) 
-    		throw new IOException(Messages.getString("FrontendManager.0")); //$NON-NLS-1$
+        if (cmgr == null) 
+            throw new IOException(Messages.getString("FrontendManager.0")); //$NON-NLS-1$
         String line = cmgr.readLine();
         while (cmgr != null) 
             if (cmgr.readLine().equals("#")) break; //$NON-NLS-1$

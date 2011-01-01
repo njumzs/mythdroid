@@ -151,9 +151,9 @@ public abstract class MDListActivity extends ListActivity {
     
     @Override
     public void onResume() {
-    	super.onResume();
-    	if (Globals.appContext == null)
-        	Globals.appContext = getApplicationContext();
+        super.onResume();
+        if (Globals.appContext == null)
+            Globals.appContext = getApplicationContext();
     }
 
     @Override

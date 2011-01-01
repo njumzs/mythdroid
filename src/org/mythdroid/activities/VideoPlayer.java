@@ -173,9 +173,9 @@ public class VideoPlayer extends MDActivity {
             else {
                 Program prog = Globals.curProg;
                 if (prog == null) {
-                	ErrUtil.err(this, Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
-                	finish();
-                	return;
+                    ErrUtil.err(this, Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
+                    finish();
+                    return;
                 }
                 path = prog.Path;
                 if (prog.StorGroup != null)

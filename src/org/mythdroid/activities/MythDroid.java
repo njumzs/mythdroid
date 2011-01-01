@@ -75,13 +75,13 @@ public class MythDroid extends MDListActivity implements
     /** Entries for the main menu list */
     final private static String[] MenuItems =
         { 
-    		Messages.getString("MythDroid.7"),    // Watch TV   //$NON-NLS-1$
-    		Messages.getString("MythDroid.8"),    // Recordings //$NON-NLS-1$
-    		Messages.getString("MythDroid.12"),   // Videos     //$NON-NLS-1$
-    		Messages.getString("MythDroid.9"),    // Music      //$NON-NLS-1$
-    		Messages.getString("MythDroid.10"),   // Guide      //$NON-NLS-1$
-    		Messages.getString("MythDroid.11")    // Status     //$NON-NLS-1$
-    	};
+            Messages.getString("MythDroid.7"),    // Watch TV   //$NON-NLS-1$
+            Messages.getString("MythDroid.8"),    // Recordings //$NON-NLS-1$
+            Messages.getString("MythDroid.12"),   // Videos     //$NON-NLS-1$
+            Messages.getString("MythDroid.9"),    // Music      //$NON-NLS-1$
+            Messages.getString("MythDroid.10"),   // Guide      //$NON-NLS-1$
+            Messages.getString("MythDroid.11")    // Status     //$NON-NLS-1$
+        };
 
     /** ListAdapter containing the main menu entries */
     private ArrayAdapter<String> menuAdapter = null;
@@ -114,11 +114,11 @@ public class MythDroid extends MDListActivity implements
         super.onDestroy();
         
         try {
-			Globals.destroyBackend();
-			Globals.destroyFrontend();
-		} catch (IOException e) {
-			ErrUtil.err(this, e);
-		}
+            Globals.destroyBackend();
+            Globals.destroyFrontend();
+        } catch (IOException e) {
+            ErrUtil.err(this, e);
+        }
         
         Globals.destroyWorker();
         
@@ -133,18 +133,18 @@ public class MythDroid extends MDListActivity implements
         getListView().setOnItemLongClickListener(this);
   
         try {
-			if (Globals.getBackend() == null) {
-				((TextView)findViewById(R.id.emptyMsg))
-                	.setText(R.string.no_be);
-				((TextView)findViewById(R.id.emptyDetail))
-                	.setText(R.string.no_be_detail);
-				setListAdapter(null);
-			}
-			else
-				setListAdapter(menuAdapter);
-		} catch (IOException e) {
-			ErrUtil.err(this, e);
-		}
+            if (Globals.getBackend() == null) {
+                ((TextView)findViewById(R.id.emptyMsg))
+                    .setText(R.string.no_be);
+                ((TextView)findViewById(R.id.emptyDetail))
+                    .setText(R.string.no_be_detail);
+                setListAdapter(null);
+            }
+            else
+                setListAdapter(menuAdapter);
+        } catch (IOException e) {
+            ErrUtil.err(this, e);
+        }
 
     }
 
@@ -155,17 +155,17 @@ public class MythDroid extends MDListActivity implements
         Class<?> activity = null;
 
         if      (action.equals(Messages.getString("MythDroid.7"))) //$NON-NLS-1$
-        	activity = TVRemote.class;
+            activity = TVRemote.class;
         else if (action.equals(Messages.getString("MythDroid.8"))) //$NON-NLS-1$
-        	activity = Recordings.class;
+            activity = Recordings.class;
         else if (action.equals(Messages.getString("MythDroid.12"))) //$NON-NLS-1$
             activity = Videos.class;
         else if (action.equals(Messages.getString("MythDroid.9"))) //$NON-NLS-1$
-        	activity = MusicRemote.class;
+            activity = MusicRemote.class;
         else if (action.equals(Messages.getString("MythDroid.10"))) //$NON-NLS-1$
-        	activity = Guide.class;
+            activity = Guide.class;
         else if (action.equals(Messages.getString("MythDroid.11"))) //$NON-NLS-1$
-        	activity = Status.class;
+            activity = Status.class;
 
         startActivity(
             new Intent().putExtra(
@@ -243,13 +243,13 @@ public class MythDroid extends MDListActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(Menu.NONE, MENU_SETTINGS, Menu.NONE, R.string.settings)
-        	.setIcon(drawable.ic_menu_preferences);
+            .setIcon(drawable.ic_menu_preferences);
         menu.add(Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.set_def_fe)
             .setIcon(drawable.ic_menu_upload_you_tube);
         menu.add(Menu.NONE, MENU_WAKE, Menu.NONE, R.string.wake_fe)
             .setIcon(drawable.ic_lock_power_off);
         menu.add(Menu.NONE, MENU_NAV, Menu.NONE, R.string.remote)
-        	.setIcon(drawable.ic_menu_compass);
+            .setIcon(drawable.ic_menu_compass);
         menu.add(Menu.NONE, MENU_MDD, Menu.NONE, R.string.mddCmds)
             .setIcon(drawable.ic_menu_agenda);
         return true;
@@ -289,10 +289,10 @@ public class MythDroid extends MDListActivity implements
         super.onActivityResult(reqCode, resCode, data);
         getPreferences();
         try {
-        	Globals.getBackend();
-		} catch (IOException e) {
-			ErrUtil.err(this, e);
-		}
+            Globals.getBackend();
+        } catch (IOException e) {
+            ErrUtil.err(this, e);
+        }
     }
     
     @Override
@@ -355,7 +355,7 @@ public class MythDroid extends MDListActivity implements
         if (Globals.defaultFrontend != null) 
             // On <defaultFrontend>
             items.add(
-            	Messages.getString("MythDroid.22") + Globals.defaultFrontend //$NON-NLS-1$
+                Messages.getString("MythDroid.22") + Globals.defaultFrontend //$NON-NLS-1$
             );  
         items.add(Messages.getString("MythDroid.23")); // Choose frontend //$NON-NLS-1$
 

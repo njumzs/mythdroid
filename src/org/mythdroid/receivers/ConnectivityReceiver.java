@@ -118,7 +118,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
      * @param ctx - Context to unregister from
      */
     public void dispose(Context ctx) {
-    	ctx.unregisterReceiver(this);
+        ctx.unregisterReceiver(this);
     }
     
     /**

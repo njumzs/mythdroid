@@ -415,7 +415,7 @@ public class Program implements Comparable<Program> {
         list[END+1]       =  String.valueOf(EndTime.getTime() / 1000);
         list[RECSTART+1]  =  String.valueOf(RecStartTime.getTime() / 1000); 
         list[RECEND+1]    =  String.valueOf(RecEndTime.getTime() / 1000); 
-		list[STATUS+1]    =  String.valueOf(Status.value());        
+        list[STATUS+1]    =  String.valueOf(Status.value());        
         
         return list;
         

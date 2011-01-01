@@ -84,8 +84,8 @@ public class RecordingDetail extends MDActivity {
         }
         prog = Globals.curProg;
         if (prog == null) {
-        	finish();
-        	return;
+            finish();
+            return;
         }
         setViews();
     }

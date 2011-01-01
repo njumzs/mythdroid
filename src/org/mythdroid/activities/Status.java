@@ -55,10 +55,10 @@ public class Status extends ListActivity {
     final private Context         ctx         = this;
     final private static String[] StatusItems =
     { 
-    	Messages.getString("Status.0"),    // Recorders //$NON-NLS-1$
-    	Messages.getString("Status.1"),    // Scheduled //$NON-NLS-1$
-    	Messages.getString("Status.2"),    // Job Queue //$NON-NLS-1$
-    	Messages.getString("Status.3")     // Backend Info //$NON-NLS-1$
+        Messages.getString("Status.0"),    // Recorders //$NON-NLS-1$
+        Messages.getString("Status.1"),    // Scheduled //$NON-NLS-1$
+        Messages.getString("Status.2"),    // Job Queue //$NON-NLS-1$
+        Messages.getString("Status.3")     // Backend Info //$NON-NLS-1$
     };
 
     final private Handler handler = new Handler();
@@ -66,7 +66,7 @@ public class Status extends ListActivity {
     final private Runnable getStatusTask = new Runnable() {
         @Override
         public void run() {
-        	getStatus(ctx);
+            getStatus(ctx);
             handler.post(
                 new Runnable() {
                     @Override
@@ -104,13 +104,13 @@ public class Status extends ListActivity {
         Class<?> activity = null;
 
         if      (action.equals(Messages.getString("Status.0"))) //$NON-NLS-1$
-        	activity = StatusRecorders.class;
+            activity = StatusRecorders.class;
         else if (action.equals(Messages.getString("Status.1"))) //$NON-NLS-1$
-        	activity = StatusScheduled.class;
+            activity = StatusScheduled.class;
         else if (action.equals(Messages.getString("Status.2"))) //$NON-NLS-1$
-        	activity = StatusJobs.class;
+            activity = StatusJobs.class;
         else if (action.equals(Messages.getString("Status.3"))) //$NON-NLS-1$
-        	activity = StatusBackend.class;
+            activity = StatusBackend.class;
 
         startActivity(new Intent().setClass(this, activity));
 
