@@ -39,6 +39,7 @@ sub handleDisconnect($);
 sub readCommands();
 sub clientMsg($);
 sub sendMsg($);
+sub sendMsgs($);
 sub runCommand($);
 sub videoList($);
 sub streamFile($);
@@ -87,7 +88,7 @@ my (
     $cpus, $streampid, $mythdb
 );
 
-my $size = 1024;
+my @clients;
 
 my (%commands, %videos, %storageGroups);
 
@@ -216,7 +217,7 @@ while (my @ready = $s->can_read) {
             next;
         }
 
-        unless (sysread($fd, $data, $size)) {
+        unless (sysread($fd, $data, 1024)) {
             # Someone disconnected
             handleDisconnect($fd);
             next;
@@ -226,7 +227,7 @@ while (my @ready = $s->can_read) {
             # Ferry data from lcdserver -> mythfrontend
             syswrite($lcdClient, $data);
         }
-        elsif ($client && $fd == $client) {
+        elsif ($client = (grep { $fd == $_ } @clients)[0]) {
             # From MythDroid
             $data =~ s/\r//;
             clientMsg($data);
@@ -236,7 +237,7 @@ while (my @ready = $s->can_read) {
             foreach (split /\n/, $data) { 
                 $log->dbg("-> LMSG: $_");
                 my $msg = $lcd->command($_) if length > 4;
-                sendMsg($msg) if $msg;
+                sendMsgs($msg) if $msg;
             }
             syswrite($lcdServer, $data) if $lcdServer;
         }
@@ -279,14 +280,10 @@ sub handleMdConn($) {
 
     my $fd = shift;
 
-    if (defined $client) {
-        $s->remove($client);
-        $client->close;
-    }
-
     return unless ($client = $fd->accept);
 
     $s->add($client);
+    push @clients, $client;
 
     # Send a list of MDD commands
     map { syswrite($client, "COMMAND $_\n") } (keys %commands);
@@ -307,7 +304,12 @@ sub handleDisconnect($) {
     $s->remove($fd);
     $fd->close;
 
-    undef $client if (defined $client && $fd == $client);
+    foreach (0 .. $#clients) {
+        if ($clients[$_] == $fd) {
+            splice @clients, $_, 1;
+            last;
+        }
+    }
 
     if (!$backend && defined $lcdServer && $fd == $lcdServer) {
         $log->warn("Lost connection to LCD server, reconnecting");
@@ -346,12 +348,22 @@ sub readCommands() {
     close F;
 }
 
-# Send a message to the client (MythDroid)
+# Send a message to the current client (MythDroid)
 sub sendMsg($) {
 
     my $msg = shift;
     $msg .= "\n";
     syswrite($client, $msg) if (defined $client);
+    $log->dbg("<- CMSG: $msg");
+
+}
+
+# Send a message to all clients (MythDroid)
+sub sendMsgs($) {
+
+    my $msg = shift;
+    $msg .= "\n";
+    map { syswrite($_, $msg) } @clients;
     $log->dbg("<- CMSG: $msg");
 
 }
