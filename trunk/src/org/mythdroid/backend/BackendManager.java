@@ -193,12 +193,12 @@ public class BackendManager {
     public Program getRecording(final String basename) throws IOException {
 
         if (basename.equalsIgnoreCase("Unknown")) { //$NON-NLS-1$
-        	Program prog = new Program();
-        	prog.Title = "Unknown"; //$NON-NLS-1$
-        	return prog;
+            Program prog = new Program();
+            prog.Title = "Unknown"; //$NON-NLS-1$
+            return prog;
         }
-    	
-    	cmgr.sendString("QUERY_RECORDING BASENAME " + basename); //$NON-NLS-1$
+        
+        cmgr.sendString("QUERY_RECORDING BASENAME " + basename); //$NON-NLS-1$
         return new Program(cmgr.readStringList(), 1);
 
     }
@@ -311,7 +311,7 @@ public class BackendManager {
         String protoToken = getToken(protoVer);
         // prefix a space for the actual request
         if (protoToken.length() > 0)
-        	protoToken = " " + protoToken; //$NON-NLS-1$
+            protoToken = " " + protoToken; //$NON-NLS-1$
 
         cmgr.sendString("MYTH_PROTO_VERSION " + protoVer + protoToken); //$NON-NLS-1$
 
@@ -334,15 +334,15 @@ public class BackendManager {
      */
     private String getToken(int protoVer) {
         
-    	String key = "ProtoToken." + protoVer; //$NON-NLS-1$
-    	String token = Messages.getString(key);
-    	
-    	if (token.equals("!" + key + "!")) { //$NON-NLS-1$ //$NON-NLS-2$
-    		token = ""; //$NON-NLS-1$
-    	}
+        String key = "ProtoToken." + protoVer; //$NON-NLS-1$
+        String token = Messages.getString(key);
+        
+        if (token.equals("!" + key + "!")) { //$NON-NLS-1$ //$NON-NLS-2$
+            token = ""; //$NON-NLS-1$
+        }
 
-    	return token.trim();
-    	
+        return token.trim();
+        
     }
 
 }

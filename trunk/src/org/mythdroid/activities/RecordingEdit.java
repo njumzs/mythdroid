@@ -75,7 +75,7 @@ public class RecordingEdit extends MDActivity {
     
     @Override
     public void onResume() {
-    	
+        
         super.onResume();
         try {
             beMgr = Globals.getBackend();
@@ -84,19 +84,19 @@ public class RecordingEdit extends MDActivity {
         }
         
         try {
-        	new MDDManager(beMgr.addr);
+            new MDDManager(beMgr.addr);
         } catch (IOException e) {
-        	ErrUtil.err(
-        		this, Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
-        	); 
-        	finish();
-        	return;
+            ErrUtil.err(
+                this, Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
+            ); 
+            finish();
+            return;
         }
         
         prog = Globals.curProg;
         if (prog == null) {
-        	finish();
-        	return;
+            finish();
+            return;
         }
         
         type = prog.Type;

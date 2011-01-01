@@ -166,7 +166,7 @@ public class MusicRemote extends Remote {
             handler.post(
                 new Runnable() {
                     @Override
-					public void run() {
+                    public void run() {
                         titleView.setText(track);
                         detailView.setText(details);
                         if (artid != -1)
@@ -250,9 +250,9 @@ public class MusicRemote extends Remote {
         }
         
         if (feMgr == null) {
-        	ErrUtil.err(this, Messages.getString("TVRemote.5")); //$NON-NLS-1$
-        	finish();
-        	return;
+            ErrUtil.err(this, Messages.getString("TVRemote.5")); //$NON-NLS-1$
+            finish();
+            return;
         }
         
         try {

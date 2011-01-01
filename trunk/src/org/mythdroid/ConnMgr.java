@@ -89,7 +89,7 @@ public class ConnMgr {
     /** contains our onConnect callback if there is one */
     private onConnectListener       oCL              = null;
     /** An IOException with a message that we've been disconnected */
-    private IOException 			disconnected 	 = null; 
+    private IOException             disconnected     = null; 
 
     /**
      * Constructor

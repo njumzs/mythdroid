@@ -209,8 +209,8 @@ public class StatusRecorders extends ListActivity {
                     enc.program.Channel 
                 );
                 vHolder.endTime.setText(
-                		Messages.getString("StatusRecorders.18") +  //$NON-NLS-1$
-                		enc.program.endString()
+                        Messages.getString("StatusRecorders.18") +  //$NON-NLS-1$
+                        enc.program.endString()
                 );
                 vHolder.rec.setVisibility(View.VISIBLE);
             }

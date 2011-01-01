@@ -220,7 +220,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         if (Globals.appContext == null)
-        	Globals.appContext = getApplicationContext();
+            Globals.appContext = getApplicationContext();
         if (moveWake)
             stopService(new Intent().setClassName(this, wakeService));
     }
@@ -247,19 +247,19 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     }
     
     @Override
-	public void onOptionsMenuClosed(Menu menu) {
-		super.onOptionsMenuClosed(menu);
-		setVolumeControlStream(AudioManager.STREAM_MUSIC);
-	}
+    public void onOptionsMenuClosed(Menu menu) {
+        super.onOptionsMenuClosed(menu);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+    }
 
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		final boolean onPrepareOptionsMenu = super.onPrepareOptionsMenu(menu);
-		setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
-		return onPrepareOptionsMenu;
-	}
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        final boolean onPrepareOptionsMenu = super.onPrepareOptionsMenu(menu);
+        setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
+        return onPrepareOptionsMenu;
+    }
 
-	@Override
+    @Override
     public boolean onTouchEvent(MotionEvent me) {
         if (gDetector != null && gDetector.onTouchEvent(me)) 
             return true;
@@ -315,13 +315,13 @@ public abstract class Remote extends Activity implements View.OnClickListener {
                     shift = !shift;
                     break;
                 case KeyEvent.KEYCODE_VOLUME_UP:
-					feMgr.sendKey(Key.VOL_UP);
-					feMgr.sendKey(Key.VOL_UP);
-					break;
+                    feMgr.sendKey(Key.VOL_UP);
+                    feMgr.sendKey(Key.VOL_UP);
+                    break;
                 case KeyEvent.KEYCODE_VOLUME_DOWN:
-					feMgr.sendKey(Key.VOL_DOWN);
-					feMgr.sendKey(Key.VOL_DOWN);
-					break;
+                    feMgr.sendKey(Key.VOL_DOWN);
+                    feMgr.sendKey(Key.VOL_DOWN);
+                    break;
                 default:
                     int meta = (alt ? KeyEvent.META_ALT_ON : 0);
                     meta |= (shift ? KeyEvent.META_SHIFT_ON : 0);

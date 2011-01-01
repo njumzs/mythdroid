@@ -67,7 +67,7 @@ public class Video {
         String[] fields = line.split("\\|\\|"); //$NON-NLS-1$
         
         if (fields.length < FILENAME + 1)
-        	return;
+            return;
         
         fields[0] = fields[0].replaceFirst("VIDEO ", ""); //$NON-NLS-1$ //$NON-NLS-2$
                        

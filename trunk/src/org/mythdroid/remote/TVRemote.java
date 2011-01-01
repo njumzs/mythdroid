@@ -130,9 +130,9 @@ public class TVRemote extends Remote {
         public void run() {
 
             if (feMgr == null || !feMgr.isConnected())
-            	return;
-        	
-        	try {
+                return;
+            
+            try {
                 
                 final FrontendLocation loc = feMgr.getLoc();
             
@@ -195,9 +195,9 @@ public class TVRemote extends Remote {
             
             try {
                 if (livetv) {
-                	if (!feMgr.getLoc().livetv) 
-                		feMgr.jumpTo("livetv"); //$NON-NLS-1$
-                	
+                    if (!feMgr.getLoc().livetv) 
+                        feMgr.jumpTo("livetv"); //$NON-NLS-1$
+                    
                     if (!feMgr.getLoc().livetv) {
                         ErrUtil.postErr(ctx, Messages.getString("TVRemote.1")); //$NON-NLS-1$
                         done();
@@ -306,9 +306,9 @@ public class TVRemote extends Remote {
         }
         
         if (feMgr == null) {
-        	ErrUtil.err(this, Messages.getString("TVRemote.5")); //$NON-NLS-1$
-        	finish();
-        	return;
+            ErrUtil.err(this, Messages.getString("TVRemote.5")); //$NON-NLS-1$
+            finish();
+            return;
         }
         
         try {
@@ -488,8 +488,8 @@ public class TVRemote extends Remote {
         if (id != DIALOG_GUIDE) return;
 
         final String[] items = new String[] { 
-        		Messages.getString("TVRemote.2"),  //$NON-NLS-1$
-        		Messages.getString("TVRemote.3") + feMgr.name  //$NON-NLS-1$
+                Messages.getString("TVRemote.2"),  //$NON-NLS-1$
+                Messages.getString("TVRemote.3") + feMgr.name  //$NON-NLS-1$
         };
 
         final ListView lv = ((AlertDialog)dialog).getListView();

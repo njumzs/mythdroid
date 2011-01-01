@@ -56,9 +56,9 @@ public class RecordingEditGroups extends MDActivity {
         }
         
         if (recGroups == null || storGroups == null) {
-        	ErrUtil.err(this, Messages.getString("RecordingEditGroups.0")); //$NON-NLS-1$
-        	finish();
-        	return;
+            ErrUtil.err(this, Messages.getString("RecordingEditGroups.0")); //$NON-NLS-1$
+            finish();
+            return;
         }
         
         setViews();
