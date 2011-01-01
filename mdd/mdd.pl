@@ -402,19 +402,62 @@ sub runCommand($) {
 
 }
 
+# Get a list of videos in given subddirectory of video storage groups
+sub videoListSG($) {
+
+    my $subdir = shift;
+
+    my (@dirs, @vids);
+
+    $subdir =~ s/^-?\d+\s//;
+    $subdir = '.' if ($subdir eq 'ROOT');
+
+    my $videos = $mythdb->getVideos("^$subdir");
+
+    foreach my $vid (@$videos) {
+        my $file = ($vid =~ /\|\|([^\|]+)$/)[0];
+        map { $file =~ s/^$_\/?// } @{ $storageGroups{Videos} };
+        $file =~ s/^$subdir// unless $subdir eq '.';
+        if ($file =~ /(.+?)\//) {
+            push @dirs, $1 unless grep { $1 eq $_ } @dirs;
+            next;
+        }
+        else {
+            push @vids, $vid;
+        }
+    }
+
+    map { sendMsg("-1 DIRECTORY $_") } @dirs;
+    map { sendMsg($_) } (@vids);
+
+    sendMsg("VIDEOLIST DONE");
+
+}
+
 # Get a list of videos in given subddirectory of VideoStartupDir
 sub videoList($) {
 
     my $subdir = shift;
-
     my $regex;
+    
+    %storageGroups = %{ $mythdb->getStorGroups() } 
+        unless (scalar %storageGroups);
+
+    return videoListSG($subdir) if (exists $storageGroups{Videos});
 
     $videoDir = $mythdb->setting('VideoStartupDir', hostname)
         unless $videoDir;
 
     my @videoDirs = split /:/, $videoDir;
+    map { s/\/+$// } @videoDirs;
 
-    $log->dbg("VideoDirs: @videoDirs") if scalar @videoDirs;
+    if (scalar @videoDirs) {
+        $log->dbg("VideoDirs: @videoDirs");
+    }
+    else {
+        sendMsg("VIDEOLIST DONE");
+        return;
+    }
 
     my ($vd, $sd) = $subdir =~ /^(-?\d+)\s(.+)/;
 
@@ -436,7 +479,7 @@ sub videoList($) {
 
     $regex .= "$sd/" unless ($sd eq 'ROOT');
     
-    $regex =~ s/'/\'/;
+    $regex =~ s/'/\\'/;
 
     my @dirs = grep(
         /\S+/, 
@@ -494,6 +537,7 @@ sub streamFile($) {
     }
     else {
         $file =~ s/ /\\ /g;
+        $file =~ s/'/\\'/g;
     }
 
     $log->dbg("Streaming - resolved path is $file");
@@ -570,7 +614,7 @@ sub create_user_account() {
 
     print "Creating mdd user account..\n";
 
-    system("useradd -d /dev/null -c 'Added by MDD' -U $user");
+    system("useradd -d /dev/null -c 'Added by MDD' -U $user -s /sbin/nologin");
 
 }
 
