@@ -1,4 +1,4 @@
-On a box that is used as a frontend, as root:
+On a box that is used as a frontend, or combined frontend/backend, as root:
 
     # perl mdd.pl
 
