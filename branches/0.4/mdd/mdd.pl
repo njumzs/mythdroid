@@ -31,7 +31,6 @@ use Sys::Hostname;
 use Config;
 use MDD::LCD;
 use MDD::MythDB;
-use MDD::XOSD;
 use MDD::Log;
 
 sub usage();
@@ -42,7 +41,6 @@ sub clientMsg($);
 sub sendMsg($);
 sub sendMsgs($);
 sub runCommand($);
-sub osdMsg($);
 sub videoList($);
 sub streamFile($);
 sub stopStreaming();
@@ -111,7 +109,6 @@ my @clientMsgs = (
     { regex => qr/^COMMAND (.*)$/,   proc => sub { runCommand($1) }      },
     { regex => qr/^VIDEOLIST (.*)$/, proc => sub { videoList($1) }       },
     { regex => qr/^STREAM (.*)$/,    proc => sub { streamFile($1) }      },
-    { regex => qr/^OSD (.*)$/,       proc => sub { osdMsg($1) }          },
     { regex => qr/^STOPSTREAM$/,     proc => \&stopStreaming             },
     { regex => qr/^STORGROUPS$/,     proc => \&getStorGroups             },
     { regex => qr/^RECGROUPS$/,      proc => \&getRecGroups              },
@@ -405,16 +402,6 @@ sub runCommand($) {
 
 }
 
-sub osdMsg($) {
-
-    my $osd = MDD::XOSD->new();
-
-    return if ($osd->display(shift));
-
-    $log->err("Failed to create OSD object");
-
-}
-
 # Get a list of videos in given subddirectory of video storage groups
 sub videoListSG($) {
 
@@ -634,7 +621,7 @@ sub create_user_account() {
 
 sub install_modules() {
 
-    my @mods = (qw(LCD MythDB Log XOSD));
+    my @mods = (qw(LCD MythDB Log));
     
     # Install modules
     mkdir($Config{vendorlib} . "/MDD");
