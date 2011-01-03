@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Enums.Category;
@@ -121,21 +122,55 @@ public class Guide extends MDActivity {
                 new Runnable() {
                     @Override
                     public void run() {
+                        
                         try {
                             dismissDialog(DIALOG_LOAD);
                         } catch (IllegalArgumentException e) {}
+                        
                         tbl.addView(getHeader());
                         // this is necessary to get proper layout
                         tbl.addView(getSpacer());
 
-                        int i = 0;
-                        for (Channel ch : channels) {
-                            if (i++ == 7) {
-                                tbl.addView(getHeader());
-                                i = 0;
+                        int j = 0;
+                        int maxChan = channels.size() - 1;
+                        
+                        for (int i = 0; i < maxChan; i++) {
+                            
+                            Channel current = channels.get(i);
+                                                        
+                            if (current.num.length() == 0)    continue;
+                            
+                            /* 
+                             * MythTV 0.24 sometimes splits programs amongst 
+                             * channels with different ids but the same num
+                             * and callsign.. :/
+                             */
+                            if (i < maxChan - 1) {
+                                
+                                Channel next = channels.get(i+1);
+                            
+                                if (
+                                    current.num.equals(next.num) &&
+                                    current.callSign.equals(next.callSign)
+                                ) {
+                                    next.programs.addAll(current.programs);
+                                    continue;
+                                }
+                                
                             }
-                            tbl.addView(getRowFromChannel(ch));
+                            
+                            if (j++ == 7) {
+                                tbl.addView(getHeader());
+                                j = 0;
+                            }
+                            
+                            // This became necessary in either android 2.2 or MythTV 0.24
+                            Collections.sort(current.programs);
+                            
+                            tbl.addView(getRowFromChannel(current));
+                            
                         }
+                        
                     }
                 }
            );
@@ -146,7 +181,7 @@ public class Guide extends MDActivity {
         new OnClickListener() {
             @Override
             public void onClick(View v) {
-                MythDroid.curProg = (Program)v.getTag();
+                Globals.curProg = (Program)v.getTag();
                 startActivityForResult(
                     new Intent()
                         .putExtra(Extras.GUIDE.toString(), true)
@@ -363,7 +398,7 @@ public class Guide extends MDActivity {
             j += hdrSpan;
         }
 
-        MythDroid.getWorker().post(getData);
+        Globals.getWorker().post(getData);
 
     }
 
@@ -399,14 +434,14 @@ public class Guide extends MDActivity {
         try {
 
             final URL url = new URL(
-                MythDroid.getBackend().getStatusURL() +
+                Globals.getBackend().getStatusURL() +
                 "/Myth/GetProgramGuide?" +  //$NON-NLS-1$
-                "StartTime=" + MythDroid.dateFmt.format(start) + //$NON-NLS-1$
-                "&EndTime=" + MythDroid.dateFmt.format(end) + //$NON-NLS-1$
+                "StartTime=" + Globals.dateFmt.format(start) + //$NON-NLS-1$
+                "&EndTime="  + Globals.dateFmt.format(end)   + //$NON-NLS-1$
                 "&StartChanId=0" + "&NumOfChannels=-1" + "&Details=1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             );
             
-            if (MythDroid.debug)
+            if (Globals.debug)
                 Log.d("Guide", "Fetching XML from " + url.toExternalForm()); //$NON-NLS-1$ //$NON-NLS-2$
 
             Xml.parse(
@@ -484,6 +519,9 @@ public class Guide extends MDActivity {
 
         for (Program prog : ch.programs) {
 
+            if (prog.StartTime.equals(later))
+                continue;
+            
             tv = new TextView(this);
             layout = new LayoutParams(this, null);
             layout.topMargin = layout.bottomMargin = 

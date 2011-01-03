@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.mythdroid.activities.MythDroid;
 import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
 
@@ -59,10 +58,6 @@ public class ConnMgr {
     /** An array of weak references to current connections */
     final private static ArrayList<WeakReference<ConnMgr>> conns =
         new ArrayList<WeakReference<ConnMgr>>(8);
-    
-    /** An IOException with a message that we've been disconnected */
-    final private static IOException disconnected =
-        new IOException(Messages.getString("ConnMgr.0")); //$NON-NLS-1$
 
     /** Receive buffer size */
     final private static int        rbufSize         = 128;
@@ -93,6 +88,8 @@ public class ConnMgr {
     private byte[]                  lastSent         = null;
     /** contains our onConnect callback if there is one */
     private onConnectListener       oCL              = null;
+    /** An IOException with a message that we've been disconnected */
+    private IOException             disconnected     = null; 
 
     /**
      * Constructor
@@ -107,16 +104,18 @@ public class ConnMgr {
         hostname = host;
         addr = host + ":" + port; //$NON-NLS-1$
         
+        disconnected = new IOException(Messages.getString("ConnMgr.0") + addr); //$NON-NLS-1$
+        
         oCL = ocl;
 
         /* 
          * Increase default socket timeout if we're not on WiFi 
-         *  Grab a WifiLock if we are
+         * Grab a WifiLock if we are
          */
         if (
             ConnectivityReceiver.networkType() == ConnectivityManager.TYPE_WIFI
         ) {
-            wifiLock = ((WifiManager)MythDroid.appContext
+            wifiLock = ((WifiManager)Globals.appContext
                 .getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock("MythDroid"); //$NON-NLS-1$
             wifiLock.acquire();
@@ -154,7 +153,7 @@ public class ConnMgr {
             write(str.getBytes());
         }
 
-        if (MythDroid.debug) Log.d("ConnMgr", "writeLine: " + str); //$NON-NLS-1$ //$NON-NLS-2$
+        if (Globals.debug) Log.d("ConnMgr", "writeLine: " + str); //$NON-NLS-1$ //$NON-NLS-2$
 
     }
 
@@ -166,7 +165,7 @@ public class ConnMgr {
 
         str = String.format("%-8d", str.length()) + str; //$NON-NLS-1$
 
-        if (MythDroid.debug) Log.d("ConnMgr", "sendString: " + str); //$NON-NLS-1$ //$NON-NLS-2$
+        if (Globals.debug) Log.d("ConnMgr", "sendString: " + str); //$NON-NLS-1$ //$NON-NLS-2$
 
         write(str.getBytes());
 
@@ -197,7 +196,7 @@ public class ConnMgr {
         int r = -1;
         
         // Have left over buffered data?
-        if (rbufIdx > -1) 
+        if (rbufIdx > -1 && rbuf.length >= rbufIdx + 1) 
             line = new String(rbuf, 0, rbufIdx + 1);
 
         rbufIdx = line.length() - 1;
@@ -215,7 +214,7 @@ public class ConnMgr {
                 rbuf = null;
                 rbufIdx = -1;
             }
-            if (MythDroid.debug) Log.d("ConnMgr", "readLine: #");  //$NON-NLS-1$ //$NON-NLS-2$
+            if (Globals.debug) Log.d("ConnMgr", "readLine: #");  //$NON-NLS-1$ //$NON-NLS-2$
             return "#"; //$NON-NLS-1$
         }
                 
@@ -228,14 +227,14 @@ public class ConnMgr {
                 // Nope
                 rbuf = line.substring(r + 1, rbufIdx + 1).getBytes();
                 rbufIdx -= r + 1;
-                if (MythDroid.debug) 
+                if (Globals.debug) 
                     Log.d("ConnMgr", "readLine: " + line.substring(0,r)); //$NON-NLS-1$ //$NON-NLS-2$
                 return line.substring(0, r).trim();
             }
             // Yup
             rbuf = null;
             rbufIdx = -1;
-            if (MythDroid.debug) Log.d("ConnMgr", "readLine: " + line); //$NON-NLS-1$ //$NON-NLS-2$
+            if (Globals.debug) Log.d("ConnMgr", "readLine: " + line); //$NON-NLS-1$ //$NON-NLS-2$
             return line.trim();    
         }
         
@@ -259,7 +258,7 @@ public class ConnMgr {
                 line.length() == 2 && 
                 line.charAt(0) == '#' && line.charAt(1) == ' '
             ) {
-                if (MythDroid.debug) Log.d("ConnMgr", "readLine: #"); //$NON-NLS-1$ //$NON-NLS-2$
+                if (Globals.debug) Log.d("ConnMgr", "readLine: #"); //$NON-NLS-1$ //$NON-NLS-2$
                 return "#"; //$NON-NLS-1$
             }
             
@@ -278,14 +277,14 @@ public class ConnMgr {
             // Nope, buffer the rest
             rbuf = line.substring(r + 1, tot + 1).getBytes();
             rbufIdx = tot - (r + 1);
-            if (MythDroid.debug) 
+            if (Globals.debug) 
                 Log.d("ConnMgr", "readLine: " + line.substring(0,r)); //$NON-NLS-1$ //$NON-NLS-2$
             return line.substring(0, r).trim();
         }
         // Yup
         rbuf = null;
         rbufIdx = -1;
-        if (MythDroid.debug) Log.d("ConnMgr", "readLine: " + line); //$NON-NLS-1$ //$NON-NLS-2$
+        if (Globals.debug) Log.d("ConnMgr", "readLine: " + line); //$NON-NLS-1$ //$NON-NLS-2$
         return line.trim();
         
     }
@@ -318,7 +317,7 @@ public class ConnMgr {
             
         }
         
-        if (MythDroid.debug) 
+        if (Globals.debug) 
             Log.d("ConnMgr", "readBytes read " + read + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         
         return bytes;
@@ -332,7 +331,7 @@ public class ConnMgr {
 
         byte[] bytes = new byte[8];
         if (read(bytes, 0, 8) == -1) {
-            if (MythDroid.debug) 
+            if (Globals.debug) 
                 Log.d("ConnMgr", "readStringList from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             disconnect();
             throw disconnected;
@@ -349,7 +348,7 @@ public class ConnMgr {
      * @return true if socket is connected, false otherwise
      */
     public boolean isConnected() {
-        return sock.isConnected();
+        return sock.isConnected() && connectedReady;
     }
     
     public void dispose() throws IOException {
@@ -366,14 +365,9 @@ public class ConnMgr {
         
             for (WeakReference<ConnMgr> r : conns) {
             
-                if (r == null) 
-                    continue;
-                
+                if (r == null) continue;
                 ConnMgr c = r.get();
-                    
-                if (c == null) 
-                    continue;
-                
+                if (c == null) continue;
                 c.disconnect();
                 c.reconnectPending = true;
                 
@@ -392,14 +386,9 @@ public class ConnMgr {
             
             for (WeakReference<ConnMgr> r : conns) {
             
-                if (r == null)
-                    continue;
-                
+                if (r == null) continue;
                 ConnMgr c = r.get();
-                    
-                if (c == null)
-                    continue;
-     
+                if (c == null) continue;
                 c.connect(1000);
                 
             }
@@ -414,13 +403,13 @@ public class ConnMgr {
      */
     private void connect(int timeout) throws IOException {
         
-        ConnectivityReceiver.waitForWifi(MythDroid.appContext, 5000);
+        ConnectivityReceiver.waitForWifi(Globals.appContext, 5000);
         
-        if (MythDroid.debug)
+        if (Globals.debug)
             Log.d("ConnMgr", "Connecting to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
         
         if (sock != null && sock.isConnected() && connectedReady) {
-            if (MythDroid.debug)
+            if (Globals.debug)
                 Log.d("ConnMgr", addr + " is already connected"); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
@@ -453,7 +442,7 @@ public class ConnMgr {
         os = sock.getOutputStream();
         is = sock.getInputStream();
         
-        if (MythDroid.debug)
+        if (Globals.debug)
             Log.d("ConnMgr", "Connection to " + addr + " successful"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         
         connectedReady = true;
@@ -470,7 +459,7 @@ public class ConnMgr {
         
         connectedReady = false;
         
-        if (MythDroid.debug)
+        if (Globals.debug)
             Log.d("ConnMgr", "Disconnecting from " + addr); //$NON-NLS-1$ //$NON-NLS-2$
         
         if (!sock.isClosed())
@@ -489,7 +478,7 @@ public class ConnMgr {
             ret = is.read(buf, off, len);
         } catch (SocketTimeoutException e) {
             
-            if (MythDroid.debug)
+            if (Globals.debug)
                 Log.d("ConnMgr", "Read from " + addr + " timed out"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             
             if (!sock.isConnected() || !connectedReady) {
@@ -502,7 +491,7 @@ public class ConnMgr {
             
         }
         
-        if (ret == -1 && MythDroid.debug)
+        if (ret == -1 && Globals.debug)
             Log.d("ConnMgr", "read from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         
         return ret;
@@ -542,16 +531,17 @@ public class ConnMgr {
             }, timeout
         );
         
-        if (MythDroid.debug)
+        if (Globals.debug)
             Log.d("ConnMgr", "Waiting for a connection to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
         
         while (!sock.isConnected() || !connectedReady)
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
-                if (MythDroid.debug)
+                if (Globals.debug)
                     Log.d("ConnMgr", "Timed out waiting for connection to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
-                break;
+                connectedReady = false;
+                throw new IOException(Messages.getString("ConnMgr.3") + addr); //$NON-NLS-1$
             }
     }
 

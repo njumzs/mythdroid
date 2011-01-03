@@ -65,10 +65,11 @@ my $delRecSQL =
 my $settingSQL = 
     'SELECT data FROM settings WHERE value = ? AND hostname = ?';
 
-my $upnpVideoSQL     = 'SELECT intid FROM upnpmedia WHERE filepath = ?';
 my $getStorGroupsSQL = 'SELECT groupname,dirname FROM storagegroup';
 my $recTypeSQL       = 'SELECT type FROM record WHERE recordid = ?';
 my $storGroupSQL     = 'SELECT storagegroup FROM record WHERE recordid = ?';
+my $upnpVideoSQL     =
+    'SELECT intid,filepath FROM upnpmedia WHERE filepath LIKE \'%\' ?';
 
 my @videoFields = (
     qw(
@@ -155,6 +156,7 @@ sub getVideos($) {
         my $id = $upnparef->[0];
         my %h;
         @h{@videoFields} = @$aref;
+        $h{filename} = $upnparef->[1];
         $videos{$id} = \%h;
     }
     
@@ -217,7 +219,7 @@ sub getStorGroups() {
     $getStorGroupsSth = execute($getStorGroupsSth, \$getStorGroupsSQL);
 
     while (my $aref = $getStorGroupsSth->fetchrow_arrayref) {
-        $storGroups{$aref->[0]} = $aref->[1];
+        push @{ $storGroups{$aref->[0]} }, $aref->[1];
     }
     
     $log->dbg("getStorGroups() found " . scalar(keys %storGroups) . " groups");

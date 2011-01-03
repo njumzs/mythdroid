@@ -26,7 +26,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.mythdroid.activities.MythDroid;
+import org.mythdroid.Globals;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -65,6 +65,10 @@ public class Video {
         }
         
         String[] fields = line.split("\\|\\|"); //$NON-NLS-1$
+        
+        if (fields.length < FILENAME + 1)
+            return;
+        
         fields[0] = fields[0].replaceFirst("VIDEO ", ""); //$NON-NLS-1$ //$NON-NLS-2$
                        
         id          = Integer.valueOf(fields[ID]);
@@ -98,7 +102,7 @@ public class Video {
         URL url = null;
         try {
             url = new URL(
-                MythDroid.getBackend().getStatusURL() +
+                Globals.getBackend().getStatusURL() +
                 "/Myth/GetVideoArt?" +  //$NON-NLS-1$
                 "Id=" + id  //$NON-NLS-1$
             );

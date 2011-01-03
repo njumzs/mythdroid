@@ -19,6 +19,7 @@
 package org.mythdroid.activities;
 
 import org.mythdroid.Enums.Extras;
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.Video;
 import org.mythdroid.remote.TVRemote;
@@ -55,7 +56,7 @@ public class VideoDetail extends MDActivity {
     
     private void setViews() {
         
-        video = MythDroid.curVid;
+        video = Globals.curVid;
         ((TextView)findViewById(R.id.videoDTitle))
             .setText(video.title);
         ((TextView)findViewById(R.id.videoDDirector))

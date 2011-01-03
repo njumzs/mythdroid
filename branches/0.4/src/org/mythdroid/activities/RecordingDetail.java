@@ -20,6 +20,7 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Enums.RecStatus;
@@ -52,8 +53,9 @@ public class RecordingDetail extends MDActivity {
     final static private int DELETE_DIALOG = 0, STOP_DIALOG = 1;
     
     final private Context ctx = this;
+    private Program prog = null;
     private BackendManager beMgr = null;
-
+     
     private boolean livetv = false, guide = false;
     private Button stop = null;
 
@@ -64,7 +66,6 @@ public class RecordingDetail extends MDActivity {
         setContentView(R.layout.recording_detail);
         livetv = getIntent().getBooleanExtra(Extras.LIVETV.toString(), false);
         guide = getIntent().getBooleanExtra(Extras.GUIDE.toString(), false);
-        setViews();
     }
 
     @Override
@@ -77,10 +78,16 @@ public class RecordingDetail extends MDActivity {
     public void onResume() {
         super.onResume();
         try {
-            beMgr = MythDroid.getBackend();
+            beMgr = Globals.getBackend();
         } catch (Exception e) {
             ErrUtil.err(this, e);
         }
+        prog = Globals.curProg;
+        if (prog == null) {
+            finish();
+            return;
+        }
+        setViews();
     }
 
     @Override
@@ -120,9 +127,7 @@ public class RecordingDetail extends MDActivity {
                                 public void onClick(
                                     DialogInterface dialog, int which) {
                                     try {
-                                        beMgr.deleteRecording(
-                                            MythDroid.curProg
-                                        );
+                                        beMgr.deleteRecording(prog);
                                     } catch (Exception e) { 
                                         ErrUtil.err(ctx, e); 
                                     }
@@ -147,9 +152,7 @@ public class RecordingDetail extends MDActivity {
                                     DialogInterface dialog, int which
                                 ) {
                                     try {
-                                        beMgr.stopRecording(
-                                            MythDroid.curProg
-                                        );
+                                        beMgr.stopRecording(prog);
                                     } catch (IOException e) {
                                         ErrUtil.err(ctx, e);
                                         dialog.dismiss();
@@ -157,7 +160,7 @@ public class RecordingDetail extends MDActivity {
                                     }
                                     setResult(Recordings.REFRESH_NEEDED);
                                     stop.setVisibility(View.GONE);
-                                    MythDroid.curProg.Status = RecStatus.RECORDED;
+                                    prog.Status = RecStatus.RECORDED;
                                     setViews();
                                     dialog.dismiss();
                                 }
@@ -173,8 +176,7 @@ public class RecordingDetail extends MDActivity {
     }
 
     private void setViews() {
-
-        final Program prog = MythDroid.curProg;
+        
         ((ImageView)findViewById(R.id.rec_thumb))
             .setImageBitmap(prog.previewImage());
         ((TextView)findViewById(R.id.rec_title)).setText(prog.Title);

@@ -22,6 +22,7 @@ import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
@@ -54,10 +55,10 @@ public class Status extends ListActivity {
     final private Context         ctx         = this;
     final private static String[] StatusItems =
     { 
-    	Messages.getString("Status.0"),    // Recorders //$NON-NLS-1$
-    	Messages.getString("Status.1"),    // Scheduled //$NON-NLS-1$
-    	Messages.getString("Status.2"),    // Job Queue //$NON-NLS-1$
-    	Messages.getString("Status.3")     // Backend Info //$NON-NLS-1$
+        Messages.getString("Status.0"),    // Recorders //$NON-NLS-1$
+        Messages.getString("Status.1"),    // Scheduled //$NON-NLS-1$
+        Messages.getString("Status.2"),    // Job Queue //$NON-NLS-1$
+        Messages.getString("Status.3")     // Backend Info //$NON-NLS-1$
     };
 
     final private Handler handler = new Handler();
@@ -65,12 +66,7 @@ public class Status extends ListActivity {
     final private Runnable getStatusTask = new Runnable() {
         @Override
         public void run() {
-            try {
-                getStatus();
-            } catch (SAXException e) {
-                ErrUtil.err(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
-            } catch (Exception e) { ErrUtil.err(ctx, e); }
-
+            getStatus(ctx);
             handler.post(
                 new Runnable() {
                     @Override
@@ -91,7 +87,7 @@ public class Status extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         showDialog(DIALOG_LOAD);
-        MythDroid.getWorker().post(getStatusTask);
+        Globals.getWorker().post(getStatusTask);
     }
 
     @Override
@@ -108,13 +104,13 @@ public class Status extends ListActivity {
         Class<?> activity = null;
 
         if      (action.equals(Messages.getString("Status.0"))) //$NON-NLS-1$
-        	activity = StatusRecorders.class;
+            activity = StatusRecorders.class;
         else if (action.equals(Messages.getString("Status.1"))) //$NON-NLS-1$
-        	activity = StatusScheduled.class;
+            activity = StatusScheduled.class;
         else if (action.equals(Messages.getString("Status.2"))) //$NON-NLS-1$
-        	activity = StatusJobs.class;
+            activity = StatusJobs.class;
         else if (action.equals(Messages.getString("Status.3"))) //$NON-NLS-1$
-        	activity = StatusBackend.class;
+            activity = StatusBackend.class;
 
         startActivity(new Intent().setClass(this, activity));
 
@@ -136,14 +132,17 @@ public class Status extends ListActivity {
     /**
      * Get new statusDoc from the backend
      */
-    public static void getStatus() throws Exception {
+    public static void getStatus(Context ctx) {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        URL url = new URL(MythDroid.getBackend().getStatusURL() + "/xml"); //$NON-NLS-1$
-        statusDoc = dbf.newDocumentBuilder().parse(
-            url.openConnection().getInputStream()
-        );
+        try {
+            URL url = new URL(Globals.getBackend().getStatusURL() + "/xml"); //$NON-NLS-1$
+            statusDoc = dbf.newDocumentBuilder().parse(
+                url.openConnection().getInputStream()
+            );
+        } catch (SAXException e) {
+            ErrUtil.err(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
+        } catch (Exception e) { ErrUtil.err(ctx, e); }
 
     }
 
