@@ -21,6 +21,7 @@ package org.mythdroid.activities;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.resource.Messages;
@@ -75,7 +76,7 @@ public abstract class MDListActivity extends ListActivity {
                 if (
                     (
                         !onHere && (
-                            MythDroid.defaultFrontend == null || 
+                            Globals.defaultFrontend == null || 
                             nextActivity == null
                         )
                     ) || 
@@ -147,6 +148,13 @@ public abstract class MDListActivity extends ListActivity {
                 super.onPrepareDialog(id, dialog);
         }
     }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Globals.appContext == null)
+            Globals.appContext = getApplicationContext();
+    }
 
     @Override
     public void onDestroy() {
@@ -173,7 +181,7 @@ public abstract class MDListActivity extends ListActivity {
                     if (fe.equals(Messages.getString("MDListActivity.0"))) // Here //$NON-NLS-1$
                         onHere = true;
                     else 
-                        MythDroid.defaultFrontend = fe;
+                        Globals.defaultFrontend = fe;
                     d.dismiss();
                 }
             }
@@ -184,7 +192,7 @@ public abstract class MDListActivity extends ListActivity {
     
     private void prepareFrontendDialog(final Dialog dialog) {
         
-        Cursor c = FrontendDB.getFrontends();
+        Cursor c = FrontendDB.getFrontends(this);
         ArrayList<String> list = new ArrayList<String>();
         
         int num = c.getCount();

@@ -31,6 +31,7 @@ use Sys::Hostname;
 use Config;
 use MDD::LCD;
 use MDD::MythDB;
+use MDD::XOSD;
 use MDD::Log;
 
 sub usage();
@@ -39,7 +40,9 @@ sub handleDisconnect($);
 sub readCommands();
 sub clientMsg($);
 sub sendMsg($);
+sub sendMsgs($);
 sub runCommand($);
+sub osdMsg($);
 sub videoList($);
 sub streamFile($);
 sub stopStreaming();
@@ -87,7 +90,7 @@ my (
     $cpus, $streampid, $mythdb
 );
 
-my $size = 1024;
+my @clients;
 
 my (%commands, %videos, %storageGroups);
 
@@ -108,6 +111,7 @@ my @clientMsgs = (
     { regex => qr/^COMMAND (.*)$/,   proc => sub { runCommand($1) }      },
     { regex => qr/^VIDEOLIST (.*)$/, proc => sub { videoList($1) }       },
     { regex => qr/^STREAM (.*)$/,    proc => sub { streamFile($1) }      },
+    { regex => qr/^OSD (.*)$/,       proc => sub { osdMsg($1) }          },
     { regex => qr/^STOPSTREAM$/,     proc => \&stopStreaming             },
     { regex => qr/^STORGROUPS$/,     proc => \&getStorGroups             },
     { regex => qr/^RECGROUPS$/,      proc => \&getRecGroups              },
@@ -216,7 +220,7 @@ while (my @ready = $s->can_read) {
             next;
         }
 
-        unless (sysread($fd, $data, $size)) {
+        unless (sysread($fd, $data, 1024)) {
             # Someone disconnected
             handleDisconnect($fd);
             next;
@@ -226,7 +230,7 @@ while (my @ready = $s->can_read) {
             # Ferry data from lcdserver -> mythfrontend
             syswrite($lcdClient, $data);
         }
-        elsif ($client && $fd == $client) {
+        elsif ($client = (grep { $fd == $_ } @clients)[0]) {
             # From MythDroid
             $data =~ s/\r//;
             clientMsg($data);
@@ -236,7 +240,7 @@ while (my @ready = $s->can_read) {
             foreach (split /\n/, $data) { 
                 $log->dbg("-> LMSG: $_");
                 my $msg = $lcd->command($_) if length > 4;
-                sendMsg($msg) if $msg;
+                sendMsgs($msg) if $msg;
             }
             syswrite($lcdServer, $data) if $lcdServer;
         }
@@ -279,14 +283,10 @@ sub handleMdConn($) {
 
     my $fd = shift;
 
-    if (defined $client) {
-        $s->remove($client);
-        $client->close;
-    }
-
     return unless ($client = $fd->accept);
 
     $s->add($client);
+    push @clients, $client;
 
     # Send a list of MDD commands
     map { syswrite($client, "COMMAND $_\n") } (keys %commands);
@@ -307,7 +307,12 @@ sub handleDisconnect($) {
     $s->remove($fd);
     $fd->close;
 
-    undef $client if (defined $client && $fd == $client);
+    foreach (0 .. $#clients) {
+        if ($clients[$_] == $fd) {
+            splice @clients, $_, 1;
+            last;
+        }
+    }
 
     if (!$backend && defined $lcdServer && $fd == $lcdServer) {
         $log->warn("Lost connection to LCD server, reconnecting");
@@ -346,12 +351,22 @@ sub readCommands() {
     close F;
 }
 
-# Send a message to the client (MythDroid)
+# Send a message to the current client (MythDroid)
 sub sendMsg($) {
 
     my $msg = shift;
     $msg .= "\n";
     syswrite($client, $msg) if (defined $client);
+    $log->dbg("<- CMSG: $msg");
+
+}
+
+# Send a message to all clients (MythDroid)
+sub sendMsgs($) {
+
+    my $msg = shift;
+    $msg .= "\n";
+    map { syswrite($_, $msg) } @clients;
     $log->dbg("<- CMSG: $msg");
 
 }
@@ -390,19 +405,72 @@ sub runCommand($) {
 
 }
 
+sub osdMsg($) {
+
+    my $osd = MDD::XOSD->new();
+
+    return if ($osd->display(shift));
+
+    $log->err("Failed to create OSD object");
+
+}
+
+# Get a list of videos in given subddirectory of video storage groups
+sub videoListSG($) {
+
+    my $subdir = shift;
+
+    my (@dirs, @vids);
+
+    $subdir =~ s/^-?\d+\s//;
+    $subdir = '.' if ($subdir eq 'ROOT');
+
+    my $videos = $mythdb->getVideos("^$subdir");
+
+    foreach my $vid (@$videos) {
+        my $file = ($vid =~ /\|\|([^\|]+)$/)[0];
+        map { $file =~ s/^$_\/?// } @{ $storageGroups{Videos} };
+        $file =~ s/^$subdir// unless $subdir eq '.';
+        if ($file =~ /(.+?)\//) {
+            push @dirs, $1 unless grep { $1 eq $_ } @dirs;
+            next;
+        }
+        else {
+            push @vids, $vid;
+        }
+    }
+
+    map { sendMsg("-1 DIRECTORY $_") } @dirs;
+    map { sendMsg($_) } (@vids);
+
+    sendMsg("VIDEOLIST DONE");
+
+}
+
 # Get a list of videos in given subddirectory of VideoStartupDir
 sub videoList($) {
 
     my $subdir = shift;
-
     my $regex;
+    
+    %storageGroups = %{ $mythdb->getStorGroups() } 
+        unless (scalar %storageGroups);
+
+    return videoListSG($subdir) if (exists $storageGroups{Videos});
 
     $videoDir = $mythdb->setting('VideoStartupDir', hostname)
         unless $videoDir;
 
     my @videoDirs = split /:/, $videoDir;
+    map { s/\/+$// } @videoDirs;
 
-    $log->dbg("VideoDirs: @videoDirs") if scalar @videoDirs;
+    if (scalar @videoDirs) {
+        $log->dbg("VideoDirs: @videoDirs");
+    }
+    else {
+        sendMsg("VIDEOLIST DONE");
+        return;
+    }
 
     my ($vd, $sd) = $subdir =~ /^(-?\d+)\s(.+)/;
 
@@ -424,7 +492,7 @@ sub videoList($) {
 
     $regex .= "$sd/" unless ($sd eq 'ROOT');
     
-    $regex =~ s/'/\'/;
+    $regex =~ s/'/\\'/;
 
     my @dirs = grep(
         /\S+/, 
@@ -482,6 +550,7 @@ sub streamFile($) {
     }
     else {
         $file =~ s/ /\\ /g;
+        $file =~ s/'/\\'/g;
     }
 
     $log->dbg("Streaming - resolved path is $file");
@@ -558,14 +627,14 @@ sub create_user_account() {
 
     print "Creating mdd user account..\n";
 
-    system("useradd -d /dev/null -c 'Added by MDD' -U $user");
+    system("useradd -d /dev/null -c 'Added by MDD' -U $user -s /sbin/nologin");
 
 }
 
 
 sub install_modules() {
 
-    my @mods = (qw(LCD MythDB Log));
+    my @mods = (qw(LCD MythDB Log XOSD));
     
     # Install modules
     mkdir($Config{vendorlib} . "/MDD");

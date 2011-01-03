@@ -21,6 +21,7 @@ package org.mythdroid.activities;
 import java.util.ArrayList;
 
 import org.mythdroid.Enums.Extras;
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.Program;
 import org.mythdroid.activities.RecordingDetail;
@@ -30,7 +31,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import android.R.layout;
 import android.app.Activity;
@@ -92,12 +92,7 @@ public class StatusRecorders extends ListActivity {
     final private Runnable getStatusTask = new Runnable() {
         @Override
         public void run() {
-            try {
-                Status.getStatus();
-            } catch (SAXException e) {
-                ErrUtil.err(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
-            } catch (Exception e) { ErrUtil.err(ctx, e); }
-            
+            Status.getStatus(ctx);
             if (Status.statusDoc == null) {
                 dismissDialog(DIALOG_LOAD);
                 ErrUtil.postErr(ctx, Messages.getString("StatusRecorders.3")); //$NON-NLS-1$
@@ -214,8 +209,8 @@ public class StatusRecorders extends ListActivity {
                     enc.program.Channel 
                 );
                 vHolder.endTime.setText(
-                		Messages.getString("StatusRecorders.18") +  //$NON-NLS-1$
-                		enc.program.endString()
+                        Messages.getString("StatusRecorders.18") +  //$NON-NLS-1$
+                        enc.program.endString()
                 );
                 vHolder.rec.setVisibility(View.VISIBLE);
             }
@@ -253,7 +248,7 @@ public class StatusRecorders extends ListActivity {
 
         if (enc.program == null) return;
 
-        MythDroid.curProg = enc.program;
+        Globals.curProg = enc.program;
         startActivityForResult(
             new Intent()
             .putExtra(
@@ -279,7 +274,7 @@ public class StatusRecorders extends ListActivity {
 
     private void refresh() {
         showDialog(DIALOG_LOAD);
-        MythDroid.getWorker().post(getStatusTask);
+        Globals.getWorker().post(getStatusTask);
     }
 
 }

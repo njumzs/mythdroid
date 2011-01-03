@@ -20,6 +20,7 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.R.id;
@@ -27,6 +28,7 @@ import org.mythdroid.R.layout;
 import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
 import org.mythdroid.mdd.MDDManager;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 
 import android.R.drawable;
@@ -83,9 +85,10 @@ public class VideoPlayer extends MDActivity {
     public void onResume() {
         super.onResume();
         try {
-            beMgr = MythDroid.getBackend();
+            beMgr = Globals.getBackend();
         } catch (Exception e) {
             ErrUtil.err(this, e);
+            finish();
         }
     }
     
@@ -168,7 +171,12 @@ public class VideoPlayer extends MDActivity {
                 sg = "Default"; //$NON-NLS-1$
             }
             else {
-                Program prog = MythDroid.curProg;
+                Program prog = Globals.curProg;
+                if (prog == null) {
+                    ErrUtil.err(this, Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
+                    finish();
+                    return;
+                }
                 path = prog.Path;
                 if (prog.StorGroup != null)
                     sg = prog.StorGroup;
@@ -183,6 +191,7 @@ public class VideoPlayer extends MDActivity {
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();
+            return;
         }
         
         try {

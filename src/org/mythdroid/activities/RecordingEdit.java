@@ -20,6 +20,7 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.RecDupIn;
 import org.mythdroid.Enums.RecDupMethod;
@@ -51,10 +52,10 @@ public class RecordingEdit extends MDActivity {
     static public String        recGroup;
     static public String        storGroup; 
     
-    private Program prog         = MythDroid.curProg;
+    private Program prog         = null;
     private BackendManager beMgr = null;
-    private RecType type         = prog.Type;
-    private int prio             = prog.RecPrio;
+    private RecType type;
+    private int prio;
     
     private Button  save, schedOptions, groupOptions;
     private Spinner prioSpinner;
@@ -64,15 +65,7 @@ public class RecordingEdit extends MDActivity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        
-        dupMethod = prog.DupMethod;
-        dupIn = prog.DupIn;
-        epiFilter = prog.EpiFilter;
-        recGroup = prog.RecGroup;
-        storGroup = prog.StorGroup;
-     
         setContentView(R.layout.recording_edit);
-        
     }
 
     @Override
@@ -82,12 +75,38 @@ public class RecordingEdit extends MDActivity {
     
     @Override
     public void onResume() {
+        
         super.onResume();
         try {
-            beMgr = MythDroid.getBackend();
+            beMgr = Globals.getBackend();
         } catch (Exception e) {
             ErrUtil.err(this, e);
         }
+        
+        try {
+            new MDDManager(beMgr.addr);
+        } catch (IOException e) {
+            ErrUtil.err(
+                this, Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
+            ); 
+            finish();
+            return;
+        }
+        
+        prog = Globals.curProg;
+        if (prog == null) {
+            finish();
+            return;
+        }
+        
+        type = prog.Type;
+        prio = prog.RecPrio;
+        
+        dupMethod = prog.DupMethod;
+        dupIn = prog.DupIn;
+        epiFilter = prog.EpiFilter;
+        recGroup = prog.RecGroup;
+        storGroup = prog.StorGroup;
         
         if (prog.RecID != -1) {
             try {
@@ -105,6 +124,7 @@ public class RecordingEdit extends MDActivity {
         }
         
         setViews();
+        
     }
 
     @Override
@@ -117,6 +137,7 @@ public class RecordingEdit extends MDActivity {
     @Override
     protected void onActivityResult(int reqCode, int resCode, Intent data) {
         super.onActivityResult(reqCode, resCode, data);
+        if (prog == null || recGroup == null || storGroup == null) return;
         if (
             dupMethod == prog.DupMethod && dupIn == prog.DupIn && 
             epiFilter == prog.EpiFilter && recGroup.equals(prog.RecGroup) &&

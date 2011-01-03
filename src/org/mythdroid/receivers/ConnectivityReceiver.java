@@ -5,7 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.mythdroid.ConnMgr;
-import org.mythdroid.activities.MythDroid;
+import org.mythdroid.Globals;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -44,7 +44,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
         
         final IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        MythDroid.appContext.registerReceiver(this, filter);
+        ctx.registerReceiver(this, filter);
         
     }
     
@@ -61,7 +61,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
         int type = info.getType();
         State state = info.getState();
         
-        if (MythDroid.debug)
+        if (Globals.debug)
             Log.d(
                 "ConnectivityReceiver",   //$NON-NLS-1$
                 "wasConnected " + connected + " type " + info.getTypeName() + //$NON-NLS-1$ //$NON-NLS-2$
@@ -114,6 +114,14 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     }
     
     /**
+     * Unregister the broadcast receiver
+     * @param ctx - Context to unregister from
+     */
+    public void dispose(Context ctx) {
+        ctx.unregisterReceiver(this);
+    }
+    
+    /**
      * Get the current network type (WiFi or mobile)
      * @return - ConnectivityManager.TYPE_WIFI or ConnectivityManager.TYPE_MOBILE
      */
@@ -161,7 +169,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
                 winfo.getState() == NetworkInfo.State.CONNECTING
             ) {
                 
-                if (MythDroid.debug)
+                if (Globals.debug)
                     Log.d(
                         "ConnectivityReceiver", "Waiting for WiFi link" //$NON-NLS-1$ //$NON-NLS-2$
                     );
@@ -177,7 +185,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
             
             while (netType != ConnectivityManager.TYPE_WIFI || connected == false) {
                 
-                if (MythDroid.debug)
+                if (Globals.debug)
                     Log.d(
                         "ConnectivityReceiver", "Waiting for WiFi connection" //$NON-NLS-1$ //$NON-NLS-2$
                     );

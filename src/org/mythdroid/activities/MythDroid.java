@@ -361,7 +361,7 @@ public class MythDroid extends MDListActivity implements
      * problem
      * @throws IOException 
      */
-    public static FrontendManager getFrontend() throws IOException {
+    public static FrontendManager getFrontend(Context ctx) throws IOException {
 
         String name = defaultFrontend;
 
@@ -374,7 +374,7 @@ public class MythDroid extends MDListActivity implements
             feMgr = null;
         }
 
-        Cursor c = FrontendDB.getFrontends();
+        Cursor c = FrontendDB.getFrontends(ctx);
 
         if (c.getCount() < 1) {
             c.close();
@@ -610,7 +610,7 @@ public class MythDroid extends MDListActivity implements
     private void prepareWakeDialog(final Dialog dialog) {
         
         final SimpleCursorAdapter ca = new SimpleCursorAdapter(
-            ctx, R.layout.simple_list_item_1, FrontendDB.getFrontends(),
+            ctx, R.layout.simple_list_item_1, FrontendDB.getFrontends(this),
             new String[] { "name" }, new int[] { id.text1 } //$NON-NLS-1$
         );
 
@@ -658,7 +658,7 @@ public class MythDroid extends MDListActivity implements
         
         try {
             cmds = MDDManager.getCommands(
-                getFrontend().addr
+                getFrontend(this).addr
             );
         } catch(IOException e) { 
             ErrUtil.err(ctx, e);
