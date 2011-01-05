@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -43,12 +43,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 /** MDActivity displays browsable list of Videos */
-public class Videos extends MDActivity implements 
+public class Videos extends MDActivity implements
     ListView.OnItemClickListener, AdapterView.OnItemLongClickListener {
-    
-    final private WeakHashMap<Integer, Drawable> artCache = 
+
+    final private WeakHashMap<Integer, Drawable> artCache =
         new WeakHashMap<Integer, Drawable>(32);
-    
+
     final private Handler handler   = new Handler();
     private Thread artThread        = null;
     private ListView lv             = null;
@@ -58,16 +58,16 @@ public class Videos extends MDActivity implements
     private TextView dirText        = null;
     private boolean fetchingArt     = false;
     /** Scale factor for pixel values for different display densities */
-    private float scale              = 1; 
-    
+    private float scale              = 1;
+
     /**
-     * Fetch a list of videos from MDD and then start a Thread to fetch 
+     * Fetch a list of videos from MDD and then start a Thread to fetch
      * the posters
      */
     final private Runnable getVideos  = new Runnable() {
         @Override
         public void run() {
-            
+
             try {
                 videos = MDDManager.getVideos(
                     Globals.getBackend().addr, viddir, path
@@ -77,7 +77,7 @@ public class Videos extends MDActivity implements
                 finish();
                 return;
             }
-        
+
             handler.post(
                 new Runnable() {
                     @Override
@@ -105,7 +105,7 @@ public class Videos extends MDActivity implements
             );
         }
     };
-    
+
     /** Fetch posters for the current list of videos */
     final private Runnable fetchArt = new Runnable() {
         @Override
@@ -116,9 +116,9 @@ public class Videos extends MDActivity implements
                     break;
                 if (video.poster != null) continue;
                 Drawable d = artCache.get(video.id);
-                if (d != null) 
+                if (d != null)
                     video.poster = d;
-                else { 
+                else {
                     video.getPoster(70 * scale + 0.5f, 110 * scale + 0.5f);
                     artCache.put(video.id, video.poster);
                 }
@@ -132,10 +132,10 @@ public class Videos extends MDActivity implements
                     }
                 );
             }
-            
+
         }
     };
-       
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -145,41 +145,41 @@ public class Videos extends MDActivity implements
         lv = (ListView)findViewById(R.id.videoList);
         lv.setOnItemClickListener(this);
         lv.setOnItemLongClickListener(this);
-        
+
         scale = getResources().getDisplayMetrics().density;
-        
+
         showDialog(DIALOG_LOAD);
         Globals.getWorker().post(getVideos);
     }
-    
+
     @Override
     public void onItemClick(
         AdapterView<?> adapter, View view, int pos, long id
     ) {
-    
+
         Video video = videos.get(pos);
-        
+
         // A directory?
         if (video.id == -1) {
-            
+
             if (path.equals("ROOT")) //$NON-NLS-1$
                 path = video.title;
             else
                 path += "/" + video.title; //$NON-NLS-1$
-            
+
             dirText.setText(currentDir(path));
             viddir = video.dir;
             showDialog(DIALOG_LOAD);
             Globals.getWorker().post(getVideos);
             return;
-            
+
         }
-        
+
         Globals.curVid = video;
         startActivity(new Intent().setClass(this, VideoDetail.class));
-        
+
     }
-    
+
     @Override
     public boolean onItemLongClick(
         AdapterView<?> adapter, View item, int pos, long itemid
@@ -196,9 +196,9 @@ public class Videos extends MDActivity implements
 
     @Override
     public boolean onKeyDown(int code, KeyEvent event) {
-        
+
         if (code == KeyEvent.KEYCODE_BACK) {
-            
+
             // At top level?
             if (path.equals("ROOT") && viddir == -1)  //$NON-NLS-1$
                 return super.onKeyDown(code, event);
@@ -218,13 +218,13 @@ public class Videos extends MDActivity implements
             showDialog(DIALOG_LOAD);
             Globals.getWorker().post(getVideos);
             return true;
-            
+
         }
 
         return super.onKeyDown(code, event);
-        
+
     }
-    
+
     private String currentDir(String path) {
         int slash = path.lastIndexOf('/');
         if (slash == -1)

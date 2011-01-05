@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -60,12 +60,12 @@ public class FrontendDB {
 
     /**
      * Get a cursor listing the frontends - columns are ID, ADDR and NAME
-     * @return Cursor 
+     * @return Cursor
      */
     public static Cursor getFrontends(Context ctx) {
-        
+
         if (db == null) initDB(ctx);
-        
+
         return db.rawQuery(
             "SELECT _id, addr, name, hwaddr from " + FRONTEND_TABLE, null //$NON-NLS-1$
         );
@@ -101,7 +101,7 @@ public class FrontendDB {
 
         c.close();
         return true;
-        
+
     }
 
     /**

@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -40,7 +40,7 @@ public class NumPadLayout extends ViewGroup {
     /**
      * Constructor
      * @param ctx Context
-     * @param attrs AttributeSet 
+     * @param attrs AttributeSet
      */
     public NumPadLayout(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
@@ -60,8 +60,8 @@ public class NumPadLayout extends ViewGroup {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
 
         final int pad =
-            getResources().getConfiguration().orientation == 
-                Configuration.ORIENTATION_PORTRAIT 
+            getResources().getConfiguration().orientation ==
+                Configuration.ORIENTATION_PORTRAIT
                     ? 10 : 2;
 
         final View child0 = getChildAt(0);
@@ -85,16 +85,16 @@ public class NumPadLayout extends ViewGroup {
             }
             y += yInc;
         }
-        
+
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        
+
         int width = 0;
         int height = 0;
         final int pad =
-            getResources().getConfiguration().orientation == 
+            getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_PORTRAIT
                     ? 10 : 2;
 
@@ -110,7 +110,7 @@ public class NumPadLayout extends ViewGroup {
         width = resolveSize(width, widthMeasureSpec);
         height = resolveSize(height, heightMeasureSpec);
         setMeasuredDimension(width, height);
-        
+
     }
 
 }

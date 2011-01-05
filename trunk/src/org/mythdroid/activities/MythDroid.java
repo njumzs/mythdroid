@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -56,25 +56,25 @@ import android.widget.AdapterView.OnItemClickListener;
 
 /**
  * MDListActivity for the main menu
- * Holds a number of public static members used as 'globals' 
+ * Holds a number of public static members used as 'globals'
  */
 public class MythDroid extends MDListActivity implements
     AdapterView.OnItemLongClickListener {
 
     /** Menu IDs */
-    final private static int 
+    final private static int
         MENU_SETTINGS = 0, MENU_FRONTEND = 1, MENU_NAV = 2,
         MENU_WAKE = 3,     MENU_MDD = 4;
 
     /** Dialog IDs */
-    final private static int 
+    final private static int
         DIALOG_GUIDE  = 0, WAKE_FRONTEND = 1, MDD_COMMAND = 2;
-    
+
     final private static int PREFS_CODE  = 0;
 
     /** Entries for the main menu list */
     final private static String[] MenuItems =
-        { 
+        {
             Messages.getString("MythDroid.7"),    // Watch TV   //$NON-NLS-1$
             Messages.getString("MythDroid.8"),    // Recordings //$NON-NLS-1$
             Messages.getString("MythDroid.12"),   // Videos     //$NON-NLS-1$
@@ -85,17 +85,17 @@ public class MythDroid extends MDListActivity implements
 
     /** ListAdapter containing the main menu entries */
     private ArrayAdapter<String> menuAdapter = null;
-    
+
     /** ConnectivityReceiver instance */
     ConnectivityReceiver crecv = null;
-    
+
     @Override
     public void onCreate(Bundle icicle) {
-        
+
         super.onCreate(icicle);
 
         Globals.appContext = getApplicationContext();
-        
+
         setContentView(R.layout.mainmenu);
 
         menuAdapter = new ArrayAdapter<String>(
@@ -103,35 +103,35 @@ public class MythDroid extends MDListActivity implements
         );
 
         getPreferences();
-        
+
         crecv = new ConnectivityReceiver(Globals.appContext);
 
     }
 
     @Override
     public void onDestroy() {
-        
+
         super.onDestroy();
-        
+
         try {
             Globals.destroyBackend();
             Globals.destroyFrontend();
         } catch (IOException e) {
             ErrUtil.err(this, e);
         }
-        
+
         Globals.destroyWorker();
-        
+
         crecv.dispose(Globals.appContext);
-        
+
     }
-    
-    @Override 
+
+    @Override
     public void onResume() {
-        
+
         super.onResume();
         getListView().setOnItemLongClickListener(this);
-  
+
         try {
             if (Globals.getBackend() == null) {
                 ((TextView)findViewById(R.id.emptyMsg))
@@ -150,7 +150,7 @@ public class MythDroid extends MDListActivity implements
 
     @Override
     public void onListItemClick(ListView list, View item, int pos, long id) {
-        
+
         final String action = (String)list.getItemAtPosition(pos);
         Class<?> activity = null;
 
@@ -179,7 +179,7 @@ public class MythDroid extends MDListActivity implements
     public boolean onItemLongClick(
         AdapterView<?> adapter, View item, int pos, long itemid
     ) {
-        
+
         final String action = (String) adapter.getItemAtPosition(pos);
 
         if (action.equals(Messages.getString("MythDroid.7"))) { //$NON-NLS-1$
@@ -187,7 +187,7 @@ public class MythDroid extends MDListActivity implements
             setExtra(Extras.LIVETV.toString());
             showDialog(FRONTEND_CHOOSER);
         }
-        
+
         else if (action.equals(Messages.getString("MythDroid.9"))) { //$NON-NLS-1$
             nextActivity = MusicRemote.class;
             showDialog(FRONTEND_CHOOSER);
@@ -205,7 +205,7 @@ public class MythDroid extends MDListActivity implements
     public Dialog onCreateDialog(int id) {
 
         switch (id) {
-            
+
             case DIALOG_GUIDE:
                 return createGuideDialog();
             case WAKE_FRONTEND:
@@ -216,14 +216,14 @@ public class MythDroid extends MDListActivity implements
                 return super.onCreateDialog(id);
 
         }
-        
+
     }
 
     @Override
     public void onPrepareDialog(int id, final Dialog dialog) {
-        
+
         switch (id) {
-            
+
             case DIALOG_GUIDE:
                 prepareGuideDialog(dialog);
                 return;
@@ -236,7 +236,7 @@ public class MythDroid extends MDListActivity implements
             default:
                 super.onPrepareDialog(id, dialog);
         }
-       
+
     }
 
     /** Populate the pop-up menu */
@@ -294,28 +294,28 @@ public class MythDroid extends MDListActivity implements
             ErrUtil.err(this, e);
         }
     }
-    
+
     @Override
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
     }
- 
-    
+
+
     private Dialog createGuideDialog() {
-        
+
         final AlertDialog d = new AlertDialog.Builder(ctx)
             .setItems(new String[] {}, null)
             .setIcon(drawable.ic_menu_upload_you_tube)
             .setTitle(R.string.disp_guide)
             .create();
-        
+
         d.getListView().setOnItemClickListener(
             new OnItemClickListener() {
                 @Override
                 public void onItemClick(
                     AdapterView<?> av, View v, int pos, long id
                 ) {
-                    
+
                     String item = (String)av.getItemAtPosition(pos);
                     d.dismiss();
 
@@ -344,19 +344,19 @@ public class MythDroid extends MDListActivity implements
 
                 }
         });
-        
+
         return d;
     }
-    
+
     private void prepareGuideDialog(final Dialog dialog) {
-        
+
         final ArrayList<String> items = new ArrayList<String>(3);
         items.add(Messages.getString("MythDroid.21"));  // Here //$NON-NLS-1$
-        if (Globals.defaultFrontend != null) 
+        if (Globals.defaultFrontend != null)
             // On <defaultFrontend>
             items.add(
                 Messages.getString("MythDroid.22") + Globals.defaultFrontend //$NON-NLS-1$
-            );  
+            );
         items.add(Messages.getString("MythDroid.23")); // Choose frontend //$NON-NLS-1$
 
         final ListView lv = ((AlertDialog)dialog).getListView();
@@ -365,26 +365,26 @@ public class MythDroid extends MDListActivity implements
                 ctx, R.layout.simple_list_item_1, items
             )
         );
-        
+
         return;
-        
+
     }
-    
+
     private Dialog createWakeDialog() {
-        
+
         final AlertDialog d = new AlertDialog.Builder(ctx)
             .setItems(new String[] {}, null)
             .setIcon(drawable.ic_lock_power_off)
             .setTitle(R.string.wake_fe)
             .create();
-        
+
         d.getListView().setOnItemClickListener(
             new OnItemClickListener() {
                 @Override
                 public void onItemClick(
                     AdapterView<?> av, View v, int pos, long id
                 ) {
-                    Cursor c = 
+                    Cursor c =
                         ((SimpleCursorAdapter)av.getAdapter()).getCursor();
                     c.moveToPosition(pos);
                     try {
@@ -397,13 +397,13 @@ public class MythDroid extends MDListActivity implements
                 }
             }
         );
-        
+
         return d;
-        
+
     }
-    
+
     private void prepareWakeDialog(final Dialog dialog) {
-        
+
         final SimpleCursorAdapter ca = new SimpleCursorAdapter(
             ctx, R.layout.simple_list_item_1, FrontendDB.getFrontends(this),
             new String[] { "name" }, new int[] { id.text1 } //$NON-NLS-1$
@@ -413,11 +413,11 @@ public class MythDroid extends MDListActivity implements
             ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
             return;
         }
-        
+
         ((AlertDialog)dialog).getListView().setAdapter(ca);
-        
+
     }
-    
+
     private Dialog createMddDialog() {
 
         final AlertDialog d = new AlertDialog.Builder(ctx)
@@ -425,7 +425,7 @@ public class MythDroid extends MDListActivity implements
             .setIcon(drawable.ic_menu_agenda)
             .setTitle(R.string.mddCmd)
             .create();
-        
+
         d.getListView().setOnItemClickListener(
             new OnItemClickListener() {
                 @Override
@@ -442,20 +442,20 @@ public class MythDroid extends MDListActivity implements
                 }
             }
         );
-        
+
         return d;
-        
+
     }
-    
+
     private void prepareMddDialog(final Dialog dialog) {
-        
+
         ArrayList<String> cmds = null;
-        
+
         try {
             cmds = MDDManager.getCommands(
                 Globals.getFrontend(this).addr
             );
-        } catch(IOException e) { 
+        } catch(IOException e) {
             ErrUtil.err(ctx, e);
         }
 
@@ -468,14 +468,14 @@ public class MythDroid extends MDListActivity implements
             new ArrayAdapter<String>(
                 ctx, R.layout.simple_list_item_1, cmds
             )
-         ); 
-        
+         );
+
         return;
-   
+
     }
 
     private void getPreferences() {
-        Globals.backend = 
+        Globals.backend =
             PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("backendAddr", ""); //$NON-NLS-1$ //$NON-NLS-2$
     }

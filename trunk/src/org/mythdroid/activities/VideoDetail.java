@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -45,7 +45,7 @@ public class VideoDetail extends MDActivity {
 
     private Video video = null;
     private Context ctx = this;
-    
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -53,9 +53,9 @@ public class VideoDetail extends MDActivity {
         setContentView(R.layout.video_detail);
         setViews();
     }
-    
+
     private void setViews() {
-        
+
         video = Globals.curVid;
         ((TextView)findViewById(R.id.videoDTitle))
             .setText(video.title);
@@ -63,19 +63,19 @@ public class VideoDetail extends MDActivity {
             .setText(Messages.getString("VideoDetail.0") + video.director); //$NON-NLS-1$
         ((TextView)findViewById(R.id.videoDRating))
             .setText(
-                Messages.getString("VideoDetail.1") + //$NON-NLS-1$ 
+                Messages.getString("VideoDetail.1") + //$NON-NLS-1$
                 String.format("%.2f", video.rating) //$NON-NLS-1$
-            ); 
+            );
         ((TextView)findViewById(R.id.videoDYear))
             .setText(
-                Messages.getString("VideoDetail.3") + //$NON-NLS-1$ 
+                Messages.getString("VideoDetail.3") + //$NON-NLS-1$
                 String.valueOf(video.year)
-            ); 
+            );
         ((TextView)findViewById(R.id.videoDLength))
             .setText(
                 Messages.getString("VideoDetail.4") + //$NON-NLS-1$
                 String.valueOf(video.length) + " mins" //$NON-NLS-1$
-            ); 
+            );
         ((TextView)findViewById(R.id.videoDPlot))
             .setText(video.plot);
         if (video.subtitle.length() > 0)
@@ -84,16 +84,16 @@ public class VideoDetail extends MDActivity {
         else
             ((TextView)findViewById(R.id.videoDSubtitle))
                 .setVisibility(View.GONE);
-        
+
         if (video.poster == null)
             ((ImageView)findViewById(R.id.videoDPoster))
                 .setImageResource(R.drawable.video);
         else
             ((ImageView)findViewById(R.id.videoDPoster))
                 .setImageDrawable(video.poster);
-        
-        Button play = ((Button)findViewById(R.id.videoDPlay)); 
-        
+
+        Button play = ((Button)findViewById(R.id.videoDPlay));
+
         play.setOnClickListener(
             new OnClickListener() {
                 @Override
@@ -119,7 +119,7 @@ public class VideoDetail extends MDActivity {
                 }
             }
         );
-        
+
         ((Button)findViewById(R.id.videoDTVDB))
             .setOnClickListener(
                 new OnClickListener() {
@@ -133,14 +133,14 @@ public class VideoDetail extends MDActivity {
                     }
                 }
             );
- 
+
     }
-    
+
     @Override
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
         setContentView(R.layout.video_detail);
         setViews();
     }
-    
+
 }

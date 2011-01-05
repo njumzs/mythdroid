@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -65,7 +65,7 @@ public class ProgramAdapter extends ArrayAdapter<Object> {
             );
             vHolder = new ViewHolder();
             vHolder.title = (TextView)old.findViewById(R.id.reclist_title);
-            vHolder.subtitle = 
+            vHolder.subtitle =
                 (TextView)old.findViewById(R.id.reclist_subtitle);
             vHolder.channel = (TextView)old.findViewById(R.id.reclist_channel);
             vHolder.date = (TextView)old.findViewById(R.id.reclist_date);

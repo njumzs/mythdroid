@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -25,7 +25,7 @@ import android.preference.PreferenceActivity;
 
 /**
  * PreferenceActivity - the 'Settings' page
- * Built from res.xml.preferences 
+ * Built from res.xml.preferences
  */
 public class Prefs extends PreferenceActivity {
     @Override

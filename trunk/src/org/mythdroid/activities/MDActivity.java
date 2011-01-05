@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -44,16 +44,16 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 
-/** Base class for activities that display frontend choosers 
+/** Base class for activities that display frontend choosers
  * and/or loading dialogs - same as MDListActivity */
 public abstract class MDActivity extends Activity {
 
     /** Frontend chooser and loading dialogs */
-    final protected static int 
+    final protected static int
         FRONTEND_CHOOSER = -1, DIALOG_LOAD = -2;
     final protected Context ctx = this;
 
-    /** 
+    /**
      * The activity we are on the way to when the frontend chooser dialog
      * finishes
      */
@@ -61,11 +61,11 @@ public abstract class MDActivity extends Activity {
 
     /** Extras to put in the intent passed to nextActivity */
     final private ArrayList<String> boolExtras = new ArrayList<String>();
-    final private HashMap<String, Integer> intExtras = 
+    final private HashMap<String, Integer> intExtras =
         new HashMap<String, Integer>();
-    final private HashMap<String, String> stringExtras = 
+    final private HashMap<String, String> stringExtras =
         new HashMap<String, String>();
-    
+
     private boolean onHere = false;
 
     /** Start nextActivity when the frontend dialog chooser is finished */
@@ -76,10 +76,10 @@ public abstract class MDActivity extends Activity {
                 if (
                     (
                         !onHere && (
-                            Globals.defaultFrontend == null || 
+                            Globals.defaultFrontend == null ||
                             nextActivity == null
                         )
-                    ) || 
+                    ) ||
                     (onHere && hereActivity == null)
                 )
                     return;
@@ -98,7 +98,7 @@ public abstract class MDActivity extends Activity {
             }
         };
 
-    /** Clear nextActivity if the frontend chooser is cancelled */ 
+    /** Clear nextActivity if the frontend chooser is cancelled */
     protected OnCancelListener cancelListener =
         new OnCancelListener() {
             @Override
@@ -131,13 +131,13 @@ public abstract class MDActivity extends Activity {
                     }
                 );
                 return prog;
-        
+
         }
 
         return null;
 
     }
-    
+
     @Override
     public void onPrepareDialog(int id, final Dialog dialog) {
         switch (id) {
@@ -148,7 +148,7 @@ public abstract class MDActivity extends Activity {
                 super.onPrepareDialog(id, dialog);
         }
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
@@ -170,7 +170,7 @@ public abstract class MDActivity extends Activity {
             .setIcon(drawable.ic_menu_upload_you_tube)
             .setTitle(R.string.ch_fe)
             .create();
-        
+
         d.getListView().setOnItemClickListener(
             new OnItemClickListener() {
                 @Override
@@ -180,49 +180,49 @@ public abstract class MDActivity extends Activity {
                     String fe = (String)av.getAdapter().getItem(pos);
                     if (fe.equals(Messages.getString("MDActivity.0")))  // Here //$NON-NLS-1$
                         onHere = true;
-                    else 
+                    else
                         Globals.defaultFrontend = fe;
                     d.dismiss();
                 }
             }
         );
-        
+
         return d;
     }
-    
+
     private void prepareFrontendDialog(final Dialog dialog) {
-        
+
         Cursor c = FrontendDB.getFrontends(this);
         ArrayList<String> list = new ArrayList<String>();
-        
+
         int num = c.getCount();
-        
+
         if (hereActivity != null && num < 1) {
             ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
             return;
         }
-        
+
         if (num > 0) {
             c.moveToFirst();
             do  {
                 list.add(c.getString(FrontendDB.NAME));
             } while(c.moveToNext());
         }
-        
+
         c.close();
         FrontendDB.close();
-        
+
         if (hereActivity != null)
             list.add(Messages.getString("MDActivity.1")); // Here //$NON-NLS-1$
-        
+
         ((AlertDialog)dialog).getListView().setAdapter(
             new ArrayAdapter<String>(
                 ctx, R.layout.simple_list_item_1, id.text1, list
             )
         );
-        
+
     }
-    
+
     /**
      * Add "Here" to the frontend chooser and start the provided
      * activity if it's selected
@@ -231,7 +231,7 @@ public abstract class MDActivity extends Activity {
     protected void addHereToFrontendChooser(Class<?> activity) {
         hereActivity = activity;
     }
-    
+
     /**
      * Add a valueless Extra to the Intent used to start child activities
      * when the frontend chooser finishes
@@ -250,7 +250,7 @@ public abstract class MDActivity extends Activity {
     protected void setExtra(String name, int value) {
         intExtras.put(name, value);
     }
-    
+
     /**
      * Add an Extra with an String value to the Intent used to start child
      * activities when the frontend chooser finishes

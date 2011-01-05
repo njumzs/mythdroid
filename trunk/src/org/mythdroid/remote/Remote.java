@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -46,32 +46,32 @@ public abstract class Remote extends Activity implements View.OnClickListener {
 
     final private static KeyCharacterMap keyMap =
         KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
-    
-    final private static String wakeService = 
+
+    final private static String wakeService =
         "org.mythdroid.remote.WakeService"; //$NON-NLS-1$
 
     /** Result codes for when a remote is startActivityForResult()'d */
     final protected int REMOTE_RESULT_FINISH = RESULT_FIRST_USER;
-    
+
     /** Scale factor for pixel values for different display densities */
     private float scale = 1;
-    
+
     private boolean alt = false, shift = false, moveWake = true;
-    
+
     private GestureDetector gDetector;
-    
+
     private class RemoteGestureListener extends SimpleOnGestureListener {
 
-        public float scrollIntX = (int)(50 * scale), 
+        public float scrollIntX = (int)(50 * scale),
                      scrollIntY = (int)(50 * scale);
 
         final private float maxScrollSpeed = (float) (0.30 * scale);
         final private float minFlingSpeed  = 360  * scale;
         final private float wobble         = (int)  (40   * scale);
-        
+
         final private static int   SCROLL_LOCK_UNLOCKED = 0;
         final private static int   SCROLL_LOCK_X        = 1, SCROLL_LOCK_Y = 2;
-        
+
         private float              lastStartX           = 0;
         private float              lastStartY           = 0;
         private float              scrollMul            = 1;
@@ -89,7 +89,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         public boolean onFling(
             MotionEvent start, MotionEvent end, float vX, float vY
         ) {
-            
+
             if (!fling) return true;
 
             float absVX = Math.abs(vX);
@@ -103,7 +103,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
                 else
                     onFlingLeft();
 
-            else if (absVY > minFlingSpeed && absDX < absDY / 2) 
+            else if (absVY > minFlingSpeed && absDX < absDY / 2)
                 if (vY > 0)
                     onFlingDown();
                 else
@@ -165,8 +165,8 @@ public abstract class Remote extends Activity implements View.OnClickListener {
 
             // Triggered a scroll event?
             if (
-                absX > scrollIntX * scrollMul && 
-                absY < wobble && 
+                absX > scrollIntX * scrollMul &&
+                absY < wobble &&
                 scrollLock != SCROLL_LOCK_Y
             ) {
                 if (scrolledX > 0)
@@ -177,7 +177,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
                 fling = false;
             }
             else if (
-                absY > scrollIntY * scrollMul && 
+                absY > scrollIntY * scrollMul &&
                 absX < wobble &&
                 scrollLock != SCROLL_LOCK_X
             ) {
@@ -212,10 +212,10 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         super.onCreate(icicle);
         scale    = getResources().getDisplayMetrics().density;
         moveWake = PreferenceManager.getDefaultSharedPreferences(this)
-                       .getBoolean("moveWake", true); //$NON-NLS-1$ 
+                       .getBoolean("moveWake", true); //$NON-NLS-1$
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
@@ -224,28 +224,28 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         if (moveWake)
             stopService(new Intent().setClassName(this, wakeService));
     }
-    
+
     @Override
     public void onPause() {
         super.onPause();
         if (moveWake)
             startService(new Intent().setClassName(this, wakeService));
     }
-    
+
     @Override
     public void onStop() {
         super.onStop();
         if (moveWake)
             stopService(new Intent().setClassName(this, wakeService));
     }
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         if (moveWake)
             stopService(new Intent().setClassName(this, wakeService));
     }
-    
+
     @Override
     public void onOptionsMenuClosed(Menu menu) {
         super.onOptionsMenuClosed(menu);
@@ -261,7 +261,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
 
     @Override
     public boolean onTouchEvent(MotionEvent me) {
-        if (gDetector != null && gDetector.onTouchEvent(me)) 
+        if (gDetector != null && gDetector.onTouchEvent(me))
             return true;
         return false;
 
@@ -339,7 +339,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         return true;
 
     }
-    
+
     /**
      * Listen to gestures
      * @param listen true to start listening, false to stop
@@ -353,8 +353,8 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         else
             gDetector = null;
     }
-    
-    /** 
+
+    /**
      * Executed when user gestures an upward fling
      * Default implementation sends Key.UP
      */
@@ -365,7 +365,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         onAction();
     }
 
-    /** 
+    /**
      * Executed when user gestures a downard fling
      * Default implementation sends Key.DOWN
      */
@@ -376,7 +376,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         onAction();
     }
 
-    /** 
+    /**
      * Executed when user gestures a fling left
      * Default implementation sends Key.LEFT
      */
@@ -387,7 +387,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         onAction();
     }
 
-    /** 
+    /**
      * Executed when user gestures an fling right
      * Default implementation sends Key.RIGHT
      */
@@ -398,7 +398,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         onAction();
     }
 
-    /** 
+    /**
      * Executed when user gestures a downward scroll
      * Default implementation sends Key.DOWN
      */
@@ -406,7 +406,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         onFlingDown();
     }
 
-    /** 
+    /**
      * Executed when user gestures a scroll left
      * Default implementation sends Key.LEFT
      */
@@ -414,7 +414,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         onFlingLeft();
     }
 
-    /** 
+    /**
      * Executed when user gestures an scroll right
      * Default implementation sends Key.RIGHT
      */
@@ -422,7 +422,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         onFlingRight();
     }
 
-    /** 
+    /**
      * Executed when user gestures an upward scroll
      * Default implementation sends Key.UP
      */
@@ -430,7 +430,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         onFlingUp();
     }
 
-    /** 
+    /**
      * Executed when user gestures a tap
      * Default implementation sends Key.ENTER
      */

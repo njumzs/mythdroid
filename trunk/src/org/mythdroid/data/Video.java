@@ -45,30 +45,30 @@ public class Video {
     
     final private static Options opts = new BitmapFactory.Options();
     static { opts.inSampleSize = 8; }
-    
-    final private static int 
+
+    final private static int
         ID = 0, TITLE = 1, SUBTITLE = 2, DIRECTOR = 3, PLOT = 4, HOMEPAGE = 5,
         YEAR = 6, USERRATING = 7, LENGTH = 8, FILENAME = 9;
-    
+
     /**
      * Constructor
-     * @param line A String containing a DIRECTORY or VIDEO line from MDD 
+     * @param line A String containing a DIRECTORY or VIDEO line from MDD
      */
     public Video(String line) {
-                
+
         if (line.matches("^[0-9-]+ DIRECTORY .+")) { //$NON-NLS-1$
             dir   = Integer.valueOf(line.substring(0, line.indexOf(" "))); //$NON-NLS-1$
             title = line.substring(line.indexOf("DIRECTORY") + 10); //$NON-NLS-1$
             return;
         }
-        
+
         String[] fields = line.split("\\|\\|"); //$NON-NLS-1$
-        
+
         if (fields.length < FILENAME + 1)
             return;
-        
+
         fields[0] = fields[0].replaceFirst("VIDEO ", ""); //$NON-NLS-1$ //$NON-NLS-2$
-                       
+
         id          = Integer.valueOf(fields[ID]);
         title       = fields[TITLE];
         subtitle    = fields[SUBTITLE];
@@ -82,10 +82,10 @@ public class Video {
         length      = fields[LENGTH].matches("[0-9]+") ? //$NON-NLS-1$
                           Integer.valueOf(fields[LENGTH]) : 0;
         filename    = fields[FILENAME];
-        
+
     }
-    
-    
+
+
     /**
      * Fetch the poster for the video, scale it and store it as a Drawable
      *  in this.poster
@@ -93,10 +93,10 @@ public class Video {
      * @param y desired height of poster in pixels
      */
     public void getPoster(float x, float y) {
-        
-        if (id == -1) 
+
+        if (id == -1)
             return;
-       
+
         URL url = null;
         try {
             url = new URL(
@@ -105,10 +105,10 @@ public class Video {
                 "Id=" + id  //$NON-NLS-1$
             );
         } catch (Exception e) {}
-        
+
         if (url == null)
             return;
-        
+
         Bitmap bm = null;
 
         try {
@@ -117,14 +117,14 @@ public class Video {
             if (resp.getStatusLine().getStatusCode() == 404)
                 return;
             InputStream is = new BufferedHttpEntity(resp.getEntity())
-                .getContent(); 
+                .getContent();
             bm = BitmapFactory.decodeStream(is, null, opts);
             is.close();
         } catch (Exception e) {}
-        
+
         if (bm == null)
             return;
-        
+
         int width = bm.getWidth();
         int height = bm.getHeight();
         float wf = x / width;
@@ -135,7 +135,7 @@ public class Video {
         poster = new BitmapDrawable(
             Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true)
         );
-        
+
     }
 
 }

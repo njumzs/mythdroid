@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -36,10 +36,10 @@ import android.widget.AdapterView.OnItemSelectedListener;
 
 /** Edit recording and storage groups for a recording rule */
 public class RecordingEditGroups extends MDActivity {
-  
+
     private String[] recGroups = null;
     private String[] storGroups = null;
-    
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -50,18 +50,18 @@ public class RecordingEditGroups extends MDActivity {
             );
             storGroups = MDDManager.getStorageGroups(
                 Globals.getBackend().addr
-            ); 
+            );
         } catch (Exception e) {
             ErrUtil.err(this, e);
             finish();
         }
-        
+
         if (recGroups == null || storGroups == null) {
             ErrUtil.err(this, Messages.getString("RecordingEditGroups.0")); //$NON-NLS-1$
             finish();
             return;
         }
-        
+
         setViews();
     }
 
@@ -70,9 +70,9 @@ public class RecordingEditGroups extends MDActivity {
         super.onDestroy();
         setResult(Activity.RESULT_OK);
     }
-    
+
     private void setViews() {
-       
+
         final Spinner recGroupSpinner = ((Spinner)findViewById(R.id.recedit_recGroup));
         final ArrayAdapter<String> recGroupAdapter = new ArrayAdapter<String>(
             this, android.R.layout.simple_spinner_item, recGroups
@@ -80,14 +80,14 @@ public class RecordingEditGroups extends MDActivity {
         recGroupAdapter.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item
         );
-        
+
         int pos = 0;
-        
+
         if (RecordingEdit.recGroup != null)
             for (pos = 0; pos < recGroups.length; pos++)
                 if (recGroups[pos].equals(RecordingEdit.recGroup))
                     break;
-        
+
         recGroupSpinner.setAdapter(recGroupAdapter);
         recGroupSpinner.setSelection(pos);
         recGroupSpinner.setOnItemSelectedListener(
@@ -101,10 +101,10 @@ public class RecordingEditGroups extends MDActivity {
 
                 @Override
                 public void onNothingSelected(AdapterView<?> arg0) {}
-                
+
             }
         );
-        
+
         final Spinner storGroupSpinner = ((Spinner)findViewById(R.id.recedit_storGroup));
         final ArrayAdapter<String> storGroupAdapter = new ArrayAdapter<String>(
             this, android.R.layout.simple_spinner_item, storGroups
@@ -112,14 +112,14 @@ public class RecordingEditGroups extends MDActivity {
         storGroupAdapter.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item
         );
-        
+
         pos = 0;
-        
+
         if (RecordingEdit.storGroup != null)
             for (pos = 0; pos < storGroups.length; pos++)
                 if (storGroups[pos].equals(RecordingEdit.storGroup))
                     break;
-        
+
         storGroupSpinner.setAdapter(storGroupAdapter);
         storGroupSpinner.setSelection(pos);
         storGroupSpinner.setOnItemSelectedListener(
@@ -133,7 +133,7 @@ public class RecordingEditGroups extends MDActivity {
 
                 @Override
                 public void onNothingSelected(AdapterView<?> arg0) {}
-                
+
             }
         );
     }

@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -31,18 +31,18 @@ public class WakeOnLan {
 
     static private byte[] addr;
     static private byte[] buf = new byte [17 * 6];
-    
+
     /**
      * Send a wake on lan packet
      * @param hwaddr String containing the MAC address of the target
      */
     public static void Wake(String hwaddr) throws Exception {
         addr = parseAddr(hwaddr);
-        for (int i = 0; i < 6; i++) 
+        for (int i = 0; i < 6; i++)
             buf[i] = (byte)0xff;
         for (int i = 6; i < buf.length; i += 6)
             System.arraycopy(addr, 0, buf, i, 6);
-        if (Globals.debug) 
+        if (Globals.debug)
             Log.d(
                 "WakeOnLAN",  //$NON-NLS-1$
                 "Sending WOL packets to 255.255.255.255 " +  //$NON-NLS-1$
@@ -57,11 +57,11 @@ public class WakeOnLan {
         sock.send(dgram);
         sock.close();
     }
-    
+
     private static byte[] parseAddr(String addr) throws IllegalArgumentException {
         byte[] bytes = new byte[6];
         String[] hex = addr.split(":"); //$NON-NLS-1$
-        if (hex.length != 6) 
+        if (hex.length != 6)
             throw new IllegalArgumentException("Invalid MAC address"); //$NON-NLS-1$
         try {
             for (int i = 0; i < 6; i++)
@@ -73,5 +73,5 @@ public class WakeOnLan {
         }
         return bytes;
     }
-    
+
 }

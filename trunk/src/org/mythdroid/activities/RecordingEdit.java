@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -46,7 +46,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 
 /** Edit a recording rule */
 public class RecordingEdit extends MDActivity {
-    
+
     /** Duplicate matching method for the current recording rule */
     static public RecDupMethod  dupMethod;
     /** Duplicate matching type for the current recording rule */
@@ -56,18 +56,18 @@ public class RecordingEdit extends MDActivity {
     /** Recording group for the current recording rule */
     static public String        recGroup;
     /** Storage group for the current recording rule */
-    static public String        storGroup; 
-    
+    static public String        storGroup;
+
     private Program prog         = null;
     private BackendManager beMgr = null;
     private RecType type;
     private int prio;
-    
+
     private Button  save, schedOptions, groupOptions;
     private Spinner prioSpinner;
     private boolean childrenModified = false, modified = false;
     private String  updates = ""; //$NON-NLS-1$
-    
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -78,47 +78,47 @@ public class RecordingEdit extends MDActivity {
     public void onDestroy() {
         super.onDestroy();
     }
-    
+
     @Override
     public void onResume() {
-        
+
         super.onResume();
         try {
             beMgr = Globals.getBackend();
         } catch (Exception e) {
             ErrUtil.err(this, e);
         }
-        
+
         try {
             new MDDManager(beMgr.addr);
         } catch (IOException e) {
             ErrUtil.err(
                 this, Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
-            ); 
+            );
             finish();
             return;
         }
-        
+
         prog = Globals.curProg;
         if (prog == null) {
             finish();
             return;
         }
-        
+
         type = prog.Type;
         prio = prog.RecPrio;
-        
+
         dupMethod = prog.DupMethod;
         dupIn = prog.DupIn;
         epiFilter = prog.EpiFilter;
         recGroup = prog.RecGroup;
         storGroup = prog.StorGroup;
-        
+
         if (prog.RecID != -1) {
             try {
-                type = prog.Type = 
+                type = prog.Type =
                     MDDManager.getRecType(beMgr.addr, prog.RecID);
-                
+
                 if (storGroup == null) {
                     storGroup = prog.StorGroup =
                         MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
@@ -128,9 +128,9 @@ public class RecordingEdit extends MDActivity {
                 finish();
             }
         }
-        
+
         setViews();
-        
+
     }
 
     @Override
@@ -139,30 +139,30 @@ public class RecordingEdit extends MDActivity {
         setContentView(R.layout.recording_edit);
         setViews();
     }
-    
+
     @Override
     protected void onActivityResult(int reqCode, int resCode, Intent data) {
         super.onActivityResult(reqCode, resCode, data);
         if (prog == null || recGroup == null || storGroup == null) return;
         if (
-            dupMethod == prog.DupMethod && dupIn == prog.DupIn && 
+            dupMethod == prog.DupMethod && dupIn == prog.DupIn &&
             epiFilter == prog.EpiFilter && recGroup.equals(prog.RecGroup) &&
             storGroup.equals(prog.StorGroup)
-        ) 
+        )
             childrenModified = false;
         else
             childrenModified = true;
         updateSaveEnabled();
     }
-    
+
     private void setViews() {
-       
+
         ((TextView)findViewById(R.id.recedit_title)).setText(prog.Title);
         ((TextView)findViewById(R.id.recedit_subtitle)).setText(prog.SubTitle);
         ((TextView)findViewById(R.id.recedit_channel)).setText(prog.Channel);
         ((TextView)findViewById(R.id.recedit_start))
             .setText(prog.startString());
-        
+
         final Spinner typeSpinner = ((Spinner)findViewById(R.id.recedit_type));
         final ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(
             this, android.R.layout.simple_spinner_item
@@ -170,13 +170,13 @@ public class RecordingEdit extends MDActivity {
         typeAdapter.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item
         );
-        
+
         for (RecType type : RecType.values()) {
             if (type == RecType.DONT || type == RecType.OVERRIDE)
                 continue;
             typeAdapter.add(type.msg());
         }
-        
+
         typeSpinner.setAdapter(typeAdapter);
         typeSpinner.setSelection(type.ordinal());
         typeSpinner.setOnItemSelectedListener(
@@ -191,7 +191,7 @@ public class RecordingEdit extends MDActivity {
                     else
                         modified = false;
                     updateSaveEnabled();
-                    
+
                     if (type == RecType.NOT) {
                         prioSpinner.setEnabled(false);
                         schedOptions.setEnabled(false);
@@ -206,23 +206,23 @@ public class RecordingEdit extends MDActivity {
 
                 @Override
                 public void onNothingSelected(AdapterView<?> arg0) {}
-                
+
             }
         );
-        
+
         prioSpinner = ((Spinner)findViewById(R.id.recedit_prio));
-        
+
         final String[] prios = new String[21];
         for (int i = -10, j = 0; i < 11; i++)
             prios[j++] = String.valueOf(i);
-        
+
         final ArrayAdapter<String> prioAdapter = new ArrayAdapter<String>(
             this, android.R.layout.simple_spinner_item, prios
         );
         prioAdapter.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item
         );
-        
+
         prioSpinner.setAdapter(prioAdapter);
         prioSpinner.setSelection(prio + 10);
         prioSpinner.setOnItemSelectedListener(
@@ -241,7 +241,7 @@ public class RecordingEdit extends MDActivity {
 
                 @Override
                 public void onNothingSelected(AdapterView<?> arg0) {}
-                
+
             }
         );
         prioSpinner.setEnabled(type == RecType.NOT ? false : true);
@@ -258,7 +258,7 @@ public class RecordingEdit extends MDActivity {
             }
         );
         schedOptions.setEnabled(type == RecType.NOT ? false : true);
-        
+
         groupOptions = (Button)findViewById(R.id.recedit_groupoptions);
         groupOptions.setOnClickListener(
             new OnClickListener() {
@@ -271,7 +271,7 @@ public class RecordingEdit extends MDActivity {
             }
         );
         groupOptions.setEnabled(type == RecType.NOT ? false : true);
-        
+
         save = (Button)findViewById(R.id.recedit_save);
         save.setOnClickListener(
             new OnClickListener() {
@@ -282,30 +282,30 @@ public class RecordingEdit extends MDActivity {
             }
         );
         save.setEnabled(false);
-        
+
     }
-    
+
     private void updateSaveEnabled() {
         if (modified || childrenModified)
             save.setEnabled(true);
         else
             save.setEnabled(false);
     }
-    
+
     private void doSave() {
-        
+
         int recid = -1;
-        
+
         if (modified) {
             if (prio != prog.RecPrio) {
                 addUpdate("recpriority = " + prio); //$NON-NLS-1$
                 prog.RecPrio = prio;
             }
             if (type != prog.Type) {
-                
+
                 addUpdate("type = " + type.value()); //$NON-NLS-1$
                 prog.Type = type;
-                
+
                 if (type == RecType.NOT && prog.RecID != -1) {
                     try {
                         MDDManager.deleteRecording(beMgr.addr, prog.RecID);
@@ -318,7 +318,7 @@ public class RecordingEdit extends MDActivity {
                     finish();
                     return;
                 }
-                
+
                 addUpdate("findday = " + prog.StartTime.getDay()); //$NON-NLS-1$
                 addUpdate(
                     "findtime = '" +  //$NON-NLS-1$
@@ -333,7 +333,7 @@ public class RecordingEdit extends MDActivity {
 
             }
         }
-        
+
         if (childrenModified) {
             if (dupMethod != prog.DupMethod) {
                 addUpdate("dupmethod = " + dupMethod.value()); //$NON-NLS-1$
@@ -352,37 +352,37 @@ public class RecordingEdit extends MDActivity {
                 prog.StorGroup = storGroup;
             }
         }
-        
+
         if (updates.length() == 0) {
             finish();
             return;
         }
-        
+
         try {
-            recid = MDDManager.updateRecording(beMgr.addr, prog, updates); 
+            recid = MDDManager.updateRecording(beMgr.addr, prog, updates);
         } catch (IOException e) {
             ErrUtil.err(ctx, e);
         }
-        
+
         prog.RecID = recid;
-        
+
         if (recid == -1) {
             ErrUtil.err(this, Messages.getString("RecordingEdit.0")); //$NON-NLS-1$
             finish();
             return;
         }
-        
+
         try {
             beMgr.reschedule(recid);
         } catch (IOException e) {
             ErrUtil.err(this, e);
         }
-        
+
         setResult(Guide.REFRESH_NEEDED);
         finish();
- 
+
     }
-    
+
     private void addUpdate(String update) {
         if (updates.length() > 0)
             updates += ", "; //$NON-NLS-1$

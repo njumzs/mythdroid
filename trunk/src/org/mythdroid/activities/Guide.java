@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -69,9 +69,9 @@ import android.widget.TableRow.LayoutParams;
 /** Display a program guide */
 public class Guide extends MDActivity {
 
-    /** 
+    /**
      * A resultCode that child activities should set via setResult() to tell
-     * Guide to refresh when they finish 
+     * Guide to refresh when they finish
      */
     final public static int  REFRESH_NEEDED = Activity.RESULT_FIRST_USER + 1;
     final private static int MENU_DATE    = 0, MENU_TIME = 1;
@@ -81,41 +81,41 @@ public class Guide extends MDActivity {
     final private static int
         numHours = 2,   colMins = 5,    hdrSpan = 6,
         numTimes = numHours * 60 / colMins;
-    
+
     private static Date now = null, later = null;
-    
+
     /** ArrayList of channel objects, capacity ensured during XML parsing */
     final private ArrayList<Channel> channels = new ArrayList<Channel>();
 
-    final private SimpleDateFormat 
+    final private SimpleDateFormat
         date = new SimpleDateFormat("d MMM yy"), //$NON-NLS-1$
         time = new SimpleDateFormat("HH:mm"); //$NON-NLS-1$
 
     final private Handler handler   = new Handler();
-            
+
     final private long[]   times    = new long[numTimes + 1];
     final private String[] hdrTimes = new String[numTimes / hdrSpan];
 
-    final private LayoutParams 
-        rowLayout     = new LayoutParams(), chanLayout    = new LayoutParams(), 
-        hdrDateLayout = new LayoutParams(), hdrTimeLayout = new LayoutParams(), 
+    final private LayoutParams
+        rowLayout     = new LayoutParams(), chanLayout    = new LayoutParams(),
+        hdrDateLayout = new LayoutParams(), hdrTimeLayout = new LayoutParams(),
         spacerLayout  = new LayoutParams();
 
-    private Drawable 
-        recordedIcon = null, willRecordIcon = null, failedIcon = null, 
+    private Drawable
+        recordedIcon = null, willRecordIcon = null, failedIcon = null,
         conflictIcon = null, otherIcon = null;
 
     private String      hdrDate = null;
     private TableLayout tbl     = null;
-    
+
     /** Scale factor for pixel values for different display densities */
     private float       scale   = 1;
     /**
     * Tweak colWidth to alter the visible width of the columns
-    * Tweak rowHeight to alter the visible height of rows 
-    */   
+    * Tweak rowHeight to alter the visible height of rows
+    */
     private int         colWidth, rowHeight, chanWidth;
-    
+
     /** Get and sort the list of channels, add them to table in UI thread */
     final private Runnable getData = new Runnable() {
         @Override
@@ -126,33 +126,33 @@ public class Guide extends MDActivity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        
+
                         try {
                             dismissDialog(DIALOG_LOAD);
                         } catch (IllegalArgumentException e) {}
-                        
+
                         tbl.addView(getHeader());
                         // this is necessary to get proper layout
                         tbl.addView(getSpacer());
 
                         int j = 0;
                         int maxChan = channels.size() - 1;
-                        
+
                         for (int i = 0; i < maxChan; i++) {
-                            
+
                             Channel current = channels.get(i);
-                                                        
+
                             if (current.num.length() == 0)    continue;
-                            
-                            /* 
-                             * MythTV 0.24 sometimes splits programs amongst 
+
+                            /*
+                             * MythTV 0.24 sometimes splits programs amongst
                              * channels with different ids but the same num
                              * and callsign.. :/
                              */
                             if (i < maxChan - 1) {
-                                
+
                                 Channel next = channels.get(i+1);
-                            
+
                                 if (
                                     current.num.equals(next.num) &&
                                     current.callSign.equals(next.callSign)
@@ -160,21 +160,21 @@ public class Guide extends MDActivity {
                                     next.programs.addAll(current.programs);
                                     continue;
                                 }
-                                
+
                             }
-                            
+
                             if (j++ == 7) {
                                 tbl.addView(getHeader());
                                 j = 0;
                             }
-                            
+
                             // This became necessary in either android 2.2 or MythTV 0.24
                             Collections.sort(current.programs);
-                            
+
                             tbl.addView(getRowFromChannel(current));
-                            
+
                         }
-                        
+
                     }
                 }
            );
@@ -221,19 +221,19 @@ public class Guide extends MDActivity {
 
     @Override
     public void onCreate(Bundle icicle) {
-        
+
         super.onCreate(icicle);
         setContentView(R.layout.guide);
-        
+
         scale = getResources().getDisplayMetrics().density;
-        colWidth  = (int)(40  * scale + 0.5f);  
+        colWidth  = (int)(40  * scale + 0.5f);
         rowHeight = (int)(60  * scale + 0.5f);
         chanWidth = (int)(100 * scale + 0.5f);
-        
+
         tbl = (TableLayout)findViewById(R.id.guide_table);
 
         rowLayout.topMargin = rowLayout.bottomMargin = chanLayout.topMargin =
-            chanLayout.bottomMargin = chanLayout.leftMargin = 
+            chanLayout.bottomMargin = chanLayout.leftMargin =
             chanLayout.rightMargin = hdrDateLayout.leftMargin =
             hdrDateLayout.rightMargin = hdrTimeLayout.leftMargin =
             hdrTimeLayout.rightMargin = 1;
@@ -263,7 +263,7 @@ public class Guide extends MDActivity {
         displayGuide(new Date());
 
     }
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -302,7 +302,7 @@ public class Guide extends MDActivity {
         switch (id) {
 
             case DIALOG_DATE:
-                return new DatePickerDialog(this, 
+                return new DatePickerDialog(this,
                     new OnDateSetListener() {
                         @Override
                         public void onDateSet(
@@ -313,12 +313,12 @@ public class Guide extends MDActivity {
                             now.setDate(day);
                             displayGuide(now);
                         }
-                    }, 
+                    },
                     now.getYear() + 1900, now.getMonth(), now.getDate()
                 );
 
             case DIALOG_TIME:
-                return new TimePickerDialog(this, 
+                return new TimePickerDialog(this,
                     new OnTimeSetListener() {
                         @Override
                         public void onTimeSet(
@@ -328,7 +328,7 @@ public class Guide extends MDActivity {
                             now.setMinutes(min);
                             displayGuide(now);
                         }
-                    }, 
+                    },
                     now.getHours(), now.getMinutes(), true
             );
 
@@ -338,7 +338,7 @@ public class Guide extends MDActivity {
         }
 
     }
-    
+
     @Override
     public void onActivityResult(int reqCode, int resCode, Intent data) {
         if (resCode == REFRESH_NEEDED)
@@ -367,7 +367,7 @@ public class Guide extends MDActivity {
     }
 
     /**
-     * Display the guide 
+     * Display the guide
      * @param when Date to start at
      */
     private void displayGuide(Date when) {
@@ -434,7 +434,7 @@ public class Guide extends MDActivity {
                                   .getChild("Channel"); //$NON-NLS-1$
 
         chanElement.setStartElementListener(
-            new ChannelXMLParser(this, chanElement, 
+            new ChannelXMLParser(this, chanElement,
                 new ChannelListener() {
                     @Override
                     public void channel(Channel chan) {
@@ -453,13 +453,13 @@ public class Guide extends MDActivity {
                 "&EndTime="  + Globals.dateFmt.format(end)   + //$NON-NLS-1$
                 "&StartChanId=0" + "&NumOfChannels=-1" + "&Details=1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             );
-            
+
             if (Globals.debug)
                 Log.d("Guide", "Fetching XML from " + url.toExternalForm()); //$NON-NLS-1$ //$NON-NLS-2$
 
             Xml.parse(
-                url.openConnection().getInputStream(), 
-                Xml.Encoding.UTF_8, 
+                url.openConnection().getInputStream(),
+                Xml.Encoding.UTF_8,
                 handler
             );
 
@@ -480,7 +480,7 @@ public class Guide extends MDActivity {
     private void setStatusDrawable(TextView tv, Program prog) {
 
         Drawable icon = null;
-        
+
         switch (prog.Status) {
             case RECORDED:
             case CURRENT:
@@ -506,7 +506,7 @@ public class Guide extends MDActivity {
                 icon = otherIcon;
                 break;
         }
-        
+
         if (icon != null) {
             tv.setCompoundDrawablesWithIntrinsicBounds(
                 icon, null, null, null
@@ -545,10 +545,10 @@ public class Guide extends MDActivity {
 
             if (prog.StartTime.equals(later))
                 continue;
-            
+
             tv = new TextView(this);
             layout = new LayoutParams(this, null);
-            layout.topMargin = layout.bottomMargin = 
+            layout.topMargin = layout.bottomMargin =
                 layout.leftMargin = layout.rightMargin = 1;
             layout.height = rowHeight;
 

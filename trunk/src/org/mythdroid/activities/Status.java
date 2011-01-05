@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -50,11 +50,11 @@ public class Status extends ListActivity {
 
     /** The status XML doc from the backend */
     public static Document        statusDoc   = null;
-    
+
     final static private int      DIALOG_LOAD = 0;
     final private Context         ctx         = this;
     final private static String[] StatusItems =
-    { 
+    {
         Messages.getString("Status.0"),    // Recorders //$NON-NLS-1$
         Messages.getString("Status.1"),    // Scheduled //$NON-NLS-1$
         Messages.getString("Status.2"),    // Job Queue //$NON-NLS-1$
@@ -62,7 +62,7 @@ public class Status extends ListActivity {
     };
 
     final private Handler handler = new Handler();
-            
+
     final private Runnable getStatusTask = new Runnable() {
         @Override
         public void run() {
@@ -99,7 +99,7 @@ public class Status extends ListActivity {
     /** When a status menu entry is selected */
     @Override
     public void onListItemClick(ListView list, View item, int pos, long id) {
-        
+
         final String action = (String)list.getItemAtPosition(pos);
         Class<?> activity = null;
 
