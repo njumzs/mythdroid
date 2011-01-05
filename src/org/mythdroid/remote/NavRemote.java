@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -49,15 +49,15 @@ public class NavRemote extends Remote {
     final private static int MENU_GESTURE = 0, MENU_BUTTON = 1;
 
     final private Handler    handler = new Handler();
-    
+
     private FrontendLocation lastLoc = null;
     private MDDManager       mddMgr  = null;
     private TextView         locView = null, itemView = null;
-    
-    private boolean 
+
+    private boolean
         gesture = false, jumpGuide = false, calledByRemote = false,
         calledByTVRemote = false, calledByMusicRemote = false;
-    
+
     private class mddListener implements MDDMenuListener {
         @Override
         public void onMenuItem(final String menu, final String item) {
@@ -81,26 +81,26 @@ public class NavRemote extends Remote {
         gesture = PreferenceManager.getDefaultSharedPreferences(this)
                     .getString("tvDefaultStyle", "") //$NON-NLS-1$ //$NON-NLS-2$
                         .equals(Messages.getString("NavRemote.0")); // Gesture //$NON-NLS-1$
-        
+
         setupViews(gesture);
         listenToGestures(gesture);
 
-        if (getIntent().hasExtra(Extras.GUIDE.toString())) 
+        if (getIntent().hasExtra(Extras.GUIDE.toString()))
             jumpGuide = true;
 
         String calledBy = null;
-        
+
         ComponentName caller = getCallingActivity();
-        if (caller != null) 
+        if (caller != null)
             calledBy = caller.getShortClassName();
-        
-        if (calledBy != null) { 
+
+        if (calledBy != null) {
             if(calledBy.endsWith(".TVRemote")) //$NON-NLS-1$
                 calledByTVRemote = true;
             else if (calledBy.endsWith(".MusicRemote")) //$NON-NLS-1$
                 calledByMusicRemote = true;
         }
-        
+
         calledByRemote = calledByTVRemote || calledByMusicRemote;
 
     }
@@ -115,7 +115,7 @@ public class NavRemote extends Remote {
             finish();
             return;
         }
-        
+
         if (feMgr == null) {
             ErrUtil.err(this, Messages.getString("TVRemote.5")); //$NON-NLS-1$
             finish();
@@ -123,25 +123,25 @@ public class NavRemote extends Remote {
         }
 
         try {
-            if (jumpGuide) 
+            if (jumpGuide)
                 feMgr.jumpTo("guidegrid"); //$NON-NLS-1$
             updateLoc();
         } catch (IOException e) { ErrUtil.err(this, e); }
-        
+
         if (!calledByRemote) {
             try {
                 mddMgr = new MDDManager(feMgr.addr);
             } catch (IOException e) { mddMgr = null; }
-            
+
             if (mddMgr != null) {
                 mddMgr.setMenuListener(new mddListener());
             }
         }
     }
-    
+
     private void cleanup() {
         try {
-            if (feMgr != null && !calledByRemote)  
+            if (feMgr != null && !calledByRemote)
                 feMgr.disconnect();
             feMgr = null;
             if (mddMgr != null)
@@ -149,25 +149,25 @@ public class NavRemote extends Remote {
             mddMgr = null;
         } catch (IOException e) { ErrUtil.err(this, e); }
     }
-    
+
     @Override
     public void onPause() {
         super.onPause();
         cleanup();
     }
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         cleanup();
     }
-    
-    
+
+
     @Override
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
         setupViews(gesture);
-        
+
         try {
             if (feMgr == null)
                 onResume();
@@ -177,7 +177,7 @@ public class NavRemote extends Remote {
 
     @Override
     public void onClick(View v) {
-        
+
         try {
             switch (v.getId()) {
                 case R.id.nav_back:
@@ -244,14 +244,14 @@ public class NavRemote extends Remote {
         return true;
 
     }
-    
+
     @Override
     public boolean onKeyDown(int code, KeyEvent event) {
-        
+
         if (code == KeyEvent.KEYCODE_BACK && calledByTVRemote) {
             try {
                 feMgr.sendKey(Key.ESCAPE);
-            } catch (IOException e) { 
+            } catch (IOException e) {
                 ErrUtil.err(this, e);
             }
             return true;
@@ -259,9 +259,9 @@ public class NavRemote extends Remote {
 
         super.onKeyDown(code, event);
         return false;
-        
+
     }
-    
+
     @Override
     public void onActivityResult(int reqCode, int resCode, Intent data) {
         if (resCode == REMOTE_RESULT_FINISH)
@@ -274,10 +274,10 @@ public class NavRemote extends Remote {
             updateLoc();
         } catch (IOException e) { ErrUtil.err(this, e); }
     }
-    
+
     /**
      * Setup the interactive views
-     * @param gesture true for 'gesture' layout, false for 'button' 
+     * @param gesture true for 'gesture' layout, false for 'button'
      */
     private void setupViews(boolean gesture) {
         setContentView(
@@ -287,7 +287,7 @@ public class NavRemote extends Remote {
         locView = (TextView)findViewById(R.id.nav_loc);
         itemView = (TextView)findViewById(R.id.nav_item);
 
-        if (feMgr != null) 
+        if (feMgr != null)
             try {
                 updateLoc();
             } catch (IOException e) { ErrUtil.err(this, e); }
@@ -310,9 +310,9 @@ public class NavRemote extends Remote {
      * Update the frontend location display, start another remote if appropriate
      */
     private void updateLoc() throws IOException {
-        
+
         if (calledByMusicRemote) return;
-        
+
         if (locView == null || itemView == null) return;
 
         final FrontendLocation newLoc = feMgr.getLoc();
@@ -322,21 +322,21 @@ public class NavRemote extends Remote {
         }
 
         if (newLoc.video) {
-            if (lastLoc != null) 
+            if (lastLoc != null)
                 Globals.lastLocation = lastLoc;
             if (calledByRemote)
                 finish();
             else {
-                final Intent intent = 
+                final Intent intent =
                     new Intent().setClass(this, TVRemote.class)
                                 .putExtra(Extras.DONTJUMP.toString(), true);
-                
-                if (newLoc.livetv) 
+
+                if (newLoc.livetv)
                     intent.putExtra(Extras.LIVETV.toString(), true);
                 startActivityForResult(intent, 0);
             }
         }
-        
+
         else if (newLoc.music) {
             if (lastLoc != null)
                 Globals.lastLocation = lastLoc;
@@ -346,7 +346,7 @@ public class NavRemote extends Remote {
                     .putExtra(Extras.DONTJUMP.toString(), true)
             );
         }
-         
+
         else
             lastLoc = newLoc;
 

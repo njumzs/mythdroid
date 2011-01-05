@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -40,9 +40,9 @@ public class XMLHandler extends DefaultHandler {
         /** Text contained in the element or the empty string */
         public String text = ""; //$NON-NLS-1$
         /** HashMap of name -> Element */
-        public HashMap<String, Element> elements = 
+        public HashMap<String, Element> elements =
             new HashMap<String, Element>(16);
-        
+
         private StartElementListener   startListener = null;
         private EndElementListener     endListener   = null;
         private EndTextElementListener textListener  = null;
@@ -71,7 +71,7 @@ public class XMLHandler extends DefaultHandler {
         public void setStartElementListener(StartElementListener l) {
             startListener = l;
         }
-        
+
         /**
          * Set or replace the EndElementListener on this element
          * @param l a EndElementListener
@@ -79,7 +79,7 @@ public class XMLHandler extends DefaultHandler {
         public void setEndElementListener(EndElementListener l) {
             endListener = l;
         }
-        
+
         /**
          * Set or replace the EndTextElementListener on this element
          * @param l a EndTextlementListener
@@ -87,13 +87,13 @@ public class XMLHandler extends DefaultHandler {
         public void setTextElementListener(EndTextElementListener l) {
             textListener = l;
         }
-        
+
         private Element getOrCreateElement(String name) {
             Element elem = elements.get(name);
 
             if (elem != null)
                 return elem;
-            
+
             elem = new Element(name);
             elements.put(name, elem);
             return elem;
@@ -108,7 +108,7 @@ public class XMLHandler extends DefaultHandler {
     private Element            rootElem = null;
 
     /**
-     * Constructor, call rootElement() post construction to get the 
+     * Constructor, call rootElement() post construction to get the
      * root Element
      * @param rootElement the name of the root element
      */
@@ -117,7 +117,7 @@ public class XMLHandler extends DefaultHandler {
         rootElem = curElem.getChild(rootElement);
     }
 
-    
+
     /**
      * Get the root Element
      * @return the root Element
@@ -140,9 +140,9 @@ public class XMLHandler extends DefaultHandler {
 
         curElem = elem;
         tree.add(elem);
-        if (elem.startListener != null) 
+        if (elem.startListener != null)
             elem.startListener.start(attr);
-        if (elem.textListener != null) 
+        if (elem.textListener != null)
             getChars = true;
 
     }
@@ -154,7 +154,7 @@ public class XMLHandler extends DefaultHandler {
             curElem.textListener.end(curElem.text);
             curElem.text = ""; //$NON-NLS-1$
         }
-        if (curElem.endListener != null) 
+        if (curElem.endListener != null)
             curElem.endListener.end();
         int lastIdx = tree.size() - 1;
         tree.remove(lastIdx--);
@@ -165,7 +165,7 @@ public class XMLHandler extends DefaultHandler {
 
     @Override
     public void characters(char ch[], int start, int end) {
-        if (getChars) 
+        if (getChars)
             curElem.text += new String(ch, start, end);
     }
 

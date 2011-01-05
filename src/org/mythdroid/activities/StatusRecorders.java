@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -61,7 +61,7 @@ public class StatusRecorders extends ListActivity {
     private ArrayList<Encoder> encoders = new ArrayList<Encoder>();
 
     final private Handler handler = new Handler();
-    
+
     final private Runnable refreshEncoders = new Runnable() {
         @Override
         public void run() {
@@ -70,7 +70,7 @@ public class StatusRecorders extends ListActivity {
 
             encoders.clear();
 
-            NodeList encoderItems = 
+            NodeList encoderItems =
                 doc.getElementsByTagName("Encoder"); //$NON-NLS-1$
 
             for (int i = 0; i < encoderItems.getLength(); i++)
@@ -97,36 +97,36 @@ public class StatusRecorders extends ListActivity {
                 finish();
                 return;
             }
-            
+
             handler.post(refreshEncoders);
         }
     };
 
     static final private class Encoder {
 
-        private final static String[] states = { 
+        private final static String[] states = {
             Messages.getString("StatusRecorders.1"),  // Idle //$NON-NLS-1$
             Messages.getString("StatusRecorders.2"),  // Live TV //$NON-NLS-1$
-            "?", "?", //$NON-NLS-1$ //$NON-NLS-2$ 
+            "?", "?", //$NON-NLS-1$ //$NON-NLS-2$
             Messages.getString("StatusRecorders.5"),  // Recording //$NON-NLS-1$
             Messages.getString("StatusRecorders.5"),  // Recording //$NON-NLS-1$
             Messages.getString("StatusRecorders.5"),  // Recording //$NON-NLS-1$
-            // Cope with new but irrelevant TVStates (e.g. 'Watching BD') by 
+            // Cope with new but irrelevant TVStates (e.g. 'Watching BD') by
             // padding with 'Recording' states
             Messages.getString("StatusRecorders.5"),  // Recording //$NON-NLS-1$
             Messages.getString("StatusRecorders.5")   // Recording //$NON-NLS-1$
         };
-                
+
         public int     id;
         public boolean local;
         public String  hostname, state;
         public Program program;
 
         public Encoder(Node item) {
-                      
+
             NamedNodeMap attr = item.getAttributes();
             id = Integer.parseInt(attr.getNamedItem("id").getNodeValue()); //$NON-NLS-1$
-            local = 
+            local =
                 attr.getNamedItem("local").getNodeValue().equals("1") //$NON-NLS-1$ //$NON-NLS-2$
                     ? true : false;
             hostname = attr.getNamedItem("hostname").getNodeValue(); //$NON-NLS-1$
@@ -150,7 +150,7 @@ public class StatusRecorders extends ListActivity {
                 }
             }
 
-            if (ProgNode != null) 
+            if (ProgNode != null)
                 program = new Program(ProgNode);
 
         }
@@ -179,12 +179,12 @@ public class StatusRecorders extends ListActivity {
                     R.layout.encoder_list_item, null
                 );
                 vHolder = new ViewHolder();
-                vHolder.encoder = 
+                vHolder.encoder =
                     (TextView)old.findViewById(R.id.enclist_encoder);
                 vHolder.state = (TextView)old.findViewById(R.id.enclist_state);
-                vHolder.program = 
+                vHolder.program =
                     (TextView)old.findViewById(R.id.enclist_program);
-                vHolder.endTime = 
+                vHolder.endTime =
                     (TextView)old.findViewById(R.id.enclist_endTime);
                 vHolder.rec = (ProgressBar)old.findViewById(R.id.enclist_rec);
                 old.setTag(vHolder);
@@ -202,9 +202,9 @@ public class StatusRecorders extends ListActivity {
             vHolder.state.setText(enc.state);
             if (enc.program != null) {
                 vHolder.program.setText(
-                    enc.program.Title + 
-                    Messages.getString("StatusRecorders.0") + // on //$NON-NLS-1$ 
-                    enc.program.Channel 
+                    enc.program.Title +
+                    Messages.getString("StatusRecorders.0") + // on //$NON-NLS-1$
+                    enc.program.Channel
                 );
                 vHolder.endTime.setText(
                         Messages.getString("StatusRecorders.18") +  //$NON-NLS-1$
@@ -241,7 +241,7 @@ public class StatusRecorders extends ListActivity {
 
     @Override
     public void onListItemClick(ListView list, View item, int pos, long id) {
-        
+
         Encoder enc = (Encoder)list.getItemAtPosition(pos);
 
         if (enc.program == null) return;
@@ -250,10 +250,10 @@ public class StatusRecorders extends ListActivity {
         startActivityForResult(
             new Intent()
             .putExtra(
-                Extras.LIVETV.toString(), 
+                Extras.LIVETV.toString(),
                 enc.state.equals(Extras.LIVETV.toString()) ? true : false
             )
-            .setClass(this, RecordingDetail.class), 
+            .setClass(this, RecordingDetail.class),
             0
         );
 
@@ -261,7 +261,7 @@ public class StatusRecorders extends ListActivity {
 
     @Override
     public void onActivityResult(int reqCode, int resCode, Intent data) {
-        if (resCode == REFRESH_NEEDED) 
+        if (resCode == REFRESH_NEEDED)
             refresh();
     }
 

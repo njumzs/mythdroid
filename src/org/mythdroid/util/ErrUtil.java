@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@ import android.widget.Toast;
 
 /** General utility methods */
 final public class ErrUtil {
-    
+
     /**
      * Inform user of an exception - call from UI thread
      * @param c context
@@ -39,7 +39,7 @@ final public class ErrUtil {
     static public void err(final Context c, final Exception e) {
         Toast.makeText(c, e.getMessage(), Toast.LENGTH_SHORT).show();
     }
-    
+
     /**
      * Inform user of a message - call from UI thread
      * @param c context
@@ -48,7 +48,7 @@ final public class ErrUtil {
     static public void err(final Context c, final String e) {
         Toast.makeText(c, e, Toast.LENGTH_SHORT).show();
     }
-    
+
     /**
      * Inform user of an exception - call from non-UI thread
      * @param c context
@@ -65,7 +65,7 @@ final public class ErrUtil {
             }
         );
     }
-    
+
     /**
      * Inform user of a message - call from non-UI thread
      * @param c context
@@ -82,7 +82,7 @@ final public class ErrUtil {
             }
         );
     }
-    
+
     /**
      * Put an error message and 'OK' button in a dialog
      * @param c context
@@ -95,9 +95,9 @@ final public class ErrUtil {
         ((AlertDialog)dialog).setMessage(
             c.getResources().getString(msgId)
         );
-        
+
         ((AlertDialog)dialog).setButton(
-            AlertDialog.BUTTON_POSITIVE, 
+            AlertDialog.BUTTON_POSITIVE,
             c.getResources().getString(R.string.ok),
             new OnClickListener() {
                 @Override
@@ -109,5 +109,5 @@ final public class ErrUtil {
             }
         );
     }
-    
+
 }

@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -43,7 +43,7 @@ public class FrontendList extends ListActivity implements
     final static private int ADD_DIALOG  = 0, EDIT_DIALOG = 1;
 
     final private Context ctx             = this;
-    
+
     private Cursor        c               = null;
     private AlertDialog   feEditor        = null;
     private int           clickedPosition = -1;
@@ -69,9 +69,9 @@ public class FrontendList extends ListActivity implements
 
         setListAdapter(
             new SimpleCursorAdapter(
-                this, R.layout.frontend_list_item, c, 
+                this, R.layout.frontend_list_item, c,
                 new String[] { "addr", "name", "hwaddr" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                new int[] { 
+                new int[] {
                     R.id.fe_addr_text, R.id.fe_name_text, R.id.fe_hwaddr_text
                 }
             )
@@ -94,7 +94,7 @@ public class FrontendList extends ListActivity implements
         );
 
         switch (id) {
-            
+
             case ADD_DIALOG:
                 feEditor = new AlertDialog.Builder(this)
                                .setView(editor)
@@ -102,7 +102,7 @@ public class FrontendList extends ListActivity implements
                                .setNegativeButton(R.string.cancel, this)
                                .create();
                 break;
-                
+
             case EDIT_DIALOG:
                 feEditor = new AlertDialog.Builder(this)
                                .setView(editor)
@@ -111,7 +111,7 @@ public class FrontendList extends ListActivity implements
                                .setNegativeButton(R.string.cancel, this)
                                .create();
                 break;
-                
+
         }
 
         return feEditor;
@@ -119,13 +119,13 @@ public class FrontendList extends ListActivity implements
 
     @Override
     public void onPrepareDialog(int id, Dialog dialog) {
-        
+
         switch (id) {
-            
+
             case EDIT_DIALOG:
-                
+
                 if (clickedView == null) return;
-                
+
                 CharSequence name = ((TextView)clickedView
                                         .findViewById(R.id.fe_name_text))
                                         .getText();
@@ -135,19 +135,19 @@ public class FrontendList extends ListActivity implements
                 CharSequence hwaddr = ((TextView)clickedView
                                         .findViewById(R.id.fe_hwaddr_text))
                                         .getText();
-                
+
                 ((EditText)dialog.findViewById(R.id.fe_name)).setText(name);
                 ((EditText)dialog.findViewById(R.id.fe_addr)).setText(addr);
                 ((EditText)dialog.findViewById(R.id.fe_hwaddr)).setText(hwaddr);
                 break;
-                
+
             case ADD_DIALOG:
-                
+
                 ((EditText)dialog.findViewById(R.id.fe_name)).setText(""); //$NON-NLS-1$
                 ((EditText)dialog.findViewById(R.id.fe_addr)).setText(""); //$NON-NLS-1$
                 ((EditText)dialog.findViewById(R.id.fe_hwaddr)).setText(""); //$NON-NLS-1$
                 break;
-                
+
         }
     }
 
@@ -164,14 +164,14 @@ public class FrontendList extends ListActivity implements
         long rowID = getListAdapter().getItemId(clickedPosition - 1);
 
         switch (which) {
-            
+
             case AlertDialog.BUTTON_POSITIVE:
-                
+
                 String name   = ((EditText)feEditor.findViewById(R.id.fe_name))
                                   .getText().toString();
                 String addr   = ((EditText)feEditor.findViewById(R.id.fe_addr))
                                   .getText().toString();
-                String hwaddr = 
+                String hwaddr =
                     ((EditText)feEditor.findViewById(R.id.fe_hwaddr))
                         .getText().toString();
 
@@ -187,17 +187,17 @@ public class FrontendList extends ListActivity implements
                             ctx, Messages.getString("FrontendList.5") + name //$NON-NLS-1$
                         );
                 }
-                
+
                 else
                     FrontendDB.update(this, rowID, name, addr, hwaddr);
 
                 break;
-                
+
             case AlertDialog.BUTTON_NEUTRAL:
-                
+
                 FrontendDB.delete(this, rowID);
                 break;
-                
+
         }
 
         c.requery();

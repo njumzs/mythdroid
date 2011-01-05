@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -46,7 +46,7 @@ public class StatusScheduled extends ListActivity {
         super.onCreate(icicle);
 
         if (Status.statusDoc == null) Status.getStatus(this);
-        
+
         Document doc = Status.statusDoc;
 
         Node scheduled = doc.getElementsByTagName("Scheduled").item(0); //$NON-NLS-1$

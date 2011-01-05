@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -35,7 +35,7 @@ public interface MDDChannelListener {
      */
     public void onProgress(int pos);
     /**
-     * Called on receipt of EXIT event 
+     * Called on receipt of EXIT event
      */
     public void onExit();
 }

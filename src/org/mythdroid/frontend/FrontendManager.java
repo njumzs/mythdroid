@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -33,20 +33,20 @@ import android.util.Log;
 
 /** Manages a frontend */
 public class FrontendManager {
-    
+
     public  String  name = null, addr = null;
     private ConnMgr cmgr = null;
-   
+
     /**
      * Constructor
      * @param name name of frontend
      * @param host hostname or IP address of frontend
      */
     public FrontendManager(String name, String host) throws IOException {
-        
-        if (Globals.debug) 
+
+        if (Globals.debug)
             Log.d("FrontendManager", "Connecting to " + host + ":6546"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        
+
         cmgr = new ConnMgr(host, 6546, new onConnectListener() {
                 @Override
                 public void onConnect(ConnMgr cmgr) throws IOException {
@@ -54,15 +54,15 @@ public class FrontendManager {
                 }
             }
         );
-        
+
         if (cmgr == null) return;
-        
+
         // jump <loc> (e.g. where loc == livetv) can take a long time
         cmgr.setTimeout(10000);
-        
+
         this.name = name;
         addr = host;
-        
+
     }
 
     /**
@@ -143,12 +143,12 @@ public class FrontendManager {
     }
 
     /**
-     * Get a HashMap of frontend locations and their descriptions from the 
-     * frontend 
+     * Get a HashMap of frontend locations and their descriptions from the
+     * frontend
      * @return HashMap<String,String> of locations -> descriptions
      */
     public synchronized HashMap<String,String> getLocs() throws IOException {
-        HashMap<String,String> locs = new HashMap<String,String>(44); 
+        HashMap<String,String> locs = new HashMap<String,String>(44);
         cmgr.writeLine("help jump"); //$NON-NLS-1$
         ArrayList<String> lines = getResponse();
         for (String line : lines) {
@@ -170,7 +170,7 @@ public class FrontendManager {
             return true;
         return false;
     }
-    
+
     /**
      * Play a video
      * @param file filename of video to play
@@ -201,7 +201,7 @@ public class FrontendManager {
         cmgr.dispose();
         cmgr = null;
     }
-    
+
     private synchronized ArrayList<String> getResponse() throws IOException {
         final ArrayList<String> resp = new ArrayList<String>(32);
         String msg = ""; //$NON-NLS-1$
@@ -213,21 +213,21 @@ public class FrontendManager {
         }
         return resp;
     }
-    
+
     @SuppressWarnings("null")
     private synchronized String getSingleLineResponse(ConnMgr cmgr)
         throws IOException {
         String line = cmgr.readLine();
-        while (cmgr != null) 
+        while (cmgr != null)
             if (cmgr.readLine().equals("#")) break; //$NON-NLS-1$
         return line;
     }
-    
+
     private synchronized String getSingleLineResponse() throws IOException {
-        if (cmgr == null) 
+        if (cmgr == null)
             throw new IOException(Messages.getString("FrontendManager.0")); //$NON-NLS-1$
         String line = cmgr.readLine();
-        while (cmgr != null) 
+        while (cmgr != null)
             if (cmgr.readLine().equals("#")) break; //$NON-NLS-1$
         return line;
     }

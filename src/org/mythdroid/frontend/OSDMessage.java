@@ -8,7 +8,7 @@ import java.util.TimeZone;
 
 /** Format and display messages on the MythTV OSD */
 final public class OSDMessage {
-    
+
     final private static String alert =
         "<mythnotify version=\"1\">\n" + //$NON-NLS-1$
         "  <container name=\"notify_alert_text\">\n" + //$NON-NLS-1$
@@ -26,7 +26,7 @@ final public class OSDMessage {
         "    </textarea>\n" + //$NON-NLS-1$
         "  </container>\n" + //$NON-NLS-1$
         "</mythnotify>"; //$NON-NLS-1$
-    
+
     final private static String cid =
         "<mythnotify version=\"1\">\n" + //$NON-NLS-1$
         "  <container name=\"notify_cid_info\">\n" + //$NON-NLS-1$
@@ -38,7 +38,7 @@ final public class OSDMessage {
         "    </textarea>\n" + //$NON-NLS-1$
         "  </container>\n" + //$NON-NLS-1$
         "</mythnotify>";  //$NON-NLS-1$
-    
+
     /** SimpleDateFormat of EEE d MMM yy */
     final private static SimpleDateFormat dateFmt =
         new SimpleDateFormat("EEE d MMM yy"); //$NON-NLS-1$
@@ -50,7 +50,7 @@ final public class OSDMessage {
         timeFmt.setTimeZone(TimeZone.getDefault());
         dateFmt.setTimeZone(TimeZone.getDefault());
     }
-    
+
     /**
      * Send an 'alert' message for display on OSD
      * @param message String containing message to display
@@ -59,7 +59,7 @@ final public class OSDMessage {
         String msg = alert.replace("%alert_text%", message); //$NON-NLS-1$
         send(msg);
     }
-    
+
     /**
      * Send a 'scrolling' message for display on the OSD
      * @param message String containing the message
@@ -67,11 +67,11 @@ final public class OSDMessage {
      */
     public static void Scroller(String message, int displaytime) throws Exception {
         String msg = scroll.replace("%scroll_text%", message); //$NON-NLS-1$
-        if (displaytime != 1) 
+        if (displaytime != 1)
             msg = msg.replaceFirst("-1", String.valueOf(displaytime)); //$NON-NLS-1$
         send(msg);
     }
-    
+
     /**
      * Send a 'callerid' message for display on the OSD
      * @param name String containing the name of the caller
@@ -82,7 +82,7 @@ final public class OSDMessage {
         msg = msg.replace("%caller_number%", number); //$NON-NLS-1$
         send(msg);
     }
-        
+
     private static void send(String message) throws Exception {
         InetAddress address = InetAddress.getByName("255.255.255.255"); //$NON-NLS-1$
         byte[] buf = message.getBytes("utf8"); //$NON-NLS-1$

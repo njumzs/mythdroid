@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -60,11 +60,11 @@ public class Recordings extends MDListActivity implements
 
     final private static int FILTER_DIALOG  = 0;
 
-    final private static int 
+    final private static int
         MENU_REFRESH   = 0, MENU_FILTER = 1, MENU_FILTER_RESET = 2;
-    
-    final private Handler handler = new Handler(); 
-    
+
+    final private Handler handler = new Handler();
+
     final private Context ctx = this;
     /** A list of recordings (Programs) */
     private ArrayList<Program> recordings = null;
@@ -75,10 +75,10 @@ public class Recordings extends MDListActivity implements
     final private Runnable getRecordings  = new Runnable() {
         @Override
         public void run() {
-            
+
             try {
                 recordings = Globals.getBackend().getRecordings();
-            } catch (Exception e) { 
+            } catch (Exception e) {
                 ErrUtil.postErr(ctx, Messages.getString("Recordings.0")); //$NON-NLS-1$
                 try {
                     dismissDialog(DIALOG_LOAD);
@@ -142,7 +142,7 @@ public class Recordings extends MDListActivity implements
 
     @Override
     public void onActivityResult(int reqCode, int resCode, Intent data) {
-        if (resCode == REFRESH_NEEDED) 
+        if (resCode == REFRESH_NEEDED)
             refresh();
     }
 
@@ -180,7 +180,7 @@ public class Recordings extends MDListActivity implements
 
                 Collections.sort(titles);
 
-                return 
+                return
                     new AlertDialog.Builder(this)
                         .setTitle(R.string.filter_rec)
                         .setAdapter(
@@ -239,7 +239,7 @@ public class Recordings extends MDListActivity implements
     }
 
     private void empty() {
-        if (recordings != null) 
+        if (recordings != null)
             recordings.clear();
         recordings = null;
         setListAdapter(null);

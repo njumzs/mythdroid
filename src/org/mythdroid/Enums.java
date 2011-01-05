@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -40,9 +40,9 @@ public class Enums {
         /** Don't jumpTo() (All remotes) */
         DONTJUMP,
         /** jumpTo() the program guide (NavRemote) */
-        GUIDE; 
+        GUIDE;
     }
-    
+
     /** Recording statuses, with reverse lookup by code */
     public enum RecStatus {
         FAILED      (-9,    Messages.getString("Program.0")),  //$NON-NLS-1$
@@ -208,7 +208,7 @@ public class Enums {
             return revMap.get(value);
         }
     }
-    
+
     /** Recording epsidode filters, with reverse lookup by code */
     public enum RecEpiFilter {
         NONE        (0x00,     "Record all episodes"), //$NON-NLS-1$
@@ -304,7 +304,7 @@ public class Enums {
             return revMap.get(value);
         }
     }
-    
+
     /** Program categories and their colours */
     public enum Category {
         unknown         (0xff404040),   shopping        (0xff301040),
@@ -353,7 +353,7 @@ public class Enums {
 
         ZERO    ("0"), ONE  ("1"), TWO  ("2"), THREE    ("3"), FOUR ("4"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
         FIVE    ("5"), SIX  ("6"), SEVEN("7"), EIGHT    ("8"), NINE ("9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-        
+
         ESCAPE              ("escape"),  //$NON-NLS-1$
         GUIDE               ("s"), //$NON-NLS-1$
         VOL_UP              ("]"), //$NON-NLS-1$
@@ -399,5 +399,5 @@ public class Enums {
         }
 
     }
-    
+
 }

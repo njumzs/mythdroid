@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -33,7 +33,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 
 /** Edit scheduling options for a recording rule */
 public class RecordingEditSched extends MDActivity {
-    
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -46,22 +46,22 @@ public class RecordingEditSched extends MDActivity {
         super.onDestroy();
         setResult(Activity.RESULT_OK);
     }
-    
+
     private void setViews() {
-        
-        final Spinner dupMatchSpinner = 
+
+        final Spinner dupMatchSpinner =
             ((Spinner)findViewById(R.id.recedit_dupMatch));
-        
+
         final ArrayAdapter<String> dupMatchAdapter = new ArrayAdapter<String>(
             this, android.R.layout.simple_spinner_item
         );
         dupMatchAdapter.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item
         );
-        
+
         for (RecDupMethod method : RecDupMethod.values())
             dupMatchAdapter.add(method.msg());
-        
+
         dupMatchSpinner.setAdapter(dupMatchAdapter);
         dupMatchSpinner.setSelection(RecordingEdit.dupMethod.ordinal());
         dupMatchSpinner.setOnItemSelectedListener(
@@ -75,23 +75,23 @@ public class RecordingEditSched extends MDActivity {
 
                 @Override
                 public void onNothingSelected(AdapterView<?> arg0) {}
-                
+
             }
         );
-        
-        final Spinner dupInSpinner = 
+
+        final Spinner dupInSpinner =
             ((Spinner)findViewById(R.id.recedit_dupIn));
-        
+
         final ArrayAdapter<String> dupInAdapter = new ArrayAdapter<String>(
             this, android.R.layout.simple_spinner_item
         );
         dupInAdapter.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item
         );
-        
+
         for (RecDupIn set : RecDupIn.values())
             dupInAdapter.add(set.msg());
-        
+
         dupInSpinner.setAdapter(dupInAdapter);
         dupInSpinner.setSelection(RecordingEdit.dupIn.ordinal());
         dupInSpinner.setOnItemSelectedListener(
@@ -105,23 +105,23 @@ public class RecordingEditSched extends MDActivity {
 
                 @Override
                 public void onNothingSelected(AdapterView<?> arg0) {}
-                
+
             }
         );
-        
-        final Spinner epiFilterSpinner = 
+
+        final Spinner epiFilterSpinner =
             ((Spinner)findViewById(R.id.recedit_epiFilter));
-        
+
         ArrayAdapter<String> epiFilterAdapter = new ArrayAdapter<String>(
             this, android.R.layout.simple_spinner_item
         );
         epiFilterAdapter.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item
         );
-        
+
         for (RecEpiFilter filter : RecEpiFilter.values())
             epiFilterAdapter.add(filter.msg());
-        
+
         epiFilterSpinner.setAdapter(epiFilterAdapter);
         epiFilterSpinner.setSelection(RecordingEdit.epiFilter.ordinal());
         epiFilterSpinner.setOnItemSelectedListener(
@@ -135,7 +135,7 @@ public class RecordingEditSched extends MDActivity {
 
                 @Override
                 public void onNothingSelected(AdapterView<?> arg0) {}
-                
+
             }
         );
     }
