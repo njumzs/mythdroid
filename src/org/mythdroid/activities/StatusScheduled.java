@@ -36,9 +36,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 
-/**
- * ListActivity displays scheduled recordings
- */
+/** ListActivity displays scheduled recordings */
 public class StatusScheduled extends ListActivity {
 
     private ArrayList<Program> recordings = new ArrayList<Program>(10);

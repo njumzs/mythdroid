@@ -30,8 +30,8 @@ public final class PhoneUtil {
     
     /**
      * Get a contact id from a phone number
-     * @param ctx - Context
-     * @param number - String containing the phone number
+     * @param ctx Context
+     * @param number String containing the phone number
      */
     public static String idFromNumber(Context ctx, String number) {
         
@@ -56,8 +56,8 @@ public final class PhoneUtil {
     
     /**
      * Get a contact name from a contact id
-     * @param ctx - Context
-     * @param id - String containing the contact id
+     * @param ctx Context
+     * @param id String containing the contact id
      */
     public static String nameFromId(Context ctx, String id) {
         
@@ -82,8 +82,8 @@ public final class PhoneUtil {
     
     /**
      * Get a contact name from a phone number
-     * @param ctx - Context
-     * @param number - String containing the phone number
+     * @param ctx Context
+     * @param number String containing the phone number
      */
     public static String nameFromNumber(Context ctx, String number) {
      

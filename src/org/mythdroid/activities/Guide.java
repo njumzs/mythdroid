@@ -69,6 +69,10 @@ import android.widget.TableRow.LayoutParams;
 /** Display a program guide */
 public class Guide extends MDActivity {
 
+    /** 
+     * A resultCode that child activities should set via setResult() to tell
+     * Guide to refresh when they finish 
+     */
     final public static int  REFRESH_NEEDED = Activity.RESULT_FIRST_USER + 1;
     final private static int MENU_DATE    = 0, MENU_TIME = 1;
     final private static int DIALOG_DATE  = 0, DIALOG_TIME = 1;
@@ -362,6 +366,10 @@ public class Guide extends MDActivity {
 
     }
 
+    /**
+     * Display the guide 
+     * @param when Date to start at
+     */
     private void displayGuide(Date when) {
 
         showDialog(DIALOG_LOAD);
@@ -402,6 +410,11 @@ public class Guide extends MDActivity {
 
     }
 
+    /**
+     * Fetch and parse guide data from the backend
+     * @param start Date that guide should start at
+     * @param end Date that guide should end at
+     */
     private void getGuideData(Date start, Date end) {
 
         XMLHandler handler = new XMLHandler("GetProgramGuideResponse"); //$NON-NLS-1$
@@ -458,6 +471,12 @@ public class Guide extends MDActivity {
 
     }
 
+    /**
+     * Add a small indicator to the provided TextView based on the Program
+     * recording status
+     * @param tv TextView to add an indicator to
+     * @param prog Program to retrieve a recording status from
+     */
     private void setStatusDrawable(TextView tv, Program prog) {
 
         Drawable icon = null;
@@ -497,6 +516,11 @@ public class Guide extends MDActivity {
 
     }
 
+    /**
+     * Generate a TableRow from the provided Channel
+     * @param ch Channel to generate a row for
+     * @return populated TableRow representing the channel
+     */
     private TableRow getRowFromChannel(Channel ch) {
 
         final TableRow row = new TableRow(this);
@@ -560,6 +584,10 @@ public class Guide extends MDActivity {
 
     }
 
+    /**
+     * Get a header row containing column time values
+     * @return header TableRow
+     */
     private TableRow getHeader() {
 
         final TableRow row = new TableRow(this, null);
@@ -589,6 +617,10 @@ public class Guide extends MDActivity {
 
     }
 
+    /**
+     * Get a spacer row
+     * @return a spacer TableRow
+     */
     private TableRow getSpacer() {
 
         final TableRow row = new TableRow(this, null);
@@ -614,6 +646,10 @@ public class Guide extends MDActivity {
 
     }
 
+    /**
+     * Round the given Date to the nearest column time
+     * @param time
+     */
     private void roundTime(Date time) {
         final int mins = time.getMinutes();
         final int off = mins % colMins;
@@ -626,6 +662,12 @@ public class Guide extends MDActivity {
             time.setMinutes(mins + (colMins - off));
     }
 
+    /**
+     * Populate the given LayoutParams based on a Program
+     * @param params LayoutParams to populate
+     * @param prog Program to generate LayoutParams from
+     * @return integer containing the number of columns the program should span
+     */
     private int setLayoutParams(LayoutParams params, Program prog) {
 
         final Date startTime = prog.StartTime, endTime = prog.EndTime;

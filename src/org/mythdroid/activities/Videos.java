@@ -42,9 +42,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-/**
- * MDActivity displays browsable list of Videos
- */
+/** MDActivity displays browsable list of Videos */
 public class Videos extends MDActivity implements 
     ListView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     
@@ -108,9 +106,7 @@ public class Videos extends MDActivity implements
         }
     };
     
-    /**
-     * Fetch posters for the current list of videos 
-     */
+    /** Fetch posters for the current list of videos */
     final private Runnable fetchArt = new Runnable() {
         @Override
         public void run() {
@@ -235,8 +231,5 @@ public class Videos extends MDActivity implements
             return path;
         return path.substring(slash + 1);
     }
-  
-    
-    
 
 }

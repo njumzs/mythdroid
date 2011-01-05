@@ -52,9 +52,9 @@ public class VideoAdapter extends ArrayAdapter<Object> {
 
     /**
      * Constructor
-     * @param ctx - context
-     * @param resource - layout resource for items
-     * @param list - ArrayList of Videos
+     * @param ctx context
+     * @param resource layout resource for items
+     * @param list ArrayList of Videos
      */
     public VideoAdapter(Context ctx, int resource, ArrayList<Video> list) {
         super(ctx, resource, list.toArray());

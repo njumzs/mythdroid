@@ -24,24 +24,26 @@ import java.util.Map;
 
 import org.mythdroid.resource.Messages;
 
-public class Enums { 
+/** Contains all enums */
+public class Enums {
 
-    /**
-     * Intent extras
-     *
-     */
+    /** Intent extras  */
     public enum Extras {
-        LIVETV,             // (TVRemote)  We want livetv please
-        JUMPCHAN,           // (TVRemote)  The channel we'd like to view
-        FILENAME,           // (TVRemote)  The filename of the video
-        TITLE,              // (TVRemote)  The title of the video
-        DONTJUMP,           // (*Remote)   Don't jumpTo()
-        GUIDE;              // (NavRemote) jumpTo() the program guide 
+        /** We want livetv please (TVRemtoe)*/
+        LIVETV,
+        /** The channel we'd like to view (TVRemote) */
+        JUMPCHAN,
+        /** The filename of the video (TVRemote) */
+        FILENAME,
+        /** The title of the video (TVRemote) */
+        TITLE,
+        /** Don't jumpTo() (All remotes) */
+        DONTJUMP,
+        /** jumpTo() the program guide (NavRemote) */
+        GUIDE; 
     }
     
-    /**
-     * Enum of recording statuses, with reverse lookup by code
-     */
+    /** Recording statuses, with reverse lookup by code */
     public enum RecStatus {
         FAILED      (-9,    Messages.getString("Program.0")),  //$NON-NLS-1$
         TUNERBUSY   (-8,    Messages.getString("Program.13")), //$NON-NLS-1$
@@ -107,9 +109,7 @@ public class Enums {
         }
     }
 
-    /**
-     * Enum of recording types, with reverse lookup by code
-     */
+    /** Recording types, with reverse lookup by code */
     public enum RecType {
         NOT         (0,     "Don't record this program"), //$NON-NLS-1$
         SINGLE      (1,     "This showing only"), //$NON-NLS-1$
@@ -163,9 +163,7 @@ public class Enums {
         }
     }
 
-    /**
-     * Enum of recording duplicate searches, with reverse lookup by code
-     */
+    /** Recording duplicate search types, with reverse lookup by code */
     public enum RecDupIn {
         RECORDED    (0x01,     "In current recordings only"), //$NON-NLS-1$
         OLDRECORDED (0x02,     "In old recordings only"), //$NON-NLS-1$
@@ -211,9 +209,7 @@ public class Enums {
         }
     }
     
-    /**
-     * Enum of recording epsidode filters, with reverse lookup by code
-     */
+    /** Recording epsidode filters, with reverse lookup by code */
     public enum RecEpiFilter {
         NONE        (0x00,     "Record all episodes"), //$NON-NLS-1$
         NEW         (0x10,     "Record new episodes only"), //$NON-NLS-1$
@@ -261,9 +257,7 @@ public class Enums {
         }
     }
 
-    /**
-     * Enum of recording duplicate matching methods, with reverse lookup by code
-     */
+    /** Recording duplicate matching methods, with reverse lookup by code */
     public enum RecDupMethod {
         NONE        (1,     "Nothing"), //$NON-NLS-1$
         SUB         (2,     "Subtitle"), //$NON-NLS-1$
@@ -354,6 +348,7 @@ public class Enums {
         }
     }
 
+    /** Key mappings for the network control interface */
     public enum Key {
 
         ZERO    ("0"), ONE  ("1"), TWO  ("2"), THREE    ("3"), FOUR ("4"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$

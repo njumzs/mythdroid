@@ -49,7 +49,7 @@ public class XMLHandler extends DefaultHandler {
 
         /**
          * Constructor
-         * @param name - name of the element
+         * @param name name of the element
          */
         public Element(String name) {
             this.name = name;
@@ -57,7 +57,7 @@ public class XMLHandler extends DefaultHandler {
 
         /**
          * Get a child element, or create one if it doesn't exist
-         * @param name - name of the element
+         * @param name name of the element
          * @return an existing or new child Element
          */
         public Element getChild(String name) {
@@ -66,7 +66,7 @@ public class XMLHandler extends DefaultHandler {
 
         /**
          * Set or replace the StartElementListener on this element
-         * @param l - a StartElementListener
+         * @param l a StartElementListener
          */
         public void setStartElementListener(StartElementListener l) {
             startListener = l;
@@ -74,7 +74,7 @@ public class XMLHandler extends DefaultHandler {
         
         /**
          * Set or replace the EndElementListener on this element
-         * @param l - a EndElementListener
+         * @param l a EndElementListener
          */
         public void setEndElementListener(EndElementListener l) {
             endListener = l;
@@ -82,7 +82,7 @@ public class XMLHandler extends DefaultHandler {
         
         /**
          * Set or replace the EndTextElementListener on this element
-         * @param l - a EndTextlementListener
+         * @param l a EndTextlementListener
          */
         public void setTextElementListener(EndTextElementListener l) {
             textListener = l;
@@ -110,7 +110,7 @@ public class XMLHandler extends DefaultHandler {
     /**
      * Constructor, call rootElement() post construction to get the 
      * root Element
-     * @param rootElement - the name of the root element
+     * @param rootElement the name of the root element
      */
     public XMLHandler(String rootElement) {
         curElem = new Element(null);
@@ -120,7 +120,7 @@ public class XMLHandler extends DefaultHandler {
     
     /**
      * Get the root Element
-     * @return - the root Element
+     * @return the root Element
      */
     public Element rootElement() {
         return rootElem;

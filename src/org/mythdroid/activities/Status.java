@@ -131,6 +131,7 @@ public class Status extends ListActivity {
 
     /**
      * Get new statusDoc from the backend
+     * @param ctx Context
      */
     public static void getStatus(Context ctx) {
 

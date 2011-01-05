@@ -53,6 +53,7 @@ import android.util.Log;
  */
 public class BackendManager {
 
+    /** Hostname or IP address of the backend */
     public String addr = null;
     
     static final private String BACKEND_UPNP_ID =
@@ -72,7 +73,7 @@ public class BackendManager {
   
     /**
      * Constructor
-     * @param host - the backend address
+     * @param host String containing the backend address
      */
     public BackendManager(final String host) throws IOException {
 
@@ -168,7 +169,7 @@ public class BackendManager {
     }
     
     /**
-     * Get the connection state of the backend
+     * Get the state of the connection to the backend
      * @return true if we are connected, false otherwise
      */
     public boolean isConnected() {
@@ -177,7 +178,7 @@ public class BackendManager {
     
     /**
      * Get the URL of the status / XML service
-     * @return A String containing the URL
+     * @return String containing the URL
      */
     public String getStatusURL() {
         if (Globals.debug)
@@ -187,7 +188,7 @@ public class BackendManager {
 
     /**
      * Get a Program from a recording filename
-     * @param basename - String containing the full path to the recording
+     * @param basename String containing the full path to the recording
      * @return A Program representing the recording
      */
     public Program getRecording(final String basename) throws IOException {
@@ -233,7 +234,7 @@ public class BackendManager {
 
     /**
      * Stop an in-progress recording
-     * @param prog - The Program to stop recording 
+     * @param prog The Program to stop recording 
      */    
     public void stopRecording(final Program prog) throws IOException {
         final String[] list = prog.stringList();
@@ -245,7 +246,7 @@ public class BackendManager {
     
     /**
      * Delete a recording
-     * @param prog - The Program to delete 
+     * @param prog The Program to delete 
      */
     public void deleteRecording(final Program prog) throws IOException {
         final String[] list = prog.stringList();
@@ -254,6 +255,10 @@ public class BackendManager {
         cmgr.readStringList();
     }
     
+    /**
+     * Ask the backend to reschedule a recording
+     * @param recid integer recording id
+     */
     public void reschedule(int recid) throws IOException {
         cmgr.sendString("RESCHEDULE_RECORDINGS " + recid); //$NON-NLS-1$
         cmgr.readStringList();
@@ -267,8 +272,8 @@ public class BackendManager {
     
     /**
      * Get the protocol version from the backend
-     * @param sURL - string containing backend status URL
-     * @return - integer containing backend protocol version
+     * @param sURL string containing backend status URL
+     * @return integer containing backend protocol version
      */
     private int getVersion(String sURL) throws IOException {
         
@@ -301,7 +306,7 @@ public class BackendManager {
   
     /**
      * Announce ourselves to the backend
-     * @return - true if backend accepts us, false otherwise
+     * @return true if backend accepts us, false otherwise
      */
     private boolean announce(ConnMgr cmgr) throws IOException {
 
@@ -328,9 +333,8 @@ public class BackendManager {
     /**
      * Returns the protocol token for a given protocol version.
      * Tokens are defined in the messages.properties as:
-     * ProtoToken.<protoVer> = <token>
-     *
-     * @param protoVer - protocol version to retrieve token for
+     * ProtoToken.protoVer = token
+     * @param protoVer protocol version to retrieve token for
      */
     private String getToken(int protoVer) {
         

@@ -35,9 +35,7 @@ import android.graphics.BitmapFactory.Options;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
-/**
- * Class representing a video
- */
+/** Represents a video or directory containing videos */
 public class Video {
     
     public String title, subtitle, director, plot, homepage, filename;
@@ -54,7 +52,7 @@ public class Video {
     
     /**
      * Constructor
-     * @param line - A String containing a DIRECTORY or VIDEO line from MDD 
+     * @param line A String containing a DIRECTORY or VIDEO line from MDD 
      */
     public Video(String line) {
                 
@@ -91,8 +89,8 @@ public class Video {
     /**
      * Fetch the poster for the video, scale it and store it as a Drawable
      *  in this.poster
-     * @param x - desired width of poster in pixels
-     * @param y - desired height of poster in pixels
+     * @param x desired width of poster in pixels
+     * @param y desired height of poster in pixels
      */
     public void getPoster(float x, float y) {
         

@@ -26,9 +26,7 @@ import org.mythdroid.Enums.RecType;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.Video;
 
-/**
- * Manage a connection to mdd
- */
+/** Manage a connection to MDD */
 public class MDDManager {
     
     private ConnMgr cmgr = null;
@@ -78,8 +76,8 @@ public class MDDManager {
     
     /**
      * Get a list of MDD commands from mdd
-     * @param addr - String containing address of frontend
-     * @return - ArrayList<String> containing names of MDD commands
+     * @param addr String containing address of frontend
+     * @return ArrayList<String> containing names of MDD commands
      */
     public static ArrayList<String> getCommands(String addr) throws IOException {
         final ConnMgr cmgr = new ConnMgr(addr, 16546, null);
@@ -99,8 +97,8 @@ public class MDDManager {
     
     /**
      * Send a MDD command to mdd
-     * @param addr - String containing address of frontend
-     * @param cmd - String containing the name of the MDD command
+     * @param addr String containing address of frontend
+     * @param cmd String containing the name of the MDD command
      */
     public static void mddCommand(String addr, String cmd) throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "COMMAND " + cmd); //$NON-NLS-1$
@@ -109,10 +107,10 @@ public class MDDManager {
     
     /**
      * Static method, retrieves a list of Videos
-     * @param addr - String containing IP address of MDD to retrieve video list from
-     * @param viddir - which video dir to look in (could be a : separated list in mythtv config)
-     * @param subdir - String containing directory to enumerate, pass "ROOT" for the root video directory
-     * @return - ArrayList of Videos
+     * @param addr String containing IP address of MDD to retrieve video list from
+     * @param viddir which video dir to look in (could be a : separated list in mythtv config)
+     * @param subdir String containing directory to enumerate, pass "ROOT" for the root video directory
+     * @return ArrayList of Videos
      * @throws IOException
      */
     public static ArrayList<Video> 
@@ -140,12 +138,12 @@ public class MDDManager {
     
     /**
      * Ask MDD to stream a file, SDP will be at http://addr:5554/stream
-     * @param addr - String containing IP address of MDD
-     * @param file - String containing path to the file
-     * @param w - int representing desired width of video in pixels
-     * @param h - int representing desired height of video in pixels
-     * @param vb - int representing desired bitrate of video in kb/s
-     * @param ab - int representing desired bitrate of audio in kb/s
+     * @param addr String containing IP address of MDD
+     * @param file String containing path to the file
+     * @param w int representing desired width of video in pixels
+     * @param h int representing desired height of video in pixels
+     * @param vb int representing desired bitrate of video in kb/s
+     * @param ab int representing desired bitrate of audio in kb/s
      */
     public static void streamFile(
             String addr, String file, String sg, int w, int h, int vb, int ab
@@ -160,7 +158,7 @@ public class MDDManager {
     
     /**
      * Ask MDD to stop streaming the currently streaming file
-     * @param addr - String containing IP address of MDD
+     * @param addr String containing IP address of MDD
      */
     public static void stopStream(String addr) throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "STOPSTREAM"); //$NON-NLS-1$
@@ -169,8 +167,8 @@ public class MDDManager {
     
     /**
      * Determine the RecType of a recording
-     * @param addr - String containing IP address of MDD
-     * @param recid - int representing RecID of recording
+     * @param addr String containing IP address of MDD
+     * @param recid int representing RecID of recording
      * @return - RecType
      */
     public static RecType getRecType(String addr, int recid) 
@@ -183,9 +181,9 @@ public class MDDManager {
     
     /**
      * Determine the storage group of a recording
-     * @param addr - String containing IP address of MDD
-     * @param recid - int representing RecID of recording
-     * @return - String contaning recording's storage group
+     * @param addr String containing IP address of MDD
+     * @param recid int representing RecID of recording
+     * @return String contaning recording's storage group
      */
     public static String getStorageGroup(String addr, int recid) throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "STORGROUP " + recid); //$NON-NLS-1$
@@ -196,7 +194,7 @@ public class MDDManager {
     
     /**
      * Get a list of storage groups
-     * @param addr - String containing IP address of MDD
+     * @param addr String containing IP address of MDD
      * @return String[] of storage groups
      */
     public static String[] getStorageGroups(String addr) throws IOException {
@@ -216,7 +214,7 @@ public class MDDManager {
     
     /**
      * Get a list of recording groups
-     * @param addr - String containing IP address of MDD
+     * @param addr String containing IP address of MDD
      * @return String[] of recording groups
      */
     public static String[] getRecGroups(String addr) throws IOException {
@@ -236,10 +234,10 @@ public class MDDManager {
     
     /**
      * Create or update a recording rule
-     * @param addr - String containing IP address of MDD 
-     * @param prog - Program the rule relates to
-     * @param updates - a list of modifications to an existing or default rule
-     * @return - int representing the RecID of the new/updated recording rule
+     * @param addr String containing IP address of MDD 
+     * @param prog Program the rule relates to
+     * @param updates a list of modifications to an existing or default rule
+     * @return int representing the RecID of the new/updated recording rule
      */
     public static int updateRecording(
         String addr, Program prog, String updates
@@ -259,8 +257,8 @@ public class MDDManager {
     
     /**
      * Delete a recording rule
-     * @param addr - String containing IP address of MDD 
-     * @param recid - RecID of the rule to delete
+     * @param addr String containing IP address of MDD 
+     * @param recid RecID of the rule to delete
      * @throws IOException
      */
     public static void deleteRecording(String addr, int recid) 
@@ -271,7 +269,7 @@ public class MDDManager {
     
     /**
      * Construct a new MDDManager
-     * @param addr - String containing address of frontend
+     * @param addr String containing address of frontend
      */
     public MDDManager(String addr) throws IOException {
         cmgr = new ConnMgr(addr, 16546, null);
@@ -282,7 +280,7 @@ public class MDDManager {
     
     /**
      * Add a new listener for MENU events
-     * @param l - MenuListener
+     * @param l MenuListener
      */
     public void setMenuListener(MDDMenuListener l) {
         menuListeners.add(l);
@@ -290,7 +288,7 @@ public class MDDManager {
     
     /**
      * Add a new listener for MUSIC events
-     * @param l - MusicListener
+     * @param l MusicListener
      */
     public void setMusicListener(MDDMusicListener l) {
         musicListeners.add(l);
@@ -298,15 +296,13 @@ public class MDDManager {
     
     /**
      * Add a new listener for CHANNEL events
-     * @param l - ChannelListener
+     * @param l ChannelListener
      */
     public void setChannelListener(MDDChannelListener l) {
         channelListeners.add(l);
     }
     
-    /**
-     * Disconnect from mdd
-     */
+    /** Disconnect from MDD and clean up internal resources */
     public void shutdown() throws IOException {
         cmgr.dispose();
     }

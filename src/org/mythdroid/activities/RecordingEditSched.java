@@ -31,6 +31,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 
+/** Edit scheduling options for a recording rule */
 public class RecordingEditSched extends MDActivity {
     
     @Override

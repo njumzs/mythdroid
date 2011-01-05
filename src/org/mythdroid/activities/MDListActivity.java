@@ -226,22 +226,39 @@ public abstract class MDListActivity extends ListActivity {
     /**
      * Add "Here" to the frontend chooser and start the provided
      * activity if it's selected
-     * @param activity - the activity to start
+     * @param activity the activity to start
      */
     protected void addHereToFrontendChooser(Class<?> activity) {
         hereActivity = activity;
     }
     
+    /**
+     * Add a valueless Extra to the Intent used to start child activities
+     * when the frontend chooser finishes
+     * @param name String containing the name of the Extra
+     */
     protected void setExtra(String name) {
         boolExtras.add(name);
     }
 
+    /**
+     * Add an Extra with an integer value to the Intent used to start child
+     * activities when the frontend chooser finishes
+     * @param name String containing the name of the Extra
+     * @param value integer value for the Extra
+     */
     protected void setExtra(String name, int value) {
         intExtras.put(name, value);
     }
     
+    /**
+     * Add an Extra with an String value to the Intent used to start child
+     * activities when the frontend chooser finishes
+     * @param name String containing the name of the Extra
+     * @param value String value for the Extra
+     */
     protected void setExtra(String name, String value) {
         stringExtras.put(name, value);
     }
-}
 
+}

@@ -29,14 +29,29 @@ public class NumPadLayout extends ViewGroup {
 
     private int rows = 4, columns = 3;
 
+    /**
+     * Constructor
+     * @param ctx Context
+     */
     public NumPadLayout(Context ctx) {
         super(ctx);
     }
 
+    /**
+     * Constructor
+     * @param ctx Context
+     * @param attrs AttributeSet 
+     */
     public NumPadLayout(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
     }
 
+    /**
+     * Constructor
+     * @param ctx Context
+     * @param attrs AttributeSet
+     * @param defStyle Default style
+     */
     public NumPadLayout(Context ctx, AttributeSet attrs, int defStyle) {
         super(ctx, attrs, defStyle);
     }

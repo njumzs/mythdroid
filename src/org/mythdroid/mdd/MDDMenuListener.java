@@ -24,8 +24,8 @@ package org.mythdroid.mdd;
 public interface MDDMenuListener {
     /**
      * Called on receipt of MENU events
-     * @param menu - String containing the name of the menu
-     * @param item - String containing the currently selected item
+     * @param menu String containing the name of the menu
+     * @param item String containing the currently selected item
      */
     public void onMenuItem(String menu, String item);
 }

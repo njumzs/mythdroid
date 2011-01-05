@@ -342,7 +342,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     
     /**
      * Listen to gestures
-     * @param listen - true to start listening, false to stop
+     * @param listen true to start listening, false to stop
      */
     protected void listenToGestures(boolean listen) {
 
@@ -354,6 +354,10 @@ public abstract class Remote extends Activity implements View.OnClickListener {
             gDetector = null;
     }
     
+    /** 
+     * Executed when user gestures an upward fling
+     * Default implementation sends Key.UP
+     */
     protected void onFlingUp() {
         try {
             feMgr.sendKey(Key.UP);
@@ -361,6 +365,10 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         onAction();
     }
 
+    /** 
+     * Executed when user gestures a downard fling
+     * Default implementation sends Key.DOWN
+     */
     protected void onFlingDown() {
         try {
             feMgr.sendKey(Key.DOWN);
@@ -368,6 +376,10 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         onAction();
     }
 
+    /** 
+     * Executed when user gestures a fling left
+     * Default implementation sends Key.LEFT
+     */
     protected void onFlingLeft() {
         try {
             feMgr.sendKey(Key.LEFT);
@@ -375,6 +387,10 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         onAction();
     }
 
+    /** 
+     * Executed when user gestures an fling right
+     * Default implementation sends Key.RIGHT
+     */
     protected void onFlingRight() {
         try {
             feMgr.sendKey(Key.RIGHT);
@@ -382,22 +398,42 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         onAction();
     }
 
+    /** 
+     * Executed when user gestures a downward scroll
+     * Default implementation sends Key.DOWN
+     */
     protected void onScrollDown() {
         onFlingDown();
     }
 
+    /** 
+     * Executed when user gestures a scroll left
+     * Default implementation sends Key.LEFT
+     */
     protected void onScrollLeft() {
         onFlingLeft();
     }
 
+    /** 
+     * Executed when user gestures an scroll right
+     * Default implementation sends Key.RIGHT
+     */
     protected void onScrollRight() {
         onFlingRight();
     }
 
+    /** 
+     * Executed when user gestures an upward scroll
+     * Default implementation sends Key.UP
+     */
     protected void onScrollUp() {
         onFlingUp();
     }
 
+    /** 
+     * Executed when user gestures a tap
+     * Default implementation sends Key.ENTER
+     */
     protected void onTap() {
         try {
             feMgr.sendKey(Key.ENTER);

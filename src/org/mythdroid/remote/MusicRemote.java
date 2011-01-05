@@ -57,9 +57,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-/**
- * Remote for music playback
- */
+/** Remote for music playback */
 public class MusicRemote extends Remote {
 
     /** Menu entry identifiers */
