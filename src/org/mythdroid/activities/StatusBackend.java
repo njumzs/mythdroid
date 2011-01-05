@@ -141,15 +141,20 @@ public class StatusBackend extends Activity {
                 );
             } catch (Exception e) {}
 
-            ((TextView)findViewById(R.id.guide_length)).setText(
-                attr.getNamedItem("guideDays").getNodeValue() +  //$NON-NLS-1$
-                Messages.getString("StatusBackend.30") + // days (until //$NON-NLS-1$ 
-                Globals.dispFmt.format(when) + ")" //$NON-NLS-1$
-            );
-            ((TextView)findViewById(R.id.guide_last)).setText(
-                Messages.getString("StatusBackend.32") + // Last run:  //$NON-NLS-1$
-                attr.getNamedItem("status").getNodeValue().toLowerCase() //$NON-NLS-1$
-            );
+            Node days, lastRun;
+            
+            if ((days = attr.getNamedItem("guideDays")) != null) //$NON-NLS-1$
+                ((TextView)findViewById(R.id.guide_length)).setText(
+                    days.getNodeValue() +
+                    Messages.getString("StatusBackend.30") + // days (until //$NON-NLS-1$ 
+                    Globals.dispFmt.format(when) + ")" //$NON-NLS-1$
+                );
+            
+            if ((lastRun = attr.getNamedItem("status")) != null) //$NON-NLS-1$
+                ((TextView)findViewById(R.id.guide_last)).setText(
+                    Messages.getString("StatusBackend.32") + // Last run:  //$NON-NLS-1$
+                    lastRun.getNodeValue().toLowerCase()
+                );
         
         }
     }
