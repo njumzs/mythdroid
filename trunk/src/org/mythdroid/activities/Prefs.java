@@ -28,7 +28,6 @@ import android.preference.PreferenceActivity;
  * Built from res.xml.preferences 
  */
 public class Prefs extends PreferenceActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

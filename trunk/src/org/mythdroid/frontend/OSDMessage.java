@@ -6,9 +6,7 @@ import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-/**
- * Format and display messages on the MythTV OSD
- */
+/** Format and display messages on the MythTV OSD */
 final public class OSDMessage {
     
     final private static String alert =
@@ -55,7 +53,7 @@ final public class OSDMessage {
     
     /**
      * Send an 'alert' message for display on OSD
-     * @param message - String containing message to display
+     * @param message String containing message to display
      */
     public static void Alert(String message) throws Exception {
         String msg = alert.replace("%alert_text%", message); //$NON-NLS-1$
@@ -64,8 +62,8 @@ final public class OSDMessage {
     
     /**
      * Send a 'scrolling' message for display on the OSD
-     * @param message - String containing the message
-     * @param displaytime - for display, in seconds
+     * @param message String containing the message
+     * @param displaytime for display, in seconds
      */
     public static void Scroller(String message, int displaytime) throws Exception {
         String msg = scroll.replace("%scroll_text%", message); //$NON-NLS-1$
@@ -76,8 +74,8 @@ final public class OSDMessage {
     
     /**
      * Send a 'callerid' message for display on the OSD
-     * @param name - String containing the name of the caller
-     * @param number - String containing the number of the caller
+     * @param name String containing the name of the caller
+     * @param number String containing the number of the caller
      */
     public static void Caller(String name, String number) throws Exception {
         String msg = cid.replace("%caller_name%", name); //$NON-NLS-1$

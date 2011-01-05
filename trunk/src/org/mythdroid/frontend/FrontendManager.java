@@ -39,8 +39,8 @@ public class FrontendManager {
    
     /**
      * Constructor
-     * @param name - name of frontend
-     * @param host - hostname or IP address of frontend
+     * @param name name of frontend
+     * @param host hostname or IP address of frontend
      */
     public FrontendManager(String name, String host) throws IOException {
         
@@ -75,7 +75,7 @@ public class FrontendManager {
 
     /**
      * Jump to a frontend location
-     * @param loc - String describing location
+     * @param loc String describing location
      * @return true if we jumped ok, false otherwise
      */
     public synchronized boolean jumpTo(final String loc) throws IOException {
@@ -87,7 +87,7 @@ public class FrontendManager {
 
     /**
      * Jump to a frontend location
-     * @param loc - a FrontendLocation to jump to
+     * @param loc a FrontendLocation to jump to
      * @return true if we jumped ok, false otherwise
      */
     public synchronized boolean jumpTo(FrontendLocation loc) throws IOException {
@@ -100,7 +100,7 @@ public class FrontendManager {
 
     /**
      * Send a key to the frontend
-     * @param key - Key to send
+     * @param key Key to send
      * @return true if the frontend accepted the key, false otherwise
      */
     public synchronized boolean sendKey(final Key key) throws IOException {
@@ -112,7 +112,7 @@ public class FrontendManager {
 
     /**
      * Send a key to the frontend
-     * @param key - String containing key to send
+     * @param key String containing key to send
      * @return true if the frontend accepted the key, false otherwise
      */
     public synchronized boolean sendKey(final String key) throws IOException {
@@ -161,7 +161,7 @@ public class FrontendManager {
 
     /**
      * Play a recording
-     * @param prog - Program to play
+     * @param prog Program to play
      * @return true if starting playing ok, false otherwise
      */
     public synchronized boolean playRec(final Program prog) throws IOException {
@@ -173,7 +173,7 @@ public class FrontendManager {
     
     /**
      * Play a video
-     * @param file - filename of video to play
+     * @param file filename of video to play
      * @return true if starting playing ok, false otherwise
      */
     public synchronized boolean playFile(final String file) throws IOException {
@@ -185,7 +185,7 @@ public class FrontendManager {
 
     /**
      * Switch to a channel in livetv (must be in livetv to call)
-     * @param chanid - channel id to switch to
+     * @param chanid channel id to switch to
      * @return boolean if we switched ok, false otherwise
      */
     public synchronized boolean playChan(int chanid) throws IOException {

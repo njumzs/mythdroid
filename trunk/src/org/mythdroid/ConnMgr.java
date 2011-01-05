@@ -47,12 +47,16 @@ import android.util.Log;
  */
 public class ConnMgr {
     
-    /** A callback called upon a successful connection */
+    /** A callback that'll be called upon a successful connection */
     public interface onConnectListener {
+        /**
+         * Called when the connection has been successfully established
+         * @param cmgr the ConnMgr instance
+         */
         public void onConnect(ConnMgr cmgr) throws IOException;
     }
     
-    /** The address of the remote host in '<host>:<port>' form */
+    /** The address of the remote host in 'host:port' form */
     public  String                  addr             = null;
     
     /** An array of weak references to current connections */
@@ -88,13 +92,13 @@ public class ConnMgr {
     private byte[]                  lastSent         = null;
     /** contains our onConnect callback if there is one */
     private onConnectListener       oCL              = null;
-    /** An IOException with a message that we've been disconnected */
+    /** An IOException with a message that we've been unexpectedly disconnected */
     private IOException             disconnected     = null; 
 
     /**
      * Constructor
-     * @param host - String with hostname or dotted decimal IP address
-     * @param port - integer port number
+     * @param host String with hostname or dotted decimal IP address
+     * @param port integer port number
      */
     public ConnMgr(String host, int port, onConnectListener ocl)
         throws IOException {
@@ -132,7 +136,7 @@ public class ConnMgr {
     
     /**
      * Set the socket timeout  
-     * @param timeout - in milliseconds
+     * @param timeout in milliseconds
      */
     public void setTimeout(int timeout) {
         try {
@@ -142,7 +146,7 @@ public class ConnMgr {
 
     /**
      * Write a line of text to the socket
-     * @param str - string to write, will have '\n' appended if necessary
+     * @param str string to write, will have '\n' appended if necessary
      */
     public void writeLine(String str) throws IOException {
 
@@ -159,7 +163,7 @@ public class ConnMgr {
 
     /**
      * Write a string to the socket, prefixing with 8 chars of length
-     * @param str - string to write
+     * @param str string to write
      */
     public void sendString(String str) throws IOException {
 
@@ -173,7 +177,7 @@ public class ConnMgr {
 
     /**
      * Separate and write a stringlist to the socket
-     * @param list - List of strings to write
+     * @param list Array of strings to write
      */
     public void sendStringList(String[] list) throws IOException {
 
@@ -291,7 +295,7 @@ public class ConnMgr {
 
     /**
      * Read len bytes from the socket (unbuffered)
-     * @param len - number of bytes to read
+     * @param len number of bytes to read
      * @return a byte array of len bytes
      */
     public byte[] readBytes(int len) throws IOException {
@@ -344,21 +348,20 @@ public class ConnMgr {
     }
     
     /**
-     * Get state of socket
+     * Get the connection state
      * @return true if socket is connected, false otherwise
      */
     public boolean isConnected() {
         return sock.isConnected() && connectedReady;
     }
     
+    /** Disconnect and clean up internal resources */
     public void dispose() throws IOException {
         disconnect();
         conns.remove(weakThis);
     }
 
-    /**
-     * Disconnect all currently connected connections
-     */
+    /** Disconnect all currently connected connections */
     static public void disconnectAll() throws IOException {
         
         synchronized(conns) {
@@ -377,9 +380,7 @@ public class ConnMgr {
         
     }
     
-    /**
-     * Reconnect all disconnected connections
-     */
+    /** Reconnect all disconnected connections */
     static public void reconnectAll() throws IOException {
         
         synchronized(conns) {
@@ -399,7 +400,7 @@ public class ConnMgr {
     
     /**
      * Connect to the remote host
-     * @param timeout - connect timeout in milliseconds
+     * @param timeout connect timeout in milliseconds
      */
     private void connect(int timeout) throws IOException {
         
@@ -452,9 +453,6 @@ public class ConnMgr {
         
     }
     
-    /**
-     * Disconnect
-     */
     private void disconnect() throws IOException {
         
         connectedReady = false;

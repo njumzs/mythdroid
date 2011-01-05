@@ -43,9 +43,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-/**
- * Remote for menu / guide navigation
- */
+/** Remote for menu / guide navigation */
 public class NavRemote extends Remote {
 
     final private static int MENU_GESTURE = 0, MENU_BUTTON = 1;
@@ -279,7 +277,7 @@ public class NavRemote extends Remote {
     
     /**
      * Setup the interactive views
-     * @param gesture - true for 'gesture' layout, false for 'button' 
+     * @param gesture true for 'gesture' layout, false for 'button' 
      */
     private void setupViews(boolean gesture) {
         setContentView(
@@ -309,7 +307,7 @@ public class NavRemote extends Remote {
     }
 
     /**
-     * Update the frontend location display, start another remote if appropriate  
+     * Update the frontend location display, start another remote if appropriate
      */
     private void updateLoc() throws IOException {
         

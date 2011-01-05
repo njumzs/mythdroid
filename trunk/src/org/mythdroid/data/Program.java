@@ -46,8 +46,7 @@ import android.sax.StartElementListener;
 
 /**
  * A Program - can be constructed from a stringlist (from a backend)
- * or from XML (e.g. in Status or in the Guide). Has mostly public
- * members and a few convenience methods
+ * or from XML (e.g. in Status or in the Guide). 
  */
 public class Program implements Comparable<Program> {
     
@@ -58,7 +57,7 @@ public class Program implements Comparable<Program> {
     static public interface ProgramListener {
         /**
          * Called when a Program is parsed from XML
-         * @param program - Program
+         * @param program the new Program
          */
         public void program(Program program);
     }
@@ -75,9 +74,9 @@ public class Program implements Comparable<Program> {
         
         /**
          * Constructor
-         * @param context - activity context, used for toasting errors
-         * @param elem - a Program (XMLHandler) Element
-         * @param listener - A ProgramListener to call back with Programs 
+         * @param context activity context, used for toasting errors
+         * @param elem a Program (XMLHandler) Element
+         * @param listener A ProgramListener to call back with Programs 
          */
         ProgramXMLParser(
             Context context, Element elem, final ProgramListener listener
@@ -199,19 +198,18 @@ public class Program implements Comparable<Program> {
         }
     }
     
-    /** Strings representing the relevant field */
     public String       Title, SubTitle, Category, Description, Channel, Path,
                         RecGroup, StorGroup;
-    /** Dates representing the relevant field */
     public Date         StartTime, EndTime, RecStartTime, RecEndTime;
+    /** Recording status */
     public RecStatus    Status = RecStatus.UNKNOWN;
-    /** The recording type */
+    /** Recording type */
     public RecType      Type = RecType.NOT;
-    /** The recording duplicate search space */
+    /** Recording duplicate search space */
     public RecDupIn     DupIn = RecDupIn.ALL;
-    /** The recording episode filter */
+    /** Recording episode filter */
     public RecEpiFilter EpiFilter = RecEpiFilter.NONE;
-    /** The recording duplicate match method */
+    /** Recording duplicate match method */
     public RecDupMethod DupMethod = RecDupMethod.SUBANDDESC;
     
     public int          ChanID, RecID = -1, RecPrio = 0;
@@ -220,7 +218,7 @@ public class Program implements Comparable<Program> {
 
     /**
      * Construct a Program from a stringlist
-     * @param list - a stringlist (e.g. from a backend)
+     * @param list a stringlist (e.g. from a backend)
      */
     public Program(String[] list, int off) {
          
@@ -257,7 +255,7 @@ public class Program implements Comparable<Program> {
 
     /**
      * Construct a Program from an XML (DOM) Node 
-     * @param item - a Program XML (DOM) node 
+     * @param item a Program XML (DOM) node 
      */
     public Program(Node item) {
 

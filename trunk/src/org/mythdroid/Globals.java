@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
 
+/** Contains all globals */
 public class Globals {
     
      /** Debug? */
@@ -25,8 +26,10 @@ public class Globals {
     
     /** Backend protocol version */
     public static int protoVersion  = 0;
+    /** Backend version - used only to workaround MythTV r25366 */
     public static int beVersion = 0;
 
+    /** Application context */
     public static Context appContext = null;
     
     /** The name of the current default frontend */
@@ -66,7 +69,7 @@ public class Globals {
      * Connect to defaultFrontend or the first frontend in the FrontendDB
      * if defaultFrontend is null, returns quickly if the defaultFrontend if
      * already connected
-     * @param ctx - a Context
+     * @param ctx a Context
      * @return A FrontendManager connected to a frontend or null if there's a 
      * problem
      * @throws IOException 
@@ -149,7 +152,6 @@ public class Globals {
     
     /**
      * Get a Handler for the worker thread
-     * 
      * @return a Handler for the worker thread
      */
     public static Handler getWorker() {
@@ -173,18 +175,21 @@ public class Globals {
         
     }
     
+    /** Disconnect and dispose of the currently connected frontend */
     public static void destroyFrontend() throws IOException {
          if (feMgr != null && feMgr.isConnected())
              feMgr.disconnect();
          feMgr = null;
     }
     
+    /** Disconnect and dispose of the currently connected backend */
     public static void destroyBackend() throws IOException {
         if (beMgr != null) 
             beMgr.done();
         beMgr = null;
     }
     
+    /** Dispose of the worker thread */
     public static void destroyWorker() {
         if (wHandler != null) 
             wHandler.getLooper().quit();

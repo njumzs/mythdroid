@@ -44,12 +44,18 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemSelectedListener;
 
+/** Edit a recording rule */
 public class RecordingEdit extends MDActivity {
     
+    /** Duplicate matching method for the current recording rule */
     static public RecDupMethod  dupMethod;
+    /** Duplicate matching type for the current recording rule */
     static public RecDupIn      dupIn;
+    /** Episode filter for the current recording rule */
     static public RecEpiFilter  epiFilter;
+    /** Recording group for the current recording rule */
     static public String        recGroup;
+    /** Storage group for the current recording rule */
     static public String        storGroup; 
     
     private Program prog         = null;

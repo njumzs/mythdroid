@@ -44,7 +44,7 @@ public class Channel implements Comparable<Channel> {
     static public interface ChannelListener {
         /**
          * Called when a Channel has been parsed from XML
-         * @param channel - Channel object
+         * @param channel Channel object
          */
         public void channel(Channel channel);
     }
@@ -60,9 +60,9 @@ public class Channel implements Comparable<Channel> {
         
         /**
          * Constructor
-         * @param ctx - activity context, used for toasting errors
-         * @param elem - a Channel (XMLHandler) Element
-         * @param listener - A ChannelListener to call back with Channels 
+         * @param ctx activity context, used for toasting errors
+         * @param elem a Channel (XMLHandler) Element
+         * @param listener A ChannelListener to call back with Channels 
          */
         public ChannelXMLParser(
             Context ctx, Element elem, final ChannelListener listener
@@ -107,21 +107,13 @@ public class Channel implements Comparable<Channel> {
 
     }
 
-    /**
-     * String representing channel callsign
-     */
+    /** String representing channel callsign */
     public String callSign;
-    /**
-     * String representing channel number
-     */
+    /** String representing channel number  */
     public String num;
-    /**
-     * Int representing channel ID
-     */
+    /** integer representing channel ID */
     public int ID;
-    /**
-     * ArrayList of Programs
-     */
+    /** ArrayList of Programs */
     public ArrayList<Program> programs = new ArrayList<Program>();
 
     /** Construct an empty Channel */

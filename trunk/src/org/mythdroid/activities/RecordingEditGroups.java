@@ -34,6 +34,7 @@ import android.widget.Spinner;
 
 import android.widget.AdapterView.OnItemSelectedListener;
 
+/** Edit recording and storage groups for a recording rule */
 public class RecordingEditGroups extends MDActivity {
   
     private String[] recGroups = null;

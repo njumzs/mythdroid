@@ -33,9 +33,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.widget.TextView;
 
-/**
- * Activity displays backend status
- */
+/** Activity displays backend status */
 public class StatusBackend extends Activity {
 
     @Override

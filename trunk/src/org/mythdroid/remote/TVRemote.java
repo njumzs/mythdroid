@@ -60,9 +60,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
-/**
- * Remote for controlling tv/recording/video playback
- */
+/** Remote for controlling tv/recording/video playback */
 public class TVRemote extends Remote {
 
     /** Menu entry identifiers */
@@ -595,7 +593,7 @@ public class TVRemote extends Remote {
 
     /**
      * Setup the interactive views
-     * @param gesture - true for 'gesture' layout, false for 'button' 
+     * @param gesture true for 'gesture' layout, false for 'button' 
      */
     private void setupViews(boolean gesture) {
 
@@ -655,9 +653,7 @@ public class TVRemote extends Remote {
         removeDialog(DIALOG_NUMPAD);
     }
 
-    /**
-     * Setup the status widgets (progress bar, program title)
-     */
+    /** Setup the status widgets (progress bar, program title) */
     private void setupStatus() {
 
         titleView = (TextView)findViewById(R.id.tv_title);
@@ -707,9 +703,7 @@ public class TVRemote extends Remote {
 
     }
     
-    /**
-     * Call finish() but jump to lastLocation first, if possible
-     */
+    /** Call finish() but jump to lastLocation first, if possible */
     private void done() {
         if (feMgr != null && feMgr.isConnected() && jump) {
             try {

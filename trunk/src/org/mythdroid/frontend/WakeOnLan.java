@@ -26,9 +26,7 @@ import org.mythdroid.Globals;
 
 import android.util.Log;
 
-/**
- * Send WakeOnLan packets
- */
+/** Send WakeOnLan packets */
 public class WakeOnLan {
 
     static private byte[] addr;
@@ -36,7 +34,7 @@ public class WakeOnLan {
     
     /**
      * Send a wake on lan packet
-     * @param hwaddr - String containing the MAC address of the target
+     * @param hwaddr String containing the MAC address of the target
      */
     public static void Wake(String hwaddr) throws Exception {
         addr = parseAddr(hwaddr);

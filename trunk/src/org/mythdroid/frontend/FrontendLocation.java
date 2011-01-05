@@ -39,7 +39,7 @@ public class FrontendLocation {
 
     /**
      * Constructor
-     * @param loc - String describing location
+     * @param loc String describing location
      */
     public FrontendLocation(FrontendManager feMgr, String loc) {
 

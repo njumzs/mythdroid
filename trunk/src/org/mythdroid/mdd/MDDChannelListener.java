@@ -24,14 +24,14 @@ package org.mythdroid.mdd;
 public interface MDDChannelListener {
     /**
      * Called on receipt of CHANNEL events
-     * @param channel - String containing the name of the channel
-     * @param title - String containing the title of the program
-     * @param subtitle - String containing the subtitle of the program
+     * @param channel String containing the name of the channel
+     * @param title String containing the title of the program
+     * @param subtitle String containing the subtitle of the program
      */
     public void onChannel(String channel, String title, String subtitle);
     /**
      * Called on receipt of PROGRESS events
-     * @param pos - int representing current position
+     * @param pos int representing current position
      */
     public void onProgress(int pos);
     /**

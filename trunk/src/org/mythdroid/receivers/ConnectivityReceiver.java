@@ -28,6 +28,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     /**
      * Register a new ConnectivityReceiver to monitor and act upon 
      * connectivity changes
+     * @param ctx Context
      */
     public ConnectivityReceiver(Context ctx) {
         
@@ -68,9 +69,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
                 " state " + state //$NON-NLS-1$
             );
         
-        /*
-         * Ignore irrelevant connectivity changes
-         */
+        /* Ignore irrelevant connectivity changes */
         if (
             connected &&
             netType == ConnectivityManager.TYPE_WIFI &&
@@ -84,9 +83,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
         )
             return;
 
-        /*
-         * We've lost connectivity - disconnect all
-         */
+        /* We've lost connectivity - disconnect all */
         if (state == State.DISCONNECTED) {
            
             try {
@@ -100,10 +97,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
         if (state != State.CONNECTED)
             return;
         
-        /*
-         * We've regained connectivity - attempt to reconnect
-         */
-        
+        /* We've regained connectivity - attempt to reconnect */
         netType = type;
         connected = true;
             
@@ -115,7 +109,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     
     /**
      * Unregister the broadcast receiver
-     * @param ctx - Context to unregister from
+     * @param ctx Context to unregister from
      */
     public void dispose(Context ctx) {
         ctx.unregisterReceiver(this);
@@ -123,7 +117,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     
     /**
      * Get the current network type (WiFi or mobile)
-     * @return - ConnectivityManager.TYPE_WIFI or ConnectivityManager.TYPE_MOBILE
+     * @return ConnectivityManager.TYPE_WIFI or ConnectivityManager.TYPE_MOBILE
      */
     public static int networkType() {
         return netType;
@@ -131,7 +125,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     
     /**
      * If a WiFi connection is being established wait for it to complete
-     * @param timeout - maximum wait time in milliseconds
+     * @param timeout maximum wait time in milliseconds
      */
     public static void waitForWifi(Context ctx, int timeout) {
         
