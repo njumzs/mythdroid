@@ -1,0 +1,11 @@
+org.mythdroid
+org.mythdroid.activities
+org.mythdroid.backend
+org.mythdroid.data
+org.mythdroid.frontend
+org.mythdroid.mdd
+org.mythdroid.receivers
+org.mythdroid.remote
+org.mythdroid.resource
+org.mythdroid.util
+org.mythdroid.views
