@@ -70,14 +70,16 @@ foreach my $idx (0 .. $#ARGV) {
     }
     elsif ($ARGV[$idx] eq '-b' || $ARGV[$idx] eq '--backend') {
         $backend = 1;
-        splice @ARGV, $idx, 1;
+        $ARGV[$idx] = undef;
     }
     elsif ($ARGV[$idx] eq '-d' || $ARGV[$idx] eq '--debug') {
         $debug = 1;
-        splice @ARGV, $idx, 1;
+        $ARGV[$idx] = undef;
     }
 
 }
+
+@ARGV = grep { defined } @ARGV;
 
 my $log = MDD::Log->new('/tmp/mdd.log', $debug);
 
