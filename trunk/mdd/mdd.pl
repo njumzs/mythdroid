@@ -704,36 +704,75 @@ sub check_lcd_settings() {
 
 }
 
+sub install_init_script() {
 
+    my $init  = '/etc/init.d/mdd';
+    my $uinit = '/etc/init/mdd.conf'; 
+
+    my $running = (`ps aux | grep /usr/bin/mdd | grep -v grep`)[0];
+
+    if (-e '/usr/sbin/service' && -d '/etc/init') {
+        if (! -e $uinit) {
+            print "Installing upstart script\n";
+            copy('init/upstart', $uinit);
+        }
+        exec 'service', 'mdd', $running ? 'restart' : 'start';
+    }
+    
+    if (-e '/sbin/runscript' && -e '/sbin/start-stop-daemon') {
+        if (! -e $init) {
+            print "Installing gentoo init script\n";
+            copy('init/gentoo', $init);
+            chmod(0755, $init);
+            system 'rc-update add mdd default';
+        }
+        exec $init, 'restart';
+    }
+
+    if (-d '/etc/rc0.d') {
+        if (! -e $init) {
+            print "Installing sysv init script\n";
+            copy('init/sysv', $init);
+            chmod(0755, $init);
+            map { symlink $init, "/etc/rc$_.d/K01mdd" } (qw(0 1 6));
+            map { symlink $init, "/etc/rc$_.d/S98mdd" } (qw(2 3 4 5));
+        }
+        exec $init, $running ? 'restart' : 'start';
+    }
+
+    die "\nWARNING: Unknown init system - you'll have to manually arrange " .
+        "for '/usr/bin/mdd --backend' to be started at boot\n";
+
+}
 
 sub install {
 
     print "Installing mdd..\n";
+
+    my ($path, $dst);
 
     create_user_account();
 
     install_modules();
     
     if ($backend) {
-        print "cp $0 -> /usr/bin/mdd\n";
-        copy($0, "/usr/bin/mdd");
-        chmod(0755, "/usr/bin/mdd") 
-            or warn "chmod of /usr/bin/mdd failed\n";
+        $dst = '/usr/bin/mdd';
+        print "cp $0 -> $dst\n";
+        copy($0, $dst);
+        chmod(0755, $dst) or warn "chmod of $dst failed\n";
+        install_init_script();
         exit;
     }
 
     print "Stopping mythfrontend and mythlcdserver\n";
 
-    system(
-        "killall mythfrontend 2>/dev/null;" .
-        "killall mythfrontend.real 2>/dev/null;" . 
-        "killall -9 mythlcdserver 2>/dev/null"
-    );
+    map { system("killall -9 $_ 2>/dev/null") } 
+        (qw(mythfrontend mythfrontend.real mythlcdserver mythlcd));
 
     my $dir = get_install_dir();
 
-    my $path = "$dir/mythlcdserver";
-    my $dst  = "$dir/mythlcd"; 
+    $dst  = "$dir/mythlcd"; 
+    $path = "$dir/mythlcdserver";
 
     unless ((`file $path`)[0] =~ /perl/) {
         print "cp $path -> $dst\n";
