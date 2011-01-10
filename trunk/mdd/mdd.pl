@@ -517,6 +517,18 @@ sub videoList($) {
 
 }
 
+sub findFileSG($$) {
+
+    my $sgd = shift;
+    my $file = shift;
+
+    foreach my $d (@$sgd) {
+        return "$d$file" if (-e "$d$file");
+    }
+
+    return undef;
+}
+
 # Stream a recording or video
 sub streamFile($) {
     
@@ -547,13 +559,19 @@ sub streamFile($) {
             unless (scalar %storageGroups);
     
         $file =~ s/.*\//\//;
+        my $filename = $file;
 
         if (exists $storageGroups{$sg}) {
-            $file = $storageGroups{$sg} . $file;
+            $file = findFileSG($storageGroups{$sg}, $file);
         }
         else {
             $log->dbg("Storage Group $sg not found, assume 'Default'");
-            $file = $storageGroups{'Default'} . $file;
+            $file = findFileSG($storageGroups{'Default'}, $file);
+        }
+        
+        unless (defined $file) {
+            $log->err("Couldn't find $filename in SG $sg");
+            return;
         }
 
     }
@@ -594,7 +612,6 @@ sub stopStreaming() {
     undef $streampid;
 
 }
-
 
 # Get a list of storage groups
 sub getStorGroups() {
