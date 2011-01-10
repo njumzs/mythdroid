@@ -86,7 +86,7 @@ install() unless ($0 =~ /mythlcdserver$/ || ($backend && $0 =~ /^\/usr\/bin/));
 
 my (
     $data, $lcdClient, $lcdServer, $lcdListen, $lcd, $client, $videoDir,
-    $cpus, $streampid, $mythdb
+    $cpus, $streampid, $mythdb, $no_xosd
 );
 
 my @clients;
