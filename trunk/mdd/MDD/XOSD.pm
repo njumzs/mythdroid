@@ -22,7 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package MDD::XOSD;
 use strict;
 use warnings;
-use X::Osd;
+use carp;
+eval "use X::Osd" or carp "Warning: X::Osd is not installed\n";
 
 my $font = '-microsoft-verdana-bold-r-normal-*-*-300-*-*-*-*-*';
 

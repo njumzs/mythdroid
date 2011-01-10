@@ -31,7 +31,6 @@ use Sys::Hostname;
 use Config;
 use MDD::LCD;
 use MDD::MythDB;
-use MDD::XOSD;
 use MDD::Log;
 
 sub usage();
@@ -133,6 +132,9 @@ my @clientMsgs = (
         proc  => sub { sendMsg($mythdb->newRec($1, $2, $3)) }
     },
 ); 
+
+eval "use MDD::XOSD";
+$no_xosd++ if $@;
 
 # Change euid/uid
 my @pwent = getpwnam 'mdd';
@@ -406,6 +408,11 @@ sub runCommand($) {
 }
 
 sub osdMsg($) {
+
+    if ($no_xosd) {
+        $log->err("Can't display OSD - X::Osd isn't installed");
+        return;
+    }
 
     my $osd = MDD::XOSD->new();
 
