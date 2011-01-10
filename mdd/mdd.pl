@@ -100,10 +100,10 @@ my (%commands, %videos, %storageGroups);
 my $stream_cmd = 
     'ffmpeg -i %FILE% -vcodec rawvideo -acodec pcm_s16le -deinterlace ' .
     '-s %WIDTH%x%HEIGHT% -ac 2 -ar 48000 -copyts -async 100 -f asf -y - ' .
-    '2>/tmp/ffmpeg.out | /usr/bin/vlc -vvv -I dummy - --sout=\'' .
-    '#transcode{vcodec=h264,venc=x264{no-cabac,level=30,keyint=250,ref=4,' .
-    'bframes=0},vb=%VB%,threads=%THR%,width=%WIDTH%,height=%HEIGHT%,' .
-    'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2}' .
+    '2>/tmp/ffmpeg.out | /usr/bin/vlc -vvv -I dummy - ' .
+    '--sout=\'#transcode{vcodec=h264,venc=x264{no-cabac,level=30,keyint=50' .
+    ',ref=1,bframes=0},vb=%VB%,threads=%THR%,width=%WIDTH%,height=%HEIGHT%,' .
+    'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2,audio-sync}' .
     ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
 
 # List of regex to match messages we might get from MythDroid
@@ -137,6 +137,9 @@ my @clientMsgs = (
 
 eval "use MDD::XOSD";
 $no_xosd++ if $@;
+
+# Get rid of old streaming log files in case root owns them
+unlink (qw(/tmp/ffmpeg.out /tmp/vlc.out));
 
 # Change euid/uid
 my @pwent = getpwnam 'mdd';
