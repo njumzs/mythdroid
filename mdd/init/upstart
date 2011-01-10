@@ -1,0 +1,14 @@
+# MDD - MythDroid Daemon
+#
+# MDD enables a range of additional functionality for MythDroid -
+# an android MythTV remote
+
+description     "MythDroid Daemon"
+
+start on started mysql
+stop on stopping mysql
+
+expect fork
+respawn
+
+exec mdd --backend
