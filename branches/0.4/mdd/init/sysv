@@ -1,0 +1,20 @@
+#!/bin/bash
+
+case "$1" in
+  start)
+    echo "Starting MDD..."
+    /usr/bin/mdd --backend
+    ;;
+  stop)
+    echo "Stopping MDD..."
+    PID=`ps aux | grep /usr/bin/mdd | grep -v grep | awk '{print $2}'`
+    if [ $PID ]; then kill $PID; fi
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    ;;
+  *)
+    ;;
+esac
+

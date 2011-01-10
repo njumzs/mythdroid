@@ -69,14 +69,16 @@ foreach my $idx (0 .. $#ARGV) {
     }
     elsif ($ARGV[$idx] eq '-b' || $ARGV[$idx] eq '--backend') {
         $backend = 1;
-        splice @ARGV, $idx, 1;
+        $ARGV[$idx] = undef;
     }
     elsif ($ARGV[$idx] eq '-d' || $ARGV[$idx] eq '--debug') {
         $debug = 1;
-        splice @ARGV, $idx, 1;
+        $ARGV[$idx] = undef;
     }
 
 }
+
+@ARGV = grep { defined } @ARGV;
 
 my $log = MDD::Log->new('/tmp/mdd.log', $debug);
 
@@ -97,10 +99,10 @@ my (%commands, %videos, %storageGroups);
 my $stream_cmd = 
     'ffmpeg -i %FILE% -vcodec rawvideo -acodec pcm_s16le -deinterlace ' .
     '-s %WIDTH%x%HEIGHT% -ac 2 -ar 48000 -copyts -async 100 -f asf -y - ' .
-    '2>/tmp/ffmpeg.out | /usr/bin/vlc -vvv -I dummy - --sout=\'' .
-    '#transcode{vcodec=h264,venc=x264{no-cabac,level=30,keyint=250,ref=4,' .
-    'bframes=0},vb=%VB%,threads=%THR%,width=%WIDTH%,height=%HEIGHT%,' .
-    'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2}' .
+    '2>/tmp/ffmpeg.out | /usr/bin/vlc -vvv -I dummy - ' .
+    '--sout=\'#transcode{vcodec=h264,venc=x264{no-cabac,level=30,keyint=50' .
+    ',ref=1,bframes=0},vb=%VB%,threads=%THR%,width=%WIDTH%,height=%HEIGHT%,' .
+    'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2,audio-sync}' .
     ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
 
 # List of regex to match messages we might get from MythDroid
@@ -130,6 +132,9 @@ my @clientMsgs = (
         proc  => sub { sendMsg($mythdb->newRec($1, $2, $3)) }
     },
 ); 
+
+# Get rid of old streaming log files in case root owns them
+unlink (qw(/tmp/ffmpeg.out /tmp/vlc.out));
 
 # Change euid/uid
 my @pwent = getpwnam 'mdd';
@@ -495,6 +500,18 @@ sub videoList($) {
 
 }
 
+sub findFileSG($$) {
+
+    my $sgd = shift;
+    my $file = shift;
+
+    foreach my $d (@$sgd) {
+        return "$d$file" if (-e "$d$file");
+    }
+
+    return undef;
+}
+
 # Stream a recording or video
 sub streamFile($) {
     
@@ -525,13 +542,19 @@ sub streamFile($) {
             unless (scalar %storageGroups);
     
         $file =~ s/.*\//\//;
+        my $filename = $file;
 
         if (exists $storageGroups{$sg}) {
-            $file = $storageGroups{$sg} . $file;
+            $file = findFileSG($storageGroups{$sg}, $file);
         }
         else {
             $log->dbg("Storage Group $sg not found, assume 'Default'");
-            $file = $storageGroups{'Default'} . $file;
+            $file = findFileSG($storageGroups{'Default'}, $file);
+        }
+        
+        unless (defined $file) {
+            $log->err("Couldn't find $filename in SG $sg");
+            return;
         }
 
     }
@@ -572,7 +595,6 @@ sub stopStreaming() {
     undef $streampid;
 
 }
-
 
 # Get a list of storage groups
 sub getStorGroups() {
@@ -662,36 +684,75 @@ sub check_lcd_settings() {
 
 }
 
+sub install_init_script() {
 
+    my $init  = '/etc/init.d/mdd';
+    my $uinit = '/etc/init/mdd.conf'; 
+
+    my $running = (`ps aux | grep /usr/bin/mdd | grep -v grep`)[0];
+
+    if (-e '/usr/sbin/service' && -d '/etc/init') {
+        if (! -e $uinit) {
+            print "Installing upstart script\n";
+            copy('init/upstart', $uinit);
+        }
+        exec 'service', 'mdd', $running ? 'restart' : 'start';
+    }
+    
+    if (-e '/sbin/runscript' && -e '/sbin/start-stop-daemon') {
+        if (! -e $init) {
+            print "Installing gentoo init script\n";
+            copy('init/gentoo', $init);
+            chmod(0755, $init);
+            system 'rc-update add mdd default';
+        }
+        exec $init, 'restart';
+    }
+
+    if (-d '/etc/rc0.d') {
+        if (! -e $init) {
+            print "Installing sysv init script\n";
+            copy('init/sysv', $init);
+            chmod(0755, $init);
+            map { symlink $init, "/etc/rc$_.d/K01mdd" } (qw(0 1 6));
+            map { symlink $init, "/etc/rc$_.d/S98mdd" } (qw(2 3 4 5));
+        }
+        exec $init, $running ? 'restart' : 'start';
+    }
+
+    die "\nWARNING: Unknown init system - you'll have to manually arrange " .
+        "for '/usr/bin/mdd --backend' to be started at boot\n";
+
+}
 
 sub install {
 
     print "Installing mdd..\n";
+
+    my ($path, $dst);
 
     create_user_account();
 
     install_modules();
     
     if ($backend) {
-        print "cp $0 -> /usr/bin/mdd\n";
-        copy($0, "/usr/bin/mdd");
-        chmod(0755, "/usr/bin/mdd") 
-            or warn "chmod of /usr/bin/mdd failed\n";
+        $dst = '/usr/bin/mdd';
+        print "cp $0 -> $dst\n";
+        copy($0, $dst);
+        chmod(0755, $dst) or warn "chmod of $dst failed\n";
+        install_init_script();
         exit;
     }
 
     print "Stopping mythfrontend and mythlcdserver\n";
 
-    system(
-        "killall mythfrontend 2>/dev/null;" .
-        "killall mythfrontend.real 2>/dev/null;" . 
-        "killall -9 mythlcdserver 2>/dev/null"
-    );
+    map { system("killall -9 $_ 2>/dev/null") } 
+        (qw(mythfrontend mythfrontend.real mythlcdserver mythlcd));
 
     my $dir = get_install_dir();
 
-    my $path = "$dir/mythlcdserver";
-    my $dst  = "$dir/mythlcd"; 
+    $dst  = "$dir/mythlcd"; 
+    $path = "$dir/mythlcdserver";
 
     unless ((`file $path`)[0] =~ /perl/) {
         print "cp $path -> $dst\n";
