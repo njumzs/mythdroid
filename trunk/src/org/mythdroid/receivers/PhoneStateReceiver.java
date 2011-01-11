@@ -78,22 +78,29 @@ public class PhoneStateReceiver extends BroadcastReceiver {
         ) {
             Bundle bundle = intent.getExtras();
             Object[] pdus = (Object[])bundle.get("pdus"); //$NON-NLS-1$
+            
+            SmsMessage msg = SmsMessage.createFromPdu((byte[]) pdus[0]);
+            String from    = msg.getDisplayOriginatingAddress();
 
+            String m = Messages.getString("BCastReceiver.5") + from + ": " + //$NON-NLS-1$ //$NON-NLS-2$
+                       msg.getDisplayMessageBody();
+        
+            for (int i = 1; i < pdus.length; i++){
+                msg = SmsMessage.createFromPdu((byte[]) pdus[i]);
+                if (!msg.getDisplayOriginatingAddress().equals(from))
+                    continue;
+                m += msg.getDisplayMessageBody();
+            }
+            
             try {
-                for (int i = 0; i < pdus.length; i++){
-                    SmsMessage msg = SmsMessage.createFromPdu((byte[]) pdus[i]);
-                    String m = Messages.getString("BCastReceiver.5") + // SMS from //$NON-NLS-1$
-                        msg.getDisplayOriginatingAddress() +
-                        ": " + msg.getDisplayMessageBody(); //$NON-NLS-1$
-                    if (scrollSMS)
-                        OSDMessage.Scroller(m, m.length() / 9 + 8);
-                    else
-                        OSDMessage.Alert(m);
-                }
+                if (scrollSMS)
+                    OSDMessage.Scroller(m, m.length() / 9 + 8);
+                else
+                    OSDMessage.Alert(m);
             } catch (Exception e){}
-
         }
 
     }
 
 }
+
