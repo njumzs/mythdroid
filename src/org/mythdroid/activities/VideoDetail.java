@@ -91,6 +91,24 @@ public class VideoDetail extends MDActivity {
         else
             ((ImageView)findViewById(R.id.videoDPoster))
                 .setImageDrawable(video.poster);
+        
+        Button tvdb = ((Button)findViewById(R.id.videoDTVDB));
+        
+        if (video.homepage == null || video.homepage.length() == 0)
+            tvdb.setVisibility(View.GONE);
+        else
+            tvdb.setOnClickListener(
+                new OnClickListener() {
+                    @Override
+                        public void onClick(View v) {
+                        startActivity(
+                            new Intent(Intent.ACTION_VIEW).setData(
+                                Uri.parse(video.homepage)
+                            )
+                        );
+                    }
+                }
+            );
 
         Button play = ((Button)findViewById(R.id.videoDPlay));
 
@@ -107,6 +125,7 @@ public class VideoDetail extends MDActivity {
                 }
             }
         );
+        
         play.setOnLongClickListener(
             new OnLongClickListener() {
                 @Override
@@ -119,20 +138,6 @@ public class VideoDetail extends MDActivity {
                 }
             }
         );
-
-        ((Button)findViewById(R.id.videoDTVDB))
-            .setOnClickListener(
-                new OnClickListener() {
-                    @Override
-                        public void onClick(View v) {
-                        startActivity(
-                            new Intent(Intent.ACTION_VIEW).setData(
-                                Uri.parse(video.homepage)
-                            )
-                        );
-                    }
-                }
-            );
 
     }
 
