@@ -275,6 +275,8 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     @Override
     public boolean onKeyDown(int code, KeyEvent event) {
 
+        if (feMgr == null) return false;
+        
         try {
             switch (code) {
                 case KeyEvent.KEYCODE_BACK:
