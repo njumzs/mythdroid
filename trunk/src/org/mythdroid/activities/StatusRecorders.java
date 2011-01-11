@@ -90,8 +90,8 @@ public class StatusRecorders extends ListActivity {
     final private Runnable getStatusTask = new Runnable() {
         @Override
         public void run() {
-            Status.getStatus(ctx);
-            if (Status.statusDoc == null) {
+            
+            if (!Status.getStatus(ctx) && Status.statusDoc == null) {
                 dismissDialog(DIALOG_LOAD);
                 ErrUtil.postErr(ctx, Messages.getString("StatusRecorders.3")); //$NON-NLS-1$
                 finish();

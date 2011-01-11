@@ -45,7 +45,10 @@ public class StatusScheduled extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
-        if (Status.statusDoc == null) Status.getStatus(this);
+        if (Status.statusDoc == null && !Status.getStatus(this)) {
+            finish();
+            return;
+        }
 
         Document doc = Status.statusDoc;
 
