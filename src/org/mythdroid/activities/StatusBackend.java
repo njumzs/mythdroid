@@ -42,7 +42,10 @@ public class StatusBackend extends Activity {
         super.onCreate(icicle);
         setContentView(R.layout.status_backend);
 
-        if (Status.statusDoc == null) Status.getStatus(this);
+        if (Status.statusDoc == null && !Status.getStatus(this)) {
+            finish();
+            return;
+        }
 
         Document doc = Status.statusDoc;
 

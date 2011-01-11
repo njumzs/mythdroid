@@ -133,7 +133,7 @@ public class Status extends ListActivity {
      * Get new statusDoc from the backend
      * @param ctx Context
      */
-    public static void getStatus(Context ctx) {
+    public static boolean getStatus(Context ctx) {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
@@ -144,6 +144,8 @@ public class Status extends ListActivity {
         } catch (SAXException e) {
             ErrUtil.err(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
         } catch (Exception e) { ErrUtil.err(ctx, e); }
+        
+        return statusDoc != null;
 
     }
 
