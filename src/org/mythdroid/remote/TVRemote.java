@@ -366,7 +366,7 @@ public class TVRemote extends Remote {
 
     @Override
     public void onAction() {
-        if (mddMgr != null) return;
+        if (mddMgr != null || updateStatus == null) return;
         updateStatus.run();
     }
 
