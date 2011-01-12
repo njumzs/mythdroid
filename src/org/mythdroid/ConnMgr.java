@@ -148,7 +148,7 @@ public class ConnMgr {
      * Write a line of text to the socket
      * @param str string to write, will have '\n' appended if necessary
      */
-    public void writeLine(String str) throws IOException {
+    public synchronized void writeLine(String str) throws IOException {
 
         if (str.endsWith("\n")) //$NON-NLS-1$
             write(str.getBytes());
@@ -165,7 +165,7 @@ public class ConnMgr {
      * Write a string to the socket, prefixing with 8 chars of length
      * @param str string to write
      */
-    public void sendString(String str) throws IOException {
+    public synchronized void sendString(String str) throws IOException {
 
         str = String.format("%-8d", str.length()) + str; //$NON-NLS-1$
 
@@ -179,7 +179,7 @@ public class ConnMgr {
      * Separate and write a stringlist to the socket
      * @param list Array of strings to write
      */
-    public void sendStringList(String[] list) throws IOException {
+    public synchronized void sendStringList(String[] list) throws IOException {
 
         String str = list[0];
 
@@ -194,7 +194,7 @@ public class ConnMgr {
      * Read a line from the socket (buffered)
      * @return A string containing the line we read
      */
-    public String readLine() throws IOException {
+    public synchronized String readLine() throws IOException {
 
         String line = ""; //$NON-NLS-1$
         int r = -1;
@@ -298,7 +298,7 @@ public class ConnMgr {
      * @param len number of bytes to read
      * @return a byte array of len bytes
      */
-    public byte[] readBytes(int len) throws IOException {
+    public synchronized byte[] readBytes(int len) throws IOException {
 
         final byte[] bytes = new byte[len];
         int read = read(bytes, 0, len);
@@ -331,7 +331,7 @@ public class ConnMgr {
      * Read a stringlist from the socket (unbuffered)
      * @return List of strings
      */
-    public String[] readStringList() throws IOException {
+    public synchronized String[] readStringList() throws IOException {
 
         byte[] bytes = new byte[8];
         if (read(bytes, 0, 8) == -1) {
@@ -356,13 +356,13 @@ public class ConnMgr {
     }
 
     /** Disconnect and clean up internal resources */
-    public void dispose() throws IOException {
+    public synchronized void dispose() throws IOException {
         disconnect();
         conns.remove(weakThis);
     }
 
     /** Disconnect all currently connected connections */
-    static public void disconnectAll() throws IOException {
+    static public synchronized void disconnectAll() throws IOException {
 
         synchronized(conns) {
 
@@ -381,7 +381,7 @@ public class ConnMgr {
     }
 
     /** Reconnect all disconnected connections */
-    static public void reconnectAll() throws IOException {
+    static public synchronized void reconnectAll() throws IOException {
 
         synchronized(conns) {
 
@@ -402,7 +402,7 @@ public class ConnMgr {
      * Connect to the remote host
      * @param timeout connect timeout in milliseconds
      */
-    private void connect(int timeout) throws IOException {
+    private synchronized void connect(int timeout) throws IOException {
 
         ConnectivityReceiver.waitForWifi(Globals.appContext, 5000);
 
@@ -453,7 +453,7 @@ public class ConnMgr {
 
     }
 
-    private void disconnect() throws IOException {
+    private synchronized void disconnect() throws IOException {
 
         connectedReady = false;
 
@@ -468,7 +468,7 @@ public class ConnMgr {
 
     }
 
-    private int read(byte[] buf, int off, int len) throws IOException {
+    private synchronized int read(byte[] buf, int off, int len) throws IOException {
 
         int ret = -1;
 
@@ -496,7 +496,7 @@ public class ConnMgr {
 
     }
 
-    private void write(byte[] buf) throws IOException {
+    private synchronized void write(byte[] buf) throws IOException {
 
         if (!sock.isConnected() || !connectedReady)
             waitForConnection(timeout * 4);
@@ -510,7 +510,7 @@ public class ConnMgr {
      * Wait for a connection to be established
      * @param timeout - maximum wait time in milliseconds
      */
-    private void waitForConnection(int timeout) throws IOException {
+    private synchronized void waitForConnection(int timeout) throws IOException {
 
         if (!reconnectPending) {
             connect(timeout);
