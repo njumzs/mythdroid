@@ -71,7 +71,9 @@ public class Status extends ListActivity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        dismissDialog(DIALOG_LOAD);
+                        try {
+                            dismissDialog(DIALOG_LOAD);
+                        } catch (IllegalArgumentException e) {}
                         setListAdapter(
                             new ArrayAdapter<String>(
                                 ctx, layout.simple_list_item_1, StatusItems
