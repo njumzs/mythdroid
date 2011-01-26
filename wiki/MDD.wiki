@@ -16,10 +16,10 @@ For mdd to function, you must ensure that the following settings in the LCD page
 
 mdd should check these settings during installation and let you know if you need to take action.
 
-So, to install, checkout or download [http://code.google.com/p/mythdroid/downloads/detail?name=mdd-0.4.tgz mdd] to each frontend (or combined backend/frontend) and then (as root):
+So, to install, checkout or download [http://code.google.com/p/mythdroid/downloads/detail?name=mdd-0.4.3.tgz mdd] to each frontend (or combined backend/frontend) and then (as root):
 
 {{{
-tar zxf mdd-0.4.tgz
+tar zxf mdd-0.4.3.tgz
 cd mdd
 perl mdd.pl
 }}}
@@ -29,12 +29,10 @@ Note: You will need to reinstall mdd each time you upgrade MythTV. See the detai
 On a box that serves only as a backend:
 
 {{{
-tar zxf mdd-0.4.tgz
+tar zxf mdd-0.4.3.tgz
 cd mdd
 perl mdd.pl --backend
 }}}
-
-Then run /usr/bin/mdd and arrange for it to be run at boot.
 
 == Configuration ==
 
