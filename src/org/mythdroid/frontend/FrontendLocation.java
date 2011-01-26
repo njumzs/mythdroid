@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -29,23 +29,23 @@ import android.util.Log;
 public class FrontendLocation {
 
     private static HashMap<String, String> locations = null;
-        
+
     public String  location  = null, niceLocation = null;
     public int     position, end;
     public float   rate;
     public String  filename;
-    public boolean 
+    public boolean
         video = false, livetv = false, music = false, musiceditor = false;
 
     /**
      * Constructor
-     * @param loc - String describing location
+     * @param loc String describing location
      */
     public FrontendLocation(FrontendManager feMgr, String loc) {
 
         location = loc;
-        
-        if (locations == null && !populateLocations(feMgr)) 
+
+        if (locations == null && !populateLocations(feMgr))
             return;
 
         loc = loc.toLowerCase();
@@ -63,8 +63,8 @@ public class FrontendLocation {
             music = true;
         else if (loc.equals("musicplaylists")) //$NON-NLS-1$
             musiceditor = true;
-        
-        if (Globals.debug) 
+
+        if (Globals.debug)
             Log.d(
                 "FrontendLocation",  //$NON-NLS-1$
                 "loc: " + loc +  //$NON-NLS-1$
@@ -82,18 +82,18 @@ public class FrontendLocation {
         try {
             locations = feMgr.getLocs();
         } catch (IOException e) { return false; }
-        
+
         return true;
-        
+
     }
 
     private void parsePlaybackLoc(String loc) {
-        
+
         String[] tok = loc.split(" "); //$NON-NLS-1$
         niceLocation = tok[0] + " " + tok[1]; //$NON-NLS-1$
         location = niceLocation;
         position = timeToInt(tok[2]);
-        
+
         if (tok[1].equals("recorded") || tok[1].equals("livetv")) { //$NON-NLS-1$ //$NON-NLS-2$
             end = timeToInt(tok[4]);
             if (tok[5].equals("pause")) //$NON-NLS-1$
@@ -120,10 +120,10 @@ public class FrontendLocation {
             end = -1;
             filename = "Unknown"; //$NON-NLS-1$
         }
-        
+
         video = true;
-        
-        if (Globals.debug) 
+
+        if (Globals.debug)
             Log.d(
                 "FrontendLocation",  //$NON-NLS-1$
                 "position: " + position +  //$NON-NLS-1$
@@ -132,21 +132,21 @@ public class FrontendLocation {
                 " filename: " + filename +  //$NON-NLS-1$
                 " livetv: " + livetv //$NON-NLS-1$
             );
-        
+
     }
 
     private int timeToInt(String time) {
-        
+
         String tm[] = time.split(":"); //$NON-NLS-1$
-        
+
         if (tm.length == 2)
             return Integer.parseInt(tm[0]) * 60 +
                      Integer.parseInt(tm[1]);
-        
-        return Integer.parseInt(tm[0]) * 3600 + 
+
+        return Integer.parseInt(tm[0]) * 3600 +
                  Integer.parseInt(tm[1]) * 60 +
                    Integer.parseInt(tm[2]);
-        
+
     }
 
 }

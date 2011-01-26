@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -24,18 +24,18 @@ package org.mythdroid.mdd;
 public interface MDDChannelListener {
     /**
      * Called on receipt of CHANNEL events
-     * @param channel - String containing the name of the channel
-     * @param title - String containing the title of the program
-     * @param subtitle - String containing the subtitle of the program
+     * @param channel String containing the name of the channel
+     * @param title String containing the title of the program
+     * @param subtitle String containing the subtitle of the program
      */
     public void onChannel(String channel, String title, String subtitle);
     /**
      * Called on receipt of PROGRESS events
-     * @param pos - int representing current position
+     * @param pos int representing current position
      */
     public void onProgress(int pos);
     /**
-     * Called on receipt of EXIT event 
+     * Called on receipt of EXIT event
      */
     public void onExit();
 }

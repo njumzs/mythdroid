@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -27,12 +27,12 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.mythdroid.Enums.Extras;
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.mdd.MDDMusicListener;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
-import org.mythdroid.activities.MythDroid;
 import org.mythdroid.Enums.Key;
 
 import android.R.drawable;
@@ -57,34 +57,32 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-/**
- * Remote for music playback
- */
+/** Remote for music playback */
 public class MusicRemote extends Remote {
 
     /** Menu entry identifiers */
-    final private static int 
-        MENU_OSDMENU = 0, MENU_SHUFFLE = 1, MENU_REPEAT = 2, 
+    final private static int
+        MENU_OSDMENU = 0, MENU_SHUFFLE = 1, MENU_REPEAT = 2,
         MENU_VISUALISE = 3, MENU_CHANGE_VISUAL = 4, MENU_EDIT = 5;
-    
-    final private static int DIALOG_QUIT = 0; 
-    
+
+    final private static int DIALOG_QUIT = 0;
+
     final private static HashMap<Integer, Key>
         ctrls = new HashMap<Integer, Key>(20);
-    
+
     static {
         ctrls.put(R.id.music_seek_back,    Key.MUSIC_REWIND);
         ctrls.put(R.id.music_skip_back,    Key.MUSIC_PREV);
         ctrls.put(R.id.music_skip_forward, Key.MUSIC_NEXT);
         ctrls.put(R.id.music_seek_forward, Key.MUSIC_FFWD);
     }
-    
+
     final private Handler handler = new Handler();
     final private Context ctx     = this;
-        
-    final private WeakHashMap<Integer, Bitmap> artCache = 
+
+    final private WeakHashMap<Integer, Bitmap> artCache =
         new WeakHashMap<Integer, Bitmap>(8);
-    
+
     private boolean         jump = true;
     private MDDManager      mddMgr  = null;
     private TextView        titleView = null, detailView = null;
@@ -95,14 +93,14 @@ public class MusicRemote extends Remote {
     private RepeatMode      repeat = null;
     private String          lastTrack = null, lastDetails = null;
     private int             lastArtid = -1, lastProgress = 0;
-        
+
     private enum RepeatMode {
         Off   (0),
         Track (1),
         All   (2);
-        
+
         private int value;
-        
+
         static final private Map<Integer, RepeatMode> revMap =
             new HashMap<Integer, RepeatMode>(3);
 
@@ -118,22 +116,22 @@ public class MusicRemote extends Remote {
         public int value() {
             return value;
         }
-        
+
         public static RepeatMode get(int code) {
             return revMap.get(code);
         }
-        
+
     };
-    
+
     private enum ShuffleMode {
         Off         (0),
         Random      (1),
         Intelligent (2),
         Album       (3),
         Artist      (4);
-        
+
         private int value;
-        
+
         static final private Map<Integer, ShuffleMode> revMap =
             new HashMap<Integer, ShuffleMode>(5);
 
@@ -149,22 +147,23 @@ public class MusicRemote extends Remote {
         public int value() {
             return value;
         }
-        
+
         public static ShuffleMode get(int code) {
             return revMap.get(code);
         }
-        
+
     };
-    
+
     private class mddListener implements MDDMusicListener {
         @Override
         public void onMusic(
-            final String artist, final String album, 
+            final String artist, final String album,
             final String track, final int artid
         ) {
             final String details = artist + " ~ " + album; //$NON-NLS-1$
             handler.post(
                 new Runnable() {
+                    @Override
                     public void run() {
                         titleView.setText(track);
                         detailView.setText(details);
@@ -172,15 +171,15 @@ public class MusicRemote extends Remote {
                             artView.setImageBitmap(getAlbumArt(artid));
                         else
                             artView.setImageDrawable(defaultArt);
-                        
+
                         lastTrack = track;
-                        lastDetails = details; 
+                        lastDetails = details;
                         lastArtid = artid;
-                        
+
                     }
                 }
             );
-            
+
         }
 
         @Override
@@ -193,8 +192,8 @@ public class MusicRemote extends Remote {
                             ShuffleMode s = ShuffleMode.get(value);
                             if (shuffle != null && shuffle != s)
                                 Toast.makeText(
-                                    ctx, Messages.getString("MusicRemote.2") + // Shuffle mode is //$NON-NLS-1$ 
-                                    s,  
+                                    ctx, Messages.getString("MusicRemote.2") + // Shuffle mode is //$NON-NLS-1$
+                                    s,
                                     Toast.LENGTH_SHORT
                                 ).show();
                             shuffle = s;
@@ -204,8 +203,8 @@ public class MusicRemote extends Remote {
                             RepeatMode r = RepeatMode.get(value);
                             if (repeat != null && repeat != r)
                                 Toast.makeText(
-                                    ctx, Messages.getString("MusicRemote.4") + // Repeat mode is //$NON-NLS-1$ 
-                                    r,  
+                                    ctx, Messages.getString("MusicRemote.4") + // Repeat mode is //$NON-NLS-1$
+                                    r,
                                     Toast.LENGTH_SHORT
                                 ).show();
                             repeat = r;
@@ -228,37 +227,43 @@ public class MusicRemote extends Remote {
             );
         }
     };
-    
-    
+
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         jump = !getIntent().hasExtra(Extras.DONTJUMP.toString());
         defaultArt = getResources().getDrawable(R.drawable.mdmusic);
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
         try {
-            feMgr = MythDroid.getFrontend(this);
+            feMgr = Globals.getFrontend(this);
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();
             return;
         }
-        
+
+        if (feMgr == null) {
+            ErrUtil.err(this, Messages.getString("TVRemote.5")); //$NON-NLS-1$
+            finish();
+            return;
+        }
+
         try {
             mddMgr = new MDDManager(feMgr.addr);
         } catch (IOException e) { mddMgr = null; }
-        
+
         setupViews();
-        
+
         if (mddMgr != null)
             mddMgr.setMusicListener(new mddListener());
-      
+
         try {
-            if (jump && !feMgr.getLoc().music)  
+            if (jump && !feMgr.getLoc().music)
                 feMgr.jumpTo("playmusic"); //$NON-NLS-1$
         } catch (IOException e) {
             ErrUtil.err(this, e);
@@ -266,10 +271,10 @@ public class MusicRemote extends Remote {
             return;
         }
     }
-    
+
     private void cleanup() {
         try {
-            if (feMgr != null)  
+            if (feMgr != null)
                 feMgr.disconnect();
             feMgr = null;
             if (mddMgr != null)
@@ -277,24 +282,24 @@ public class MusicRemote extends Remote {
             mddMgr = null;
         } catch (IOException e) { ErrUtil.err(this, e); }
     }
-    
+
     @Override
     public void onPause() {
        super.onPause();
        cleanup();
     }
-    
+
     @Override
     public void onDestroy() {
        super.onDestroy();
        cleanup();
     }
-    
+
     @Override
     public void onClick(View v) {
 
         final Key key = (Key)v.getTag();
-       
+
         try {
             feMgr.sendKey(key);
         } catch (IOException e) { ErrUtil.err(this, e); }
@@ -302,7 +307,7 @@ public class MusicRemote extends Remote {
         super.onClick(v);
 
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(Menu.NONE, MENU_SHUFFLE, Menu.NONE, R.string.shuffle_mode)
@@ -319,13 +324,13 @@ public class MusicRemote extends Remote {
             .setIcon(drawable.ic_menu_more);
         return true;
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         Key key = null;
         Class<?> activity = null;
-        
+
         switch (item.getItemId()) {
             case MENU_SHUFFLE:
                 key = Key.MUSIC_SHUFFLE;
@@ -348,25 +353,25 @@ public class MusicRemote extends Remote {
                 activity = NavRemote.class;
                 break;
         }
-        
+
         try {
             feMgr.sendKey(key);
         } catch (IOException e) { ErrUtil.err(this, e); }
-        
+
         if (activity != null)
             startActivityForResult(
                 new Intent().setClass(ctx, activity), 0
             );
-      
+
         return true;
-                
+
     }
-    
+
     @Override
     public Dialog onCreateDialog(int id) {
 
         switch (id) {
-            
+
             case DIALOG_QUIT:
 
                 OnClickListener cl = new OnClickListener() {
@@ -374,11 +379,11 @@ public class MusicRemote extends Remote {
                     public void onClick(DialogInterface dialog, int which) {
 
                         dialog.dismiss();
-                        
+
                         try {
                             switch(which) {
-                                case Dialog.BUTTON_POSITIVE: 
-                                    feMgr.jumpTo(MythDroid.lastLocation);
+                                case Dialog.BUTTON_POSITIVE:
+                                    feMgr.jumpTo(Globals.lastLocation);
                                     break;
                                 case Dialog.BUTTON_NEUTRAL:
                                     feMgr.sendKey(Key.ESCAPE);
@@ -389,13 +394,13 @@ public class MusicRemote extends Remote {
                                     return;
                             }
                         } catch (IOException e) { ErrUtil.err(ctx, e); }
-                        
+
                         finish();
 
                     }
                 };
 
-                return 
+                return
                     new AlertDialog.Builder(ctx)
                         .setTitle(R.string.leave_remote)
                         .setMessage(R.string.halt_playback)
@@ -403,13 +408,13 @@ public class MusicRemote extends Remote {
                         .setNeutralButton(R.string.no, cl)
                         .setNegativeButton(R.string.cancel, cl)
                         .create();
-                
+
         }
-        
+
         return null;
-        
+
     }
-    
+
     @Override
     public boolean onKeyDown(int code, KeyEvent event) {
         if (code == KeyEvent.KEYCODE_BACK) {
@@ -418,17 +423,17 @@ public class MusicRemote extends Remote {
         }
         return super.onKeyDown(code, event);
     }
-    
+
     @Override
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
         setupViews();
     }
- 
+
     private void setupViews() {
 
         setContentView(R.layout.music_remote);
-        
+
         for (int id : ctrls.keySet()) {
             final View v = findViewById(id);
             Key key = ctrls.get(id);
@@ -436,21 +441,21 @@ public class MusicRemote extends Remote {
             v.setFocusable(false);
             v.setTag(key);
         }
-        
+
         titleView = (TextView)findViewById(R.id.music_title);
         detailView = (TextView)findViewById(R.id.music_details);
         artView = (ImageView)findViewById(R.id.music_coverart);
         pBar = (ProgressBar)findViewById(R.id.music_progress);
-        
+
         if (mddMgr == null) {
             titleView.setVisibility(View.GONE);
             detailView.setVisibility(View.GONE);
             pBar.setVisibility(View.GONE);
         }
-        
+
         else {
             pBar.setMax(100);
-            pBar.setProgress(lastProgress);            
+            pBar.setProgress(lastProgress);
             if (lastTrack != null)
                 titleView.setText(lastTrack);
             if (lastDetails != null)
@@ -458,29 +463,29 @@ public class MusicRemote extends Remote {
             if (lastArtid != -1)
                 artView.setImageBitmap(getAlbumArt(lastArtid));
         }
-        
+
         listenToGestures(true);
-        
+
     }
-    
+
     private Bitmap getAlbumArt(int artid) {
-        
+
         Bitmap bm = artCache.get(artid);
-        
+
         if (bm != null)
             return bm;
-        
+
         URL url = null;
         try {
             url = new URL(
-                MythDroid.getBackend().getStatusURL() +
+                Globals.getBackend().getStatusURL() +
                 "/Myth/GetAlbumArt?" +  //$NON-NLS-1$
                 "Id=" + artid + //$NON-NLS-1$
                 "&Width=" + artView.getWidth() + //$NON-NLS-1$
                 "&Height=" + artView.getHeight() //$NON-NLS-1$
             );
         } catch (Exception e) { url = null; }
-        
+
         if (url == null)
             return null;
 
@@ -490,11 +495,11 @@ public class MusicRemote extends Remote {
             bm = BitmapFactory.decodeStream(conn.getInputStream());
             artCache.put(artid, bm);
             return bm;
-        } catch (IOException e) { 
+        } catch (IOException e) {
             ErrUtil.err(this, e);
             return null;
         }
-        
+
     }
 
     @Override
@@ -526,14 +531,14 @@ public class MusicRemote extends Remote {
             feMgr.sendKey(Key.VOL_UP);
         } catch (IOException e) { ErrUtil.err(this, e); }
     }
-    
+
     @Override
     protected void onFlingLeft() {
         try {
             feMgr.sendKey(Key.MUSIC_PREV);
         } catch (IOException e) { ErrUtil.err(this, e); }
     }
-    
+
     @Override
     protected void onFlingRight() {
         try {
@@ -547,5 +552,5 @@ public class MusicRemote extends Remote {
             feMgr.sendKey(Key.PAUSE);
         } catch (IOException e) { ErrUtil.err(this, e); }
     }
-    
+
 }

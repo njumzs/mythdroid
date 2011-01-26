@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -27,7 +27,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 /** Manage a sqlite database of frontends */
 public class FrontendDB {
 
-    /** ints representing the columns of ID, ADDR, NAME and HWADDR */
     final public static int     ID = 0, ADDR = 1, NAME = 2, HWADDR = 3;
 
     final private static String DB_NAME        = "MythDroid.db"; //$NON-NLS-1$
@@ -61,12 +60,12 @@ public class FrontendDB {
 
     /**
      * Get a cursor listing the frontends - columns are ID, ADDR and NAME
-     * @return Cursor 
+     * @return Cursor
      */
     public static Cursor getFrontends(Context ctx) {
-        
+
         if (db == null) initDB(ctx);
-        
+
         return db.rawQuery(
             "SELECT _id, addr, name, hwaddr from " + FRONTEND_TABLE, null //$NON-NLS-1$
         );
@@ -75,10 +74,10 @@ public class FrontendDB {
 
     /**
      * Insert a new frontend
-     * @param name - name of the frontend
-     * @param addr - address of the frontend
-     * @return true if successful, 
-     * false if a frontend with that name already existed
+     * @param name name of the frontend
+     * @param addr address of the frontend
+     * @return true if successful, false if a frontend with that name already
+     *  existed
      */
     public static boolean insert(
         Context ctx, String name, String addr, String hwaddr
@@ -102,14 +101,14 @@ public class FrontendDB {
 
         c.close();
         return true;
-        
+
     }
 
     /**
      * Update a frontend record
-     * @param id - id of frontend record
-     * @param name - new name of frontend
-     * @param addr - new address of frontend
+     * @param id id of frontend record
+     * @param name new name of frontend
+     * @param addr new address of frontend
      */
     public static void update(
         Context ctx, long id, String name, String addr, String hwaddr
@@ -128,7 +127,7 @@ public class FrontendDB {
 
     /**
      * Delete a frontend record
-     * @param id - id of frontend record
+     * @param id id of frontend record
      */
     public static void delete(Context ctx, long id) {
         if (db == null) initDB(ctx);

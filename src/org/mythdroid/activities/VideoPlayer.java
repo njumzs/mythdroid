@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -51,17 +51,15 @@ import android.widget.AdapterView;
 import android.widget.VideoView;
 import android.widget.AdapterView.OnItemClickListener;
 
-/**
- * MDActivity displays streamed Video
- */
+/** MDActivity displays streamed Video */
 public class VideoPlayer extends MDActivity {
-    
+
     final private Context ctx = this;
     final private int DIALOG_QUALITY = 1;
     private int vb = 0, ab = 0;
     private VideoView videoView = null;
     private BackendManager beMgr = null;
-     
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -69,7 +67,7 @@ public class VideoPlayer extends MDActivity {
         videoView = (VideoView)findViewById(id.videoview);
         showDialog(DIALOG_QUALITY);
     }
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -80,7 +78,7 @@ public class VideoPlayer extends MDActivity {
             ErrUtil.err(ctx, e);
         }
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
@@ -91,29 +89,29 @@ public class VideoPlayer extends MDActivity {
             finish();
         }
     }
-    
+
     @Override
     public Dialog onCreateDialog(int id) {
 
         switch (id) {
-            
+
             case DIALOG_QUALITY:
                 return createQualityDialog();
             default:
                 return super.onCreateDialog(id);
 
         }
-        
+
     }
-   
+
     private Dialog createQualityDialog() {
-        
+
         final AlertDialog d = new AlertDialog.Builder(ctx)
             .setItems(R.array.streamingRates, null)
             .setIcon(drawable.ic_menu_upload_you_tube)
             .setTitle(R.string.stream_quality)
             .create();
-        
+
         d.setOnDismissListener(
             new OnDismissListener() {
                 @Override
@@ -126,14 +124,14 @@ public class VideoPlayer extends MDActivity {
                 }
             }
        );
-        
+
         d.getListView().setOnItemClickListener(
             new OnItemClickListener() {
                 @Override
                 public void onItemClick(
                     AdapterView<?> av, View v, int pos, long id
                 ) {
-                    
+
                     switch (pos) {
                         case 0:
                             vb = 448;
@@ -152,21 +150,21 @@ public class VideoPlayer extends MDActivity {
                 }
             }
         );
-        
+
         return d;
     }
-    
+
     private void startStream() {
-        
+
         showDialog(DIALOG_LOAD);
-        
+
         DisplayMetrics dm = getResources().getDisplayMetrics();
-        
+
         try {
             Intent intent = getIntent();
             String path = null, sg = null;
-            
-            if (intent.hasExtra(Extras.FILENAME.toString())) { 
+
+            if (intent.hasExtra(Extras.FILENAME.toString())) {
                 path = getIntent().getStringExtra(Extras.FILENAME.toString());
                 sg = "Default"; //$NON-NLS-1$
             }
@@ -183,9 +181,9 @@ public class VideoPlayer extends MDActivity {
                 else
                     sg = MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
             }
-                
+
             MDDManager.streamFile(
-                beMgr.addr, path, sg, 
+                beMgr.addr, path, sg,
                 dm.widthPixels, dm.heightPixels, vb, ab
             );
         } catch (IOException e) {
@@ -193,31 +191,31 @@ public class VideoPlayer extends MDActivity {
             finish();
             return;
         }
-        
+
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {}
-        
+
         String sdpAddr = beMgr.addr;
 
         // If the backend address is localhost, assume SSH port forwarding
         // We must connect to the RTSP server directly otherwise the RTP
         // goes astray, so use the public address for the backend if it's
         // configured. This requires that port 5554/tcp is forwarded to the backend
-        String sdpPublicAddr = 
+        String sdpPublicAddr =
             PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("backendPublicAddr", null);  //$NON-NLS-1$
-        
+
         if (
                (sdpAddr.equals("127.0.0.1") || sdpAddr.equals("localhost")) && //$NON-NLS-1$ //$NON-NLS-2$
                 sdpPublicAddr != null
            )
            sdpAddr = sdpPublicAddr;
-        
+
         videoView.setVideoURI(
             Uri.parse("rtsp://" + sdpAddr + ":5554/stream") //$NON-NLS-1$ //$NON-NLS-2$
         );
-        
+
         videoView.setOnPreparedListener(
             new OnPreparedListener(){
                 @Override
@@ -226,7 +224,7 @@ public class VideoPlayer extends MDActivity {
                 }
             }
         );
-        
+
         videoView.setOnCompletionListener(
             new OnCompletionListener() {
                 @Override
@@ -235,9 +233,9 @@ public class VideoPlayer extends MDActivity {
                 }
             }
         );
-        
+
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
- 
+
         videoView.start();
     }
 }

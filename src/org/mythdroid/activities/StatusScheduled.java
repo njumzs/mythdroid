@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -36,9 +36,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 
-/**
- * ListActivity displays scheduled recordings
- */
+/** ListActivity displays scheduled recordings */
 public class StatusScheduled extends ListActivity {
 
     private ArrayList<Program> recordings = new ArrayList<Program>(10);
@@ -47,8 +45,11 @@ public class StatusScheduled extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
-        if (Status.statusDoc == null) Status.getStatus(this);
-        
+        if (Status.statusDoc == null && !Status.getStatus(this)) {
+            finish();
+            return;
+        }
+
         Document doc = Status.statusDoc;
 
         Node scheduled = doc.getElementsByTagName("Scheduled").item(0); //$NON-NLS-1$
