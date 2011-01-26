@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -47,17 +47,15 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-/**
- * ListActivity displays upcoming/recent jobs
- */
+/** ListActivity displays upcoming/recent jobs */
 public class StatusJobs extends ListActivity {
 
     private final ArrayList<Job> jobs = new ArrayList<Job>(8);
 
     private enum JobStatus {
-        QUEUED  (1),     PENDING  (2),     STARTING (3),     RUNNING  (4),     
-        STOPPING(5),     PAUSED   (6),     RETRYING (7),     ERRORING (8), 
-        ABORTING(9),     DONE     (0x100), FINISHED (0x110), ABORTED  (0x120), 
+        QUEUED  (1),     PENDING  (2),     STARTING (3),     RUNNING  (4),
+        STOPPING(5),     PAUSED   (6),     RETRYING (7),     ERRORING (8),
+        ABORTING(9),     DONE     (0x100), FINISHED (0x110), ABORTED  (0x120),
         ERRORED (0x130), CANCELLED(0x140);
 
         private int value;
@@ -206,11 +204,11 @@ public class StatusJobs extends ListActivity {
                 vHolder = new ViewHolder();
                 vHolder.title = (TextView)old.findViewById(R.id.joblist_title);
                 vHolder.type = (TextView)old.findViewById(R.id.joblist_type);
-                vHolder.details = 
+                vHolder.details =
                     (TextView)old.findViewById(R.id.joblist_details);
-                vHolder.comments = 
+                vHolder.comments =
                     (TextView)old.findViewById(R.id.joblist_comments);
-                vHolder.pBar = 
+                vHolder.pBar =
                     (ProgressBar)old.findViewById(R.id.joblist_prog);
                 old.setTag(vHolder);
             }
@@ -223,11 +221,11 @@ public class StatusJobs extends ListActivity {
             vHolder.type.setText(j.type.msg());
             vHolder.details.setText(
                 Messages.getString("StatusJobs.9") + // Started //$NON-NLS-1$
-                Globals.dispFmt.format(j.startTime) + 
+                Globals.dispFmt.format(j.startTime) +
                 Messages.getString("StatusJobs.25") + j.hostname // on //$NON-NLS-1$
             );
             vHolder.comments.setText(j.comments);
-            
+
             if (j.status == JobStatus.RUNNING)
                 vHolder.pBar.setVisibility(View.VISIBLE);
             else
@@ -247,8 +245,11 @@ public class StatusJobs extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
-        if (Status.statusDoc == null) Status.getStatus(this);
-        
+        if (Status.statusDoc == null && !Status.getStatus(this)) {
+            finish();
+            return;
+        }
+
         Document doc = Status.statusDoc;
         NodeList jobNodes = doc.getElementsByTagName("Job"); //$NON-NLS-1$
 

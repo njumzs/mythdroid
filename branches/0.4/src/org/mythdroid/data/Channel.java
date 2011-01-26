@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-        
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -38,17 +38,17 @@ import android.sax.StartElementListener;
 public class Channel implements Comparable<Channel> {
 
     /**
-     * Implement this and pass to ChannelXMLParser to receive 
+     * Implement this and pass to ChannelXMLParser to receive
      * Channel objects as they are parsed from XML
      */
     static public interface ChannelListener {
         /**
          * Called when a Channel has been parsed from XML
-         * @param channel - Channel object
+         * @param channel Channel object
          */
         public void channel(Channel channel);
     }
-    
+
     /**
      * An implementation of SAX StartElementListener that parses
      * Channel XML elements and their children. Creates Channel objects
@@ -57,12 +57,12 @@ public class Channel implements Comparable<Channel> {
     static public class ChannelXMLParser implements StartElementListener {
 
         private Channel chan = null;
-        
+
         /**
          * Constructor
-         * @param ctx - activity context, used for toasting errors
-         * @param elem - a Channel (XMLHandler) Element
-         * @param listener - A ChannelListener to call back with Channels 
+         * @param ctx activity context, used for toasting errors
+         * @param elem a Channel (XMLHandler) Element
+         * @param listener A ChannelListener to call back with Channels
          */
         public ChannelXMLParser(
             Context ctx, Element elem, final ChannelListener listener
@@ -81,7 +81,7 @@ public class Channel implements Comparable<Channel> {
             final Element progElem = elem.getChild("Program"); //$NON-NLS-1$
 
             progElem.setStartElementListener(
-                new ProgramXMLParser(ctx, progElem, 
+                new ProgramXMLParser(ctx, progElem,
                     new ProgramListener() {
                         @Override
                         public void program(Program prog) {
@@ -107,26 +107,18 @@ public class Channel implements Comparable<Channel> {
 
     }
 
-    /**
-     * String representing channel callsign
-     */
+    /** String representing channel callsign */
     public String callSign;
-    /**
-     * String representing channel number
-     */
+    /** String representing channel number  */
     public String num;
-    /**
-     * Int representing channel ID
-     */
+    /** integer representing channel ID */
     public int ID;
-    /**
-     * ArrayList of Programs
-     */
+    /** ArrayList of Programs */
     public ArrayList<Program> programs = new ArrayList<Program>();
 
     /** Construct an empty Channel */
     public Channel() {}
-    
+
     @Override
     public int compareTo(Channel other) {
         int l = num.length();
@@ -135,8 +127,8 @@ public class Channel implements Comparable<Channel> {
         else if (l < ol) return -1;
         int c = num.compareTo(other.num);
         if (c > 0) return 1;
-        else if (c < 0) return -1; 
+        else if (c < 0) return -1;
         else return 0;
     }
-    
+
 }

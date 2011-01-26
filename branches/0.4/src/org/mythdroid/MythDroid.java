@@ -8,12 +8,12 @@ import android.os.Bundle;
  * ACRA error reporting class
  */
 public class MythDroid extends CrashReportingApplication {
-    
+
     @Override
     public String getFormId() {
         return "dFVIWUVVSjBubHlzSUQyeHc4dEpIWHc6MQ"; //$NON-NLS-1$
     }
-    
+
     @Override
     public Bundle getCrashResources() {
         Bundle result = new Bundle();

@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -51,11 +51,11 @@ import android.widget.TextView;
 public class RecordingDetail extends MDActivity {
 
     final static private int DELETE_DIALOG = 0, STOP_DIALOG = 1;
-    
+
     final private Context ctx = this;
     private Program prog = null;
     private BackendManager beMgr = null;
-     
+
     private boolean livetv = false, guide = false;
     private Button stop = null;
 
@@ -73,7 +73,7 @@ public class RecordingDetail extends MDActivity {
         super.onDestroy();
         setResult(Activity.RESULT_OK);
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
@@ -96,7 +96,7 @@ public class RecordingDetail extends MDActivity {
         setContentView(R.layout.recording_detail);
         setViews();
     }
-    
+
     @Override
     public void onActivityResult(int reqCode, int resCode, Intent data) {
         if (!guide || resCode != Guide.REFRESH_NEEDED)
@@ -117,7 +117,7 @@ public class RecordingDetail extends MDActivity {
         switch (id) {
 
             case DELETE_DIALOG:
-                return 
+                return
                     new AlertDialog.Builder(this)
                         .setTitle(R.string.del_rec)
                         .setMessage(R.string.sure)
@@ -128,8 +128,8 @@ public class RecordingDetail extends MDActivity {
                                     DialogInterface dialog, int which) {
                                     try {
                                         beMgr.deleteRecording(prog);
-                                    } catch (Exception e) { 
-                                        ErrUtil.err(ctx, e); 
+                                    } catch (Exception e) {
+                                        ErrUtil.err(ctx, e);
                                     }
                                     setResult(Recordings.REFRESH_NEEDED);
                                     dialog.dismiss();
@@ -172,11 +172,11 @@ public class RecordingDetail extends MDActivity {
                  return super.onCreateDialog(id);
 
         }
-        
+
     }
 
     private void setViews() {
-        
+
         ((ImageView)findViewById(R.id.rec_thumb))
             .setImageBitmap(prog.previewImage());
         ((TextView)findViewById(R.id.rec_title)).setText(prog.Title);
@@ -188,7 +188,7 @@ public class RecordingDetail extends MDActivity {
         ((TextView)findViewById(R.id.rec_status))
             .setText(Messages.getString("RecordingDetail.1") + prog.Status.msg()); // status: //$NON-NLS-1$
         ((TextView)findViewById(R.id.rec_desc)).setText(prog.Description);
-        
+
         final Button edit = (Button) findViewById(R.id.rec_edit);
         edit.setOnClickListener(
             new View.OnClickListener() {
@@ -202,7 +202,7 @@ public class RecordingDetail extends MDActivity {
         );
 
         if (livetv) return;
-        
+
         switch (prog.Status) {
 
             case RECORDING:
@@ -216,7 +216,7 @@ public class RecordingDetail extends MDActivity {
                         }
                     }
                 );
-                        
+
             //$FALL-THROUGH$
             case RECORDED:
             case CURRENT:
@@ -224,7 +224,7 @@ public class RecordingDetail extends MDActivity {
                 if (!guide) {
                     final Button del = (Button) findViewById(R.id.rec_del);
                     del.setVisibility(View.VISIBLE);
-                
+
                     del.setOnClickListener(
                         new View.OnClickListener() {
                             @Override
@@ -236,7 +236,7 @@ public class RecordingDetail extends MDActivity {
                 }
 
                 final Button play = (Button) findViewById(R.id.rec_play);
-                
+
                 play.setVisibility(View.VISIBLE);
                 play.setOnClickListener(
                     new View.OnClickListener() {

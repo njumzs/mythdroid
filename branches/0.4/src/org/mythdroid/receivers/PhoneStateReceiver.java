@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -47,8 +47,8 @@ public class PhoneStateReceiver extends BroadcastReceiver {
         final boolean scrollSMS = prefs.getBoolean("scrollSMS", true); //$NON-NLS-1$
         final String action     = intent.getAction();
         String number, name     = null;
-        
-        
+
+
         if (
             showCalls &&
             action.equals(
@@ -61,17 +61,17 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             number = intent.getStringExtra(
                 android.telephony.TelephonyManager.EXTRA_INCOMING_NUMBER
             );
-            
-            if (number != null) { 
+
+            if (number != null) {
                 name = PhoneUtil.nameFromNumber(ctx, number);
-            
+
                 try {
                     OSDMessage.Caller(name, number);
-                } catch (Exception e) {}       
+                } catch (Exception e) {}
             }
-            
+
         }
-        
+
         else if (
             showSMS &&
             action.equals("android.provider.Telephony.SMS_RECEIVED") //$NON-NLS-1$
@@ -79,21 +79,28 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             Bundle bundle = intent.getExtras();
             Object[] pdus = (Object[])bundle.get("pdus"); //$NON-NLS-1$
             
+            SmsMessage msg = SmsMessage.createFromPdu((byte[]) pdus[0]);
+            String from    = msg.getDisplayOriginatingAddress();
+
+            String m = Messages.getString("BCastReceiver.5") + from + ": " + //$NON-NLS-1$ //$NON-NLS-2$
+                       msg.getDisplayMessageBody();
+        
+            for (int i = 1; i < pdus.length; i++){
+                msg = SmsMessage.createFromPdu((byte[]) pdus[i]);
+                if (!msg.getDisplayOriginatingAddress().equals(from))
+                    continue;
+                m += msg.getDisplayMessageBody();
+            }
+            
             try {
-                for (int i = 0; i < pdus.length; i++){
-                    SmsMessage msg = SmsMessage.createFromPdu((byte[]) pdus[i]);
-                    String m = Messages.getString("BCastReceiver.5") + // SMS from //$NON-NLS-1$ 
-                        msg.getDisplayOriginatingAddress() + 
-                        ": " + msg.getDisplayMessageBody(); //$NON-NLS-1$
-                    if (scrollSMS)
-                        OSDMessage.Scroller(m, m.length() / 9 + 8);
-                    else
-                        OSDMessage.Alert(m);
-                }
+                if (scrollSMS)
+                    OSDMessage.Scroller(m, m.length() / 9 + 8);
+                else
+                    OSDMessage.Alert(m);
             } catch (Exception e){}
-                
         }
-    
+
     }
 
 }
+

@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -33,21 +33,22 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.widget.TextView;
 
-/**
- * Activity displays backend status
- */
+/** Activity displays backend status */
 public class StatusBackend extends Activity {
 
     @Override
     public void onCreate(Bundle icicle) {
-        
+
         super.onCreate(icicle);
         setContentView(R.layout.status_backend);
 
-        if (Status.statusDoc == null) Status.getStatus(this);
-        
+        if (Status.statusDoc == null && !Status.getStatus(this)) {
+            finish();
+            return;
+        }
+
         Document doc = Status.statusDoc;
-        
+
         Node info = doc.getElementsByTagName("MachineInfo").item(0); //$NON-NLS-1$
 
         Node StorageNode = null, LoadNode = null, GuideNode = null;
@@ -104,7 +105,7 @@ public class StatusBackend extends Activity {
                 }
             }
         }
-        
+
         ((TextView)findViewById(R.id.storage_total)).setText(
             Messages.getString("StatusBackend.16") + stotal + " MB" //$NON-NLS-1$ //$NON-NLS-2$
         );
@@ -116,7 +117,7 @@ public class StatusBackend extends Activity {
         );
 
         if (LoadNode != null) {
-        
+
             attr = LoadNode.getAttributes();
 
             ((TextView)findViewById(R.id.load_1min)).setText(
@@ -128,11 +129,11 @@ public class StatusBackend extends Activity {
             ((TextView)findViewById(R.id.load_15min)).setText(
                 "15 min:\t\t" + attr.getNamedItem("avg3").getNodeValue() //$NON-NLS-1$ //$NON-NLS-2$
             );
-        
+
         }
 
         if (GuideNode != null) {
-        
+
             attr = GuideNode.getAttributes();
 
             Date when = null;
@@ -144,20 +145,20 @@ public class StatusBackend extends Activity {
             } catch (Exception e) {}
             
             Node days, lastRun;
-            
+
             if ((days = attr.getNamedItem("guideDays")) != null) //$NON-NLS-1$
                 ((TextView)findViewById(R.id.guide_length)).setText(
                     days.getNodeValue() +
-                    Messages.getString("StatusBackend.30") + // days (until //$NON-NLS-1$ 
+                    Messages.getString("StatusBackend.30") + // days (until //$NON-NLS-1$
                     Globals.dispFmt.format(when) + ")" //$NON-NLS-1$
                 );
-            
+
             if ((lastRun = attr.getNamedItem("status")) != null) //$NON-NLS-1$
                 ((TextView)findViewById(R.id.guide_last)).setText(
                     Messages.getString("StatusBackend.32") + // Last run:  //$NON-NLS-1$
                     lastRun.getNodeValue().toLowerCase()
                 );
-        
+
         }
     }
 

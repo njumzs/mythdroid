@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -24,8 +24,8 @@ package org.mythdroid.mdd;
 public interface MDDMenuListener {
     /**
      * Called on receipt of MENU events
-     * @param menu - String containing the name of the menu
-     * @param item - String containing the currently selected item
+     * @param menu String containing the name of the menu
+     * @param item String containing the currently selected item
      */
     public void onMenuItem(String menu, String item);
 }

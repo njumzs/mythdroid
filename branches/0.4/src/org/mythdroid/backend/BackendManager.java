@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -49,12 +49,13 @@ import android.util.Log;
 
 /**
  * A BackendManager locates and manages a master backend, providing
- * methods to get, delete and stop recordings 
+ * methods to get, delete and stop recordings
  */
 public class BackendManager {
 
+    /** Hostname or IP address of the backend */
     public String addr = null;
-    
+
     static final private String BACKEND_UPNP_ID =
         "ST: urn:schemas-mythtv-org:device:MasterMediaServer:1\r\n"; //$NON-NLS-1$
 
@@ -66,20 +67,20 @@ public class BackendManager {
 
     static final private String UPNP_LOCATION   = "LOCATION: http://"; //$NON-NLS-1$
     static final private String myAddr          = "android"; //$NON-NLS-1$
-    
+
     private String  statusURL = null;
     private ConnMgr cmgr      = null;
-  
+
     /**
      * Constructor
-     * @param host - the backend address
+     * @param host String containing the backend address
      */
     public BackendManager(final String host) throws IOException {
 
         statusURL = "http://" + host + ":6544"; //$NON-NLS-1$ //$NON-NLS-2$
 
         Globals.protoVersion = getVersion(statusURL);
-        
+
         // Cope with odd protoVer resulting from mythtv r25366
         if (Globals.protoVersion > 1000) {
             Globals.beVersion = Globals.protoVersion / 1000;
@@ -92,7 +93,7 @@ public class BackendManager {
                 "Connecting to " + host +  //$NON-NLS-1$
                 ":6543 (ProtoVer " + Globals.protoVersion +")" //$NON-NLS-1$ //$NON-NLS-2$
              );
-        
+
         cmgr = new ConnMgr(host, 6543, new onConnectListener() {
                 @Override
                 public void onConnect(ConnMgr cmgr) throws IOException {
@@ -103,9 +104,9 @@ public class BackendManager {
                 }
             }
         );
-               
+
         addr = host;
-        
+
     }
 
     /**
@@ -129,13 +130,13 @@ public class BackendManager {
         final DatagramPacket rpkt = new DatagramPacket(new byte[1024], 1024);
 
         ConnectivityReceiver.waitForWifi(Globals.appContext, 5000);
-        
+
         if (Globals.debug)
             Log.d(
                 "BackendManager",  //$NON-NLS-1$
                 "Sending UPNP M-SEARCH to 239.255.255.250:1900" //$NON-NLS-1$
             );
-        
+
         sock.setReuseAddress(true);
         sock.bind(isa);
         sock.setBroadcast(true);
@@ -147,15 +148,15 @@ public class BackendManager {
         } catch (SocketTimeoutException e) {
             if (Globals.debug)
                 Log.d("BackendManager", "Timeout waiting for UPNP response"); //$NON-NLS-1$ //$NON-NLS-2$
-            return null; 
+            return null;
         }
-        
+
         sock.close();
 
         final String msg = new String(rpkt.getData(), 0, rpkt.getLength());
         if (Globals.debug)
             Log.d("BackendManager", "UPNP Response received: " + msg); //$NON-NLS-1$ //$NON-NLS-2$
-        
+
         if (!msg.contains(BACKEND_UPNP_ID)) return null;
 
         int locIdx = msg.indexOf(UPNP_LOCATION);
@@ -166,18 +167,18 @@ public class BackendManager {
         );
 
     }
-    
+
     /**
-     * Get the connection state of the backend
+     * Get the state of the connection to the backend
      * @return true if we are connected, false otherwise
      */
     public boolean isConnected() {
         return (cmgr != null && cmgr.isConnected());
     }
-    
+
     /**
      * Get the URL of the status / XML service
-     * @return A String containing the URL
+     * @return String containing the URL
      */
     public String getStatusURL() {
         if (Globals.debug)
@@ -187,7 +188,7 @@ public class BackendManager {
 
     /**
      * Get a Program from a recording filename
-     * @param basename - String containing the full path to the recording
+     * @param basename String containing the full path to the recording
      * @return A Program representing the recording
      */
     public Program getRecording(final String basename) throws IOException {
@@ -197,7 +198,7 @@ public class BackendManager {
             prog.Title = "Unknown"; //$NON-NLS-1$
             return prog;
         }
-        
+
         cmgr.sendString("QUERY_RECORDING BASENAME " + basename); //$NON-NLS-1$
         return new Program(cmgr.readStringList(), 1);
 
@@ -223,7 +224,7 @@ public class BackendManager {
             if (!resp[i + groupField].equals("Default")) continue; //$NON-NLS-1$
             programs.add(new Program(resp, i));
         }
-        
+
         if (Globals.protoVersion > 56)
             Collections.sort(programs, Collections.reverseOrder());
 
@@ -233,8 +234,8 @@ public class BackendManager {
 
     /**
      * Stop an in-progress recording
-     * @param prog - The Program to stop recording 
-     */    
+     * @param prog The Program to stop recording
+     */
     public void stopRecording(final Program prog) throws IOException {
         final String[] list = prog.stringList();
         list[0] = "STOP_RECORDING"; //$NON-NLS-1$
@@ -242,10 +243,10 @@ public class BackendManager {
         cmgr.readStringList();
     }
 
-    
+
     /**
      * Delete a recording
-     * @param prog - The Program to delete 
+     * @param prog The Program to delete
      */
     public void deleteRecording(final Program prog) throws IOException {
         final String[] list = prog.stringList();
@@ -253,7 +254,11 @@ public class BackendManager {
         cmgr.sendStringList(list);
         cmgr.readStringList();
     }
-    
+
+    /**
+     * Ask the backend to reschedule a recording
+     * @param recid integer recording id
+     */
     public void reschedule(int recid) throws IOException {
         cmgr.sendString("RESCHEDULE_RECORDINGS " + recid); //$NON-NLS-1$
         cmgr.readStringList();
@@ -264,22 +269,22 @@ public class BackendManager {
         cmgr.sendString("DONE"); //$NON-NLS-1$
         cmgr.dispose();
     }
-    
+
     /**
      * Get the protocol version from the backend
-     * @param sURL - string containing backend status URL
-     * @return - integer containing backend protocol version
+     * @param sURL string containing backend status URL
+     * @return integer containing backend protocol version
      */
     private int getVersion(String sURL) throws IOException {
-        
+
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         URL url = new URL(sURL + "/xml"); //$NON-NLS-1$
         Document doc;
-        
+
         URLConnection urlConn = url.openConnection();
         urlConn.setConnectTimeout(3000);
         urlConn.setReadTimeout(4000);
-        
+
         try {
             doc = dbf.newDocumentBuilder().parse(
                 urlConn.getInputStream()
@@ -291,23 +296,23 @@ public class BackendManager {
         } catch (ParserConfigurationException e) {
             throw new IOException(Messages.getString("Status.10")); //$NON-NLS-1$
         }
-        
+
         Node status = doc.getElementsByTagName("Status").item(0); //$NON-NLS-1$
         NamedNodeMap attr = status.getAttributes();
         return Integer.parseInt(attr.getNamedItem("protoVer").getNodeValue()); //$NON-NLS-1$
-        
+
     }
 
-  
+
     /**
      * Announce ourselves to the backend
-     * @return - true if backend accepts us, false otherwise
+     * @return true if backend accepts us, false otherwise
      */
     private boolean announce(ConnMgr cmgr) throws IOException {
 
         // Cope with odd protoVer resulting from mythtv r25366
         int protoVer = Globals.beVersion * 1000 + Globals.protoVersion;
-        
+
         String protoToken = getToken(protoVer);
         // prefix a space for the actual request
         if (protoToken.length() > 0)
@@ -316,7 +321,7 @@ public class BackendManager {
         cmgr.sendString("MYTH_PROTO_VERSION " + protoVer + protoToken); //$NON-NLS-1$
 
         if (!cmgr.readStringList()[0].equals("ACCEPT")) return false; //$NON-NLS-1$
-        
+
         cmgr.sendString("ANN Playback " + myAddr + " 0"); //$NON-NLS-1$ //$NON-NLS-2$
 
         if (!cmgr.readStringList()[0].equals("OK")) return false; //$NON-NLS-1$
@@ -328,21 +333,20 @@ public class BackendManager {
     /**
      * Returns the protocol token for a given protocol version.
      * Tokens are defined in the messages.properties as:
-     * ProtoToken.<protoVer> = <token>
-     *
-     * @param protoVer - protocol version to retrieve token for
+     * ProtoToken.protoVer = token
+     * @param protoVer protocol version to retrieve token for
      */
     private String getToken(int protoVer) {
-        
+
         String key = "ProtoToken." + protoVer; //$NON-NLS-1$
         String token = Messages.getString(key);
-        
+
         if (token.equals("!" + key + "!")) { //$NON-NLS-1$ //$NON-NLS-2$
             token = ""; //$NON-NLS-1$
         }
 
         return token.trim();
-        
+
     }
 
 }

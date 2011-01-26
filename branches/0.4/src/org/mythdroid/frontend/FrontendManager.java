@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -33,20 +33,20 @@ import android.util.Log;
 
 /** Manages a frontend */
 public class FrontendManager {
-    
+
     public  String  name = null, addr = null;
     private ConnMgr cmgr = null;
-   
+
     /**
      * Constructor
-     * @param name - name of frontend
-     * @param host - hostname or IP address of frontend
+     * @param name name of frontend
+     * @param host hostname or IP address of frontend
      */
     public FrontendManager(String name, String host) throws IOException {
-        
-        if (Globals.debug) 
+
+        if (Globals.debug)
             Log.d("FrontendManager", "Connecting to " + host + ":6546"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        
+
         cmgr = new ConnMgr(host, 6546, new onConnectListener() {
                 @Override
                 public void onConnect(ConnMgr cmgr) throws IOException {
@@ -54,15 +54,15 @@ public class FrontendManager {
                 }
             }
         );
-        
+
         if (cmgr == null) return;
-        
+
         // jump <loc> (e.g. where loc == livetv) can take a long time
         cmgr.setTimeout(10000);
-        
+
         this.name = name;
         addr = host;
-        
+
     }
 
     /**
@@ -75,7 +75,7 @@ public class FrontendManager {
 
     /**
      * Jump to a frontend location
-     * @param loc - String describing location
+     * @param loc String describing location
      * @return true if we jumped ok, false otherwise
      */
     public synchronized boolean jumpTo(final String loc) throws IOException {
@@ -87,7 +87,7 @@ public class FrontendManager {
 
     /**
      * Jump to a frontend location
-     * @param loc - a FrontendLocation to jump to
+     * @param loc a FrontendLocation to jump to
      * @return true if we jumped ok, false otherwise
      */
     public synchronized boolean jumpTo(FrontendLocation loc) throws IOException {
@@ -100,7 +100,7 @@ public class FrontendManager {
 
     /**
      * Send a key to the frontend
-     * @param key - Key to send
+     * @param key Key to send
      * @return true if the frontend accepted the key, false otherwise
      */
     public synchronized boolean sendKey(final Key key) throws IOException {
@@ -112,7 +112,7 @@ public class FrontendManager {
 
     /**
      * Send a key to the frontend
-     * @param key - String containing key to send
+     * @param key String containing key to send
      * @return true if the frontend accepted the key, false otherwise
      */
     public synchronized boolean sendKey(final String key) throws IOException {
@@ -143,12 +143,12 @@ public class FrontendManager {
     }
 
     /**
-     * Get a HashMap of frontend locations and their descriptions from the 
-     * frontend 
+     * Get a HashMap of frontend locations and their descriptions from the
+     * frontend
      * @return HashMap<String,String> of locations -> descriptions
      */
     public synchronized HashMap<String,String> getLocs() throws IOException {
-        HashMap<String,String> locs = new HashMap<String,String>(44); 
+        HashMap<String,String> locs = new HashMap<String,String>(44);
         cmgr.writeLine("help jump"); //$NON-NLS-1$
         ArrayList<String> lines = getResponse();
         for (String line : lines) {
@@ -161,7 +161,7 @@ public class FrontendManager {
 
     /**
      * Play a recording
-     * @param prog - Program to play
+     * @param prog Program to play
      * @return true if starting playing ok, false otherwise
      */
     public synchronized boolean playRec(final Program prog) throws IOException {
@@ -170,10 +170,10 @@ public class FrontendManager {
             return true;
         return false;
     }
-    
+
     /**
      * Play a video
-     * @param file - filename of video to play
+     * @param file filename of video to play
      * @return true if starting playing ok, false otherwise
      */
     public synchronized boolean playFile(final String file) throws IOException {
@@ -185,7 +185,7 @@ public class FrontendManager {
 
     /**
      * Switch to a channel in livetv (must be in livetv to call)
-     * @param chanid - channel id to switch to
+     * @param chanid channel id to switch to
      * @return boolean if we switched ok, false otherwise
      */
     public synchronized boolean playChan(int chanid) throws IOException {
@@ -201,7 +201,7 @@ public class FrontendManager {
         cmgr.dispose();
         cmgr = null;
     }
-    
+
     private synchronized ArrayList<String> getResponse() throws IOException {
         final ArrayList<String> resp = new ArrayList<String>(32);
         String msg = ""; //$NON-NLS-1$
@@ -213,21 +213,21 @@ public class FrontendManager {
         }
         return resp;
     }
-    
+
     @SuppressWarnings("null")
     private synchronized String getSingleLineResponse(ConnMgr cmgr)
         throws IOException {
         String line = cmgr.readLine();
-        while (cmgr != null) 
+        while (cmgr != null)
             if (cmgr.readLine().equals("#")) break; //$NON-NLS-1$
         return line;
     }
-    
+
     private synchronized String getSingleLineResponse() throws IOException {
-        if (cmgr == null) 
+        if (cmgr == null)
             throw new IOException(Messages.getString("FrontendManager.0")); //$NON-NLS-1$
         String line = cmgr.readLine();
-        while (cmgr != null) 
+        while (cmgr != null)
             if (cmgr.readLine().equals("#")) break; //$NON-NLS-1$
         return line;
     }

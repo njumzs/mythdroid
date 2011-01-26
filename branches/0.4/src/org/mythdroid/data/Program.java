@@ -1,7 +1,7 @@
 /*
     MythDroid: Android MythTV Remote
     Copyright (C) 2009-2010 foobum@gmail.com
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -46,19 +46,18 @@ import android.sax.StartElementListener;
 
 /**
  * A Program - can be constructed from a stringlist (from a backend)
- * or from XML (e.g. in Status or in the Guide). Has mostly public
- * members and a few convenience methods
+ * or from XML (e.g. in Status or in the Guide).
  */
 public class Program implements Comparable<Program> {
-    
+
     /**
-     * Implement this and pass to ProgramXMLParser to receive 
+     * Implement this and pass to ProgramXMLParser to receive
      * Program objects as they are parsed from XML
      */
     static public interface ProgramListener {
         /**
          * Called when a Program is parsed from XML
-         * @param program - Program
+         * @param program the new Program
          */
         public void program(Program program);
     }
@@ -72,12 +71,12 @@ public class Program implements Comparable<Program> {
 
         private Context ctx  = null;
         private Program prog = null;
-        
+
         /**
          * Constructor
-         * @param context - activity context, used for toasting errors
-         * @param elem - a Program (XMLHandler) Element
-         * @param listener - A ProgramListener to call back with Programs 
+         * @param context activity context, used for toasting errors
+         * @param elem a Program (XMLHandler) Element
+         * @param listener A ProgramListener to call back with Programs
          */
         ProgramXMLParser(
             Context context, Element elem, final ProgramListener listener
@@ -133,11 +132,11 @@ public class Program implements Comparable<Program> {
                             attr.getValue("recordId") //$NON-NLS-1$
                         );
 
-                        int dupInTemp = 
+                        int dupInTemp =
                             Integer.valueOf(attr.getValue("dupInType")); //$NON-NLS-1$
                         prog.DupIn = RecDupIn.get(dupInTemp & 0x0f);
                         prog.EpiFilter = RecEpiFilter.get(dupInTemp & 0xf0);
-                        
+
                     }
                 }
             );
@@ -168,15 +167,15 @@ public class Program implements Comparable<Program> {
                 prog.EndTime = Globals.dateFmt.parse(
                     attr.getValue("endTime") //$NON-NLS-1$
                 );
-            } catch (ParseException e) { 
+            } catch (ParseException e) {
                 ErrUtil.postErr(ctx, e);
             }
 
         }
 
     }
- 
-    static final public int  
+
+    static final public int
         TITLE     = 0,  SUBTITLE  = 1,  DESC     = 2,   CATEGORY  = 3,
         CHANID    = 4,  CHANNEL   = 6,  PATH     = 8,
         START, END, FINDID, RECPRIO, STATUS, RECID, RECTYPE, RECDUPIN,
@@ -198,34 +197,33 @@ public class Program implements Comparable<Program> {
             SERIESID  = 28; PROGID    = 29; STORGROUP = 36; TOTAL     = 41;
         }
     }
-    
-    /** Strings representing the relevant field */
+
     public String       Title, SubTitle, Category, Description, Channel, Path,
                         RecGroup, StorGroup;
-    /** Dates representing the relevant field */
     public Date         StartTime, EndTime, RecStartTime, RecEndTime;
+    /** Recording status */
     public RecStatus    Status = RecStatus.UNKNOWN;
-    /** The recording type */
+    /** Recording type */
     public RecType      Type = RecType.NOT;
-    /** The recording duplicate search space */
+    /** Recording duplicate search space */
     public RecDupIn     DupIn = RecDupIn.ALL;
-    /** The recording episode filter */
+    /** Recording episode filter */
     public RecEpiFilter EpiFilter = RecEpiFilter.NONE;
-    /** The recording duplicate match method */
+    /** Recording duplicate match method */
     public RecDupMethod DupMethod = RecDupMethod.SUBANDDESC;
-    
+
     public int          ChanID, RecID = -1, RecPrio = 0;
 
     private String[] list  = null;
 
     /**
      * Construct a Program from a stringlist
-     * @param list - a stringlist (e.g. from a backend)
+     * @param list a stringlist (e.g. from a backend)
      */
     public Program(String[] list, int off) {
-         
+
         int dupInTemp;
-        
+
         try {
             Title         = list[off+TITLE];
             SubTitle      = list[off+SUBTITLE];
@@ -241,23 +239,23 @@ public class Program implements Comparable<Program> {
             RecID         = Integer.valueOf(list[off+RECID]);
             Type          = RecType.get(Integer.valueOf(list[off+RECTYPE]));
             dupInTemp     = Integer.valueOf(list[off+RECDUPIN]);
-            DupMethod 
+            DupMethod
                      = RecDupMethod.get(Integer.valueOf(list[off+DUPMETHOD]));
             RecStartTime  = new Date(Long.valueOf(list[off+RECSTART]) * 1000);
             RecEndTime    = new Date(Long.valueOf(list[off+RECEND]) * 1000);
             RecGroup      = list[off+RECGROUP];
             StorGroup     = list[off+STORGROUP];
-            
+
             DupIn         = RecDupIn.get(dupInTemp & 0x0f);
             EpiFilter     = RecEpiFilter.get(dupInTemp & 0xf0);
-            
+
         } catch (NumberFormatException e) {}
-        
+
     }
 
     /**
-     * Construct a Program from an XML (DOM) Node 
-     * @param item - a Program XML (DOM) node 
+     * Construct a Program from an XML (DOM) Node
+     * @param item a Program XML (DOM) node
      */
     public Program(Node item) {
 
@@ -331,11 +329,11 @@ public class Program implements Comparable<Program> {
                 attr.getNamedItem("recordId").getNodeValue() //$NON-NLS-1$
             );
 
-            int dupInTemp = 
+            int dupInTemp =
                 Integer.valueOf(attr.getNamedItem("dupInType").getNodeValue()); //$NON-NLS-1$
             DupIn = RecDupIn.get(dupInTemp & 0x0f);
             EpiFilter = RecEpiFilter.get(dupInTemp & 0xf0);
-            
+
         }
     }
 
@@ -353,12 +351,12 @@ public class Program implements Comparable<Program> {
     /**
      * Get a preview image for the recording (will return
      * null unless Status was RECORDED or RECORDING or CURRENT)
-     * @return a Bitmap or null if no preview image was found 
+     * @return a Bitmap or null if no preview image was found
      */
     public Bitmap previewImage() {
 
         if (
-            Status != RecStatus.RECORDED && 
+            Status != RecStatus.RECORDED &&
             Status != RecStatus.RECORDING &&
             Status != RecStatus.CURRENT
         ) return null;
@@ -398,7 +396,7 @@ public class Program implements Comparable<Program> {
      * @return List of Strings, doesn't include stringlist separators
      */
     public String[] stringList() {
-        
+
         if (list != null) return list;
 
         list = new String[TOTAL+1];
@@ -413,17 +411,17 @@ public class Program implements Comparable<Program> {
         list[PATH+1]      =  Path == null ? "" : Path; //$NON-NLS-1$
         list[START+1]     =  String.valueOf(StartTime.getTime() / 1000);
         list[END+1]       =  String.valueOf(EndTime.getTime() / 1000);
-        list[RECSTART+1]  =  String.valueOf(RecStartTime.getTime() / 1000); 
-        list[RECEND+1]    =  String.valueOf(RecEndTime.getTime() / 1000); 
-        list[STATUS+1]    =  String.valueOf(Status.value());        
-        
+        list[RECSTART+1]  =  String.valueOf(RecStartTime.getTime() / 1000);
+        list[RECEND+1]    =  String.valueOf(RecEndTime.getTime() / 1000);
+        list[STATUS+1]    =  String.valueOf(Status.value());
+
         return list;
-        
+
     }
 
     /**
-     * Get index in stringlist of the TYPE field 
-     * @return int index of TYPE field 
+     * Get index in stringlist of the TYPE field
+     * @return int index of TYPE field
      */
     static public int recGroupField() {
         return RECGROUP;
