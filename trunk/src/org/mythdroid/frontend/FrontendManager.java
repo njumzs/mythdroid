@@ -34,7 +34,11 @@ import android.util.Log;
 /** Manages a frontend */
 public class FrontendManager {
 
-    public  String  name = null, addr = null;
+    /** String containing the name of the frontend */
+	public  String  name = null;
+	/** String containing the hostname or IP address of the frontend */
+	public  String  addr = null;
+	
     private ConnMgr cmgr = null;
 
     /**
@@ -55,7 +59,9 @@ public class FrontendManager {
             }
         );
 
-        if (cmgr == null) return;
+        if (cmgr == null)
+        	throw new 
+        		IOException(Messages.getString("FrontendManager.1") + name); //$NON-NLS-1$
 
         // jump <loc> (e.g. where loc == livetv) can take a long time
         cmgr.setTimeout(10000);
