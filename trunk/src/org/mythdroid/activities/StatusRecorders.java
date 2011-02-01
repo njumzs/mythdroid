@@ -104,17 +104,17 @@ public class StatusRecorders extends ListActivity {
 
     static final private class Encoder {
 
+    	// From enum TVState defined in libmythtv/tv.h
         private final static String[] states = {
             Messages.getString("StatusRecorders.1"),  // Idle //$NON-NLS-1$
             Messages.getString("StatusRecorders.2"),  // Live TV //$NON-NLS-1$
-            "?", "?", //$NON-NLS-1$ //$NON-NLS-2$
+            "?", // Watching pre-recorded //$NON-NLS-1$
+            "?", // Watching video //$NON-NLS-1$
+            "?", // Watching DVD //$NON-NLS-1$
+            "?", // Watching BD //$NON-NLS-1$
+            Messages.getString("StatusRecorders.5"),  // Watching recording //$NON-NLS-1$
             Messages.getString("StatusRecorders.5"),  // Recording //$NON-NLS-1$
-            Messages.getString("StatusRecorders.5"),  // Recording //$NON-NLS-1$
-            Messages.getString("StatusRecorders.5"),  // Recording //$NON-NLS-1$
-            // Cope with new but irrelevant TVStates (e.g. 'Watching BD') by
-            // padding with 'Recording' states
-            Messages.getString("StatusRecorders.5"),  // Recording //$NON-NLS-1$
-            Messages.getString("StatusRecorders.5")   // Recording //$NON-NLS-1$
+            Messages.getString("StatusRecorders.4")   // Changing state //$NON-NLS-1$
         };
 
         public int     id;
@@ -130,9 +130,13 @@ public class StatusRecorders extends ListActivity {
                 attr.getNamedItem("local").getNodeValue().equals("1") //$NON-NLS-1$ //$NON-NLS-2$
                     ? true : false;
             hostname = attr.getNamedItem("hostname").getNodeValue(); //$NON-NLS-1$
-            state = states[
-                Integer.parseInt(attr.getNamedItem("state").getNodeValue()) //$NON-NLS-1$
-            ];
+            
+            int s = Integer.parseInt(attr.getNamedItem("state").getNodeValue());  //$NON-NLS-1$
+            
+            if (s < 0) 
+            	state = Messages.getString("StatusRecorders.6"); //$NON-NLS-1$
+            else
+            	state = states[s];
 
             if (!item.hasChildNodes()) return;
 
