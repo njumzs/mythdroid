@@ -173,6 +173,23 @@ public class Recordings extends MDListActivity implements
 
                 final ArrayList<String> titles = new ArrayList<String>();
 
+                if (recordings == null)
+                	return new AlertDialog.Builder(this)
+                		.setTitle(R.string.filter_rec)
+                		.setMessage(R.string.no_recs)
+                		.setPositiveButton(R.string.ok, 
+                				new OnClickListener() {
+									@Override
+									public void onClick(
+											DialogInterface dialog, int which
+									) {
+										dialog.dismiss();
+										
+									} 
+								}
+                		)
+                		.create();
+                
                 for (Program prog : recordings) {
                     if (titles.contains(prog.Title)) continue;
                     titles.add(prog.Title);
