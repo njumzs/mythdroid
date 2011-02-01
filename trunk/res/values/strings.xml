@@ -35,6 +35,7 @@
 	<string name="stop_rec">Stop recording</string>
 	<string name="sure">Are you sure?</string>
 	<string name="filter_rec">Filter recordings</string>
+	<string name="no_recs">No recordings!</string>
 	<string name="refresh">Refresh</string>
 	<string name="filter">Filter</string>
 	<string name="reset_filter">Reset Filter</string>
