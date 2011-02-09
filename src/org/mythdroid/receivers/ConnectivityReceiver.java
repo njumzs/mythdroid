@@ -129,6 +129,8 @@ public class ConnectivityReceiver extends BroadcastReceiver {
      */
     public static void waitForWifi(Context ctx, int timeout) {
 
+        if (ctx == null) return;
+        
         ConnectivityManager cm =
             (ConnectivityManager)
                 ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
