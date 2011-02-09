@@ -85,11 +85,13 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             String m = Messages.getString("BCastReceiver.5") + from + ": " + //$NON-NLS-1$ //$NON-NLS-2$
                        msg.getDisplayMessageBody();
         
-            for (int i = 1; i < pdus.length; i++){
-                msg = SmsMessage.createFromPdu((byte[]) pdus[i]);
-                if (!msg.getDisplayOriginatingAddress().equals(from))
-                    continue;
-                m += msg.getDisplayMessageBody();
+            if (pdus.length > 1) {
+                for (int i = 1; i < pdus.length; i++){
+                    msg = SmsMessage.createFromPdu((byte[]) pdus[i]);
+                    if (!msg.getDisplayOriginatingAddress().equals(from))
+                        continue;
+                    m += msg.getDisplayMessageBody();
+                }
             }
             
             try {
