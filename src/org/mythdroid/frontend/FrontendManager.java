@@ -40,6 +40,8 @@ public class FrontendManager {
 	public  String  addr = null;
 	
     private ConnMgr cmgr = null;
+    private IOException connectionGone = 
+        new IOException(Messages.getString("FrontendManager.0")); //$NON-NLS-1$
 
     /**
      * Constructor
@@ -85,6 +87,7 @@ public class FrontendManager {
      * @return true if we jumped ok, false otherwise
      */
     public synchronized boolean jumpTo(final String loc) throws IOException {
+        if (cmgr == null) throw connectionGone;
         cmgr.writeLine("jump " + loc); //$NON-NLS-1$
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
@@ -110,6 +113,7 @@ public class FrontendManager {
      * @return true if the frontend accepted the key, false otherwise
      */
     public synchronized boolean sendKey(final Key key) throws IOException {
+        if (cmgr == null) throw connectionGone;
         cmgr.writeLine("key " + key.str()); //$NON-NLS-1$
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
@@ -122,6 +126,7 @@ public class FrontendManager {
      * @return true if the frontend accepted the key, false otherwise
      */
     public synchronized boolean sendKey(final String key) throws IOException {
+        if (cmgr == null) throw connectionGone;
         cmgr.writeLine("key " + key); //$NON-NLS-1$
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
@@ -133,6 +138,7 @@ public class FrontendManager {
      * @return a FrontendLocation
      */
     public synchronized FrontendLocation getLoc() throws IOException {
+        if (cmgr == null) throw connectionGone;
         cmgr.writeLine("query loc"); //$NON-NLS-1$
         String loc = getSingleLineResponse();
 
@@ -141,6 +147,7 @@ public class FrontendManager {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {}
+            if (cmgr == null) throw connectionGone;
             cmgr.writeLine("query loc"); //$NON-NLS-1$
             loc = getSingleLineResponse();
         }
@@ -230,8 +237,7 @@ public class FrontendManager {
     }
 
     private synchronized String getSingleLineResponse() throws IOException {
-        if (cmgr == null)
-            throw new IOException(Messages.getString("FrontendManager.0")); //$NON-NLS-1$
+        if (cmgr == null) throw connectionGone;
         String line = cmgr.readLine();
         while (cmgr != null)
             if (cmgr.readLine().equals("#")) break; //$NON-NLS-1$
