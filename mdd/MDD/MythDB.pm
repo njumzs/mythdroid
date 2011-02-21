@@ -124,7 +124,6 @@ sub execute {
 sub dosql {
 
     my $sql = shift;
-
     my $ret;
 
     unless (($ret = $dbh->do($sql))) {
