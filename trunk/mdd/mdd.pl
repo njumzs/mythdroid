@@ -163,11 +163,9 @@ if ($backend && !$debug) {
 elsif (!$backend) {
 
     $lcd = MDD::LCD->new();
-
     $log->dbg("Start LCD server with arguments: @ARGV");
 
     $lcdServerPort = $lcd->start(@ARGV);
-
     $log->dbg("Listen on port $lcdServerPort/tcp");
 
     # Listen for connections from mythfrontend
@@ -203,9 +201,8 @@ undef @handles;
 # Connect to the real mythlcdserver
 unless ($backend) {
     $log->dbg("Connect to real mythlcdserver");
-    $lcdServer = $lcd->connect();
-    $log->err("Couldn't connect to mythlcdserver") unless $lcdServer;
-    $s->add($lcdServer);
+    if ($lcdServer = $lcd->connect()) { $s->add($lcdServer) }
+    else { $log->err("Couldn't connect to mythlcdserver") }
 }
     
 # Main Loop
@@ -215,12 +212,9 @@ while (my @ready = $s->can_read) {
         
         if (!$backend && $fd == $lcdListen) {
             $log->dbg("New connection from mythfrontend");
-            if ($lcdClient = $fd->accept) {
-                $s->add($lcdClient);
-            }
+            if ($lcdClient = $fd->accept) { $s->add($lcdClient) }
             next;
         }
-
         elsif ($fd == $listen) {
             $log->dbg("New connection from MythDroid");
             handleMdConn($fd);
@@ -606,7 +600,6 @@ sub streamFile($) {
 sub stopStreaming() {
 
     return unless $streampid;
-
     $log->dbg("Stop streaming");
 
     # I'd like to setpgrp in the child but that seems to cause vlc issues :(
@@ -632,7 +625,6 @@ sub getStorGroups() {
 sub getRecGroups() {
 
     map { sendMsg($_) } (@{$mythdb->getRecGroups()});
-
     sendMsg("RECGROUPS DONE");
 
 }
@@ -652,10 +644,8 @@ sub create_user_account() {
 
     my $user = 'mdd';
 
-    if (getpwnam $user) { return }
-
-    print "Creating mdd user account..\n";
-
+    return if (getpwnam $user);
+    print "Creating $user user account..\n";
     system("useradd -d /dev/null -c 'Added by MDD' -U $user -s /sbin/nologin");
 
 }
