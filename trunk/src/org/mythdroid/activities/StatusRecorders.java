@@ -76,7 +76,9 @@ public class StatusRecorders extends ListActivity {
             for (int i = 0; i < encoderItems.getLength(); i++)
                 encoders.add(new Encoder(encoderItems.item(i)));
 
-            dismissDialog(DIALOG_LOAD);
+            try {
+                dismissDialog(DIALOG_LOAD);
+            } catch (IllegalArgumentException e) {}
 
             setListAdapter(
                 new EncoderAdapter(
@@ -92,7 +94,9 @@ public class StatusRecorders extends ListActivity {
         public void run() {
             
             if (!Status.getStatus(ctx) && Status.statusDoc == null) {
-                dismissDialog(DIALOG_LOAD);
+                try {
+                    dismissDialog(DIALOG_LOAD);
+                } catch (IllegalArgumentException e) {}
                 ErrUtil.postErr(ctx, Messages.getString("StatusRecorders.3")); //$NON-NLS-1$
                 finish();
                 return;
