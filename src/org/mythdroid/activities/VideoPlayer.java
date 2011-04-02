@@ -220,7 +220,9 @@ public class VideoPlayer extends MDActivity {
             new OnPreparedListener(){
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    dismissDialog(DIALOG_LOAD);
+                    try {
+                        dismissDialog(DIALOG_LOAD);
+                    } catch (IllegalArgumentException e) {}
                 }
             }
         );
