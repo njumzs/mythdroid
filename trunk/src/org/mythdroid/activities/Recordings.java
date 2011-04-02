@@ -178,15 +178,14 @@ public class Recordings extends MDListActivity implements
                 		.setTitle(R.string.filter_rec)
                 		.setMessage(R.string.no_recs)
                 		.setPositiveButton(R.string.ok, 
-                				new OnClickListener() {
-									@Override
-									public void onClick(
-											DialogInterface dialog, int which
-									) {
-										dialog.dismiss();
-										
-									} 
-								}
+                			new OnClickListener() {
+								@Override
+								public void onClick(
+										DialogInterface dialog, int which
+								) {
+									dialog.dismiss();
+								} 
+							}
                 		)
                 		.create();
                 
