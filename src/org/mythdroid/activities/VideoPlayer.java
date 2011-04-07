@@ -19,6 +19,7 @@
 package org.mythdroid.activities;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 import org.mythdroid.Globals;
 import org.mythdroid.R;
@@ -46,6 +47,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.VideoView;
@@ -191,10 +193,16 @@ public class VideoPlayer extends MDActivity {
             finish();
             return;
         }
+        
+        long beforeSleep = System.nanoTime();
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {}
+        while (System.nanoTime() < beforeSleep + 2000000) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Log.v("VideoPlayer", "Sleep was interrupted");
+            }
+        }
 
         String sdpAddr = beMgr.addr;
 
