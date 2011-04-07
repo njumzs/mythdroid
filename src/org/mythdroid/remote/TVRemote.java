@@ -175,7 +175,9 @@ public class TVRemote extends Remote {
         @Override
         public void run() {
             if (jump)
-                dismissDialog(DIALOG_LOAD);
+                try {
+                    dismissDialog(DIALOG_LOAD);
+                } catch (IllegalArgumentException e) {}
             setupStatus();
             if (mddMgr == null) {
                 updateStatus = new UpdateStatusTask();

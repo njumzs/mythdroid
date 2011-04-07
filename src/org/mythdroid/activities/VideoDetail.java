@@ -24,6 +24,7 @@ import org.mythdroid.R;
 import org.mythdroid.data.Video;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.ErrUtil;
 
 import android.content.Context;
 import android.content.Intent;
@@ -57,6 +58,12 @@ public class VideoDetail extends MDActivity {
     private void setViews() {
 
         video = Globals.curVid;
+        
+        if (video == null) {
+            ErrUtil.err(this, Messages.getString("VideoDetail.2")); //$NON-NLS-1$
+            finish();
+        }
+            
         ((TextView)findViewById(R.id.videoDTitle))
             .setText(video.title);
         ((TextView)findViewById(R.id.videoDDirector))
