@@ -197,7 +197,7 @@ public abstract class MDListActivity extends ListActivity {
 
         int num = c.getCount();
 
-        if (hereActivity != null && num < 1) {
+        if (hereActivity == null && num < 1) {
             ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
             return;
         }
