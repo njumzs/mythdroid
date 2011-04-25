@@ -174,7 +174,8 @@ public class Program implements Comparable<Program> {
         }
 
     }
-
+    
+    @SuppressWarnings("all")
     static final public int
         TITLE     = 0,  SUBTITLE  = 1,  DESC     = 2,   CATEGORY  = 3,
         CHANID    = 4,  CHANNEL   = 6,  PATH     = 8,
@@ -197,9 +198,11 @@ public class Program implements Comparable<Program> {
             SERIESID  = 28; PROGID    = 29; STORGROUP = 36; TOTAL     = 41;
         }
     }
-
+    
+    @SuppressWarnings("all")
     public String       Title, SubTitle, Category, Description, Channel, Path,
                         RecGroup, StorGroup;
+    @SuppressWarnings("all")
     public Date         StartTime, EndTime, RecStartTime, RecEndTime;
     /** Recording status */
     public RecStatus    Status = RecStatus.UNKNOWN;
@@ -211,11 +214,11 @@ public class Program implements Comparable<Program> {
     public RecEpiFilter EpiFilter = RecEpiFilter.NONE;
     /** Recording duplicate match method */
     public RecDupMethod DupMethod = RecDupMethod.SUBANDDESC;
-
+    @SuppressWarnings("all")
     public int          ChanID, RecID = -1, RecPrio = 0;
 
     private String[] list  = null;
-
+    
     /**
      * Construct a Program from a stringlist
      * @param list a stringlist (e.g. from a backend)

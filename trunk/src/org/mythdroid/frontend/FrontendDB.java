@@ -27,6 +27,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 /** Manage a sqlite database of frontends */
 public class FrontendDB {
 
+    @SuppressWarnings("all")
     final public static int     ID = 0, ADDR = 1, NAME = 2, HWADDR = 3;
 
     final private static String DB_NAME        = "MythDroid.db"; //$NON-NLS-1$
