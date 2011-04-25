@@ -101,7 +101,7 @@ public class MythDroid extends MDListActivity implements
         
         /* Allow network activity on UI thread - we only use it to connect to the
            backend, which we need to do before the UI is usable anyway */
-        if (Build.VERSION.SDK_INT >= 11)
+        if (Integer.parseInt(Build.VERSION.SDK) >= 11)
             try {
                 Reflection.rStrictMode.checkAvailable();
                 Reflection.rStrictMode.setThreadPolicy();
