@@ -25,6 +25,7 @@ import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.frontend.FrontendDB;
+import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.frontend.WakeOnLan;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.receivers.ConnectivityReceiver;
@@ -452,9 +453,12 @@ public class MythDroid extends MDListActivity implements
         ArrayList<String> cmds = null;
 
         try {
-            cmds = MDDManager.getCommands(
-                Globals.getFrontend(this).addr
-            );
+            FrontendManager femgr = Globals.getFrontend(this);
+            if (femgr == null) {
+                ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
+                return;
+            }
+            cmds = MDDManager.getCommands(femgr.addr);
         } catch(IOException e) {
             ErrUtil.err(ctx, e);
         }
