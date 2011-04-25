@@ -356,7 +356,7 @@ public class ConnMgr {
     }
 
     /** Disconnect and clean up internal resources */
-    public synchronized void dispose() throws IOException {
+    public void dispose() throws IOException {
         disconnect();
         conns.remove(weakThis);
     }
@@ -453,7 +453,7 @@ public class ConnMgr {
 
     }
 
-    private synchronized void disconnect() throws IOException {
+    private void disconnect() throws IOException {
 
         connectedReady = false;
 
