@@ -31,7 +31,7 @@ final public class OSDMessage {
         "<mythnotify version=\"1\">\n" + //$NON-NLS-1$
         "  <container name=\"notify_cid_info\">\n" + //$NON-NLS-1$
         "    <textarea name=\"notify_cid_name\">\n" + //$NON-NLS-1$
-        "      <value>NAME: %caller_name%</value>\n" + //$NON-NLS-1$
+        "      <value>NAME: %caller_name% </value>\n" + //$NON-NLS-1$
         "    </textarea>\n" + //$NON-NLS-1$
         "    <textarea name=\"notify_cid_num\">\n" + //$NON-NLS-1$
         "      <value>NUM : %caller_number%</value>\n" + //$NON-NLS-1$

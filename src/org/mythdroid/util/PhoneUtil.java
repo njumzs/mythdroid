@@ -21,64 +21,12 @@ package org.mythdroid.util;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Contacts;
-import android.provider.Contacts.PeopleColumns;
-import android.telephony.PhoneNumberUtils;
 
-/** Utility methods for dealing with Contacts **/
+/** Utility methods for dealing with Contacts */
+@SuppressWarnings("deprecation")
 public final class PhoneUtil {
-
-    /**
-     * Get a contact id from a phone number
-     * @param ctx Context
-     * @param number String containing the phone number
-     */
-    public static String idFromNumber(Context ctx, String number) {
-
-        String id = null;
-
-        Cursor c = ctx.getContentResolver().query(
-            Uri.withAppendedPath(Contacts.Phones.CONTENT_FILTER_URL, number),
-            new String[] { Contacts.Phones.PERSON_ID },
-            null, null, null
-        );
-
-        if (c != null && c.getCount() > 0) {
-            c.moveToFirst();
-            id = String.valueOf(c.getLong(0));
-        }
-
-        if (c != null) c.close();
-
-        return id;
-
-    }
-
-    /**
-     * Get a contact name from a contact id
-     * @param ctx Context
-     * @param id String containing the contact id
-     */
-    public static String nameFromId(Context ctx, String id) {
-
-        String name = null;
-
-        Cursor c = ctx.getContentResolver().query(
-            Uri.withAppendedPath(Contacts.People.CONTENT_FILTER_URI, id),
-            new String[] { PeopleColumns.DISPLAY_NAME },
-            null, null, null
-        );
-
-        if (c != null && c.getCount() > 0) {
-            c.moveToFirst();
-            name = c.getString(0);
-        }
-
-        if (c != null) c.close();
-
-        return name;
-
-    }
 
     /**
      * Get a contact name from a phone number
@@ -86,16 +34,43 @@ public final class PhoneUtil {
      * @param number String containing the phone number
      */
     public static String nameFromNumber(Context ctx, String number) {
+        
+        String name = null;
+        
+        if (Integer.parseInt(Build.VERSION.SDK) >= 5)
+            try {
+                Reflection.rContactsContract.checkAvailable();
+                Uri uri = Uri.withAppendedPath(
+                    Reflection.rContactsContract.getContentFilterURI(),
+                    Uri.encode(number)
+                );
+                Cursor c = ctx.getContentResolver().query(
+                    uri, 
+                    new String[]{Reflection.rContactsContract.getDisplayName()},
+                    null,null,null
+                );
+                if (c != null && c.moveToFirst()) 
+                    name = c.getString(0);
+                
+                if (c != null) c.close();
+                
+                return name;
+            } catch (Exception e) {}
+ 
+            
+        /* Old method */
+        Cursor c = ctx.getContentResolver().query(
+            Uri.withAppendedPath(
+                Contacts.Phones.CONTENT_FILTER_URL, Uri.encode(number)
+            ),
+            new String[] { Contacts.Phones.DISPLAY_NAME },
+            null, null, null
+        );
 
-        String id = idFromNumber(ctx, number);
+        if (c != null && c.moveToFirst())
+            name = c.getString(0);
 
-        if (id == null)
-            return PhoneNumberUtils.formatNumber(number);
-
-        String name = nameFromId(ctx, id);
-
-        if (name == null)
-            return PhoneNumberUtils.formatNumber(number);
+        if (c != null) c.close();
 
         return name;
 
