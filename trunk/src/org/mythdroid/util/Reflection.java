@@ -1,7 +1,9 @@
 package org.mythdroid.util;
 
+import android.net.Uri;
 import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
+import android.provider.ContactsContract;
 
 /**
  * Wrap classes that are only present in newer SDK versions
@@ -40,6 +42,40 @@ public class Reflection {
                                           .penaltyLog()
                                           .build()
             );
+        }
+        
+    }
+    
+    /**
+     * Wrapped ContactsContract
+     */
+    public static class rContactsContract {
+        
+        static {
+            try {
+                Class.forName("android.provider.ContactsContract"); //$NON-NLS-1$
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        /**
+         * Initialise rContactsContract to see if it's available
+         */
+        public static void checkAvailable() {}
+        
+        /**
+         * Return ContactContract.PhoneLookup's CONTENT_FILTER_URI
+         */
+        public static Uri getContentFilterURI() {
+            return ContactsContract.PhoneLookup.CONTENT_FILTER_URI;
+        }
+        
+        /**
+         *  Return ContactsContract.PhoneLookup's DISPLAY_NAME
+         */
+        public static String getDisplayName() {
+            return ContactsContract.PhoneLookup.DISPLAY_NAME;
         }
         
     }
