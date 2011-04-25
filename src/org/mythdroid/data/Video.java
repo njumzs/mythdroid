@@ -37,10 +37,14 @@ import android.graphics.drawable.Drawable;
 
 /** Represents a video or directory containing videos */
 public class Video {
-    
+
+    @SuppressWarnings("all")
     public String title, subtitle, director, plot, homepage, filename;
+    @SuppressWarnings("all")
     public float rating;
+    @SuppressWarnings("all")
     public int year, length, dir = -1, id = -1;
+    @SuppressWarnings("all")
     public Drawable poster = null;
     
     final private static Options opts = new BitmapFactory.Options();
