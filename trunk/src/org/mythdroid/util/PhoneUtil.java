@@ -37,6 +37,7 @@ public final class PhoneUtil {
         
         String name = null;
         
+        /* Use ContractsContract via reflection on Froyo and above */        
         if (Integer.parseInt(Build.VERSION.SDK) >= 5)
             try {
                 Reflection.rContactsContract.checkAvailable();
@@ -49,16 +50,12 @@ public final class PhoneUtil {
                     new String[]{Reflection.rContactsContract.getDisplayName()},
                     null,null,null
                 );
-                if (c != null && c.moveToFirst()) 
-                    name = c.getString(0);
-                
+                if (c != null && c.moveToFirst()) name = c.getString(0);
                 if (c != null) c.close();
-                
                 return name;
             } catch (Exception e) {}
- 
-            
-        /* Old method */
+
+        /* Old method for Donut and below */
         Cursor c = ctx.getContentResolver().query(
             Uri.withAppendedPath(
                 Contacts.Phones.CONTENT_FILTER_URL, Uri.encode(number)
@@ -66,12 +63,8 @@ public final class PhoneUtil {
             new String[] { Contacts.Phones.DISPLAY_NAME },
             null, null, null
         );
-
-        if (c != null && c.moveToFirst())
-            name = c.getString(0);
-
+        if (c != null && c.moveToFirst()) name = c.getString(0);
         if (c != null) c.close();
-
         return name;
 
     }
