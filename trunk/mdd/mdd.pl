@@ -98,12 +98,12 @@ my (%commands, %videos, %storageGroups);
 # Use ffmpeg to demux and decode; VLC's TS demuxer doesn't cope with 
 # a significant proportion of dvb recordings :(
 my $stream_cmd = 
-    'ffmpeg -i %FILE% -vcodec rawvideo -acodec pcm_s16le -deinterlace ' .
-    '-s %WIDTH%x%HEIGHT% -ac 2 -ar 48000 -copyts -async 100 -f asf -y - ' .
-    '2>/tmp/ffmpeg.out | /usr/bin/vlc -vvv -I dummy - ' .
-    '--sout=\'#transcode{vcodec=h264,venc=x264{no-cabac,level=30,keyint=50' .
-    ',ref=1,bframes=0},vb=%VB%,threads=%THR%,width=%WIDTH%,height=%HEIGHT%,' .
-    'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2,audio-sync}' .
+    '/usr/bin/vlc -vvv -I dummy --file-caching=2000 ' .
+    '--sout-mux-caching=500 --demux=avformat %FILE% ' . 
+    '--sout=\'#transcode{vcodec=h264,venc=x264{no-cabac,level=30,keyint=50,' .
+    'ref=4,bframes=0,bpyramid=none,profile=baseline,no-weightb,weightp=0,' .
+    'no-8x8dct,trellis=0},vb=%VB%,threads=%THR%,acodec=mp4a,' . 
+    'samplerate=48000,ab=%AB%,channels=2,audio-sync}' .
     ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
 
 # List of regex to match messages we might get from MythDroid
@@ -603,7 +603,7 @@ sub stopStreaming() {
     $log->dbg("Stop streaming");
 
     # I'd like to setpgrp in the child but that seems to cause vlc issues :(
-    kill 'KILL', $streampid, $streampid+1, $streampid+2, $streampid+3;
+    kill 'KILL', $streampid, $streampid+1, $streampid+2;
     waitpid $streampid, 0;
     undef $streampid;
 
