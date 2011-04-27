@@ -194,7 +194,7 @@ public class VideoPlayer extends MDActivity {
         
         long beforeSleep = System.nanoTime();
 
-        while (System.nanoTime() < beforeSleep + 2000000) {
+        while (System.nanoTime() < beforeSleep + 2000000000) {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {}
@@ -202,10 +202,11 @@ public class VideoPlayer extends MDActivity {
 
         String sdpAddr = beMgr.addr;
 
-        // If the backend address is localhost, assume SSH port forwarding
-        // We must connect to the RTSP server directly otherwise the RTP
-        // goes astray, so use the public address for the backend if it's
-        // configured. This requires that port 5554/tcp is forwarded to the backend
+        /* If the backend address is localhost, assume SSH port forwarding
+           We must connect to the RTSP server directly otherwise the RTP
+           goes astray, so use the public address for the backend if it's
+           configured. This requires that port 5554/tcp is forwarded to the 
+           backend */
         String sdpPublicAddr =
             PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("backendPublicAddr", null);  //$NON-NLS-1$
@@ -219,7 +220,7 @@ public class VideoPlayer extends MDActivity {
         videoView.setVideoURI(
             Uri.parse("rtsp://" + sdpAddr + ":5554/stream") //$NON-NLS-1$ //$NON-NLS-2$
         );
-
+  
         videoView.setOnPreparedListener(
             new OnPreparedListener(){
                 @Override
