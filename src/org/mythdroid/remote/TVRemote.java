@@ -706,7 +706,7 @@ public class TVRemote extends Remote {
     }
 
     /** Call finish() but jump to lastLocation first, if possible */
-    private void done() {
+    private synchronized void done() {
         if (feMgr != null && feMgr.isConnected() && jump) {
             try {
                 feMgr.jumpTo(Globals.lastLocation);
@@ -714,6 +714,7 @@ public class TVRemote extends Remote {
                 ErrUtil.postErr(this, e);
             }
         }
+        jump = false;
         finish();
     }
 
