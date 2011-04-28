@@ -104,6 +104,9 @@ public class BackendManager {
                 }
             }
         );
+        
+        // QUERY_RECORDINGS can take a few seconds..
+        cmgr.setTimeout(3000);
 
         addr = host;
 
