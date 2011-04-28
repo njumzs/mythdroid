@@ -74,7 +74,9 @@ public class VideoPlayer extends MDActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        videoView.stopPlayback();
+        try {
+            videoView.stopPlayback();
+        } catch (IllegalArgumentException e) {}
         try {
             MDDManager.stopStream(beMgr.addr);
         } catch (IOException e) {
