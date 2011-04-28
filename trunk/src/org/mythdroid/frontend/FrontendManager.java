@@ -178,6 +178,7 @@ public class FrontendManager {
      * @return true if starting playing ok, false otherwise
      */
     public synchronized boolean playRec(final Program prog) throws IOException {
+        if (cmgr == null) throw connectionGone;
         cmgr.writeLine("play prog " + prog.playbackID()); //$NON-NLS-1$
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
@@ -190,6 +191,7 @@ public class FrontendManager {
      * @return true if starting playing ok, false otherwise
      */
     public synchronized boolean playFile(final String file) throws IOException {
+        if (cmgr == null) throw connectionGone;
         cmgr.writeLine("play file " + file); //$NON-NLS-1$
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
@@ -202,6 +204,7 @@ public class FrontendManager {
      * @return boolean if we switched ok, false otherwise
      */
     public synchronized boolean playChan(int chanid) throws IOException {
+        if (cmgr == null) throw connectionGone;
         cmgr.writeLine("play chanid " + chanid); //$NON-NLS-1$
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
