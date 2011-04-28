@@ -30,6 +30,7 @@ import org.mythdroid.data.Program;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.views.MDVideoView;
 
 import android.R.drawable;
 import android.app.AlertDialog;
@@ -42,13 +43,15 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
-import android.widget.VideoView;
 import android.widget.AdapterView.OnItemClickListener;
 
 /** MDActivity displays streamed Video */
@@ -56,22 +59,24 @@ public class VideoPlayer extends MDActivity {
 
     final private Context ctx = this;
     final private int DIALOG_QUALITY = 1;
-    private int vb = 0, ab = 0;
-    private VideoView videoView = null;
+    private int vb = 0, ab = 0, vwidth = 0, vheight = 0;
+    private MDVideoView videoView = null;
     private BackendManager beMgr = null;
 
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(layout.video_player);
-        videoView = (VideoView)findViewById(id.videoview);
+        videoView = (MDVideoView)findViewById(id.videoview);
         showDialog(DIALOG_QUALITY);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        videoView.stopPlayback();
+        try {
+            videoView.stopPlayback();
+        } catch (IllegalArgumentException e) {}
         try {
             MDDManager.stopStream(beMgr.addr);
         } catch (IOException e) {
@@ -103,7 +108,7 @@ public class VideoPlayer extends MDActivity {
         }
 
     }
-
+    
     private Dialog createQualityDialog() {
 
         final AlertDialog d = new AlertDialog.Builder(ctx)
@@ -191,17 +196,22 @@ public class VideoPlayer extends MDActivity {
             finish();
             return;
         }
+        
+        long beforeSleep = System.nanoTime();
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {}
+        while (System.nanoTime() < beforeSleep + 2000000000) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {}
+        }
 
         String sdpAddr = beMgr.addr;
 
-        // If the backend address is localhost, assume SSH port forwarding
-        // We must connect to the RTSP server directly otherwise the RTP
-        // goes astray, so use the public address for the backend if it's
-        // configured. This requires that port 5554/tcp is forwarded to the backend
+        /* If the backend address is localhost, assume SSH port forwarding
+           We must connect to the RTSP server directly otherwise the RTP
+           goes astray, so use the public address for the backend if it's
+           configured. This requires that port 5554/tcp is forwarded to the 
+           backend */
         String sdpPublicAddr =
             PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("backendPublicAddr", null);  //$NON-NLS-1$
@@ -215,14 +225,38 @@ public class VideoPlayer extends MDActivity {
         videoView.setVideoURI(
             Uri.parse("rtsp://" + sdpAddr + ":5554/stream") //$NON-NLS-1$ //$NON-NLS-2$
         );
-
+        
         videoView.setOnPreparedListener(
-            new OnPreparedListener(){
+            new OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     try {
                         dismissDialog(DIALOG_LOAD);
                     } catch (IllegalArgumentException e) {}
+                    vwidth = mp.getVideoWidth();
+                    vheight = mp.getVideoHeight();
+                    videoView.setVideoSize(vwidth, vheight);
+                    mp.setOnVideoSizeChangedListener(
+                        new OnVideoSizeChangedListener() {
+                            @Override
+                            public void onVideoSizeChanged(
+                                MediaPlayer mp, int width, int height
+                            ) {
+                               videoView.setVideoSize(width, height);
+                            }
+                        }
+                    );
+                    videoView.setOnTouchListener(
+                        new OnTouchListener() {
+                            public boolean onTouch(View v, MotionEvent m) {
+                                if (m.getAction() == MotionEvent.ACTION_DOWN) {
+                                   ErrUtil.err(ctx, videoView.nextVideoScale());
+                                   return true;
+                                }
+                                return false;
+                            }
+                        }
+                    );
                 }
             }
         );

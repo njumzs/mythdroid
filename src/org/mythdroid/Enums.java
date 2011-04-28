@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.mythdroid.resource.Messages;
 
+@SuppressWarnings("all")
+
 /** Contains all enums */
 public class Enums {
 

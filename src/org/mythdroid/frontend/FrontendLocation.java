@@ -30,10 +30,15 @@ public class FrontendLocation {
 
     private static HashMap<String, String> locations = null;
 
+    @SuppressWarnings("all")
     public String  location  = null, niceLocation = null;
+    @SuppressWarnings("all")
     public int     position, end;
+    @SuppressWarnings("all")
     public float   rate;
+    @SuppressWarnings("all")
     public String  filename;
+    @SuppressWarnings("all")
     public boolean
         video = false, livetv = false, music = false, musiceditor = false;
 

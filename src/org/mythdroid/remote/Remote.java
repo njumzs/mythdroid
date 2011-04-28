@@ -281,8 +281,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
             switch (code) {
                 case KeyEvent.KEYCODE_BACK:
                 case KeyEvent.KEYCODE_MENU:
-                    super.onKeyDown(code, event);
-                    return false;
+                    return super.onKeyDown(code, event);
                 case KeyEvent.KEYCODE_DPAD_UP:
                     feMgr.sendKey(Key.UP);
                     break;

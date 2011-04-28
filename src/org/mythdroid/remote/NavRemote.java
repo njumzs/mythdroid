@@ -257,8 +257,7 @@ public class NavRemote extends Remote {
             return true;
         }
 
-        super.onKeyDown(code, event);
-        return false;
+        return super.onKeyDown(code, event);
 
     }
 

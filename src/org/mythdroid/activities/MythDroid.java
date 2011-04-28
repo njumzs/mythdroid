@@ -25,6 +25,7 @@ import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.frontend.FrontendDB;
+import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.frontend.WakeOnLan;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.receivers.ConnectivityReceiver;
@@ -33,6 +34,7 @@ import org.mythdroid.remote.NavRemote;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.Reflection;
 
 import android.R.drawable;
 import android.R.id;
@@ -42,6 +44,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -95,7 +98,15 @@ public class MythDroid extends MDListActivity implements
         super.onCreate(icicle);
 
         Globals.appContext = getApplicationContext();
-
+        
+        /* Allow network activity on UI thread - we only use it to connect to the
+           backend, which we need to do before the UI is usable anyway */
+        if (Integer.parseInt(Build.VERSION.SDK) >= 11)
+            try {
+                Reflection.rStrictMode.checkAvailable();
+                Reflection.rStrictMode.setThreadPolicy();
+            } catch (Exception e) {}
+            
         setContentView(R.layout.mainmenu);
 
         menuAdapter = new ArrayAdapter<String>(
@@ -452,9 +463,12 @@ public class MythDroid extends MDListActivity implements
         ArrayList<String> cmds = null;
 
         try {
-            cmds = MDDManager.getCommands(
-                Globals.getFrontend(this).addr
-            );
+            FrontendManager femgr = Globals.getFrontend(this);
+            if (femgr == null) {
+                ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
+                return;
+            }
+            cmds = MDDManager.getCommands(femgr.addr);
         } catch(IOException e) {
             ErrUtil.err(ctx, e);
         }
