@@ -55,30 +55,21 @@
     	android:src="@drawable/skip_forward"/>
     
     <ImageButton android:id="@+id/music_skip_back"
-    	android:layout_width="58dp"
-    	android:layout_height="58dp"
+		style="@style/MDButton58"
     	android:layout_alignTop="@id/music_pause"
     	android:layout_toLeftOf="@id/music_pause"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
     	android:src="@drawable/skip_back"/>
     	
    <ImageButton android:id="@+id/music_seek_forward"
-    	android:layout_width="58dp"
-    	android:layout_height="58dp"
+    	style="@style/MDButton58"
     	android:layout_alignTop="@id/music_pause"
     	android:layout_toRightOf="@id/music_skip_forward"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
     	android:src="@drawable/seek_forward"/>
     
     <ImageButton android:id="@+id/music_seek_back"
-    	android:layout_width="58dp"
-    	android:layout_height="58dp"
+    	style="@style/MDButton58"
     	android:layout_alignTop="@id/music_pause"
     	android:layout_toLeftOf="@id/music_skip_back"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
     	android:src="@drawable/seek_back"/>
     	
     <ImageView android:id="@+id/music_coverart"
