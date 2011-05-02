@@ -13,4 +13,9 @@
 		<item name="android:layout_width">72dp</item>
     	<item name="android:layout_height">72dp</item>
    	</style>
+   	<style name="NumPadButton">
+   		<item name="android:layout_width">96px</item>
+        <item name="android:layout_height">76px</item>
+        <item name="android:background">@drawable/btn_dial</item>
+   	</style>
 </resources>
