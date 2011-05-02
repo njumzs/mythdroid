@@ -78,9 +78,8 @@ public class Guide extends MDActivity {
     final private static int DIALOG_DATE  = 0, DIALOG_TIME = 1;
 
     /** Change numHours to configure how many hours are displayed at a time */
-    final private static int
-        numHours = 2,   colMins = 5,    hdrSpan = 6,
-        numTimes = numHours * 60 / colMins;
+    private static int numHours = 2, numTimes;
+    final private static int colMins = 5, hdrSpan = 6;
 
     private static Date now = null, later = null;
 
@@ -93,8 +92,8 @@ public class Guide extends MDActivity {
 
     final private Handler handler   = new Handler();
 
-    final private long[]   times    = new long[numTimes + 1];
-    final private String[] hdrTimes = new String[numTimes / hdrSpan];
+    private long[]   times    = null;
+    private String[] hdrTimes = null;
 
     final private LayoutParams
         rowLayout     = new LayoutParams(), chanLayout    = new LayoutParams(),
@@ -224,6 +223,17 @@ public class Guide extends MDActivity {
 
         super.onCreate(icicle);
         setContentView(R.layout.guide);
+        
+        if (
+            getWindowManager().getDefaultDisplay().getWidth()  > 1000 ||
+            getWindowManager().getDefaultDisplay().getHeight() > 1000
+        )
+            numHours = 4;
+        
+        numTimes = numHours * 60 / colMins;
+        
+        times = new long[numTimes + 1];
+        hdrTimes = new String[numTimes / hdrSpan];
 
         scale = getResources().getDisplayMetrics().density;
         colWidth  = (int)(40  * scale + 0.5f);
