@@ -8,58 +8,40 @@
     android:background="@drawable/metal">
     
    	<ImageButton android:id="@+id/nav_back"
-    	android:layout_width="72dp"
-    	android:layout_height="72dp"
+    	style="@style/MDButton72"
     	android:layout_alignParentTop="true"
     	android:layout_alignParentLeft="true"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
     	android:src="@drawable/back"/>
 
     <ImageButton android:id="@+id/nav_up"
-    	android:layout_width="72dp"
-    	android:layout_height="72dp"
+    	style="@style/MDButton72"
     	android:layout_below="@id/nav_back"
     	android:layout_centerHorizontal="true"
     	android:layout_marginTop="28dp"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
     	android:src="@drawable/up"/>
     	
    	<ImageButton android:id="@+id/nav_enter"
-    	android:layout_width="72dp"
-    	android:layout_height="72dp"
+    	style="@style/MDButton72"
     	android:layout_alignLeft="@id/nav_up"
     	android:layout_below="@id/nav_up"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
     	android:src="@drawable/btn_dial"/>
    	
    	<ImageButton android:id="@+id/nav_left"
-    	android:layout_width="72dp"
-    	android:layout_height="72dp"
+    	style="@style/MDButton72"
     	android:layout_toLeftOf="@id/nav_enter"
     	android:layout_alignTop="@id/nav_enter"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
     	android:src="@drawable/left"/>
     
     <ImageButton android:id="@+id/nav_right"
-    	android:layout_width="72dp"
-    	android:layout_height="72dp"
+    	style="@style/MDButton72"
     	android:layout_toRightOf="@id/nav_enter"
     	android:layout_alignTop="@id/nav_enter"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
     	android:src="@drawable/right"/>
     	
     <ImageButton android:id="@+id/nav_down"
-    	android:layout_width="72dp"
-    	android:layout_height="72dp"
+    	style="@style/MDButton72"
     	android:layout_alignLeft="@id/nav_enter"
     	android:layout_below="@id/nav_enter"
-    	android:scaleType="fitCenter"
-    	android:focusable="false"
     	android:src="@drawable/down"/>
 
    	<TextView android:id="@+id/nav_item"

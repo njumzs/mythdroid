@@ -2,5 +2,17 @@
 <resources>
 	<style name="MDNoTitle" parent="android:Theme.Holo">
   		<item name="android:windowActionBar">true</item>
-  	</style> 
+  	</style>
+  	<style name="MDButton">
+    	<item name="android:scaleType">fitCenter</item>
+    	<item name="android:focusable">false</item>
+   	</style>
+  	<style name="MDButton58" parent="MDButton">
+		<item name="android:layout_width">58dp</item>
+    	<item name="android:layout_height">58dp</item>
+   	</style>
+   	<style name="MDButton72">
+		<item name="android:layout_width">72dp</item>
+    	<item name="android:layout_height">72dp</item>
+   	</style>
 </resources>
