@@ -7,6 +7,4 @@
     android:textAppearance="?android:attr/textAppearanceLarge"
     android:gravity="center_vertical"
     android:paddingLeft="6dip"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    android:textColor="@color/dark_grey_text" 
-    android:textColorHighlight="@color/dark_grey_text_highlight"/>
+    android:minHeight="?android:attr/listPreferredItemHeight"/>
