@@ -5,21 +5,23 @@
    	android:layout_height="fill_parent"
    	android:orientation="vertical"
    	android:paddingLeft="4dp"
-   	android:paddingRight="4dp">
+   	android:paddingRight="16dp">
    	
     <TextView
 		android:id="@+id/rec_title"
  		android:layout_width="fill_parent" 
  		android:layout_height="wrap_content"
- 		android:paddingTop="10dp"
- 		android:textSize="20sp"/>
+ 		android:paddingTop="8dp"
+ 		android:paddingBottom="8dp"
+ 		android:textSize="24sp"
+ 		android:textStyle="bold"/>
  		
  	<TextView
 		android:id="@+id/rec_subtitle"
  		android:layout_width="fill_parent" 
  		android:layout_height="wrap_content"
  		android:layout_below="@id/rec_title"
- 		android:textSize="16sp"
+ 		android:textSize="20sp"
  		android:textStyle="italic"/>
  		
  	<ImageView
@@ -29,9 +31,9 @@
  		android:layout_below="@id/rec_subtitle"
 		android:layout_centerHorizontal="true"
 		android:adjustViewBounds="true"
-		android:maxHeight="200dp"
-		android:paddingTop="16dp"
-		android:paddingBottom="16dp"/>
+		android:maxHeight="360dp"
+		android:paddingTop="22dp"
+		android:paddingBottom="22dp"/>
 		
 	<TextView	
 		android:id="@+id/rec_channel"
@@ -39,7 +41,7 @@
  		android:layout_height="wrap_content"
  		android:layout_below="@id/rec_thumb"
  		android:layout_alignParentLeft="true"
- 		android:textSize="17sp"/>
+ 		android:textSize="18sp"/>
  		
 	<TextView	
 		android:id="@+id/rec_start"
@@ -47,7 +49,7 @@
  		android:layout_height="wrap_content"
 		android:layout_alignTop="@id/rec_channel"
  		android:layout_alignParentRight="true"
-		android:textSize="17sp"/>
+		android:textSize="18sp"/>
 		
 	<TextView	
 		android:id="@+id/rec_category"
@@ -55,8 +57,8 @@
  		android:layout_height="wrap_content"
  		android:layout_below="@id/rec_channel"
  		android:layout_alignParentLeft="true"
- 		android:paddingTop="8dp"
- 		android:textSize="15sp"/>
+ 		android:paddingTop="16dp"
+ 		android:textSize="16sp"/>
  		
 	<TextView	
 		android:id="@+id/rec_status"
@@ -64,8 +66,8 @@
  		android:layout_height="wrap_content"
 		android:layout_alignTop="@id/rec_category"
  		android:layout_alignParentRight="true"
- 		android:paddingTop="8dp"
-		android:textSize="15sp"/>
+ 		android:paddingTop="16dp"
+		android:textSize="16sp"/>
 		
 	<LinearLayout
 		android:id="@+id/rec_buttons"
@@ -74,7 +76,7 @@
 		android:layout_alignParentBottom="true"
 		android:layout_centerHorizontal="true"
 		android:gravity="center"
-		android:paddingBottom="5dp"
+		android:paddingBottom="10dp"
 		android:orientation="horizontal">
 		
 		<Button
@@ -119,8 +121,8 @@
 		android:layout_below="@id/rec_category"
 		android:layout_above="@id/rec_buttons"
 		android:layout_alignWithParentIfMissing="true"
-		android:paddingTop="12dp"
-		android:paddingBottom="8dp"
+		android:paddingTop="20dp"
+		android:paddingBottom="16dp"
 		android:clipChildren="true">
 		
 		<TextView
@@ -128,7 +130,7 @@
 			android:layout_width="wrap_content" 
  			android:layout_height="wrap_content"
  			android:paddingRight="4dp"
-			android:textSize="16sp"/>
+			android:textSize="17sp"/>
 			
 	</ScrollView>
 			

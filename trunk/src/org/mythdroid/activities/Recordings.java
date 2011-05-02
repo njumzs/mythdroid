@@ -23,37 +23,33 @@ import java.util.Collections;
 
 import org.mythdroid.Globals;
 import org.mythdroid.R;
-import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.data.Program;
-import org.mythdroid.data.ProgramAdapter;
+import org.mythdroid.fragments.RecListFragment;
+
 
 import android.R.drawable;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 /**
- * MDListActivity shows list of Recordings
+ * MDFragmentActivity shows list of Recordings
  */
-public class Recordings extends MDListActivity implements
-    AdapterView.OnItemLongClickListener {
+public class Recordings extends MDFragmentActivity {
 
-    /** Child activities can set their result to this to indicate that the
+    /**
+     * Child activities can set their result to this to indicate that the
      * list of recordings should be refreshed when Recordings resumes
      */
     final public static int  REFRESH_NEEDED = Activity.RESULT_FIRST_USER;
@@ -62,15 +58,20 @@ public class Recordings extends MDListActivity implements
 
     final private static int
         MENU_REFRESH   = 0, MENU_FILTER = 1, MENU_FILTER_RESET = 2;
-
+    
     final private Handler handler = new Handler();
-
-    final private Context ctx = this;
+    
     /** A list of recordings (Programs) */
     private ArrayList<Program> recordings = null;
+    
     /** The title we should filter on */
     private String filter = null;
-
+    
+    private RecListFragment listFragment = null;
+    
+    private boolean isPaused = true, configChanged = false;
+    private int index = 0;
+    
     /** Populates recordings, filters if necessary */
     final private Runnable getRecordings  = new Runnable() {
         @Override
@@ -91,26 +92,20 @@ public class Recordings extends MDListActivity implements
 
             if (filter != null) {
                 ArrayList<Program> newList = new ArrayList<Program>();
-
                 for (Program p : recordings)
                     if (p.Title.equals(filter))
                         newList.add(p);
-
                 recordings = newList;
             }
 
             handler.post(
                 new Runnable() {
                     @Override
-                public void run() {
+                    public void run() {
                         try {
                             dismissDialog(DIALOG_LOAD);
                         } catch (IllegalArgumentException e) {}
-                        setListAdapter(
-                            new ProgramAdapter(
-                                ctx, R.layout.recording_list_item, recordings
-                            )
-                        );
+                        listFragment.setAdapter(recordings);
                     }
                 }
             );
@@ -121,13 +116,35 @@ public class Recordings extends MDListActivity implements
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        setListAdapter(null);
-        addHereToFrontendChooser(VideoPlayer.class);
-        getListView().setOnItemLongClickListener(this);
-        refresh();
-
+        setContentView(R.layout.recordings);
+        listFragment = new RecListFragment();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.reclistframe, listFragment);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.commit();
     }
-
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        isPaused = true;
+        index = listFragment.getIndex();
+        try {
+            dismissDialog(DIALOG_LOAD);
+        } catch (IllegalArgumentException e) {}
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        isPaused = false;
+        if (configChanged)
+            resetContentView(index);
+        if (hasRecordings())
+            listFragment.setAdapter(recordings);
+        configChanged = false;
+    }
+    
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -137,35 +154,24 @@ public class Recordings extends MDListActivity implements
     @Override
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
-        getListView().setOnItemLongClickListener(this);
+        if (isPaused)
+            configChanged = true;
+        else {
+            resetContentView(index);
+            if (hasRecordings())
+                listFragment.setAdapter(recordings);
+        }
     }
-
-    @Override
-    public void onActivityResult(int reqCode, int resCode, Intent data) {
-        if (resCode == REFRESH_NEEDED)
-            refresh();
-    }
-
-    @Override
-    public void onListItemClick(ListView list, View item, int pos, long id) {
-        Globals.curProg = (Program)list.getItemAtPosition(pos);
-        startActivityForResult(
-            new Intent().setClass(this, RecordingDetail.class), 0
-        );
-    }
-
-    @Override
-    public boolean onItemLongClick(
-        AdapterView<?> adapter, View item, int pos, long itemid
-    ) {
-        Globals.curProg = (Program)adapter.getItemAtPosition(pos);
-        nextActivity = TVRemote.class;
-        showDialog(FRONTEND_CHOOSER);
-        return true;
-    }
-
+    
     @Override
     public Dialog onCreateDialog(int id) {
+        
+        OnClickListener no = new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        };
 
         switch (id) {
 
@@ -177,16 +183,7 @@ public class Recordings extends MDListActivity implements
                 	return new AlertDialog.Builder(this)
                 		.setTitle(R.string.filter_rec)
                 		.setMessage(R.string.no_recs)
-                		.setPositiveButton(R.string.ok, 
-                			new OnClickListener() {
-								@Override
-								public void onClick(
-										DialogInterface dialog, int which
-								) {
-									dialog.dismiss();
-								} 
-							}
-                		)
+                		.setPositiveButton(R.string.ok, no)
                 		.create();
                 
                 for (Program prog : recordings) {
@@ -216,7 +213,7 @@ public class Recordings extends MDListActivity implements
                             }
                         )
                         .create();
-
+   
             default:
                 return super.onCreateDialog(id);
 
@@ -253,19 +250,43 @@ public class Recordings extends MDListActivity implements
         return false;
 
     }
-
-    private void empty() {
+    
+    /**
+     * Is the recordings list populated?
+     * @return true if so
+     */
+    public boolean hasRecordings() {
+        return recordings != null && !recordings.isEmpty();
+    }
+    
+    /**
+     * Empty the recordings list
+     */
+    public void empty() {
         if (recordings != null)
             recordings.clear();
         recordings = null;
-        setListAdapter(null);
         Globals.curProg = null;
     }
 
-    private void refresh() {
+    /**
+     * Refresh the recordings list
+     */
+    public void refresh() {
         empty();
         showDialog(DIALOG_LOAD);
         Globals.getWorker().post(getRecordings);
     }
-
+   
+    private void resetContentView(int index) {
+        setContentView(R.layout.recordings);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.remove(listFragment);
+        listFragment = RecListFragment.newInstance(index);
+        ft.replace(R.id.reclistframe, listFragment);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.commit();
+        getSupportFragmentManager().executePendingTransactions();
+    }
+    
 }
