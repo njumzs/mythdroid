@@ -38,7 +38,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
-import android.database.Cursor;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -192,27 +191,15 @@ public abstract class MDActivity extends Activity {
 
     private void prepareFrontendDialog(final Dialog dialog) {
 
-        Cursor c = FrontendDB.getFrontends(this);
-        ArrayList<String> list = new ArrayList<String>();
-
-        int num = c.getCount();
-
-        if (hereActivity == null && num < 1) {
-            ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
-            return;
-        }
-
-        if (num > 0) {
-            c.moveToFirst();
-            do  {
-                list.add(c.getString(FrontendDB.NAME));
-            } while(c.moveToNext());
-        }
-
-        c.close();
+        ArrayList<String> list = FrontendDB.getFrontendNames(this);
 
         if (hereActivity != null)
             list.add(Messages.getString("MDActivity.1")); // Here //$NON-NLS-1$
+        
+        if (list.isEmpty()) {
+            ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
+            return;
+        }
 
         ((AlertDialog)dialog).getListView().setAdapter(
             new ArrayAdapter<String>(

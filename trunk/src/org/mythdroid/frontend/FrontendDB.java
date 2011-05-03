@@ -18,6 +18,8 @@
 
 package org.mythdroid.frontend;
 
+import java.util.ArrayList;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -34,8 +36,10 @@ public class FrontendDB {
     final private static int    DB_VERSION     = 3;
     final private static String FRONTEND_TABLE = "frontends"; //$NON-NLS-1$
 
-    private static SQLiteDatabase db             = null;
-
+    private static SQLiteDatabase db           = null;
+    private static Cursor         cached       = null;
+    private static ArrayList<String> namesList = null;
+    
     private static class DBOpenHelper extends SQLiteOpenHelper {
 
         public DBOpenHelper(Context context) {
@@ -64,13 +68,74 @@ public class FrontendDB {
      * @return Cursor
      */
     public static Cursor getFrontends(Context ctx) {
-
-        if (db == null) initDB(ctx);
-
-        return db.rawQuery(
-            "SELECT _id, addr, name, hwaddr from " + FRONTEND_TABLE, null //$NON-NLS-1$
-        );
-
+        if (db == null || cached == null) initDB(ctx);
+        return cached;
+    }
+    
+    /**
+     * Get an ArrayList of frontend names
+     * @param ctx Context
+     * @return list of frontend names
+     */
+    public static ArrayList<String> getFrontendNames(Context ctx) {
+        
+        if (db == null || cached == null) initDB(ctx);
+        
+        if (namesList != null)
+            return namesList;
+        
+        namesList = new ArrayList<String>();
+        cached.moveToFirst();
+        
+        do  {
+            namesList.add(cached.getString(NAME));
+        } while(cached.moveToNext());
+        
+        return namesList;
+        
+    }
+    
+    /**
+     * Get the name of the first defined frontend
+     * @param ctx Context
+     * @return name of the first frontend
+     */
+    public static String getFirstFrontendName(Context ctx) {
+        if (db == null || cached == null) initDB(ctx);
+        if (cached.getCount() < 1) 
+            return null;
+        cached.moveToFirst();
+        return cached.getString(NAME);
+    }
+    
+    /**
+     * Get the addr of the first defined frontend
+     * @param ctx Context
+     * @return addr of the first frontend
+     */
+    public static String getFirstFrontendAddr(Context ctx) {
+        if (db == null || cached == null) initDB(ctx);
+        if (cached.getCount() < 1) 
+            return null;
+        cached.moveToFirst();
+        return cached.getString(ADDR);
+    }
+    
+    /**
+     * Get the addr of the frontend with the given name
+     * @param ctx Context
+     * @param name name of the frontend
+     * @return addr of the frontend
+     */
+    public static String getFrontendAddr(Context ctx, String name) {
+        if (db == null || cached == null) initDB(ctx);
+        cached.moveToFirst();
+        while (!cached.isAfterLast()) {
+            if (cached.getString(NAME).equals(name))
+                return cached.getString(ADDR);
+            cached.moveToNext();
+        }
+        return null;
     }
 
     /**
@@ -101,6 +166,8 @@ public class FrontendDB {
         db.insert(FRONTEND_TABLE, null, cv);
 
         c.close();
+        cached.requery();
+        namesList = null;
         return true;
 
     }
@@ -124,6 +191,8 @@ public class FrontendDB {
         db.update(
             FRONTEND_TABLE, cv, "_id = ?", new String[] { String.valueOf(id) } //$NON-NLS-1$
         );
+        cached.requery();
+        namesList = null;
     }
 
     /**
@@ -134,18 +203,29 @@ public class FrontendDB {
         if (db == null) initDB(ctx);
         db.delete(FRONTEND_TABLE, "_id = ?", //$NON-NLS-1$
             new String[] { String.valueOf(id) });
+        cached.requery();
+        namesList = null;
     }
 
     /** Close the frontend database */
     public static void close() {
-        if (db == null) return;
-        if (db.isOpen())
-            db.close();
-        db = null;
+        if (cached != null) {
+            cached.close();
+            cached = null;
+        }
+        if (db != null) {
+            if (db.isOpen())
+                db.close();
+            db = null;
+        }
+        namesList = null;
     }
 
     private static void initDB(Context ctx) {
         db = new DBOpenHelper(ctx).getWritableDatabase();
+        cached = db.rawQuery(
+            "SELECT _id, addr, name, hwaddr from " + FRONTEND_TABLE, null //$NON-NLS-1$
+        );
     }
 
 }
