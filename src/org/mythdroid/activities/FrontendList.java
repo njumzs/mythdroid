@@ -44,7 +44,6 @@ public class FrontendList extends ListActivity implements
 
     final private Context ctx             = this;
 
-    private Cursor        c               = null;
     private AlertDialog   feEditor        = null;
     private int           clickedPosition = -1;
     private View          clickedView     = null;
@@ -65,7 +64,7 @@ public class FrontendList extends ListActivity implements
         getListView().addHeaderView(hdr);
         getListView().setPadding(0, 4, 0, 0);
 
-        c = FrontendDB.getFrontends(this);
+        Cursor c = FrontendDB.getFrontends(this);
 
         setListAdapter(
             new SimpleCursorAdapter(
@@ -77,13 +76,6 @@ public class FrontendList extends ListActivity implements
             )
         );
 
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        c.close();
-        FrontendDB.close();
     }
 
     @Override
@@ -200,7 +192,6 @@ public class FrontendList extends ListActivity implements
 
         }
 
-        c.requery();
         dialog.dismiss();
     }
 }

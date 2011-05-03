@@ -13,7 +13,6 @@ import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.resource.Messages;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
@@ -87,37 +86,21 @@ public class Globals {
             feMgr = null;
         }
 
-        Cursor c = FrontendDB.getFrontends(ctx);
-
-        if (c.getCount() < 1) {
-            c.close();
-            throw new IOException(Messages.getString("MythDroid.26")); //$NON-NLS-1$
-        }
-
-        c.moveToFirst();
-
         if (name == null) {
-            name = c.getString(FrontendDB.NAME);
-            feMgr = new FrontendManager(name, c.getString(FrontendDB.ADDR));
+            name = FrontendDB.getFirstFrontendName(ctx);
+            if (name == null)
+                throw new IOException(Messages.getString("MythDroid.26")); //$NON-NLS-1$
+            feMgr = 
+                new FrontendManager(name, FrontendDB.getFirstFrontendAddr(ctx));
         }
 
-        else {
-            while (!c.isAfterLast()) {
-                String n = c.getString(FrontendDB.NAME);
-                if (n.equals(name)) {
-                    feMgr = new FrontendManager(
-                        name, c.getString(FrontendDB.ADDR)
-                    );
-                    break;
-                }
-                c.moveToNext();
-            }
-        }
+        else
+            feMgr = new FrontendManager(
+                name, FrontendDB.getFrontendAddr(ctx, name)
+            );
 
         if (feMgr != null)
             defaultFrontend = feMgr.name;
-
-        c.close();
 
         return feMgr;
 
