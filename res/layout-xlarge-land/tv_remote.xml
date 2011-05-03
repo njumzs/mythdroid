@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/nav_remote"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="8dp"
+    android:background="@drawable/metal">
+    
+    <ImageButton android:id="@+id/tv_back"
+    	style="@style/MDButton160"
+    	android:layout_alignParentLeft="true"
+    	android:layout_alignParentTop="true"
+    	android:src="@drawable/back"/>
+    	
+   	<ImageButton android:id="@+id/tv_seek_forward"
+    	style="@style/MDButton160"
+    	android:layout_alignParentBottom="true"
+    	android:layout_alignParentRight="true"
+    	android:layout_marginRight="20dp"
+    	android:src="@drawable/seek_forward"/>
+    	
+    <ImageButton android:id="@+id/tv_skip_forward"
+    	style="@style/MDButton160"
+    	android:layout_alignTop="@id/tv_seek_forward"
+    	android:layout_toLeftOf="@id/tv_seek_forward"
+    	android:src="@drawable/skip_forward"/>
+    	
+    <ImageButton android:id="@+id/tv_rec"
+    	style="@style/MDButton160"
+    	android:layout_toLeftOf="@id/tv_skip_forward"
+    	android:layout_alignTop="@id/tv_seek_forward"
+    	android:src="@drawable/record"/>
+    	
+   	<ImageButton android:id="@+id/tv_pause"
+    	style="@style/MDButton160"
+    	android:layout_alignLeft="@id/tv_rec"
+    	android:layout_above="@id/tv_rec"
+    	android:src="@drawable/pause"/>
+    
+    <ImageButton android:id="@+id/tv_skip_back"
+    	style="@style/MDButton160"
+    	android:layout_alignTop="@id/tv_rec"
+    	android:layout_toLeftOf="@id/tv_rec"
+    	android:src="@drawable/skip_back"/>
+    	    
+    <ImageButton android:id="@+id/tv_seek_back"
+    	style="@style/MDButton160"
+    	android:layout_alignTop="@id/tv_rec"
+    	android:layout_toLeftOf="@id/tv_skip_back"
+    	android:src="@drawable/seek_back"/>
+ 	
+ 	<ImageButton android:id="@+id/tv_skip"
+    	style="@style/MDButton160"
+    	android:layout_alignParentRight="true"
+    	android:layout_above="@id/tv_seek_forward"
+    	android:layout_marginBottom="8dp"
+    	android:src="@drawable/skip"/>
+    	
+    <ImageButton android:id="@+id/tv_guide"
+    	style="@style/MDButton160"
+    	android:layout_above="@id/tv_skip"
+    	android:layout_alignParentRight="true"
+    	android:layout_marginBottom="8dp"
+    	android:src="@drawable/cal"/>    	
+    	    	
+    <ImageButton android:id="@+id/tv_vol_up"
+    	style="@style/MDButton160"
+    	android:layout_below="@id/tv_back"
+    	android:layout_alignLeft="@id/tv_back"
+    	android:layout_marginTop="20dp"
+    	android:src="@drawable/vol_up"/>
+    
+    <ImageButton android:id="@+id/tv_vol_down"
+    	style="@style/MDButton160"
+    	android:layout_below="@id/tv_vol_up"
+    	android:layout_alignLeft="@id/tv_back"
+    	android:src="@drawable/vol_down"/>
+    
+    <ImageButton android:id="@+id/tv_vol_mute"
+    	style="@style/MDButton160"
+    	android:layout_below="@id/tv_vol_down"
+    	android:layout_alignLeft="@id/tv_back"
+    	android:src="@drawable/vol_mute"/>
+    	
+   	<ImageButton android:id="@+id/tv_left"
+    	style="@style/MDButton160"
+    	android:layout_toRightOf="@id/tv_back"
+    	android:layout_below="@id/tv_back"
+    	android:layout_marginTop="12dp"
+    	android:layout_marginLeft="16dp"
+    	android:src="@drawable/left"/>
+    	
+    <ImageButton android:id="@+id/tv_enter"
+    	style="@style/MDButton160"
+    	android:layout_toRightOf="@id/tv_left"
+    	android:layout_alignTop="@id/tv_left"
+    	android:src="@drawable/btn_dial"/>
+    	
+    <ImageButton android:id="@+id/tv_up"
+    	style="@style/MDButton160"
+    	android:layout_above="@id/tv_enter"
+    	android:layout_alignLeft="@id/tv_enter"
+    	android:src="@drawable/up"/>
+  
+    <ImageButton android:id="@+id/tv_right"
+    	style="@style/MDButton160"
+    	android:layout_toRightOf="@id/tv_enter"
+    	android:layout_alignTop="@id/tv_enter"
+    	android:src="@drawable/right"/>
+    	
+    <ImageButton android:id="@+id/tv_down"
+    	style="@style/MDButton160"
+    	android:layout_alignLeft="@id/tv_enter"
+    	android:layout_below="@id/tv_enter"
+    	android:src="@drawable/down"/>
+    	
+   	<ImageButton android:id="@+id/tv_info"
+    	style="@style/MDButton160"
+    	android:layout_alignTop="@id/tv_guide"
+    	android:layout_alignLeft="@id/tv_pause"
+    	android:src="@drawable/info"/>
+	
+	<Button android:id="@+id/tv_num"
+    	style="@style/MDButton160"
+    	android:layout_alignLeft="@id/tv_left"
+    	android:layout_alignParentBottom="true"
+    	android:text="123..."
+    	android:gravity="center"/>    
+   
+   <TextView android:id="@+id/tv_title"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_alignParentTop="true"
+    	android:layout_alignParentRight="true"
+    	android:layout_toRightOf="@id/tv_up"
+    	android:layout_marginTop="4dp"
+    	android:layout_marginRight="8dp"
+    	android:layout_marginLeft="20dp"
+    	android:gravity="center"
+    	android:textSize="18sp"
+    	android:textStyle="bold"
+    	android:textColor="@color/light_grey_text"/>
+    
+    <ProgressBar android:id="@+id/tv_progress"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_toRightOf="@id/tv_right"
+ 		android:layout_alignParentRight="true"
+    	android:layout_below="@id/tv_title"
+    	android:layout_marginTop="4dp"
+    	android:layout_marginBottom="8dp"
+    	android:gravity="center"
+    	style="?android:attr/progressBarStyleHorizontal"/>	
+   
+</RelativeLayout>
