@@ -383,7 +383,12 @@ public class MusicRemote extends Remote {
                         try {
                             switch(which) {
                                 case Dialog.BUTTON_POSITIVE:
-                                    feMgr.jumpTo(Globals.lastLocation);
+                                    if (jump)
+                                        feMgr.jumpTo(Globals.lastLocation);
+                                    else {
+                                        feMgr.sendKey(Key.ESCAPE);
+                                        feMgr.sendKey(Key.ENTER);
+                                    }
                                     break;
                                 case Dialog.BUTTON_NEUTRAL:
                                     feMgr.sendKey(Key.ESCAPE);
