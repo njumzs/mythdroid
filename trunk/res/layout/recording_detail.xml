@@ -11,7 +11,7 @@
 		android:id="@+id/rec_title"
  		android:layout_width="fill_parent" 
  		android:layout_height="wrap_content"
- 		android:paddingTop="10dp"
+ 		android:paddingTop="8dp"
  		android:textSize="20sp"/>
  		
  	<TextView
@@ -29,9 +29,9 @@
  		android:layout_below="@id/rec_subtitle"
 		android:layout_centerHorizontal="true"
 		android:adjustViewBounds="true"
-		android:maxHeight="200dp"
-		android:paddingTop="16dp"
-		android:paddingBottom="16dp"/>
+		android:maxHeight="110dp"
+		android:paddingTop="10dp"
+		android:paddingBottom="10dp"/>
 		
 	<TextView	
 		android:id="@+id/rec_channel"
@@ -55,7 +55,7 @@
  		android:layout_height="wrap_content"
  		android:layout_below="@id/rec_channel"
  		android:layout_alignParentLeft="true"
- 		android:paddingTop="8dp"
+ 		android:paddingTop="4dp"
  		android:textSize="15sp"/>
  		
 	<TextView	
@@ -64,7 +64,7 @@
  		android:layout_height="wrap_content"
 		android:layout_alignTop="@id/rec_category"
  		android:layout_alignParentRight="true"
- 		android:paddingTop="8dp"
+ 		android:paddingTop="4dp"
 		android:textSize="15sp"/>
 		
 	<LinearLayout
@@ -74,15 +74,15 @@
 		android:layout_alignParentBottom="true"
 		android:layout_centerHorizontal="true"
 		android:gravity="center"
-		android:paddingBottom="5dp"
+		android:paddingBottom="2dp"
 		android:orientation="horizontal">
 		
 		<Button
  			android:id="@+id/rec_play"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
- 			android:layout_marginRight="10dp"
- 			android:minWidth="100dp"
+ 			android:layout_marginRight="3dp"
+ 			android:minWidth="76dp"
 			android:visibility="gone"
   			android:text="Play"/>
   			
@@ -90,7 +90,7 @@
  			android:id="@+id/rec_stop"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
- 			android:minWidth="100dp"
+ 			android:minWidth="76dp"
 			android:visibility="gone"
  			android:text="Stop Rec"/>
  			
@@ -98,16 +98,16 @@
  			android:id="@+id/rec_edit"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
- 			android:layout_marginLeft="10dp"
- 			android:minWidth="100dp"
+ 			android:layout_marginLeft="3dp"
+ 			android:minWidth="76dp"
  			android:text="Schedule"/>
  			
 		<Button
  			android:id="@+id/rec_del"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
- 			android:minWidth="100dp"
- 			android:layout_marginLeft="10dp"
+ 			android:minWidth="76dp"
+ 			android:layout_marginLeft="3dp"
 			android:visibility="gone"
  			android:text="Delete"/>
  			
@@ -119,8 +119,8 @@
 		android:layout_below="@id/rec_category"
 		android:layout_above="@id/rec_buttons"
 		android:layout_alignWithParentIfMissing="true"
-		android:paddingTop="12dp"
-		android:paddingBottom="8dp"
+		android:paddingTop="6dp"
+		android:paddingBottom="4dp"
 		android:clipChildren="true">
 		
 		<TextView
