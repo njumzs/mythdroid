@@ -118,7 +118,6 @@ public class Globals {
             defaultFrontend = feMgr.name;
 
         c.close();
-        FrontendDB.close();
 
         return feMgr;
 

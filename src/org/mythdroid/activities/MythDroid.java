@@ -132,7 +132,7 @@ public class MythDroid extends MDListActivity implements
         }
 
         Globals.destroyWorker();
-
+        FrontendDB.close();
         crecv.dispose(Globals.appContext);
 
     }
@@ -403,7 +403,6 @@ public class MythDroid extends MDListActivity implements
                     } catch (Exception e) { ErrUtil.err(ctx, e); }
                     Globals.defaultFrontend = c.getString(FrontendDB.NAME);
                     c.close();
-                    FrontendDB.close();
                     d.dismiss();
                 }
             }

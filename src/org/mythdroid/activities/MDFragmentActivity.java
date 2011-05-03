@@ -211,7 +211,6 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         }
 
         c.close();
-        FrontendDB.close();
 
         if (hereActivity != null)
             list.add(Messages.getString("MDActivity.1")); // Here //$NON-NLS-1$

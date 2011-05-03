@@ -210,7 +210,6 @@ public abstract class MDListActivity extends ListActivity {
         }
 
         c.close();
-        FrontendDB.close();
 
         if (hereActivity != null)
             list.add(Messages.getString("MDListActivity.1")); // Here //$NON-NLS-1$

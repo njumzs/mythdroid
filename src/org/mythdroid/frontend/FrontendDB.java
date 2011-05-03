@@ -139,7 +139,8 @@ public class FrontendDB {
     /** Close the frontend database */
     public static void close() {
         if (db == null) return;
-        db.close();
+        if (db.isOpen())
+            db.close();
         db = null;
     }
 
