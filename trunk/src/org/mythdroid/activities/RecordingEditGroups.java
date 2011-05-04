@@ -32,7 +32,7 @@ public class RecordingEditGroups extends MDFragmentActivity {
         RecEditGroupsFragment f = new RecEditGroupsFragment();
         f.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction()
-            .add(android.R.id.content, f).commit();
+            .replace(android.R.id.content, f).commit();
     }
- 
+    
 }

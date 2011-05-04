@@ -74,6 +74,7 @@ public class RecEditGroupsFragment extends Fragment {
         embedded = 
             activity.getClass().getName().endsWith("Recordings"); //$NON-NLS-1$
         view = inflater.inflate(R.layout.recording_edit_groups, null, false);
+        
         Bundle args = getArguments();
         if (args != null) {
             int id = args.getInt("RecEditFragId", -1); //$NON-NLS-1$
@@ -81,12 +82,7 @@ public class RecEditGroupsFragment extends Fragment {
                 ref = (RecEditFragment)getFragmentManager()
                           .findFragmentById(id);
         }
-        return view;
-    }
-    
-    @Override
-    public void onResume() {
-        super.onResume();
+        
         try {
             recGroups  = MDDManager.getRecGroups(
                 Globals.getBackend().addr
@@ -103,7 +99,9 @@ public class RecEditGroupsFragment extends Fragment {
             ErrUtil.err(activity, Messages.getString("RecordingEditGroups.0")); //$NON-NLS-1$
             done();
         }
+        
         setViews();
+        return view;
     }
 
     @Override
@@ -190,6 +188,7 @@ public class RecEditGroupsFragment extends Fragment {
      * @param enabled new state
      */
     public void setEnabled(boolean enabled) {
+        if (recGroupSpinner == null) return;
         recGroupSpinner.setEnabled(enabled);
         storGroupSpinner.setEnabled(enabled);
     }
