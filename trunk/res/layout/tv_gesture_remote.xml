@@ -5,69 +5,65 @@
 	android:background="@drawable/metal">
 	
 	<ImageButton android:id="@+id/tv_back"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		style="@style/MDButton72"
 		android:layout_alignParentTop="true"
 		android:layout_alignParentLeft="true"
 		android:layout_marginTop="4dp"
-		android:background="@drawable/mdbuttonselector"
 		android:src="@drawable/back"/>
 		
+	<ProgressBar android:id="@+id/tv_progress"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_below="@id/tv_back"
+    	android:layout_marginTop="8dp"
+    	android:layout_marginLeft="8dp"
+    	android:layout_marginRight="8dp"
+    	android:gravity="center"
+    	style="?android:attr/progressBarStyleHorizontal"/>
+		
 	<ImageButton android:id="@+id/tv_guide"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true"
+		style="@style/MDButton72"
+		android:layout_below="@id/tv_progress"
 		android:layout_alignParentLeft="true"
-		android:paddingBottom="8dp"
 		android:layout_marginTop="8dp"
-		android:background="@drawable/mdbuttonselector"
 		android:src="@drawable/cal"/>
 		
 	<Button android:id="@+id/tv_num"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignTop="@id/tv_guide"
-		android:layout_toRightOf="@id/tv_guide"
-		android:paddingBottom="8dp"
+		style="@style/MDButton72"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentBottom="true"
+		android:layout_marginBottom="8dp"
+		android:gravity="center"
 		android:textSize="13sp"
-		android:background="@drawable/mdbuttonselector"
 		android:text="123.."/>
 		
 	<ImageButton android:id="@+id/tv_vol_mute"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignTop="@id/tv_guide"
+		style="@style/MDButton72"
+		android:layout_alignTop="@id/tv_num"
 		android:layout_toRightOf="@id/tv_num"
-		android:paddingBottom="8dp"
-		android:background="@drawable/mdbuttonselector"
+		android:layout_marginBottom="8dp"
 		android:src="@drawable/vol_mute"/>
 		
 	<ImageButton android:id="@+id/tv_skip"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignTop="@id/tv_guide"
+		style="@style/MDButton72"
+		android:layout_alignTop="@id/tv_num"
 		android:layout_alignParentRight="true"
-		android:paddingBottom="8dp"
-		android:background="@drawable/mdbuttonselector"
+		android:layout_marginBottom="8dp"
 		android:src="@drawable/skip"/>
 				
 	<Button android:id="@+id/tv_enter"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignTop="@id/tv_guide"
+		style="@style/MDButton72"
+		android:layout_alignTop="@id/tv_num"
 		android:layout_toLeftOf="@id/tv_skip"
-		android:paddingBottom="8dp"
+		android:layout_marginBottom="8dp"
+		android:gravity="center"
 		android:textSize="13sp"
-		android:background="@drawable/mdbuttonselector"
 		android:text="Enter"/>
 		
 	<ImageButton android:id="@+id/tv_info"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		style="@style/MDButton72"
 		android:layout_alignTop="@id/tv_guide"
-		android:layout_toLeftOf="@id/tv_enter"
-		android:paddingBottom="8dp"
-		android:background="@drawable/mdbuttonselector"
+		android:layout_alignParentRight="true"
 		android:src="@drawable/info"/>
 		
 	<TextView android:id="@+id/tv_title"
@@ -82,16 +78,6 @@
       	android:textSize="20sp"
     	android:textStyle="bold"
     	android:textColor="@color/light_grey_text"/>
-    	
-    <ProgressBar android:id="@+id/tv_progress"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:layout_below="@id/tv_back"
-    	android:layout_marginTop="8dp"
-    	android:layout_marginLeft="8dp"
-    	android:layout_marginRight="8dp"
-    	android:gravity="center"
-    	style="?android:attr/progressBarStyleHorizontal"/>
     	
 	<ImageView android:id="@+id/tv_gesture"
 		android:layout_width="200dp"
