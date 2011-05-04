@@ -53,6 +53,7 @@ public class NavRemote extends Remote {
     private FrontendLocation lastLoc = null;
     private MDDManager       mddMgr  = null;
     private TextView         locView = null, itemView = null;
+    private String           locS = null,    itemS = null;
 
     private boolean
         gesture = false, jumpGuide = false, calledByRemote = false,
@@ -65,6 +66,8 @@ public class NavRemote extends Remote {
                new Runnable() {
                    @Override
                    public void run() {
+                       locS  = menu;
+                       itemS = item;
                        if (locView == null || itemView == null) return;
                        locView.setText(menu);
                        itemView.setText(item);
@@ -167,7 +170,6 @@ public class NavRemote extends Remote {
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
         setupViews(gesture);
-
         try {
             if (feMgr == null)
                 onResume();
@@ -285,6 +287,11 @@ public class NavRemote extends Remote {
 
         locView = (TextView)findViewById(R.id.nav_loc);
         itemView = (TextView)findViewById(R.id.nav_item);
+        
+        if (locS != null)
+            locView.setText(locS);
+        if (itemS != null)
+            itemView.setText(itemS);
 
         if (feMgr != null)
             try {

@@ -50,8 +50,9 @@
    		android:layout_alignParentBottom="true"
    		android:layout_alignParentLeft="true"
    		android:layout_marginLeft="16dp"
+   		android:layout_marginBottom="16dp"
    		android:textColor="@color/light_grey_text"
-   		android:textSize="18sp"/>
+   		android:textSize="20sp"/>
     	
    	<TextView android:id="@+id/nav_loc"
    		android:layout_width="fill_parent"
@@ -59,6 +60,6 @@
    		android:layout_above="@id/nav_item"
    		android:layout_alignLeft="@id/nav_item"
    		android:textColor="@color/light_grey_text"
-   		android:textSize="20sp"/>
+   		android:textSize="22sp"/>
 
 </RelativeLayout>
