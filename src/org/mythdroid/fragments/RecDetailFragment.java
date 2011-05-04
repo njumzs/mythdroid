@@ -27,6 +27,7 @@ import org.mythdroid.Enums.RecStatus;
 import org.mythdroid.activities.Guide;
 import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.activities.Recordings;
+import org.mythdroid.activities.VideoPlayer;
 import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
 import org.mythdroid.remote.TVRemote;
@@ -105,7 +106,7 @@ public class RecDetailFragment extends Fragment {
         embedded = 
             activity.getClass().getName().endsWith("Recordings"); //$NON-NLS-1$
         if (!embedded)
-            activity.addHereToFrontendChooser(TVRemote.class);
+            activity.addHereToFrontendChooser(VideoPlayer.class);
         
         containerId = container.getId();
         
