@@ -107,7 +107,7 @@ public class RecEditSchedFragment extends Fragment {
                 ) {
                     RecEditFragment.dupMethod = RecDupMethod.values()[pos];
                     if (ref != null)
-                        ref.onActivityResult(0, 0, null);
+                        ref.checkChildren();
                 }
 
                 @Override
@@ -139,7 +139,7 @@ public class RecEditSchedFragment extends Fragment {
                 ) {
                     RecEditFragment.dupIn = RecDupIn.values()[pos];
                     if (ref != null)
-                        ref.onActivityResult(0, 0, null);
+                        ref.checkChildren();
                 }
 
                 @Override
@@ -171,7 +171,7 @@ public class RecEditSchedFragment extends Fragment {
                 ) {
                     RecEditFragment.epiFilter = RecEpiFilter.values()[pos];
                     if (ref != null)
-                        ref.onActivityResult(0, 0, null);
+                        ref.checkChildren();
                 }
 
                 @Override
