@@ -314,6 +314,7 @@ public class RecDetailFragment extends Fragment {
                     .create();
         }
     }
+    
 }
 
 
