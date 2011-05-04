@@ -82,7 +82,7 @@ public class FrontendDB {
         if (db == null || cached == null) initDB(ctx);
         
         if (namesList != null)
-            return namesList;
+            return new ArrayList<String>(namesList);
         
         namesList = new ArrayList<String>();
         cached.moveToFirst();
@@ -91,7 +91,7 @@ public class FrontendDB {
             namesList.add(cached.getString(NAME));
         } while(cached.moveToNext());
         
-        return namesList;
+        return new ArrayList<String>(namesList);
         
     }
     
