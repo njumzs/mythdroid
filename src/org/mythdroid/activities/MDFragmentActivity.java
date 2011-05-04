@@ -37,7 +37,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.res.Configuration;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -45,6 +48,14 @@ import android.widget.AdapterView.OnItemClickListener;
 
 /** Base class for activities that display frontend choosers
  * and/or loading dialogs - same as MDActivity except for some sym visibility */
+/**
+ * @author nick
+ *
+ */
+/**
+ * @author nick
+ *
+ */
 public abstract class MDFragmentActivity extends FragmentActivity {
 
     /** Frontend chooser and loading dialogs */
@@ -58,6 +69,8 @@ public abstract class MDFragmentActivity extends FragmentActivity {
      */
     public Class<?> nextActivity = null;
     protected Class<?> hereActivity = null;
+    
+    protected boolean isPaused = false, configChanged = false;
 
     /** Extras to put in the intent passed to nextActivity */
     final private ArrayList<String> boolExtras = new ArrayList<String>();
@@ -154,12 +167,31 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         super.onResume();
         if (Globals.appContext == null)
             Globals.appContext = getApplicationContext();
+        isPaused = false;
+        if (configChanged)
+            resetContentView();
+        configChanged = false;
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        isPaused = true;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         removeDialog(FRONTEND_CHOOSER);
+    }
+    
+    @Override
+    public void onConfigurationChanged(Configuration config) {
+        super.onConfigurationChanged(config);
+        if (isPaused)
+            configChanged = true;
+        else
+            resetContentView();
     }
 
     /** Create a dialog allowing user to choose default frontend */
@@ -217,6 +249,30 @@ public abstract class MDFragmentActivity extends FragmentActivity {
      */
     public void addHereToFrontendChooser(Class<?> activity) {
         hereActivity = activity;
+    }
+    
+    /**
+     * Reset fragments - 
+     * Called when configuration (orientation) changes - 
+     * Default implementation replaces the fragment occupying the 'content' id
+     * with a new instance of the same class
+     */
+    protected void resetContentView() {
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment f = null;
+        
+        try {
+            f = fm.findFragmentById(android.R.id.content)
+                    .getClass().newInstance();
+        } catch (Exception e) { 
+            ErrUtil.err(this, e);
+            return;
+        }
+        
+        f.setArguments(getIntent().getExtras());
+        fm.popBackStack();
+        fm.beginTransaction().replace(android.R.id.content, f)
+              .addToBackStack(null).commit();
     }
 
     /**

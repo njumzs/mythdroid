@@ -87,52 +87,29 @@ public class RecEditFragment extends Fragment {
     public View onCreateView(
         LayoutInflater inflater, ViewGroup container, Bundle icicle
     ) {
+        
         if (container == null) return null;
+        
         activity = (MDFragmentActivity)getActivity();
         embedded = 
             activity.getClass().getName().endsWith("Recordings"); //$NON-NLS-1$
+        
         view = inflater.inflate(R.layout.recording_edit, null, false);
+        
         View schedOptFrame = view.findViewById(R.id.recedit_schedoptframe);
         inlineOpts = schedOptFrame != null &&
                      schedOptFrame.getVisibility() == View.VISIBLE;
         
-        if (inlineOpts) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            resf = RecEditSchedFragment.newInstance(getId());
-            regf = RecEditGroupsFragment.newInstance(getId());
-            ft.replace(R.id.recedit_schedoptframe, resf);
-            ft.replace(R.id.recedit_groupoptframe, regf);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            ft.commit();
-        }
-        
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-
-        super.onResume();
         try {
             beMgr = Globals.getBackend();
         } catch (Exception e) {
             ErrUtil.err(activity, e);
         }
-
-        try {
-            new MDDManager(beMgr.addr);
-        } catch (IOException e) {
-            ErrUtil.err(
-                activity, Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
-            );
-            done();
-            return;
-        }
-
+        
         prog = Globals.curProg;
         if (prog == null) {
             done();
-            return;
+            return null;
         }
 
         type = prog.Type;
@@ -158,9 +135,41 @@ public class RecEditFragment extends Fragment {
                 done();
             }
         }
+        
+        if (inlineOpts) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            resf = RecEditSchedFragment.newInstance(getId());
+            regf = RecEditGroupsFragment.newInstance(getId());
+            ft.replace(R.id.recedit_schedoptframe, resf);
+            ft.replace(R.id.recedit_groupoptframe, regf);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            ft.commit();
+        }
 
         setViews();
+        return view;
+    }
 
+    @Override
+    public void onResume() {
+
+        super.onResume();
+        try {
+            beMgr = Globals.getBackend();
+        } catch (Exception e) {
+            ErrUtil.err(activity, e);
+        }
+
+        try {
+            new MDDManager(beMgr.addr);
+        } catch (IOException e) {
+            ErrUtil.err(
+                activity, Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
+            );
+            done();
+            return;
+        }
+        
     }
 
     @Override

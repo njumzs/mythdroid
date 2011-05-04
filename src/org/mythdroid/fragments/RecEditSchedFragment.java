@@ -186,6 +186,7 @@ public class RecEditSchedFragment extends Fragment {
      * @param enabled new state
      */
     public void setEnabled(boolean enabled) {
+        if (dupMatchSpinner == null) return;
         dupMatchSpinner.setEnabled(enabled);
         dupInSpinner.setEnabled(enabled);
         epiFilterSpinner.setEnabled(enabled);

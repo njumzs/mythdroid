@@ -69,7 +69,6 @@ public class Recordings extends MDFragmentActivity {
     
     private RecListFragment listFragment = null;
     
-    private boolean isPaused = true, configChanged = false;
     private int index = 0;
     
     /** Populates recordings, filters if necessary */
@@ -127,22 +126,10 @@ public class Recordings extends MDFragmentActivity {
     @Override
     public void onPause() {
         super.onPause();
-        isPaused = true;
         index = listFragment.getIndex();
         try {
             dismissDialog(DIALOG_LOAD);
         } catch (IllegalArgumentException e) {}
-    }
-    
-    @Override
-    public void onResume() {
-        super.onResume();
-        isPaused = false;
-        if (configChanged)
-            resetContentView(index);
-        if (hasRecordings())
-            listFragment.setAdapter(recordings);
-        configChanged = false;
     }
     
     @Override
@@ -154,13 +141,9 @@ public class Recordings extends MDFragmentActivity {
     @Override
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
-        if (isPaused)
-            configChanged = true;
-        else {
-            resetContentView(index);
+        if (!isPaused)
             if (hasRecordings())
                 listFragment.setAdapter(recordings);
-        }
     }
     
     @Override
@@ -278,15 +261,17 @@ public class Recordings extends MDFragmentActivity {
         Globals.getWorker().post(getRecordings);
     }
    
-    private void resetContentView(int index) {
+    @Override
+    protected void resetContentView() {
         setContentView(R.layout.recordings);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.remove(listFragment);
         listFragment = RecListFragment.newInstance(index);
         ft.replace(R.id.reclistframe, listFragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         ft.commit();
         getSupportFragmentManager().executePendingTransactions();
+        if (hasRecordings())
+            listFragment.setAdapter(recordings);
     }
     
 }

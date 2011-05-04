@@ -36,5 +36,13 @@ public class RecordingEdit extends MDFragmentActivity {
         getSupportFragmentManager().beginTransaction()
             .add(android.R.id.content, ref).commit();
     }
+    
+    @Override
+    protected void resetContentView() {
+        RecEditFragment ref = new RecEditFragment();
+        ref.setArguments(getIntent().getExtras());
+        getSupportFragmentManager().beginTransaction()
+            .replace(android.R.id.content, ref).commit();
+    }
 
 }

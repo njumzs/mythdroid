@@ -31,6 +31,7 @@ import org.mythdroid.remote.TVRemote;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.view.View;
@@ -85,13 +86,7 @@ public class RecListFragment extends ListFragment
         if (args != null) 
             selected = args.getInt("selected", -1); //$NON-NLS-1$
         if (selected < 0) selected = 0;
-
-    }
-    
-    @Override
-    public void onSaveInstanceState(Bundle icicle) {
-        super.onSaveInstanceState(icicle);
-        icicle.putInt("selected", selected); //$NON-NLS-1$
+   
     }
     
     @Override
@@ -157,10 +152,8 @@ public class RecListFragment extends ListFragment
     private void showDetails() {
         if (dualPane) {
             lv.setItemChecked(selected, true);
-            RecDetailFragment rdf = 
-                RecDetailFragment.newInstance(false, false);
-            FragmentTransaction ft = 
-                getFragmentManager().beginTransaction();
+            Fragment rdf = RecDetailFragment.newInstance(false, false);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.recdetails, rdf);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             ft.commit();
