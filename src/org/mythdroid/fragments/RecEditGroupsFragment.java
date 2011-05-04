@@ -138,7 +138,7 @@ public class RecEditGroupsFragment extends Fragment {
                 ) {
                     RecEditFragment.recGroup = recGroups[pos];
                     if (ref != null)
-                        ref.onActivityResult(0, 0, null);
+                        ref.checkChildren();
                 }
 
                 @Override
@@ -173,7 +173,7 @@ public class RecEditGroupsFragment extends Fragment {
                 ) {
                     RecEditFragment.storGroup = storGroups[pos];
                     if (ref != null)
-                        ref.onActivityResult(0, 0, null);
+                        ref.checkChildren();
                 }
 
                 @Override

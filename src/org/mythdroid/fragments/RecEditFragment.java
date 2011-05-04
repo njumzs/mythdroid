@@ -28,15 +28,12 @@ import org.mythdroid.Enums.RecEpiFilter;
 import org.mythdroid.Enums.RecType;
 import org.mythdroid.activities.Guide;
 import org.mythdroid.activities.MDFragmentActivity;
-import org.mythdroid.activities.RecordingEditGroups;
-import org.mythdroid.activities.RecordingEditSched;
 import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -79,26 +76,18 @@ public class RecEditFragment extends Fragment {
     private Spinner prioSpinner;
     
     private boolean childrenModified = false, modified = false,
-                    embedded = false, inlineOpts = false;
+                    inlineOpts = false;
+    
+    private int containerId;
     
     private String  updates = ""; //$NON-NLS-1$
-
+    
     @Override
-    public View onCreateView(
-        LayoutInflater inflater, ViewGroup container, Bundle icicle
-    ) {
+    public void onCreate(Bundle icicle) {
         
-        if (container == null) return null;
+        super.onCreate(icicle);
         
         activity = (MDFragmentActivity)getActivity();
-        embedded = 
-            activity.getClass().getName().endsWith("Recordings"); //$NON-NLS-1$
-        
-        view = inflater.inflate(R.layout.recording_edit, null, false);
-        
-        View schedOptFrame = view.findViewById(R.id.recedit_schedoptframe);
-        inlineOpts = schedOptFrame != null &&
-                     schedOptFrame.getVisibility() == View.VISIBLE;
         
         try {
             beMgr = Globals.getBackend();
@@ -109,7 +98,7 @@ public class RecEditFragment extends Fragment {
         prog = Globals.curProg;
         if (prog == null) {
             done();
-            return null;
+            return;
         }
 
         type = prog.Type;
@@ -136,6 +125,23 @@ public class RecEditFragment extends Fragment {
             }
         }
         
+    }
+
+    @Override
+    public View onCreateView(
+        LayoutInflater inflater, ViewGroup container, Bundle icicle
+    ) {
+        
+        if (container == null) return null;
+        
+        containerId = container.getId();
+        
+        view = inflater.inflate(R.layout.recording_edit, null, false);
+        
+        View schedOptFrame = view.findViewById(R.id.recedit_schedoptframe);
+        inlineOpts = schedOptFrame != null &&
+                     schedOptFrame.getVisibility() == View.VISIBLE;
+        
         if (inlineOpts) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             resf = RecEditSchedFragment.newInstance(getId());
@@ -147,6 +153,9 @@ public class RecEditFragment extends Fragment {
         }
 
         setViews();
+        if (!inlineOpts)
+            checkChildren();
+        
         return view;
     }
 
@@ -161,7 +170,8 @@ public class RecEditFragment extends Fragment {
         }
 
         try {
-            new MDDManager(beMgr.addr);
+            MDDManager mdd = new MDDManager(beMgr.addr);
+            mdd.shutdown();
         } catch (IOException e) {
             ErrUtil.err(
                 activity, Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
@@ -172,9 +182,10 @@ public class RecEditFragment extends Fragment {
         
     }
 
-    @Override
-    public void onActivityResult(int reqCode, int resCode, Intent data) {
-        super.onActivityResult(reqCode, resCode, data);
+    /**
+     * Check for changes that child fragments might have made
+     */
+    public void checkChildren() {
         if (prog == null || recGroup == null || storGroup == null) return;
         if (
             dupMethod == prog.DupMethod && dupIn == prog.DupIn &&
@@ -300,11 +311,12 @@ public class RecEditFragment extends Fragment {
                 new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startActivityForResult(
-                            new Intent().setClass(
-                                activity, RecordingEditSched.class
-                            ), 0
-                        );
+                        FragmentTransaction ft = 
+                            getFragmentManager().beginTransaction();
+                        ft.replace(containerId, new RecEditSchedFragment());
+                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                        ft.addToBackStack(null);
+                        ft.commit();
                     }
                 }
             );
@@ -315,11 +327,12 @@ public class RecEditFragment extends Fragment {
                 new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startActivityForResult(
-                            new Intent().setClass(
-                                activity, RecordingEditGroups.class
-                            ), 0
-                        );
+                        FragmentTransaction ft = 
+                            getFragmentManager().beginTransaction();
+                        ft.replace(containerId, new RecEditGroupsFragment());
+                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                        ft.addToBackStack(null);
+                        ft.commit();
                     }
                 }
             );
@@ -444,7 +457,6 @@ public class RecEditFragment extends Fragment {
     }
     
     private void done() {
-        if (embedded) getFragmentManager().popBackStackImmediate();
-        else activity.finish();
+        getFragmentManager().popBackStackImmediate();
     }
 }
