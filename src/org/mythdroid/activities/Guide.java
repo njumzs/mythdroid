@@ -550,10 +550,13 @@ public class Guide extends MDActivity {
         row.addView(tv);
 
         LayoutParams layout = null;
+        
+        Program[] progs = ch.programs.toArray(new Program[ch.programs.size()]);
+        int numprogs = progs.length;
 
-        for (Program prog : ch.programs) {
+        for (int i = 0; i < numprogs; i++) {
 
-            if (prog.StartTime.equals(later))
+            if (progs[i].StartTime.equals(later))
                 continue;
 
             tv = new TextView(this);
@@ -562,10 +565,10 @@ public class Guide extends MDActivity {
                 layout.leftMargin = layout.rightMargin = 1;
             layout.height = rowHeight;
 
-            String cat = prog.Category.toLowerCase()
-                             .replaceAll(" ", "") //$NON-NLS-1$ //$NON-NLS-2$
-                             .replaceAll("/", "") //$NON-NLS-1$ //$NON-NLS-2$
-                             .replaceAll("-", ""); //$NON-NLS-1$ //$NON-NLS-2$
+            String cat = progs[i].Category.toLowerCase()
+                                 .replaceAll(" ", "") //$NON-NLS-1$ //$NON-NLS-2$
+                                 .replaceAll("/", "") //$NON-NLS-1$ //$NON-NLS-2$
+                                 .replaceAll("-", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
             try {
                 tv.setBackgroundColor(Category.valueOf(cat).color());
@@ -576,15 +579,15 @@ public class Guide extends MDActivity {
             tv.setTextColor(0xfff0f0f0);
             tv.setPadding(4, 4, 4, 4);
             tv.setMaxLines(2);
-            tv.setText(prog.Title);
-            setStatusDrawable(tv, prog);
+            tv.setText(progs[i].Title);
+            setStatusDrawable(tv, progs[i]);
 
-            int width = setLayoutParams(layout, prog) * colWidth;
+            int width = setLayoutParams(layout, progs[i]) * colWidth;
             if (width < 1) continue;
 
             tv.setWidth(width);
             tv.setLayoutParams(layout);
-            tv.setTag(prog);
+            tv.setTag(progs[i]);
             tv.setOnClickListener(progClickListener);
             row.addView(tv);
 

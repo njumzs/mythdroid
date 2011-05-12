@@ -61,9 +61,8 @@ public class MDDManager {
                 }
 
                 if (!lineCache.isEmpty()) {
-                    for (String l : lineCache) {
+                    for (String l : lineCache)
                         handleData(l);
-                    }
                     lineCache.clear();
                 }
 

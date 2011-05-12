@@ -161,12 +161,13 @@ public class FrontendManager {
      * @return HashMap<String,String> of locations -> descriptions
      */
     public synchronized HashMap<String,String> getLocs() throws IOException {
-        HashMap<String,String> locs = new HashMap<String,String>(44);
+        HashMap<String,String> locs = new HashMap<String,String>(64);
         cmgr.writeLine("help jump"); //$NON-NLS-1$
-        ArrayList<String> lines = getResponse();
-        for (String line : lines) {
-            if (!line.matches(".*\\s+-\\s+.*")) continue; //$NON-NLS-1$
-            String[] l = line.split(" - "); //$NON-NLS-1$
+        String[] lines = getResponse();
+        int numlines = lines.length;
+        for (int i = 0; i < numlines; i++) {
+            if (!lines[i].matches(".*\\s+-\\s+.*")) continue; //$NON-NLS-1$
+            String[] l = lines[i].split(" - "); //$NON-NLS-1$
             locs.put(l[0].trim(), l[1].trim());
         }
         return locs;
@@ -218,8 +219,8 @@ public class FrontendManager {
         cmgr = null;
     }
 
-    private synchronized ArrayList<String> getResponse() throws IOException {
-        final ArrayList<String> resp = new ArrayList<String>(32);
+    private synchronized String[] getResponse() throws IOException {
+        final ArrayList<String> resp = new ArrayList<String>(64);
         String msg = ""; //$NON-NLS-1$
         while (cmgr != null) {
             msg = cmgr.readLine();
@@ -227,7 +228,7 @@ public class FrontendManager {
             if (msg.equals("#")) break; //$NON-NLS-1$
             resp.add(msg);
         }
-        return resp;
+        return resp.toArray(new String[resp.size()]);
     }
 
     @SuppressWarnings("null")
