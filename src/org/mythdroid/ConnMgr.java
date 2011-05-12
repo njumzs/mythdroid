@@ -417,7 +417,7 @@ public class ConnMgr {
 
         sock = new Socket();
         sock.setTcpNoDelay(true);
-        sock.setSoTimeout(timeout);
+        sock.setSoTimeout(500);
 
         try {
             sock.connect(sockAddr, timeout / 2);
@@ -475,17 +475,21 @@ public class ConnMgr {
         try {
             ret = is.read(buf, off, len);
         } catch (SocketTimeoutException e) {
+            
+            final String msg = Messages.getString("ConnMgr.5") + //$NON-NLS-1$ 
+                               addr +
+                               Messages.getString("ConnMgr.6");  //$NON-NLS-1$
 
             if (Globals.debug)
-                Log.d("ConnMgr", "Read from " + addr + " timed out"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                Log.d("ConnMgr", msg); //$NON-NLS-1$
 
             if (!sock.isConnected() || !connectedReady) {
                 waitForConnection(timeout * 4);
                 write(lastSent);
                 return read(buf, off, len);
             }
-
-            throw e;
+            
+            throw new SocketTimeoutException(msg);
 
         }
 
