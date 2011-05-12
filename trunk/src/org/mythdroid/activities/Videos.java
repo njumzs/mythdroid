@@ -111,16 +111,19 @@ public class Videos extends MDActivity implements
         @Override
         public void run() {
 
-            for (Video video : videos) {
+            Video[] vids = videos.toArray(new Video[videos.size()]);
+            int numvids = vids.length;
+            
+            for (int i = 0; i < numvids; i++) {
                 if (!fetchingArt)
                     break;
-                if (video.poster != null) continue;
-                Drawable d = artCache.get(video.id);
+                if (vids[i].poster != null) continue;
+                Drawable d = artCache.get(vids[i].id);
                 if (d != null)
-                    video.poster = d;
+                    vids[i].poster = d;
                 else {
-                    video.getPoster(70 * scale + 0.5f, 110 * scale + 0.5f);
-                    artCache.put(video.id, video.poster);
+                    vids[i].getPoster(70 * scale + 0.5f, 110 * scale + 0.5f);
+                    artCache.put(vids[i].id, vids[i].poster);
                 }
                 handler.post(
                     new Runnable() {

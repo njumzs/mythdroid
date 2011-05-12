@@ -90,10 +90,13 @@ public class Recordings extends MDFragmentActivity {
                 return;
 
             if (filter != null) {
-                ArrayList<Program> newList = new ArrayList<Program>();
-                for (Program p : recordings)
-                    if (p.Title.equals(filter))
-                        newList.add(p);
+                Program[] recs =
+                    recordings.toArray(new Program[recordings.size()]);
+                int numrecs = recs.length;
+                ArrayList<Program> newList = new ArrayList<Program>(numrecs/10);
+                for (int i = 0; i < numrecs; i++)
+                    if (recs[i].Title.equals(filter))
+                        newList.add(recs[i]);
                 recordings = newList;
             }
 

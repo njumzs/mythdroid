@@ -48,14 +48,6 @@ import android.widget.AdapterView.OnItemClickListener;
 
 /** Base class for activities that display frontend choosers
  * and/or loading dialogs - same as MDActivity except for some sym visibility */
-/**
- * @author nick
- *
- */
-/**
- * @author nick
- *
- */
 public abstract class MDFragmentActivity extends FragmentActivity {
 
     /** Frontend chooser and loading dialogs */

@@ -52,7 +52,7 @@ public class Status extends ListActivity {
     public static Document        statusDoc   = null;
 
     final static private int      DIALOG_LOAD = 0;
-    final private Context         ctx         = this;
+    
     final private static String[] StatusItems =
     {
         Messages.getString("Status.0"),    // Recorders //$NON-NLS-1$
@@ -61,6 +61,8 @@ public class Status extends ListActivity {
         Messages.getString("Status.3")     // Backend Info //$NON-NLS-1$
     };
 
+    
+    final private Context ctx     = this;
     final private Handler handler = new Handler();
 
     final private Runnable getStatusTask = new Runnable() {
