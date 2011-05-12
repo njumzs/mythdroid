@@ -417,7 +417,7 @@ public class ConnMgr {
 
         sock = new Socket();
         sock.setTcpNoDelay(true);
-        sock.setSoTimeout(500);
+        sock.setSoTimeout(timeout);
 
         try {
             sock.connect(sockAddr, timeout / 2);
