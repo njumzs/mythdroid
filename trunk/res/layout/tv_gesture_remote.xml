@@ -51,14 +51,12 @@
 		android:layout_marginBottom="8dp"
 		android:src="@drawable/skip"/>
 				
-	<Button android:id="@+id/tv_enter"
+	<ImageButton android:id="@+id/tv_enter"
 		style="@style/MDButton72"
 		android:layout_alignTop="@id/tv_num"
 		android:layout_toLeftOf="@id/tv_skip"
 		android:layout_marginBottom="8dp"
-		android:gravity="center"
-		android:textSize="13sp"
-		android:text="Enter"/>
+		android:src="@drawable/enter"/>
 		
 	<ImageButton android:id="@+id/tv_info"
 		style="@style/MDButton72"

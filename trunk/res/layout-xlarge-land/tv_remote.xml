@@ -125,6 +125,7 @@
     	style="@style/MDButton160"
     	android:layout_alignLeft="@id/tv_left"
     	android:layout_alignParentBottom="true"
+    	android:textSize="24sp"
     	android:text="123..."
     	android:gravity="center"/>    
    

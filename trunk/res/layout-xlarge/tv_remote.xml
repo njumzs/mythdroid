@@ -146,6 +146,7 @@
     	style="@style/MDButton160"
     	android:layout_alignTop="@id/tv_vol_up"
     	android:layout_alignParentRight="true"
+    	android:textSize="24sp"
     	android:text="123..."
     	android:gravity="center"/>    	
    
