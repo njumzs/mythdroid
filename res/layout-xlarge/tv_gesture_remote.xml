@@ -24,7 +24,7 @@
 		android:layout_toRightOf="@id/tv_guide"
 		android:layout_marginBottom="20dp"
 		android:gravity="center"
-		android:textSize="20sp"
+		android:textSize="24sp"
 		android:text="123.."/>
 		
 	<ImageButton android:id="@+id/tv_vol_mute"
@@ -41,14 +41,12 @@
 		android:layout_marginBottom="20dp"
 		android:src="@drawable/skip"/>
 				
-	<Button android:id="@+id/tv_enter"
+	<ImageButton android:id="@+id/tv_enter"
 		style="@style/MDButton160"
 		android:layout_alignTop="@id/tv_guide"
 		android:layout_toLeftOf="@id/tv_skip"
 		android:layout_marginBottom="20dp"
-		android:gravity="center"
-		android:textSize="20sp"
-		android:text="Enter"/>
+		android:src="@drawable/enter"/>
 		
 	<ImageButton android:id="@+id/tv_info"
 		style="@style/MDButton160"

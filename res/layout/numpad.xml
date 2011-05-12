@@ -53,7 +53,7 @@
         
         <ImageButton android:id="@+id/enter"
             style="@style/NumPadButton"
-            android:src="@drawable/enter"/>
+            android:src="@drawable/dial_enter"/>
 
 </org.mythdroid.views.NumPadLayout>
 
