@@ -41,6 +41,23 @@ public class FrontendLocation {
     @SuppressWarnings("all")
     public boolean
         video = false, livetv = false, music = false, musiceditor = false;
+    
+    final private static String[] addLocs = {
+         "library.xml",                 "Media Library",                //$NON-NLS-1$ //$NON-NLS-2$
+         "info_menu.xml",               "Information Centre",           //$NON-NLS-1$ //$NON-NLS-2$
+         "media_settings.xml",          "Media Settings",               //$NON-NLS-1$ //$NON-NLS-2$
+         "tv_search.xml",               "TV Search",                    //$NON-NLS-1$ //$NON-NLS-2$
+         "info_settings.xml",           "Information Centre Settings",  //$NON-NLS-1$ //$NON-NLS-2$
+         "optical_menu.xml",            "Optical Disks",                //$NON-NLS-1$ //$NON-NLS-2$
+         "tv_settings.xml",             "TV Settings",                  //$NON-NLS-1$ //$NON-NLS-2$
+         "recpriorities_settings.xml",  "Recording Priorities",         //$NON-NLS-1$ //$NON-NLS-2$
+         "tvmenu.xml",                  "TV Menu",                      //$NON-NLS-1$ //$NON-NLS-2$
+         "main_settings.xml",           "Settings",                     //$NON-NLS-1$ //$NON-NLS-2$
+         "util_menu.xml",               "Utilities",                    //$NON-NLS-1$ //$NON-NLS-2$
+         "tv_lists.xml",                "TV Lists",                     //$NON-NLS-1$ //$NON-NLS-2$
+         "manage_recordings.xml",       "Manage Recordings",            //$NON-NLS-1$ //$NON-NLS-2$
+         "tv_schedule.xml",             "Schedule Recordings"           //$NON-NLS-1$ //$NON-NLS-2$
+    };
 
     /**
      * Constructor
@@ -87,6 +104,11 @@ public class FrontendLocation {
         try {
             locations = feMgr.getLocs();
         } catch (IOException e) { return false; }
+        
+        int l = addLocs.length;
+        
+        for (int i = 0; i < l; i += 2)
+            locations.put(addLocs[i], addLocs[i+1]);
 
         return true;
 

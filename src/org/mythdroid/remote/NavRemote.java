@@ -58,6 +58,17 @@ public class NavRemote extends Remote {
     private boolean
         gesture = false, jumpGuide = false, calledByRemote = false,
         calledByTVRemote = false, calledByMusicRemote = false;
+    
+    // Update the location displays, posted from updateLoc() with a delay 
+    private Runnable updateLocViews = new Runnable() {
+        @Override
+        public void run() {
+            if (locS != null && locView != null)
+                locView.setText(locS);
+            if (itemS != null && itemView != null)
+                itemView.setText(itemS);
+        }
+    };
 
     private class mddListener implements MDDMenuListener {
         @Override
@@ -66,11 +77,19 @@ public class NavRemote extends Remote {
                new Runnable() {
                    @Override
                    public void run() {
-                       locS  = menu;
-                       itemS = item;
+                       
                        if (locView == null || itemView == null) return;
-                       locView.setText(menu);
+                       
+                       // Cancel any pending updates from updateLoc()
+                       handler.removeCallbacks(updateLocViews);
+                       
+                       if (menu != null && !menu.isEmpty()) {
+                           locView.setText(menu);
+                           locS = menu;
+                       }
                        itemView.setText(item);
+                       itemS = item;
+                       
                    }
                }
            );
@@ -174,34 +193,38 @@ public class NavRemote extends Remote {
             if (feMgr == null)
                 onResume();
             updateLoc();
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        } catch (IOException e) { 
+            ErrUtil.err(this, e);
+            finish();
+        }
     }
 
     @Override
     public void onClick(View v) {
 
-        try {
-            switch (v.getId()) {
-                case R.id.nav_back:
-                    feMgr.sendKey(Key.ESCAPE);
-                    break;
-                case R.id.nav_enter:
-                    feMgr.sendKey(Key.ENTER);
-                    break;
-                case R.id.nav_up:
-                    feMgr.sendKey(Key.UP);
-                    break;
-                case R.id.nav_down:
-                    feMgr.sendKey(Key.DOWN);
-                    break;
-                case R.id.nav_left:
-                    feMgr.sendKey(Key.LEFT);
-                    break;
-                case R.id.nav_right:
-                    feMgr.sendKey(Key.RIGHT);
-                    break;
-            }
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        if (feMgr != null)
+            try {
+                switch (v.getId()) {
+                    case R.id.nav_back:
+                        feMgr.sendKey(Key.ESCAPE);
+                        break;
+                    case R.id.nav_enter:
+                        feMgr.sendKey(Key.ENTER);
+                        break;
+                    case R.id.nav_up:
+                        feMgr.sendKey(Key.UP);
+                        break;
+                    case R.id.nav_down:
+                        feMgr.sendKey(Key.DOWN);
+                        break;
+                    case R.id.nav_left:
+                        feMgr.sendKey(Key.LEFT);
+                        break;
+                    case R.id.nav_right:
+                        feMgr.sendKey(Key.RIGHT);
+                        break;
+                }
+            } catch (IOException e) { ErrUtil.err(this, e); }
 
         super.onClick(v);
 
@@ -250,7 +273,9 @@ public class NavRemote extends Remote {
     @Override
     public boolean onKeyDown(int code, KeyEvent event) {
 
-        if (code == KeyEvent.KEYCODE_BACK && calledByTVRemote) {
+        if (
+            feMgr != null && code == KeyEvent.KEYCODE_BACK && calledByTVRemote
+        ) {
             try {
                 feMgr.sendKey(Key.ESCAPE);
             } catch (IOException e) {
@@ -317,14 +342,28 @@ public class NavRemote extends Remote {
      */
     private void updateLoc() throws IOException {
 
-        if (calledByMusicRemote) return;
-
-        if (locView == null || itemView == null) return;
+        if (
+            calledByMusicRemote || feMgr == null    ||
+            locView == null     || itemView == null
+        ) return;
 
         final FrontendLocation newLoc = feMgr.getLoc();
-        if (mddMgr == null || !newLoc.niceLocation.equals("Unknown")) {  //$NON-NLS-1$
-            locView.setText(newLoc.niceLocation);
-            itemView.setText(""); //$NON-NLS-1$
+        locS = newLoc.niceLocation;
+        itemS = ""; //$NON-NLS-1$
+        if (mddMgr == null) {
+            locView.setText(locS);
+            itemView.setText(itemS);
+        }
+        else if (!newLoc.niceLocation.equals("Unknown")) { //$NON-NLS-1$
+            /*
+             * The location displays will be updated by MDD at some point but
+             * if it happens to be >= a few ms after we set it from the 
+             * FrontendLocation we get an ugly 'flicker'. So we delay the
+             * update from FrontendLocation by 50ms and if an update from
+             * MDD arrives in the meantime, cancel the FrontendLocation based
+             * update.
+             */
+            handler.postDelayed(updateLocViews, 50);
         }
 
         if (newLoc.video) {
@@ -357,5 +396,5 @@ public class NavRemote extends Remote {
             lastLoc = newLoc;
 
     }
-
+    
 }
