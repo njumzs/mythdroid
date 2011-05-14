@@ -27,6 +27,24 @@ use IO::Socket::INET;
 use Time::HiRes qw(usleep);
 use MDD::MythDB;
 
+my %menuTr = (
+    MAIN                    => 'Main Menu',
+    LIBRARY                 => 'Media Library',
+    INFO                    => 'Information Centre',
+    INFO_SETUP              => 'Information Centre Settings',
+    SETUP                   => 'Settings',
+    MANAGE_RECORDINGS       => 'Manage Recordings',
+    MEDIA_SETUP             => 'Media Settings',
+    OPTICAL_DISK            => 'Optical Disks',
+    SETUP_TVRECPRIORITIES   => 'Recording Priorities',
+    LISTS                   => 'TV Lists',
+    SCHEDULE                => 'Schedule Recordings',
+    WORDS                   => 'TV Search',
+    TVSETUP                 => 'TV Settings',
+    TV                      => 'TV Menu',
+    UTIL                    => 'Utilities'
+);
+
 my $mythdb = MDD::MythDB->new();
 
 sub new {
@@ -117,7 +135,7 @@ sub command($) {
 
     $self->{LAST}{cmd} = \$data;
 
-    if    ($data =~ s/^SWITCH_TO_MENU\s+"MYTH-([^"]+)"\s+//) {
+    if    ($data =~ s/^SWITCH_TO_MENU\s+"([^"]*)"\s+//) {
         return $self->menu($1, $data);
     }
     elsif ($data =~ s/^SWITCH_TO_MUSIC\s+//) {
@@ -147,6 +165,10 @@ sub menu($$) {
     my $menu = shift;
     my $items = shift;
 
+    $menu =~ s/^MYTH-//;
+
+    $menu = $menuTr{$menu} if (exists $menuTr{$menu});
+
     return if (defined $self->{LAST}{menu} && $items eq ${$self->{LAST}{menu}});
 
     $self->{LAST}{menu}  = \$items;
@@ -156,12 +178,13 @@ sub menu($$) {
     my @menu;
 
     my (@items) = $items =~ 
-        /"([^"]+)"\s+NOTCHECKABLE\s+(\w+)/g;
+        /"(.+?)"\s+(?:NOTCHECKABLE|UNCHECKED)\s+(\w+)/g;
 
     my $idx = 0;
     my $curidx;
     
     while (my $item = shift @items) {
+        $item =~ s/""/"/;
         my $cur = shift @items;
         push @menu, { 'item' => $item, 'cur' =>  $cur };
         $curidx = $idx if $cur eq 'TRUE';

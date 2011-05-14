@@ -95,8 +95,6 @@ my @clients;
 
 my (%commands, %videos, %storageGroups);
 
-# Use ffmpeg to demux and decode; VLC's TS demuxer doesn't cope with 
-# a significant proportion of dvb recordings :(
 my $stream_cmd = 
     '/usr/bin/vlc -vvv -I dummy --file-caching=2000 ' .
     '--sout-mux-caching=500 --demux=avformat %FILE% ' . 
