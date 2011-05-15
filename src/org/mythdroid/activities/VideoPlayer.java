@@ -31,6 +31,8 @@ import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.views.MDVideoView;
+import org.mythdroid.views.MDVideoView.OnSeekListener;
+import org.mythdroid.vlc.VLCRemote;
 
 import android.R.drawable;
 import android.app.AlertDialog;
@@ -48,26 +50,30 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
+import android.widget.MediaController;
 import android.widget.AdapterView.OnItemClickListener;
 
 /** MDActivity displays streamed Video */
 public class VideoPlayer extends MDActivity {
-
+    
     final private Context ctx = this;
     final private int DIALOG_QUALITY = 1;
+    
     private int vb = 0, ab = 0, vwidth = 0, vheight = 0;
     private MDVideoView videoView = null;
     private BackendManager beMgr = null;
+    private VLCRemote vlc = null;
+    private MediaPlayer mplayer = null;
+    private Uri url = null;
 
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(layout.video_player);
         videoView = (MDVideoView)findViewById(id.videoview);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
         showDialog(DIALOG_QUALITY);
     }
 
@@ -82,6 +88,12 @@ public class VideoPlayer extends MDActivity {
         } catch (IOException e) {
             ErrUtil.err(ctx, e);
         }
+        if (vlc != null)
+            try {
+                vlc.disconnect();
+            } catch (IOException e) {
+                ErrUtil.err(ctx, e);
+            }
     }
 
     @Override
@@ -97,16 +109,13 @@ public class VideoPlayer extends MDActivity {
 
     @Override
     public Dialog onCreateDialog(int id) {
-
         switch (id) {
-
             case DIALOG_QUALITY:
                 return createQualityDialog();
             default:
                 return super.onCreateDialog(id);
 
         }
-
     }
     
     private Dialog createQualityDialog() {
@@ -197,13 +206,11 @@ public class VideoPlayer extends MDActivity {
             return;
         }
         
-        long beforeSleep = System.nanoTime();
-
-        while (System.nanoTime() < beforeSleep + 2000000000) {
+        long beforeSleep = System.currentTimeMillis();
+        while (System.currentTimeMillis() < beforeSleep + 2500)
             try {
-                Thread.sleep(2000);
+                Thread.sleep(beforeSleep + 2500 - System.currentTimeMillis());
             } catch (InterruptedException e) {}
-        }
 
         String sdpAddr = beMgr.addr;
 
@@ -222,9 +229,44 @@ public class VideoPlayer extends MDActivity {
            )
            sdpAddr = sdpPublicAddr;
 
-        videoView.setVideoURI(
-            Uri.parse("rtsp://" + sdpAddr + ":5554/stream") //$NON-NLS-1$ //$NON-NLS-2$
+        url = Uri.parse("rtsp://" + sdpAddr + ":5554/stream"); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        videoView.setVideoURI(url);
+        
+        videoView.setOnCompletionListener(
+            new OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.release();
+                    finish();
+                }
+            }
         );
+        
+        try {
+            vlc = new VLCRemote(beMgr.addr);
+            videoView.setVLC(vlc);
+            videoView.setMediaController(new MediaController(ctx, false));
+            videoView.setOnSeekListener(
+                new OnSeekListener() {
+                    @Override
+                    public void onSeek() {
+                        showDialog(DIALOG_LOAD);
+                        mplayer.pause();
+                        mplayer.reset();
+                        try {
+                            mplayer.setDataSource(ctx, url);
+                            mplayer.prepareAsync();
+                        } catch (Exception e) {
+                            ErrUtil.err(ctx, e);
+                            finish();
+                        }
+                    }
+                }
+            );
+        } catch (IOException e) {
+            ErrUtil.err(ctx, e);
+        }
         
         videoView.setOnPreparedListener(
             new OnPreparedListener() {
@@ -246,32 +288,11 @@ public class VideoPlayer extends MDActivity {
                             }
                         }
                     );
-                    videoView.setOnTouchListener(
-                        new OnTouchListener() {
-                            public boolean onTouch(View v, MotionEvent m) {
-                                if (m.getAction() == MotionEvent.ACTION_DOWN) {
-                                   ErrUtil.err(ctx, videoView.nextVideoScale());
-                                   return true;
-                                }
-                                return false;
-                            }
-                        }
-                    );
+                    mplayer = mp;
+                    videoView.start();
                 }
             }
         );
-
-        videoView.setOnCompletionListener(
-            new OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    finish();
-                }
-            }
-        );
-
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
-        videoView.start();
+        
     }
 }
