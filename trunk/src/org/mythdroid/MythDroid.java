@@ -11,7 +11,9 @@ public class MythDroid extends CrashReportingApplication {
 
     @Override
     public String getFormId() {
-        return "dFVIWUVVSjBubHlzSUQyeHc4dEpIWHc6MQ"; //$NON-NLS-1$
+        if (!getPackageName().startsWith("org.mythdroid"))  //$NON-NLS-1$
+            return null;
+        return "dFVIWUVVSjBubHlzSUQyeHc4dEpIWHc6MQ";  //$NON-NLS-1$
     }
 
     @Override
