@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.mythdroid.activities;
+package org.mythdroid.fragments;
 
 import java.util.ArrayList;
 
@@ -24,31 +24,39 @@ import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.ProgramAdapter;
+import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.activities.RecordingDetail;
+import org.mythdroid.activities.Status;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import android.app.ListActivity;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /** ListActivity displays scheduled recordings */
-public class StatusScheduled extends ListActivity {
+public class StatusScheduledFragment extends ListFragment {
 
     private ArrayList<Program> recordings = new ArrayList<Program>(10);
+    
+    private MDFragmentActivity activity = null;
 
     @Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
-
-        if (Status.statusDoc == null && !Status.getStatus(this)) {
-            finish();
-            return;
-        }
+    public View onCreateView(
+        LayoutInflater inflater, ViewGroup container, Bundle icicle
+    ) {
+        if (container == null) return null;
+        activity = (MDFragmentActivity)getActivity();
+        View view = inflater.inflate(R.layout.status_scheduled, null, false);
+        
+        if (Status.statusDoc == null && !Status.getStatus(activity))
+            activity.finish();
 
         Document doc = Status.statusDoc;
 
@@ -62,20 +70,23 @@ public class StatusScheduled extends ListActivity {
             if (!prog.getNodeName().equals("Program")) continue; //$NON-NLS-1$
             recordings.add(new Program(prog));
         }
-
+        
+        ((TextView)view.findViewById(R.id.emptyMsg))
+            .setText(R.string.no_scheduled);
+       
         setListAdapter(
-            new ProgramAdapter(this, R.layout.recording_list_item, recordings)
+            new ProgramAdapter(
+                activity, R.layout.recording_list_item, recordings
+            )
         );
+        
+        return view;
     }
 
     @Override
     public void onListItemClick(ListView list, View item, int pos, long id) {
         Globals.curProg = (Program) list.getItemAtPosition(pos);
-        startActivity(new Intent().setClass(this, RecordingDetail.class));
+        startActivity(new Intent().setClass(activity, RecordingDetail.class));
     }
-
-    @Override
-    public void onConfigurationChanged(Configuration config) {
-        super.onConfigurationChanged(config);
-    }
+    
 }

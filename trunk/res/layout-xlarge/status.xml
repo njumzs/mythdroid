@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  	android:layout_width="fill_parent"
+  	android:layout_height="fill_parent"
+  	android:orientation="vertical">
+    
+    <LinearLayout
+  		android:layout_weight="1"
+  		android:layout_width="fill_parent"
+  		android:layout_height="0px"
+  		android:orientation="horizontal">
+
+   		<FrameLayout
+  			android:id="@+id/recorderframe"
+  			android:layout_weight="1"
+    		android:layout_width="0px"
+    		android:layout_height="fill_parent"/>
+
+    	<FrameLayout
+  			android:id="@+id/backendframe"
+  			android:layout_weight="1"
+    		android:layout_width="0px"
+    		android:layout_height="fill_parent"/>
+
+    </LinearLayout>
+
+	<LinearLayout
+  		android:layout_weight="1.5"
+  		android:layout_width="fill_parent"
+  		android:layout_height="0px"
+  		android:layout_marginTop="10dp"
+  		android:orientation="horizontal">
+
+		<FrameLayout
+  			android:id="@+id/scheduledframe"
+  			android:layout_weight="1"
+    		android:layout_width="0px"
+    		android:layout_height="fill_parent"/>
+
+    	<FrameLayout
+  			android:id="@+id/jobframe"
+  			android:layout_weight="1"
+    		android:layout_width="0px"
+    		android:layout_height="fill_parent"/>
+
+    </LinearLayout>
+
+</LinearLayout>

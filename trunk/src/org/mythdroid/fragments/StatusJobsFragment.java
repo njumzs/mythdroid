@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.mythdroid.activities;
+package org.mythdroid.fragments;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,18 +28,20 @@ import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.Program;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.activities.RecordingDetail;
+import org.mythdroid.activities.Status;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import android.R.layout;
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -48,9 +50,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 /** ListActivity displays upcoming/recent jobs */
-public class StatusJobs extends ListActivity {
-
-    private final ArrayList<Job> jobs = new ArrayList<Job>(8);
+public class StatusJobsFragment extends ListFragment {
+     
+    final private ArrayList<Job> jobs = new ArrayList<Job>(8);
+    
+    private MDFragmentActivity activity = null;
 
     private enum JobStatus {
         QUEUED  (1),     PENDING  (2),     STARTING (3),     RUNNING  (4),
@@ -200,7 +204,7 @@ public class StatusJobs extends ListActivity {
             ViewHolder vHolder = null;
 
             if (old == null) {
-                old = getLayoutInflater().inflate(R.layout.job_list_item, null);
+                old = activity.getLayoutInflater().inflate(R.layout.job_list_item, null);
                 vHolder = new ViewHolder();
                 vHolder.title = (TextView)old.findViewById(R.id.joblist_title);
                 vHolder.type = (TextView)old.findViewById(R.id.joblist_type);
@@ -242,13 +246,17 @@ public class StatusJobs extends ListActivity {
     }
 
     @Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
-
-        if (Status.statusDoc == null && !Status.getStatus(this)) {
-            finish();
-            return;
-        }
+    public View onCreateView(
+        LayoutInflater inflater, ViewGroup container, Bundle icicle
+    ) {
+        if (container == null) return null;
+        activity = (MDFragmentActivity)getActivity();
+        View view = inflater.inflate(R.layout.status_jobs, null, false);
+        ((TextView)view.findViewById(R.id.emptyMsg))
+            .setText(R.string.no_jobs);
+       
+        if (Status.statusDoc == null && !Status.getStatus(activity))
+            activity.finish();
 
         Document doc = Status.statusDoc;
         NodeList jobNodes = doc.getElementsByTagName("Job"); //$NON-NLS-1$
@@ -256,19 +264,16 @@ public class StatusJobs extends ListActivity {
         for (int i = 0; i < jobNodes.getLength(); i++)
             jobs.add(new Job(jobNodes.item(i)));
 
-        setListAdapter(new JobAdapter(this, layout.simple_list_item_1, jobs));
+        setListAdapter(new JobAdapter(activity, layout.simple_list_item_1, jobs));
+        
+        return view;
 
     }
 
     @Override
     public void onListItemClick(ListView list, View item, int pos, long id) {
         Globals.curProg = ((Job)list.getItemAtPosition(pos)).program;
-        startActivity(new Intent().setClass(this, RecordingDetail.class));
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration config) {
-        super.onConfigurationChanged(config);
+        startActivity(new Intent().setClass(activity, RecordingDetail.class));
     }
 
 }

@@ -16,36 +16,43 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.mythdroid.activities;
+package org.mythdroid.fragments;
 
 import java.util.Date;
 
 import org.mythdroid.Globals;
 import org.mythdroid.R;
+import org.mythdroid.activities.MDFragmentActivity;
+import org.mythdroid.activities.Status;
 import org.mythdroid.resource.Messages;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import android.app.Activity;
-import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 /** Activity displays backend status */
-public class StatusBackend extends Activity {
+public class StatusBackendFragment extends Fragment {
 
+    private MDFragmentActivity activity = null;
+    
     @Override
-    public void onCreate(Bundle icicle) {
+    public View onCreateView(
+        LayoutInflater inflater, ViewGroup container, Bundle icicle
+    ) {
 
-        super.onCreate(icicle);
-        setContentView(R.layout.status_backend);
+        if (container == null) return null;
+        activity = (MDFragmentActivity)getActivity();
+        View view = inflater.inflate(R.layout.status_backend, null, false);
 
-        if (Status.statusDoc == null && !Status.getStatus(this)) {
-            finish();
-            return;
-        }
+        if (Status.statusDoc == null && !Status.getStatus(activity))
+            activity.finish();
 
         Document doc = Status.statusDoc;
 
@@ -106,13 +113,13 @@ public class StatusBackend extends Activity {
             }
         }
 
-        ((TextView)findViewById(R.id.storage_total)).setText(
+        ((TextView)view.findViewById(R.id.storage_total)).setText(
             Messages.getString("StatusBackend.16") + stotal + " MB" //$NON-NLS-1$ //$NON-NLS-2$
         );
-        ((TextView)findViewById(R.id.storage_used)).setText(
+        ((TextView)view.findViewById(R.id.storage_used)).setText(
             Messages.getString("StatusBackend.18") + sused + " MB" //$NON-NLS-1$ //$NON-NLS-2$
         );
-        ((TextView)findViewById(R.id.storage_free)).setText(
+        ((TextView)view.findViewById(R.id.storage_free)).setText(
             Messages.getString("StatusBackend.20") + sfree + " MB" //$NON-NLS-1$ //$NON-NLS-2$
         );
 
@@ -120,13 +127,13 @@ public class StatusBackend extends Activity {
 
             attr = LoadNode.getAttributes();
 
-            ((TextView)findViewById(R.id.load_1min)).setText(
+            ((TextView)view.findViewById(R.id.load_1min)).setText(
                 "1 min: \t\t" + attr.getNamedItem("avg1").getNodeValue() //$NON-NLS-1$ //$NON-NLS-2$
             );
-            ((TextView)findViewById(R.id.load_5min)).setText(
+            ((TextView)view.findViewById(R.id.load_5min)).setText(
                 "5 min: \t\t" + attr.getNamedItem("avg2").getNodeValue() //$NON-NLS-1$ //$NON-NLS-2$
             );
-            ((TextView)findViewById(R.id.load_15min)).setText(
+            ((TextView)view.findViewById(R.id.load_15min)).setText(
                 "15 min:\t\t" + attr.getNamedItem("avg3").getNodeValue() //$NON-NLS-1$ //$NON-NLS-2$
             );
 
@@ -147,24 +154,22 @@ public class StatusBackend extends Activity {
             Node days, lastRun;
 
             if ((days = attr.getNamedItem("guideDays")) != null) //$NON-NLS-1$
-                ((TextView)findViewById(R.id.guide_length)).setText(
+                ((TextView)view.findViewById(R.id.guide_length)).setText(
                     days.getNodeValue() +
                     Messages.getString("StatusBackend.30") + // days (until //$NON-NLS-1$
                     Globals.dispFmt.format(when) + ")" //$NON-NLS-1$
                 );
 
             if ((lastRun = attr.getNamedItem("status")) != null) //$NON-NLS-1$
-                ((TextView)findViewById(R.id.guide_last)).setText(
+                ((TextView)view.findViewById(R.id.guide_last)).setText(
                     Messages.getString("StatusBackend.32") + // Last run:  //$NON-NLS-1$
                     lastRun.getNodeValue().toLowerCase()
                 );
 
         }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration config) {
-        super.onConfigurationChanged(config);
+        
+        return view;
+        
     }
 
 }

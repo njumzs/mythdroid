@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.mythdroid.activities;
+package org.mythdroid.fragments;
 
 import java.util.ArrayList;
 
@@ -24,7 +24,9 @@ import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.Program;
+import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.activities.RecordingDetail;
+import org.mythdroid.activities.Status;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.w3c.dom.Document;
@@ -34,14 +36,12 @@ import org.w3c.dom.NodeList;
 
 import android.R.layout;
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ListFragment;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -50,12 +50,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 /** ListActivity displays status of recorders */
-public class StatusRecorders extends ListActivity {
+public class StatusRecordersFragment extends ListFragment {
 
     final private static int REFRESH_NEEDED = Activity.RESULT_FIRST_USER;
     final private static int DIALOG_LOAD    = 0;
 
-    final private Context ctx = this;
+    private MDFragmentActivity activity = null;
 
     private Document doc = null;
     private ArrayList<Encoder> encoders = new ArrayList<Encoder>();
@@ -77,12 +77,12 @@ public class StatusRecorders extends ListActivity {
                 encoders.add(new Encoder(encoderItems.item(i)));
 
             try {
-                dismissDialog(DIALOG_LOAD);
+                activity.dismissDialog(DIALOG_LOAD);
             } catch (IllegalArgumentException e) {}
-
+          
             setListAdapter(
                 new EncoderAdapter(
-                    ctx, layout.simple_list_item_1, encoders
+                    activity, layout.simple_list_item_1, encoders
                 )
             );
 
@@ -93,12 +93,14 @@ public class StatusRecorders extends ListActivity {
         @Override
         public void run() {
             
-            if (!Status.getStatus(ctx) && Status.statusDoc == null) {
+            if (!Status.getStatus(activity) && Status.statusDoc == null) {
                 try {
-                    dismissDialog(DIALOG_LOAD);
+                    activity.dismissDialog(DIALOG_LOAD);
                 } catch (IllegalArgumentException e) {}
-                ErrUtil.postErr(ctx, Messages.getString("StatusRecorders.3")); //$NON-NLS-1$
-                finish();
+                ErrUtil.postErr(
+                    activity, Messages.getString("StatusRecorders.3")  //$NON-NLS-1$
+                );
+                activity.finish();
                 return;
             }
 
@@ -183,7 +185,7 @@ public class StatusRecorders extends ListActivity {
             ViewHolder vHolder = null;
 
             if (old == null) {
-                old = getLayoutInflater().inflate(
+                old = activity.getLayoutInflater().inflate(
                     R.layout.encoder_list_item, null
                 );
                 vHolder = new ViewHolder();
@@ -234,17 +236,19 @@ public class StatusRecorders extends ListActivity {
     }
 
     @Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
-        refresh();
-    }
-
-    @Override
-    public Dialog onCreateDialog(int id) {
-        ProgressDialog d = new ProgressDialog(this);
-        d.setIndeterminate(true);
-        d.setMessage(getResources().getString(R.string.loading));
-        return d;
+    public View onCreateView(
+        LayoutInflater inflater, ViewGroup container, Bundle icicle
+    ) {
+        if (container == null) return null;
+        activity = (MDFragmentActivity)getActivity();
+        View view = inflater.inflate(R.layout.status_recorders, null, false);
+        ((TextView)view.findViewById(R.id.emptyMsg))
+            .setText(R.string.no_recorders);
+        if (((Status)activity).embed)
+            handler.post(refreshEncoders);
+        else
+            refresh();
+        return view;
     }
 
     @Override
@@ -261,7 +265,7 @@ public class StatusRecorders extends ListActivity {
                 Extras.LIVETV.toString(),
                 enc.state.equals(Extras.LIVETV.toString()) ? true : false
             )
-            .setClass(this, RecordingDetail.class),
+            .setClass(activity, RecordingDetail.class),
             0
         );
 
@@ -273,13 +277,8 @@ public class StatusRecorders extends ListActivity {
             refresh();
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration config) {
-        super.onConfigurationChanged(config);
-    }
-
     private void refresh() {
-        showDialog(DIALOG_LOAD);
+        activity.showDialog(DIALOG_LOAD);
         Globals.getWorker().post(getStatusTask);
     }
 
