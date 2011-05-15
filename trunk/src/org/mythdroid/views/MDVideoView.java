@@ -18,13 +18,39 @@
 
 package org.mythdroid.views;
 
+import java.io.IOException;
+
+import org.mythdroid.util.ErrUtil;
+import org.mythdroid.vlc.VLCRemote;
+
 import android.content.Context;
+import android.net.Uri;
 import android.util.AttributeSet;
 
 /**
  * Our own version of VideoView that allows us to change the video scaling
  */
 public class MDVideoView extends android.widget.VideoView {
+    
+    /** Pass to setOnSeekListener() to be called back upon seeks */
+    public interface OnSeekListener {
+        /** A callback called upon seeks */
+        public void onSeek();
+    }
+    
+    private enum DisplayMode {
+       ORIGINAL,   // Original aspect ratio
+       FULL        // Scaled to full screen
+    };
+    
+    private VLCRemote vlc = null;
+    private Uri url = null;
+    private OnSeekListener msl = null;
+
+    private DisplayMode screenMode = DisplayMode.FULL;
+    private int vWidth, vHeight, pausePos = 0;
+    private long duration = -1, pausedTime = 0 , pauseStart = 0; 
+    private boolean paused = false;
 
     /** Constructor */
     public MDVideoView(Context context) {
@@ -41,32 +67,88 @@ public class MDVideoView extends android.widget.VideoView {
         super(context, attr, defStyle);
     }
     
-    private enum DisplayMode {
-        ORIGINAL,   // Original aspect ratio
-        FULL        // Scaled to full screen
-     };
+    @Override
+    public void setVideoURI(Uri murl) {
+        url = murl;
+        super.setVideoURI(url);
+    }
+     
+    @Override
+    public int getDuration() {
+        if (duration == -1)
+            try {
+                duration = vlc.getLength();
+            } catch (IOException e) {
+                ErrUtil.err(getContext(), e);
+                return 0;
+            }
+        return (int)duration;
+    }
+    
+    @Override
+    public int getCurrentPosition() {
+        
+        if (paused)
+            return pausePos;
+        try {
+            return (int)(vlc.getTime() - pausedTime);
+        } catch (IOException e) {
+            ErrUtil.err(getContext(), e);
+            return 0;
+        }
+    }
+    
+    @Override
+    public void pause() {
+        super.pause();
+        paused = true;
+        pauseStart = System.currentTimeMillis();
+        try {
+            pausePos = (int)(vlc.getTime() - pausedTime);
+        } catch (IOException e) {
+            ErrUtil.err(getContext(), e);
+        }
+    }
+    
+    @Override
+    public void start() {
+        super.start();
+        if (paused)
+            pausedTime += System.currentTimeMillis() - pauseStart;
+        paused = false;
+    }
+    
+    
+    @Override
+    public void seekTo(int msecs) {
+        try {
+            vlc.seek(msecs);
+        } catch (Exception e) {
+            ErrUtil.err(getContext(), e);
+        }
+        if (msl != null)
+            msl.onSeek();
+        pausedTime = 0;
+    }
 
-
-     private DisplayMode screenMode = DisplayMode.ORIGINAL;
-     private int vWidth, vHeight;
-
-     @Override
-     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
          
-         int width = getDefaultSize(vWidth, widthMeasureSpec);
-         int height = getDefaultSize(vHeight, heightMeasureSpec);
+        int width = getDefaultSize(vWidth, widthMeasureSpec);
+        int height = getDefaultSize(vHeight, heightMeasureSpec);
          
-         if (screenMode == DisplayMode.ORIGINAL) 
-            if (vWidth > 0 && vHeight > 0) 
-                if ( vWidth * height  > width * vHeight ) 
-                    // video height exceeds screen, shrink it
-                    height = width * vHeight / vWidth;
-                else if ( vWidth * height  < width * vHeight ) 
-                    // video width exceeds screen, shrink it
-                    width = height * vWidth / vHeight;
+        if (screenMode == DisplayMode.ORIGINAL) 
+           if (vWidth > 0 && vHeight > 0) 
+               if ( vWidth * height  > width * vHeight ) 
+                   // video height exceeds screen, shrink it
+                   height = width * vHeight / vWidth;
+               else if ( vWidth * height  < width * vHeight ) 
+                   // video width exceeds screen, shrink it
+                   width = height * vWidth / vHeight;
 
-         setMeasuredDimension(width, height);
-     }
+        setMeasuredDimension(width, height);
+
+    }
      
     /**
      * Change the video scaling mode 
@@ -95,6 +177,22 @@ public class MDVideoView extends android.widget.VideoView {
         getHolder().setFixedSize(width, height);
         requestLayout();
         invalidate();
-    } 
+    }
+    
+    /**
+     * Set the VLCRemote 
+     * @param vlcr VLCRemote instance
+     */
+    public void setVLC(VLCRemote vlcr) {
+        vlc = vlcr;
+    }
+    
+    /**
+     * Set a seek listener
+     * @param sl a SeekListener
+     */
+    public void setOnSeekListener(OnSeekListener sl) {
+        msl = sl;
+    }
 
 }
