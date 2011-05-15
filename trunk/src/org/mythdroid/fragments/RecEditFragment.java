@@ -121,7 +121,7 @@ public class RecEditFragment extends Fragment {
                 }
             } catch (IOException e) {
                 ErrUtil.err(activity, e);
-                done();
+                getFragmentManager().popBackStack();
             }
         }
         
@@ -176,7 +176,7 @@ public class RecEditFragment extends Fragment {
             ErrUtil.err(
                 activity, Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
             );
-            done();
+            getFragmentManager().popBackStack();
             return;
         }
         
