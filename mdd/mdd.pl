@@ -96,8 +96,8 @@ my @clients;
 my (%commands, %videos, %storageGroups);
 
 my $stream_cmd = 
-    '/usr/bin/vlc -vvv -I dummy --file-caching=2000 ' .
-    '--sout-mux-caching=500 --demux=avformat %FILE% ' . 
+    '/usr/bin/vlc -vvv -I oldrc --rc-host 0.0.0.0:16547 ' .
+    '--file-caching=2000 --demux=avformat %FILE% ' . 
     '--sout=\'#transcode{vcodec=h264,venc=x264{no-cabac,level=30,keyint=50,' .
     'ref=4,bframes=0,bpyramid=none,profile=baseline,no-weightb,weightp=0,' .
     'no-8x8dct,trellis=0},vb=%VB%,threads=%THR%,acodec=mp4a,' . 
