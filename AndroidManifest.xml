@@ -72,23 +72,7 @@
         <activity android:name=".activities.Status" 
         	android:label="Status"
         	android:configChanges="keyboardHidden|orientation"/>
-        	
-        <activity android:name=".activities.StatusRecorders" 
-        	android:label="Recorder Status"
-        	android:configChanges="keyboardHidden|orientation"/>
-        	
-        <activity android:name=".activities.StatusScheduled" 
-        	android:label="Scheduled Recordings"
-        	android:configChanges="keyboardHidden|orientation"/>
-        	
-		<activity android:name=".activities.StatusJobs" 
-        	android:label="Job Queue"
-        	android:configChanges="keyboardHidden|orientation"/>
-        	
-        <activity android:name=".activities.StatusBackend" 
-        	android:label="Backend Status"
-        	android:configChanges="keyboardHidden|orientation"/>
-        	
+          	
         <activity android:name=".activities.Guide" 
         	android:theme="@style/MDNoTitle"
         	android:configChanges="keyboardHidden|orientation"/>

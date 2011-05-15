@@ -9,6 +9,9 @@
 	<string name="click_add_fe">Click here to add a new frontend</string>
 	<string name="no_fes">No frontends are defined!</string>
 	<string name="ch_fe">Choose frontend</string>
+	<string name="no_recorders">No encoders</string>
+	<string name="no_scheduled">No scheduled recordings</string>
+	<string name="no_jobs">No jobs</string>
 	<string name="ok">OK</string>
 	<string name="error">Error</string>
 	<string name="yes">Yes</string>

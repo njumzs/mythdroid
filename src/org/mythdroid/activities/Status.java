@@ -24,43 +24,36 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.mythdroid.Globals;
 import org.mythdroid.R;
+import org.mythdroid.fragments.StatusBackendFragment;
+import org.mythdroid.fragments.StatusFragment;
+import org.mythdroid.fragments.StatusJobsFragment;
+import org.mythdroid.fragments.StatusRecordersFragment;
+import org.mythdroid.fragments.StatusScheduledFragment;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import android.R.layout;
 import android.app.Dialog;
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.support.v4.app.FragmentTransaction;
+
 
 /**
  * ListActivity lists other Status activities
  * Houses static method to fetch the status XML
  */
-public class Status extends ListActivity {
+public class Status extends MDFragmentActivity {
 
     /** The status XML doc from the backend */
     public static Document        statusDoc   = null;
+    /** Are we embedding the child fragments? */ 
+    public boolean                embed       = true;
 
     final static private int      DIALOG_LOAD = 0;
-    
-    final private static String[] StatusItems =
-    {
-        Messages.getString("Status.0"),    // Recorders //$NON-NLS-1$
-        Messages.getString("Status.1"),    // Scheduled //$NON-NLS-1$
-        Messages.getString("Status.2"),    // Job Queue //$NON-NLS-1$
-        Messages.getString("Status.3")     // Backend Info //$NON-NLS-1$
-    };
-
     
     final private Context ctx     = this;
     final private Handler handler = new Handler();
@@ -76,11 +69,7 @@ public class Status extends ListActivity {
                         try {
                             dismissDialog(DIALOG_LOAD);
                         } catch (IllegalArgumentException e) {}
-                        setListAdapter(
-                            new ArrayAdapter<String>(
-                                ctx, layout.simple_list_item_1, StatusItems
-                            )
-                        );
+                        installFragments();
                     }
                 }
             );
@@ -90,6 +79,9 @@ public class Status extends ListActivity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        setContentView(R.layout.status);
+        if (findViewById(R.id.statuslistframe) != null)
+            embed = false;
         showDialog(DIALOG_LOAD);
         Globals.getWorker().post(getStatusTask);
     }
@@ -98,31 +90,6 @@ public class Status extends ListActivity {
     public void onDestroy() {
         super.onDestroy();
         statusDoc = null;
-    }
-
-    /** When a status menu entry is selected */
-    @Override
-    public void onListItemClick(ListView list, View item, int pos, long id) {
-
-        final String action = (String)list.getItemAtPosition(pos);
-        Class<?> activity = null;
-
-        if      (action.equals(Messages.getString("Status.0"))) //$NON-NLS-1$
-            activity = StatusRecorders.class;
-        else if (action.equals(Messages.getString("Status.1"))) //$NON-NLS-1$
-            activity = StatusScheduled.class;
-        else if (action.equals(Messages.getString("Status.2"))) //$NON-NLS-1$
-            activity = StatusJobs.class;
-        else if (action.equals(Messages.getString("Status.3"))) //$NON-NLS-1$
-            activity = StatusBackend.class;
-
-        startActivity(new Intent().setClass(this, activity));
-
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration config) {
-        super.onConfigurationChanged(config);
     }
 
     @Override
@@ -151,6 +118,33 @@ public class Status extends ListActivity {
         
         return statusDoc != null;
 
+    }
+    
+    private void installFragments() {
+        if (!embed) {
+            StatusFragment sf = new StatusFragment();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(android.R.id.content, sf);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            ft.commit();
+        }
+        else {
+            FragmentTransaction ft =
+                getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.recorderframe, new StatusRecordersFragment());
+            ft.replace(R.id.jobframe, new StatusJobsFragment());
+            ft.replace(R.id.scheduledframe, new StatusScheduledFragment());
+            ft.replace(R.id.backendframe, new StatusBackendFragment());
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            ft.commit();
+        }
+
+    }
+    
+    @Override
+    protected void resetContentView() {
+        setContentView(R.layout.status);
+        installFragments();
     }
 
 }
