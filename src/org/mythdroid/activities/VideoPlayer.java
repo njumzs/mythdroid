@@ -237,7 +237,6 @@ public class VideoPlayer extends MDActivity {
             new OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
-                    mp.release();
                     finish();
                 }
             }
