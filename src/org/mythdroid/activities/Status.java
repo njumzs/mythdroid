@@ -122,9 +122,9 @@ public class Status extends MDFragmentActivity {
     
     private void installFragments() {
         if (!embed) {
-            StatusFragment sf = new StatusFragment();
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(android.R.id.content, sf);
+            FragmentTransaction ft = 
+            	getSupportFragmentManager().beginTransaction();
+            ft.replace(android.R.id.content, new StatusFragment());
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.commit();
         }
@@ -143,8 +143,10 @@ public class Status extends MDFragmentActivity {
     
     @Override
     protected void resetContentView() {
-        setContentView(R.layout.status);
-        installFragments();
+        if (embed) {
+        	setContentView(R.layout.status);
+        	installFragments();
+        }
     }
 
 }
