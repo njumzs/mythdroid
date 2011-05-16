@@ -9,11 +9,11 @@ import android.os.Bundle;
  */
 public class MythDroid extends CrashReportingApplication {
 
+    private boolean m = getPackageName().startsWith("org.mythdroid"); //$NON-NLS-1$
+    
     @Override
     public String getFormId() {
-        if (!getPackageName().startsWith("org.mythdroid"))  //$NON-NLS-1$
-            return null;
-        return "dFVIWUVVSjBubHlzSUQyeHc4dEpIWHc6MQ";  //$NON-NLS-1$
+        return m ? "dFVIWUVVSjBubHlzSUQyeHc4dEpIWHc6MQ" : null;  //$NON-NLS-1$
     }
 
     @Override
@@ -23,7 +23,7 @@ public class MythDroid extends CrashReportingApplication {
         result.putInt(RES_NOTIF_TITLE, R.string.crash_notif_title);
         result.putInt(RES_NOTIF_TEXT, R.string.crash_notif_text);
         result.putInt(RES_NOTIF_ICON, android.R.drawable.stat_notify_error); // optional. default is a warning sign
-        result.putInt(RES_DIALOG_TEXT, R.string.crash_dialog_text);
+        result.putInt(RES_DIALOG_TEXT, m ? R.string.crash_dialog_text : R.string.mcrash_dialog_text);
         result.putInt(RES_DIALOG_ICON, android.R.drawable.ic_dialog_info); //optional. default is a warning sign
         return result;
     }
