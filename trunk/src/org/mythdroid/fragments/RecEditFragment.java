@@ -76,7 +76,7 @@ public class RecEditFragment extends Fragment {
     private Spinner prioSpinner;
     
     private boolean childrenModified = false, modified = false,
-                    inlineOpts = false;
+                    inlineOpts = false, initErr = false;
     
     private int containerId;
     
@@ -92,12 +92,13 @@ public class RecEditFragment extends Fragment {
         try {
             beMgr = Globals.getBackend();
         } catch (Exception e) {
-            ErrUtil.err(activity, e);
+        	initError(e);
+        	return;
         }
         
         prog = Globals.curProg;
         if (prog == null) {
-            done();
+        	initError(null);
             return;
         }
 
@@ -110,7 +111,7 @@ public class RecEditFragment extends Fragment {
         recGroup = prog.RecGroup;
         storGroup = prog.StorGroup;
 
-        if (prog.RecID != -1) {
+        if (prog.RecID != -1)
             try {
                 type = prog.Type =
                     MDDManager.getRecType(beMgr.addr, prog.RecID);
@@ -120,10 +121,8 @@ public class RecEditFragment extends Fragment {
                         MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
                 }
             } catch (IOException e) {
-                ErrUtil.err(activity, e);
-                getFragmentManager().popBackStack();
+                initError(e);
             }
-        }
         
     }
 
@@ -142,7 +141,7 @@ public class RecEditFragment extends Fragment {
         inlineOpts = schedOptFrame != null &&
                      schedOptFrame.getVisibility() == View.VISIBLE;
         
-        if (inlineOpts) {
+        if (inlineOpts && !initErr) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             resf = RecEditSchedFragment.newInstance(getId());
             regf = RecEditGroupsFragment.newInstance(getId());
@@ -166,18 +165,19 @@ public class RecEditFragment extends Fragment {
         try {
             beMgr = Globals.getBackend();
         } catch (Exception e) {
-            ErrUtil.err(activity, e);
+            initError(e);
+            return;
         }
 
         try {
             MDDManager mdd = new MDDManager(beMgr.addr);
             mdd.shutdown();
         } catch (IOException e) {
-            ErrUtil.err(
-                activity, Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
-            );
-            getFragmentManager().popBackStack();
-            return;
+        	initError(
+        		new IOException(
+        			Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
+        		)
+        	);
         }
         
     }
@@ -454,6 +454,13 @@ public class RecEditFragment extends Fragment {
         if (updates.length() > 0)
             updates += ", "; //$NON-NLS-1$
         updates += update;
+    }
+    
+    private void initError(Exception e) {
+    	if (e != null)
+    		ErrUtil.err(activity, e);
+    	getFragmentManager().popBackStack();
+    	initErr = true;
     }
     
     private void done() {
