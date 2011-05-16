@@ -9,15 +9,15 @@ import android.os.Bundle;
  */
 public class MythDroid extends CrashReportingApplication {
 
-    private boolean m = getPackageName().startsWith("org.mythdroid"); //$NON-NLS-1$
-    
     @Override
     public String getFormId() {
-        return m ? "dFVIWUVVSjBubHlzSUQyeHc4dEpIWHc6MQ" : null;  //$NON-NLS-1$
+        boolean m = getPackageName().startsWith("org.mythdroid"); //$NON-NLS-1$
+        return m ? "dFVIWUVVSjBubHlzSUQyeHc4dEpIWHc6MQ" : null;   //$NON-NLS-1$
     }
 
     @Override
     public Bundle getCrashResources() {
+        boolean m = getPackageName().startsWith("org.mythdroid"); //$NON-NLS-1$
         Bundle result = new Bundle();
         result.putInt(RES_NOTIF_TICKER_TEXT, R.string.crash_notif_ticker_text);
         result.putInt(RES_NOTIF_TITLE, R.string.crash_notif_title);
