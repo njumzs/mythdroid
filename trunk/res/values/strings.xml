@@ -54,4 +54,7 @@
 	<string name="crash_dialog_text">An unexpected error occurred forcing the
         application to stop. Please help us fix this by sending us error data,
         all you have to do is click \'OK\'.</string>
+	<string name="mcrash_dialog_text">An unexpected error occurred. You were running
+		an unofficial copy of MythDroid with unknown modifications. Find the original,
+		open source project at http://mythdroid.googlecode.com</string>   
 </resources>
