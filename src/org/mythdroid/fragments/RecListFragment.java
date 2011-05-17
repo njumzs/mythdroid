@@ -22,12 +22,12 @@ import java.util.ArrayList;
 
 import org.mythdroid.Globals;
 import org.mythdroid.R;
-import org.mythdroid.activities.RecordingDetail;
 import org.mythdroid.activities.Recordings;
 import org.mythdroid.activities.VideoPlayer;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.ProgramAdapter;
 import org.mythdroid.remote.TVRemote;
+import org.mythdroid.util.ErrUtil;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -42,31 +42,18 @@ import android.widget.ListView;
  * A Fragment that displays the list of recordings
  */
 public class RecListFragment extends ListFragment
-    implements AdapterView.OnItemLongClickListener{
+    implements AdapterView.OnItemLongClickListener {
 
     private Recordings activity = null;
     private ListView lv = null;
+    private String detailsFragClass = null;
+    private Bundle detailsFragBundle = null;
     private boolean dualPane = false;
-    private int selected = -1;
-    
-    /**
-     * Create a new RecListFragment
-     * @param index the previously selected index in the list
-     * @return a new RecListFragment
-     */
-    public static RecListFragment newInstance(int index) {
-        RecListFragment rlf = new RecListFragment();
-        Bundle icicle = new Bundle();
-        icicle.putInt("selected", index); //$NON-NLS-1$
-        rlf.setArguments(icicle);
-        return rlf;
-    }
-    
+
     @Override
     public void onActivityCreated(Bundle icicle) {
         
         super.onActivityCreated(icicle);
-        setListAdapter(null);
         
         lv = getListView();
         
@@ -82,11 +69,16 @@ public class RecListFragment extends ListFragment
         if (!activity.hasRecordings())
             activity.refresh();
         
+        /* Find out if we should push another fragment on the stack during
+           showDetails() to restore state post configuration change */
         Bundle args = getArguments();
-        if (args != null) 
-            selected = args.getInt("selected", -1); //$NON-NLS-1$
-        if (selected < 0) selected = 0;
-   
+        if (args != null) {
+            detailsFragClass  = args.getString("detailsFragClass");      //$NON-NLS-1$
+            detailsFragBundle = args.getParcelable("detailsFragBundle"); //$NON-NLS-1$
+            if (detailsFragClass.equals(getClass().getName()))
+                detailsFragClass = null;
+        }
+        
     }
     
     @Override
@@ -98,7 +90,7 @@ public class RecListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView list, View v, int pos, long id) {
         Globals.curProg = (Program)list.getItemAtPosition(pos);
-        selected = pos;
+        activity.index = pos;
         showDetails();
     }
 
@@ -119,14 +111,6 @@ public class RecListFragment extends ListFragment
     }
     
     /**
-     * Get the index in the list of the selected recording
-     * @return index of the currently selected recording
-     */
-    public int getIndex() {
-        return selected;
-    }
-    
-    /**
      * Populate the list 
      * @param recordings - list of recordings
      */
@@ -144,26 +128,54 @@ public class RecListFragment extends ListFragment
      * Update which recording is selected
      */
     public void updateSelection() {
-        Globals.curProg = (Program)lv.getItemAtPosition(selected); 
-        if (dualPane) 
+        Globals.curProg = (Program)lv.getItemAtPosition(activity.index);
+        lv.setItemChecked(activity.index, true);
+        if (dualPane || detailsFragClass != null) 
             showDetails();
     }
     
     private void showDetails() {
-        if (dualPane) {
-            lv.setItemChecked(selected, true);
-            Fragment rdf = RecDetailFragment.newInstance(false, false);
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
+        
+        Fragment rdf = null;
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        
+        rdf = RecDetailFragment.newInstance(false, false);
+        
+        if (dualPane)
             ft.replace(R.id.recdetails, rdf);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-            ft.commit();
-        }
         else {
-            lv.setItemChecked(selected, false);
-            startActivityForResult(
-                new Intent().setClass(activity, RecordingDetail.class), 0
-            );
+            ft.replace(R.id.reclistframe, rdf);
+            ft.addToBackStack(null);
         }
+        
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.commit();
+        
+        if (detailsFragClass == null) return;
+        
+        if (detailsFragClass.endsWith("RecDetailFragment")) { //$NON-NLS-1$
+            detailsFragClass = null;
+            return;
+        }
+        
+        /* We need to push another fragment on the stack to restore
+           state post config change */
+        ft = getFragmentManager().beginTransaction();
+        
+        try {
+            rdf = (Fragment)Class.forName(detailsFragClass).newInstance();
+        } catch (Exception e) {
+            ErrUtil.err(activity, e);
+            return;
+        }
+        rdf.setArguments(detailsFragBundle);
+        
+        ft.replace(dualPane ? R.id.recdetails : R.id.reclistframe, rdf);
+        ft.addToBackStack(null);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.commit();
+        detailsFragClass = null;
+        
     }
     
 }

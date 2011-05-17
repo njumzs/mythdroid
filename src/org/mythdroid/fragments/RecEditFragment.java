@@ -151,6 +151,12 @@ public class RecEditFragment extends Fragment {
             ft.commit();
         }
 
+        prog = Globals.curProg;
+        if (prog == null) {
+            initError(null);
+            return view;
+        }
+        
         setViews();
         if (!inlineOpts)
             checkChildren();
