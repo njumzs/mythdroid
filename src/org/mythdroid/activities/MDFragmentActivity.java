@@ -270,7 +270,9 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         }
         f.setArguments(args);
         
-        fm.beginTransaction().replace(android.R.id.content, f).commit();
+        fm.popBackStackImmediate();
+        fm.beginTransaction().replace(android.R.id.content, f)
+            .addToBackStack(null).commit();
         fm.executePendingTransactions();
     }
 

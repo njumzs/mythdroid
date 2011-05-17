@@ -147,6 +147,8 @@ public class Status extends MDFragmentActivity {
         	setContentView(R.layout.status);
         	installFragments();
         }
+        else
+            super.resetContentView();
     }
 
 }
