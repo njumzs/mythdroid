@@ -38,6 +38,8 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,6 +55,9 @@ public class Recordings extends MDFragmentActivity {
      * list of recordings should be refreshed when Recordings resumes
      */
     final public static int  REFRESH_NEEDED = Activity.RESULT_FIRST_USER;
+    
+    /** Currently selected index in the recordings list */
+    public int index = 0;
 
     final private static int FILTER_DIALOG  = 0;
 
@@ -68,8 +73,6 @@ public class Recordings extends MDFragmentActivity {
     private String filter = null;
     
     private RecListFragment listFragment = null;
-    
-    private int index = 0;
     
     /** Populates recordings, filters if necessary */
     final private Runnable getRecordings  = new Runnable() {
@@ -129,8 +132,7 @@ public class Recordings extends MDFragmentActivity {
     @Override
     public void onPause() {
         super.onPause();
-        index = listFragment.getIndex();
-        try {
+         try {
             dismissDialog(DIALOG_LOAD);
         } catch (IllegalArgumentException e) {}
     }
@@ -145,7 +147,7 @@ public class Recordings extends MDFragmentActivity {
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
         if (!isPaused)
-            if (hasRecordings())
+            if (listFragment != null && hasRecordings())
                 listFragment.setAdapter(recordings);
     }
     
@@ -266,15 +268,38 @@ public class Recordings extends MDFragmentActivity {
    
     @Override
     protected void resetContentView() {
+        
+        final FragmentManager fm = getSupportFragmentManager();
+        final Bundle args = new Bundle();
+        
+        Fragment lf = fm.findFragmentById(R.id.reclistframe);
+        Fragment df = fm.findFragmentById(R.id.recdetails);
+        
+        // The old backstack is useless now        
+        int backStackSize = fm.getBackStackEntryCount();
+        for (int i = 0; i < backStackSize; i++)
+            fm.popBackStackImmediate();
+        
         setContentView(R.layout.recordings);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        listFragment = RecListFragment.newInstance(index);
-        ft.replace(R.id.reclistframe, listFragment);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.commit();
-        getSupportFragmentManager().executePendingTransactions();
-        if (hasRecordings())
-            listFragment.setAdapter(recordings);
+        
+        boolean dualPane = findViewById(R.id.recdetails) != null;
+        
+        args.putString(
+            "detailsFragClass",  //$NON-NLS-1$
+            (dualPane || df == null ? lf : df).getClass().getName()
+        );
+         
+        args.putParcelable(
+            "detailsFragBundle", //$NON-NLS-1$
+            (dualPane || df == null ? lf : df).getArguments()
+        );
+            
+        listFragment = new RecListFragment();
+        listFragment.setArguments(args);
+        
+        fm.beginTransaction().replace(R.id.reclistframe, listFragment).commit();
+        fm.executePendingTransactions();
+
     }
     
 }

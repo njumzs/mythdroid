@@ -38,6 +38,7 @@ import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.res.Configuration;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -254,17 +255,23 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         Fragment f = null;
         
         try {
-            f = fm.findFragmentById(android.R.id.content)
-                    .getClass().newInstance();
+            f = fm.findFragmentById(android.R.id.content);
         } catch (Exception e) { 
             ErrUtil.err(this, e);
             return;
         }
         
-        f.setArguments(getIntent().getExtras());
-        fm.popBackStackImmediate();
-        fm.beginTransaction().replace(android.R.id.content, f)
-              .addToBackStack(null).commit();
+        Bundle args = f.getArguments();
+        try {
+            f = f.getClass().newInstance();
+        } catch (Exception e) {
+            ErrUtil.err(this, e);
+            return;
+        }
+        f.setArguments(args);
+        
+        fm.beginTransaction().replace(android.R.id.content, f).commit();
+        fm.executePendingTransactions();
     }
 
     /**
