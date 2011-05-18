@@ -128,6 +128,9 @@ public class RecEditGroupsFragment extends Fragment {
                 if (recGroups[pos].equals(RecEditFragment.recGroup))
                     break;
 
+        if (pos >= recGroups.length)
+            pos = 0;
+        
         recGroupSpinner.setAdapter(recGroupAdapter);
         recGroupSpinner.setSelection(pos);
         recGroupSpinner.setOnItemSelectedListener(
@@ -163,6 +166,9 @@ public class RecEditGroupsFragment extends Fragment {
                 if (storGroups[pos].equals(RecEditFragment.storGroup))
                     break;
 
+        if (pos >= storGroups.length)
+            pos = 0;
+        
         storGroupSpinner.setAdapter(storGroupAdapter);
         storGroupSpinner.setSelection(pos);
         storGroupSpinner.setOnItemSelectedListener(
