@@ -30,7 +30,6 @@ import org.mythdroid.fragments.RecListFragment;
 
 
 import android.R.drawable;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -50,12 +49,6 @@ import android.widget.ArrayAdapter;
  */
 public class Recordings extends MDFragmentActivity {
 
-    /**
-     * Child activities can set their result to this to indicate that the
-     * list of recordings should be refreshed when Recordings resumes
-     */
-    final public static int  REFRESH_NEEDED = Activity.RESULT_FIRST_USER;
-    
     /** Currently selected index in the recordings list */
     public int index = 0;
 
@@ -264,6 +257,24 @@ public class Recordings extends MDFragmentActivity {
         empty();
         showDialog(DIALOG_LOAD);
         Globals.getWorker().post(getRecordings);
+    }
+    
+    /**
+     * Remove a recording from the list
+     */
+    public void deleteRecording() {
+        recordings.remove(index);
+        if (listFragment != null && hasRecordings())
+            listFragment.setAdapter(recordings);
+    }
+    
+    /**
+     * Invalidate the list of recordings -
+     * reset the listFragment's adapter
+     */
+    public void invalidate() {
+        if (listFragment != null && hasRecordings())
+            listFragment.setAdapter(recordings);
     }
    
     @Override

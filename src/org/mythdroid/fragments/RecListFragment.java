@@ -29,7 +29,6 @@ import org.mythdroid.data.ProgramAdapter;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.util.ErrUtil;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -104,12 +103,6 @@ public class RecListFragment extends ListFragment
         return true;
     }
     
-    @Override
-    public void onActivityResult(int reqCode, int resCode, Intent data) {
-        if (resCode == Recordings.REFRESH_NEEDED)
-            activity.refresh();
-    }
-    
     /**
      * Populate the list 
      * @param recordings - list of recordings
@@ -130,6 +123,7 @@ public class RecListFragment extends ListFragment
     public void updateSelection() {
         Globals.curProg = (Program)lv.getItemAtPosition(activity.index);
         lv.setItemChecked(activity.index, true);
+        lv.setSelection(activity.index);
         if (dualPane || detailsFragClass != null) 
             showDetails();
     }
