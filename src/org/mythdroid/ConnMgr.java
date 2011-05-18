@@ -543,8 +543,12 @@ public class ConnMgr {
                 if (Globals.debug)
                     Log.d("ConnMgr", "Timed out waiting for connection to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
                 connectedReady = false;
+                timer.cancel();
                 throw new IOException(Messages.getString("ConnMgr.3") + addr); //$NON-NLS-1$
             }
+        
+        timer.cancel();
+        
     }
 
 }
