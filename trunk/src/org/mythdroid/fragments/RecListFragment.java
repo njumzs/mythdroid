@@ -56,6 +56,7 @@ public class RecListFragment extends ListFragment
         
         lv = getListView();
         
+        // Only ever embedded in Recordings activity
         activity = (Recordings)getActivity();
         activity.addHereToFrontendChooser(VideoPlayer.class);
         lv.setOnItemLongClickListener(this);
