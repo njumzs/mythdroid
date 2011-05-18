@@ -270,10 +270,11 @@ public class RecDetailFragment extends Fragment {
                                 } catch (Exception e) {
                                     ErrUtil.err(activity, e);
                                 }
-                                activity.setResult(Recordings.REFRESH_NEEDED);
                                 dialog.dismiss();
-                                if (embedded) ((Recordings)activity).refresh();
-                                else activity.finish();
+                                if (embedded)
+                                    ((Recordings)activity).deleteRecording();
+                                else
+                                    activity.finish();
                             }
                         }
                     )
@@ -303,10 +304,11 @@ public class RecDetailFragment extends Fragment {
                                     dialog.dismiss();
                                     return;
                                 }
-                                activity.setResult(Recordings.REFRESH_NEEDED);
                                 stop.setVisibility(View.GONE);
                                 prog.Status = RecStatus.RECORDED;
                                 setViews();
+                                if (embedded)
+                                    ((Recordings)activity).invalidate();
                                 dialog.dismiss();
                             }
                         }
