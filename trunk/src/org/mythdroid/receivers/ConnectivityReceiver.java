@@ -172,7 +172,10 @@ public class ConnectivityReceiver extends BroadcastReceiver {
 
                 try {
                     Thread.sleep(500);
-                } catch (InterruptedException e) { return; }
+                } catch (InterruptedException e) {
+                    timer.cancel();
+                    return; 
+                }
 
                 winfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 wifiState = wm.getWifiState();
@@ -188,9 +191,14 @@ public class ConnectivityReceiver extends BroadcastReceiver {
 
                 try {
                     Thread.sleep(200);
-                } catch (InterruptedException e) { return; }
+                } catch (InterruptedException e) {
+                    timer.cancel();
+                    return; 
+                }
 
             }
+            
+            timer.cancel();
 
         }
 

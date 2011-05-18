@@ -48,6 +48,7 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -206,12 +207,20 @@ public class VideoPlayer extends MDActivity {
             return;
         }
         
-        long beforeSleep = System.currentTimeMillis();
-        while (System.currentTimeMillis() < beforeSleep + 2500)
-            try {
-                Thread.sleep(beforeSleep + 2500 - System.currentTimeMillis());
-            } catch (InterruptedException e) {}
+        new Handler().postDelayed(
+            new Runnable() {
+                @Override
+                public void run() {
+                    playVideo();
+                }
+                
+            }, 3000
+        );
 
+    }    
+    
+    private void playVideo() {
+            
         String sdpAddr = beMgr.addr;
 
         /* If the backend address is localhost, assume SSH port forwarding
