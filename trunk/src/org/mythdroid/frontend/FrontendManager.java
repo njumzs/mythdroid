@@ -53,7 +53,7 @@ public class FrontendManager {
         if (Globals.debug)
             Log.d("FrontendManager", "Connecting to " + host + ":6546"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-        cmgr = new ConnMgr(host, 6546, new onConnectListener() {
+        cmgr = ConnMgr.connect(host, 6546, new onConnectListener() {
                 @Override
                 public void onConnect(ConnMgr cmgr) throws IOException {
                     getSingleLineResponse(cmgr);

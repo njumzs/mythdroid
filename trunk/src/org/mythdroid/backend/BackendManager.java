@@ -94,7 +94,7 @@ public class BackendManager {
                 ":6543 (ProtoVer " + Globals.protoVersion +")" //$NON-NLS-1$ //$NON-NLS-2$
              );
 
-        cmgr = new ConnMgr(host, 6543, new onConnectListener() {
+        cmgr = ConnMgr.connect(host, 6543, new onConnectListener() {
                 @Override
                 public void onConnect(ConnMgr cmgr) throws IOException {
                     if (!announce(cmgr))

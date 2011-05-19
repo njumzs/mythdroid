@@ -29,6 +29,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -84,8 +85,10 @@ public class ConnMgr {
     /** Hostname of the remote host */
     private String                  hostname         = null;
     private WifiLock                wifiLock         = null;
-    /** Are we connected and ready for IO? */
-    private boolean                 connectedReady   = false;
+    /** Is this socket in use, connected and ready for IO? */
+    private boolean                 inUse            = false;
+    /** Date of last use */
+    private Date                    lastUsed         = null;
     /** Is a reconnect pending due to connectivity changes? */
     private boolean                 reconnectPending = false;
     /** The most recently transmitted message */
@@ -96,25 +99,50 @@ public class ConnMgr {
     private ArrayList<onConnectListener> oCLs = 
         new ArrayList<onConnectListener>();
 
+    
     /**
-     * Constructor
+     * Make a connection
      * @param host String with hostname or dotted decimal IP address
      * @param port integer port number
      */
-    public ConnMgr(String host, int port) throws IOException {
-        init(host, port, null);
+    public static ConnMgr connect(String host, int port) throws IOException {
+        ConnMgr cmgr = null;
+        if ((cmgr = findExisting(host, port)) != null)
+            return cmgr;
+        return new ConnMgr(host, port, null, false);
     }
-  
+        
     /**
      * Constructor
      * @param host String with hostname or dotted decimal IP address
      * @param port integer port number
      * @param ocl callback to call upon successful connection
      */
-    public ConnMgr(String host, int port, onConnectListener ocl)
+    public static ConnMgr connect(String host, int port, onConnectListener ocl)
         throws IOException {
 
-        init(host, port, ocl);
+        ConnMgr cmgr = null;
+        if ((cmgr = findExisting(host, port)) != null)
+            return cmgr;
+        return new ConnMgr(host, port, ocl, false);
+        
+    }
+    
+    /**
+     * Constructor
+     * @param host String with hostname or dotted decimal IP address
+     * @param port integer port number
+     * @param ocl callback to call upon successful connection
+     * @param mux connection will be muxed via MDD if true
+     */
+    public static ConnMgr connect(
+        final String host, final int port, onConnectListener ocl, boolean mux
+    ) throws IOException {
+        
+        ConnMgr cmgr = null;
+        if ((cmgr = findExisting(host, port)) != null)
+            return cmgr;
+        return new ConnMgr(host, port, ocl, mux);
         
     }
     
@@ -127,9 +155,8 @@ public class ConnMgr {
      */
     public ConnMgr(
         final String host, final int port, onConnectListener ocl, boolean mux
-    )
-        throws IOException {
-        
+    ) throws IOException {
+
         if (mux)
             oCLs.add(
                 new onConnectListener() {
@@ -145,7 +172,35 @@ public class ConnMgr {
                 }
             );
         
-        init(host, mux ? 16550 : port, ocl);
+        sockAddr = new InetSocketAddress(host, mux ? 16550 : port);
+
+        hostname = host;
+        addr = host + ":" + port; //$NON-NLS-1$
+
+        disconnected = new IOException(Messages.getString("ConnMgr.0") + addr); //$NON-NLS-1$
+
+        if (ocl != null)
+            oCLs.add(ocl);
+
+        /*
+         * Increase default socket timeout if we're not on WiFi
+         * Grab a WifiLock if we are
+         */
+        if (
+            ConnectivityReceiver.networkType() == ConnectivityManager.TYPE_WIFI
+        ) {
+            wifiLock = ((WifiManager)Globals.appContext
+                .getSystemService(Context.WIFI_SERVICE))
+                .createWifiLock("MythDroid"); //$NON-NLS-1$
+            wifiLock.acquire();
+        }
+        else
+            timeout *= 8;
+
+        doConnect(timeout);
+
+        weakThis = new WeakReference<ConnMgr>(this);
+        synchronized (conns) { conns.add(weakThis); }
         
     }
     
@@ -368,12 +423,17 @@ public class ConnMgr {
      * @return true if socket is connected, false otherwise
      */
     public boolean isConnected() {
-        return sock.isConnected() && connectedReady;
+        return sock.isConnected() && inUse;
     }
 
     /** Disconnect and clean up internal resources */
     public void dispose() throws IOException {
         disconnect();
+        if (!sock.isClosed()) {
+            if (Globals.debug)
+                Log.d("ConnMgr", "Disconnecting from " + addr); //$NON-NLS-1$ //$NON-NLS-2$
+            sock.close();
+        }
         conns.remove(weakThis);
     }
 
@@ -388,6 +448,10 @@ public class ConnMgr {
                 ConnMgr c = r.get();
                 if (c == null) continue;
                 c.disconnect();
+                if (Globals.debug)
+                    Log.d("ConnMgr", "Disconnecting from " + c.addr); //$NON-NLS-1$ //$NON-NLS-2$
+                if (!c.sock.isClosed())
+                    c.sock.close();
                 c.reconnectPending = true;
 
             }
@@ -406,7 +470,7 @@ public class ConnMgr {
                 if (r == null) continue;
                 ConnMgr c = r.get();
                 if (c == null) continue;
-                c.connect(1000);
+                c.doConnect(1000);
 
             }
 
@@ -414,53 +478,65 @@ public class ConnMgr {
 
     }
     
-    private void init(String host, int port, onConnectListener ocl)
-        throws IOException {
+    static public void reapOld() {
         
-        sockAddr = new InetSocketAddress(host, port);
+        long now = new Date().getTime();
+        
+        synchronized (conns) {
+            
+            for (WeakReference<ConnMgr> r : conns) {
 
-        hostname = host;
-        addr = host + ":" + port; //$NON-NLS-1$
-
-        disconnected = new IOException(Messages.getString("ConnMgr.0") + addr); //$NON-NLS-1$
-
-        if (ocl != null)
-            oCLs.add(ocl);
-
-        /*
-         * Increase default socket timeout if we're not on WiFi
-         * Grab a WifiLock if we are
-         */
-        if (
-            ConnectivityReceiver.networkType() == ConnectivityManager.TYPE_WIFI
-        ) {
-            wifiLock = ((WifiManager)Globals.appContext
-                .getSystemService(Context.WIFI_SERVICE))
-                .createWifiLock("MythDroid"); //$NON-NLS-1$
-            wifiLock.acquire();
+                if (r == null) continue;
+                ConnMgr c = r.get();
+                if (c == null) continue;
+                if (c.inUse == false && c.lastUsed.getTime() + 60000 < now)
+                    try {
+                        c.dispose();
+                    } catch (IOException e) {}
+                    
+            }
+            
         }
-        else
-            timeout *= 8;
+        
+    }
+    
+    static private ConnMgr findExisting(String host, int port) {
+        
+        synchronized (conns) {
+            for (WeakReference<ConnMgr> r : conns) {
 
-        connect(timeout);
-
-        weakThis = new WeakReference<ConnMgr>(this);
-        synchronized(conns) { conns.add(weakThis); }
-
+                if (r == null) continue;
+                ConnMgr c = r.get();
+                if (c == null) continue;
+                if (
+                    c.addr.equals(host + ":" + port) && //$NON-NLS-1$
+                    c.sock.isConnected() &&
+                    c.inUse == false
+                ) {
+                    c.inUse = true;
+                    c.wifiLock.acquire();
+                    return c;
+                }
+                    
+            }
+        }
+        
+        return null;
+        
     }
 
     /**
      * Connect to the remote host
      * @param timeout connect timeout in milliseconds
      */
-    private synchronized void connect(int timeout) throws IOException {
+    private synchronized void doConnect(int timeout) throws IOException {
 
         ConnectivityReceiver.waitForWifi(Globals.appContext, 5000);
 
         if (Globals.debug)
             Log.d("ConnMgr", "Connecting to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
 
-        if (sock != null && sock.isConnected() && connectedReady) {
+        if (sock != null && sock.isConnected() && inUse) {
             if (Globals.debug)
                 Log.d("ConnMgr", addr + " is already connected"); //$NON-NLS-1$ //$NON-NLS-2$
             return;
@@ -497,22 +573,17 @@ public class ConnMgr {
         if (Globals.debug)
             Log.d("ConnMgr", "Connection to " + addr + " successful"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-        connectedReady = true;
+        inUse = true;
 
         for (onConnectListener oCL : oCLs)
             oCL.onConnect(this);
 
     }
 
-    private void disconnect() throws IOException {
+    private void disconnect() {
 
-        connectedReady = false;
-
-        if (Globals.debug)
-            Log.d("ConnMgr", "Disconnecting from " + addr); //$NON-NLS-1$ //$NON-NLS-2$
-
-        if (!sock.isClosed())
-            sock.close();
+        inUse = false;
+        lastUsed = new Date();
 
         if (wifiLock != null && wifiLock.isHeld())
             wifiLock.release();
@@ -534,7 +605,7 @@ public class ConnMgr {
             if (Globals.debug)
                 Log.d("ConnMgr", msg); //$NON-NLS-1$
 
-            if (!sock.isConnected() || !connectedReady) {
+            if (!sock.isConnected() || !inUse) {
                 waitForConnection(timeout * 4);
                 write(lastSent);
                 return read(buf, off, len);
@@ -553,7 +624,7 @@ public class ConnMgr {
 
     private synchronized void write(byte[] buf) throws IOException {
 
-        if (!sock.isConnected() || !connectedReady)
+        if (!sock.isConnected() || !inUse)
             waitForConnection(timeout * 4);
 
         os.write(buf);
@@ -568,7 +639,7 @@ public class ConnMgr {
     private synchronized void waitForConnection(int timeout) throws IOException {
 
         if (!reconnectPending) {
-            connect(timeout);
+            doConnect(timeout);
             return;
         }
 
@@ -587,13 +658,13 @@ public class ConnMgr {
         if (Globals.debug)
             Log.d("ConnMgr", "Waiting for a connection to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
 
-        while (!sock.isConnected() || !connectedReady)
+        while (!sock.isConnected() || !inUse)
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 if (Globals.debug)
                     Log.d("ConnMgr", "Timed out waiting for connection to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
-                connectedReady = false;
+                inUse = false;
                 timer.cancel();
                 throw new IOException(Messages.getString("ConnMgr.3") + addr); //$NON-NLS-1$
             }
