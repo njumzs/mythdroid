@@ -80,7 +80,7 @@ public class MDDManager {
      * @return ArrayList<String> containing names of MDD commands
      */
     public static ArrayList<String> getCommands(String addr) throws IOException {
-        final ConnMgr cmgr = new ConnMgr(addr, 16546, null);
+        final ConnMgr cmgr = new ConnMgr(addr, 16546);
         final ArrayList<String> cmds = new ArrayList<String>();
 
         String line = cmgr.readLine();
@@ -328,7 +328,7 @@ public class MDDManager {
     
     private static ConnMgr sendMsgNoMux(String addr, String msg)
         throws IOException {
-        final ConnMgr cmgr = new ConnMgr(addr, 16546, null);
+        final ConnMgr cmgr = new ConnMgr(addr, 16546);
         getMsgResponse(cmgr, msg);
         return cmgr;
     }
