@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.mythdroid.ConnMgr;
+import org.mythdroid.Globals;
 import org.mythdroid.Enums.RecType;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.Video;
@@ -100,7 +101,7 @@ public class MDDManager {
      * @param cmd String containing the name of the MDD command
      */
     public static void mddCommand(String addr, String cmd) throws IOException {
-        final ConnMgr cmgr = sendMsg(addr, "COMMAND " + cmd); //$NON-NLS-1$
+        final ConnMgr cmgr = sendMsgNoMux(addr, "COMMAND " + cmd); //$NON-NLS-1$
         cmgr.dispose();
     }
 
@@ -271,11 +272,24 @@ public class MDDManager {
      * @param addr String containing address of frontend
      */
     public MDDManager(String addr) throws IOException {
-        cmgr = new ConnMgr(addr, 16546, null);
+        cmgr = new ConnMgr(addr, 16546, null, Globals.muxConns);
         // Wait indefinitely for messages from MDD
         cmgr.setTimeout(0);
         new Thread(recvTask).start();
     }
+    
+    /**
+     * Construct a new MDDManager
+     * @param addr String containing address of frontend
+     * @param mux mux MDD connection via MDD if true
+     */
+    public MDDManager(String addr, boolean mux) throws IOException {
+        cmgr = new ConnMgr(addr, 16546, null, mux);
+        // Wait indefinitely for messages from MDD
+        cmgr.setTimeout(0);
+        new Thread(recvTask).start();
+    }
+
 
     /**
      * Add a new listener for MENU events
@@ -307,19 +321,34 @@ public class MDDManager {
     }
 
     private static ConnMgr sendMsg(String addr, String msg) throws IOException {
+        final ConnMgr cmgr = new ConnMgr(addr, 16546, null, Globals.muxConns);
+        getMsgResponse(cmgr, msg);
+        return cmgr;
+    }
+    
+    private static ConnMgr sendMsgNoMux(String addr, String msg)
+        throws IOException {
         final ConnMgr cmgr = new ConnMgr(addr, 16546, null);
+        getMsgResponse(cmgr, msg);
+        return cmgr;
+    }
+    
+    private static void getMsgResponse(ConnMgr cmgr, String msg)
+        throws IOException {
+        
         String resp = null;
         cmgr.writeLine(msg);
         while (true) {
             resp = cmgr.readLine();
             if (resp.equals("OK")) //$NON-NLS-1$
-                return cmgr;
+                return;
             if (resp.equals("UNKNOWN")) //$NON-NLS-1$
                 throw new IOException(
                     "MDD doesn't understand " + //$NON-NLS-1$
                     msg.substring(0, msg.indexOf(' '))
                 );
         }
+        
     }
 
     private void handleData(String line) {

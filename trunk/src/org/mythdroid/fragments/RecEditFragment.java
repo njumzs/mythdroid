@@ -176,7 +176,7 @@ public class RecEditFragment extends Fragment {
         }
 
         try {
-            MDDManager mdd = new MDDManager(beMgr.addr);
+            MDDManager mdd = new MDDManager(beMgr.addr, Globals.muxConns);
             mdd.shutdown();
         } catch (IOException e) {
         	initError(

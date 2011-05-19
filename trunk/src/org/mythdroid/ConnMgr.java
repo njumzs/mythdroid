@@ -90,49 +90,56 @@ public class ConnMgr {
     private boolean                 reconnectPending = false;
     /** The most recently transmitted message */
     private byte[]                  lastSent         = null;
-    /** contains our onConnect callback if there is one */
-    private onConnectListener       oCL              = null;
     /** An IOException with a message that we've been unexpectedly disconnected */
     private IOException             disconnected     = null;
+    /** contains our onConnect callback if there is one */
+    private ArrayList<onConnectListener> oCLs = 
+        new ArrayList<onConnectListener>();
 
     /**
      * Constructor
      * @param host String with hostname or dotted decimal IP address
      * @param port integer port number
+     * @param ocl callback to call upon successful connection
      */
     public ConnMgr(String host, int port, onConnectListener ocl)
         throws IOException {
 
-        sockAddr = new InetSocketAddress(host, port);
-
-        hostname = host;
-        addr = host + ":" + port; //$NON-NLS-1$
-
-        disconnected = new IOException(Messages.getString("ConnMgr.0") + addr); //$NON-NLS-1$
-
-        oCL = ocl;
-
-        /*
-         * Increase default socket timeout if we're not on WiFi
-         * Grab a WifiLock if we are
-         */
-        if (
-            ConnectivityReceiver.networkType() == ConnectivityManager.TYPE_WIFI
-        ) {
-            wifiLock = ((WifiManager)Globals.appContext
-                .getSystemService(Context.WIFI_SERVICE))
-                .createWifiLock("MythDroid"); //$NON-NLS-1$
-            wifiLock.acquire();
-        }
-        else
-            timeout *= 8;
-
-        connect(timeout);
-
-        weakThis = new WeakReference<ConnMgr>(this);
-        synchronized(conns) { conns.add(weakThis); }
-
+        init(host, port, ocl);
+        
     }
+    
+    /**
+     * Constructor
+     * @param host String with hostname or dotted decimal IP address
+     * @param port integer port number
+     * @param ocl callback to call upon successful connection
+     * @param mux connection will be muxed via MDD if true
+     */
+    public ConnMgr(
+        final String host, final int port, onConnectListener ocl, boolean mux
+    )
+        throws IOException {
+        
+        if (mux)
+            oCLs.add(
+                new onConnectListener() {
+                    @Override
+                    public void onConnect(ConnMgr cmgr) throws IOException {
+                        byte[] buf = new byte[512];
+                        cmgr.write(String.valueOf(port).getBytes());
+                        int read = cmgr.read(buf, 0, 512);
+                        if (read == 2 && buf[0] == 'O' && buf[1] == 'K')
+                            return;
+                        throw new IOException(new String(buf));
+                    }
+                }
+            );
+        
+        init(host, mux ? 16550 : port, ocl);
+        
+    }
+    
 
     /**
      * Set the socket timeout
@@ -397,6 +404,41 @@ public class ConnMgr {
         }
 
     }
+    
+    private void init(String host, int port, onConnectListener ocl)
+        throws IOException {
+        
+        sockAddr = new InetSocketAddress(host, port);
+
+        hostname = host;
+        addr = host + ":" + port; //$NON-NLS-1$
+
+        disconnected = new IOException(Messages.getString("ConnMgr.0") + addr); //$NON-NLS-1$
+
+        if (ocl != null)
+            oCLs.add(ocl);
+
+        /*
+         * Increase default socket timeout if we're not on WiFi
+         * Grab a WifiLock if we are
+         */
+        if (
+            ConnectivityReceiver.networkType() == ConnectivityManager.TYPE_WIFI
+        ) {
+            wifiLock = ((WifiManager)Globals.appContext
+                .getSystemService(Context.WIFI_SERVICE))
+                .createWifiLock("MythDroid"); //$NON-NLS-1$
+            wifiLock.acquire();
+        }
+        else
+            timeout *= 8;
+
+        connect(timeout);
+
+        weakThis = new WeakReference<ConnMgr>(this);
+        synchronized(conns) { conns.add(weakThis); }
+
+    }
 
     /**
      * Connect to the remote host
@@ -448,7 +490,7 @@ public class ConnMgr {
 
         connectedReady = true;
 
-        if (oCL != null)
+        for (onConnectListener oCL : oCLs)
             oCL.onConnect(this);
 
     }

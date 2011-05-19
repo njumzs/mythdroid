@@ -19,8 +19,8 @@
 package org.mythdroid.remote;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -493,11 +493,18 @@ public class MusicRemote extends Remote {
 
         if (url == null)
             return null;
+        
+        if (Globals.muxConns) try {
+            url = new URL(
+                url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
+                ":16550" + url.getFile()  //$NON-NLS-1$
+            );
+        } catch (MalformedURLException e1) {
+           return null;
+        }
 
         try {
-            URLConnection conn = url.openConnection();
-            conn.connect();
-            bm = BitmapFactory.decodeStream(conn.getInputStream());
+            bm = BitmapFactory.decodeStream(url.openStream());
             artCache.put(artid, bm);
             return bm;
         } catch (IOException e) {

@@ -45,7 +45,7 @@ public class VLCRemote {
         if (Globals.debug)
             Log.d("VLCRemote", "Connecting to " + host + ":" + port); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-        cmgr = new ConnMgr(host, port, null);
+        cmgr = new ConnMgr(host, port, null, Globals.muxConns);
 
         if (cmgr == null)
             throw new 

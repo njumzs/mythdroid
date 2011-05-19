@@ -19,6 +19,7 @@
 package org.mythdroid.data;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.http.HttpResponse;
@@ -112,6 +113,15 @@ public class Video {
 
         if (url == null)
             return;
+        
+        try {
+            url = new URL(
+                url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
+                ":16550" + url.getFile()  //$NON-NLS-1$
+            );
+        } catch (MalformedURLException e1) {
+           return;
+        }
 
         Bitmap bm = null;
 

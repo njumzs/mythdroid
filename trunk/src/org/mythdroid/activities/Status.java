@@ -41,7 +41,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 
-
 /**
  * ListActivity lists other Status activities
  * Houses static method to fetch the status XML
@@ -61,7 +60,7 @@ public class Status extends MDFragmentActivity {
     final private Runnable getStatusTask = new Runnable() {
         @Override
         public void run() {
-            getStatus(ctx);
+            final boolean ok = getStatus(ctx);
             handler.post(
                 new Runnable() {
                     @Override
@@ -69,7 +68,8 @@ public class Status extends MDFragmentActivity {
                         try {
                             dismissDialog(DIALOG_LOAD);
                         } catch (IllegalArgumentException e) {}
-                        installFragments();
+                        if (ok)
+                            installFragments();
                     }
                 }
             );
@@ -109,12 +109,12 @@ public class Status extends MDFragmentActivity {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
             URL url = new URL(Globals.getBackend().getStatusURL() + "/xml"); //$NON-NLS-1$
-            statusDoc = dbf.newDocumentBuilder().parse(
-                url.openConnection().getInputStream()
-            );
+            if (Globals.muxConns)
+                url = new URL("http://" + url.getHost() + ":16550/xml");  //$NON-NLS-1$ //$NON-NLS-2$
+            statusDoc = dbf.newDocumentBuilder().parse(url.openStream());
         } catch (SAXException e) {
-            ErrUtil.err(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
-        } catch (Exception e) { ErrUtil.err(ctx, e); }
+            ErrUtil.postErr(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
+        } catch (Exception e) { ErrUtil.postErr(ctx, e); }
         
         return statusDoc != null;
 

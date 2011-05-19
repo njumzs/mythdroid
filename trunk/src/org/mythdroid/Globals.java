@@ -36,6 +36,9 @@ public class Globals {
 
     /** Backend address from preferences */
     public static String backend = null;
+    
+    /** Mux connections to the backend host via MDD */
+    public static boolean muxConns = false;
 
     /** To remember where we were */
     public static FrontendLocation lastLocation =
