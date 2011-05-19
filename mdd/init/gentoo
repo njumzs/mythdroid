@@ -5,6 +5,7 @@
 
 depend() {
 	use mysql
+        use mythbackend
 }
 
 start() {
