@@ -32,7 +32,7 @@ import android.util.Log;
  */
 public class VLCRemote {
     
-    final static private int port = 16548;
+    final static private int port = 16547;
     
     private ConnMgr cmgr = null;
 
