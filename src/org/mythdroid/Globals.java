@@ -122,14 +122,20 @@ public class Globals {
 
         if (beMgr != null && beMgr.isConnected())
             return beMgr;
+        
+        if (
+            (backend.equals("127.0.0.1") || backend.equals("localhost")) && //$NON-NLS-1$ //$NON-NLS-2$
+            testMuxConn()
+        )
+            muxConns = true;
 
         if (backend != null && backend.length() > 0)
             try {
                 beMgr = new BackendManager(backend);
-            } catch(IOException e) {}
-
-        if (beMgr == null)
-            beMgr = BackendManager.locate();
+            } catch(IOException e) {
+                beMgr = BackendManager.locate();
+                muxConns = false;
+            }
 
         return beMgr;
 
@@ -179,6 +185,17 @@ public class Globals {
         if (wHandler != null)
             wHandler.getLooper().quit();
         wHandler = null;
+    }
+    
+    private static boolean testMuxConn() {
+        ConnMgr cmgr = null;        
+        try {
+            cmgr = new ConnMgr(backend, 6543, null, true);
+            cmgr.dispose();
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
 
 }
