@@ -80,7 +80,7 @@ public class MDDManager {
      * @return ArrayList<String> containing names of MDD commands
      */
     public static ArrayList<String> getCommands(String addr) throws IOException {
-        final ConnMgr cmgr = new ConnMgr(addr, 16546);
+        final ConnMgr cmgr = ConnMgr.connect(addr, 16546);
         final ArrayList<String> cmds = new ArrayList<String>();
 
         String line = cmgr.readLine();
@@ -272,7 +272,7 @@ public class MDDManager {
      * @param addr String containing address of frontend
      */
     public MDDManager(String addr) throws IOException {
-        cmgr = new ConnMgr(addr, 16546, null, Globals.muxConns);
+        cmgr = ConnMgr.connect(addr, 16546);
         // Wait indefinitely for messages from MDD
         cmgr.setTimeout(0);
         new Thread(recvTask).start();
@@ -284,7 +284,7 @@ public class MDDManager {
      * @param mux mux MDD connection via MDD if true
      */
     public MDDManager(String addr, boolean mux) throws IOException {
-        cmgr = new ConnMgr(addr, 16546, null, mux);
+        cmgr = ConnMgr.connect(addr, 16546, null, mux);
         // Wait indefinitely for messages from MDD
         cmgr.setTimeout(0);
         new Thread(recvTask).start();
@@ -321,14 +321,14 @@ public class MDDManager {
     }
 
     private static ConnMgr sendMsg(String addr, String msg) throws IOException {
-        final ConnMgr cmgr = new ConnMgr(addr, 16546, null, Globals.muxConns);
+        final ConnMgr cmgr = ConnMgr.connect(addr, 16546, null, Globals.muxConns);
         getMsgResponse(cmgr, msg);
         return cmgr;
     }
     
     private static ConnMgr sendMsgNoMux(String addr, String msg)
         throws IOException {
-        final ConnMgr cmgr = new ConnMgr(addr, 16546);
+        final ConnMgr cmgr = ConnMgr.connect(addr, 16546);
         getMsgResponse(cmgr, msg);
         return cmgr;
     }

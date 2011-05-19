@@ -40,7 +40,7 @@ public class VLCRemote {
      */
     public VLCRemote(String host) throws IOException {
 
-        cmgr = new ConnMgr(host, port, null, Globals.muxConns);
+        cmgr = ConnMgr.connect(host, port, null, Globals.muxConns);
 
         if (cmgr == null)
             throw new 
