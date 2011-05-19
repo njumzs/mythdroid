@@ -100,6 +100,15 @@ public class ConnMgr {
      * Constructor
      * @param host String with hostname or dotted decimal IP address
      * @param port integer port number
+     */
+    public ConnMgr(String host, int port) throws IOException {
+        init(host, port, null);
+    }
+  
+    /**
+     * Constructor
+     * @param host String with hostname or dotted decimal IP address
+     * @param port integer port number
      * @param ocl callback to call upon successful connection
      */
     public ConnMgr(String host, int port, onConnectListener ocl)
