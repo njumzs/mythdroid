@@ -32,6 +32,7 @@ use Config;
 use MDD::LCD;
 use MDD::MythDB;
 use MDD::Log;
+use MDD::CMux;
 
 sub usage();
 sub handleMdConn($);
@@ -51,12 +52,6 @@ sub killKids();
 
 my $lcdServerPort = 6545;
 my $listenPort    = 16546;
-
-# Kill off the real mythlcdserver when we are killed
-$SIG{'INT'} = $SIG{'TERM'} = $SIG{'KILL'} = \&killKids; 
-# Re-read mdd.conf if we are HUP'd
-$SIG{'HUP'} = \&readCommands;
-sub END { killKids() }
 
 my ($backend, $debug);
 
@@ -176,6 +171,17 @@ elsif (!$backend) {
     ) or $log->fatal("Couldn't listen on $lcdServerPort/tcp: $!");
 
 }
+
+MDD::CMux->new($log);
+
+# Forking is done.. install our signal handlers
+
+# Kill off the real mythlcdserver when we are killed
+$SIG{INT} = $SIG{TERM} = $SIG{KILL} = \&killKids; 
+# Re-read mdd.conf if we are HUP'd
+$SIG{HUP} = \&readCommands;
+$SIG{CHLD} = 'IGNORE';
+sub END { killKids() }
 
 $mythdb = MDD::MythDB->new($log);;
 
@@ -651,7 +657,7 @@ sub create_user_account() {
 
 sub install_modules() {
 
-    my @mods = (qw(LCD MythDB Log XOSD));
+    my @mods = (qw(LCD MythDB Log XOSD CMux));
     
     # Install modules
     mkdir($Config{vendorlib} . "/MDD");
