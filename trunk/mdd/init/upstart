@@ -5,8 +5,8 @@
 
 description     "MythDroid Daemon"
 
-start on started mysql
-stop on stopping mysql
+start on started mythtv-backend
+stop on stopping mythtv-backend
 
 expect fork
 respawn
