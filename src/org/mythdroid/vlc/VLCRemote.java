@@ -25,8 +25,6 @@ import org.mythdroid.ConnMgr;
 import org.mythdroid.Globals;
 import org.mythdroid.resource.Messages;
 
-import android.util.Log;
-
 /**
  * Manage a connection to VLC's remote control interface
  */
@@ -41,9 +39,6 @@ public class VLCRemote {
      * @param host - hostname or IP address of host running VLC
      */
     public VLCRemote(String host) throws IOException {
-        
-        if (Globals.debug)
-            Log.d("VLCRemote", "Connecting to " + host + ":" + port); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         cmgr = new ConnMgr(host, port, null, Globals.muxConns);
 
