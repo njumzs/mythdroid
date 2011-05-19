@@ -19,7 +19,6 @@
 package org.mythdroid.data;
 
 import java.net.URL;
-import java.net.URLConnection;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
@@ -365,16 +364,18 @@ public class Program implements Comparable<Program> {
         ) return null;
 
         try {
-            final URL url =
+            URL url =
                 new URL(
                     Globals.getBackend().getStatusURL() +
                     "/Myth/GetPreviewImage?ChanId=" + ChanID + //$NON-NLS-1$
                     "&StartTime=" + Globals.dateFmt.format(RecStartTime) //$NON-NLS-1$
                 );
-
-            final URLConnection conn = url.openConnection();
-            conn.connect();
-            return BitmapFactory.decodeStream(conn.getInputStream());
+            if (Globals.muxConns)
+                url = new URL(
+                    url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
+                    ":16550" + url.getFile()  //$NON-NLS-1$
+                );
+            return BitmapFactory.decodeStream(url.openStream());
         } catch (Exception e) { return null; }
     }
 

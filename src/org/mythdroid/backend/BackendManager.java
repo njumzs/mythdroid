@@ -102,7 +102,7 @@ public class BackendManager {
                             Messages.getString("BackendManager.0") //$NON-NLS-1$)
                         );
                 }
-            }
+            }, Globals.muxConns
         );
         
         // QUERY_RECORDINGS can take a few seconds..
@@ -283,15 +283,18 @@ public class BackendManager {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         URL url = new URL(sURL + "/xml"); //$NON-NLS-1$
         Document doc;
-
+        
+        if (Globals.muxConns)
+            url = new URL(
+                url.getProtocol() + "://" + url.getHost() +  ":16550/xml"  //$NON-NLS-1$ //$NON-NLS-2$
+            );
+       
         URLConnection urlConn = url.openConnection();
         urlConn.setConnectTimeout(3000);
         urlConn.setReadTimeout(4000);
 
         try {
-            doc = dbf.newDocumentBuilder().parse(
-                urlConn.getInputStream()
-            );
+            doc = dbf.newDocumentBuilder().parse(urlConn.getInputStream());
         } catch (SocketTimeoutException e) {
             throw new IOException(Messages.getString("BackendManager.1")); //$NON-NLS-1$
         } catch (SAXException e) {

@@ -456,7 +456,7 @@ public class Guide extends MDActivity {
 
         try {
 
-            final URL url = new URL(
+            URL url = new URL(
                 Globals.getBackend().getStatusURL() +
                 "/Myth/GetProgramGuide?" +  //$NON-NLS-1$
                 "StartTime=" + Globals.dateFmt.format(start) + //$NON-NLS-1$
@@ -466,12 +466,14 @@ public class Guide extends MDActivity {
 
             if (Globals.debug)
                 Log.d("Guide", "Fetching XML from " + url.toExternalForm()); //$NON-NLS-1$ //$NON-NLS-2$
-
-            Xml.parse(
-                url.openConnection().getInputStream(),
-                Xml.Encoding.UTF_8,
-                handler
-            );
+            
+            if (Globals.muxConns)
+                url = new URL(
+                    url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
+                    ":16550" + url.getFile()  //$NON-NLS-1$
+                );
+            
+            Xml.parse(url.openStream(), Xml.Encoding.UTF_8, handler);
 
         } catch (SAXException e1) {
             ErrUtil.err(this, Messages.getString("Guide.13")); // Guide XML parse error //$NON-NLS-1$
