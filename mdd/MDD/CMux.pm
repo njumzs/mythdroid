@@ -27,6 +27,8 @@ my %conns;
 my $mux_port = 16550;
 my $log;
 
+my @allowed_ports = ( 6543, 6544, 16546, 16547 );
+
 sub new {
 
     my $class = shift;
@@ -75,7 +77,7 @@ sub initConn {
 
     $log->dbg("CMux: New connection from " . $c->peerhost . ":" . $c->peerport);
 
-    unless (sysread($c, $port, 256)) {
+    unless (sysread($c, $port, 512)) {
         handleDisconnect($c);
         return;
     }
@@ -88,6 +90,15 @@ sub initConn {
         chomp($port);
         $port =~ s/\s+$//;
     }
+
+    unless (grep { $_ == $port } @allowed_ports) {
+        my $msg = "CMux: connections to port $port are not permitted";
+        $log->err($msg);
+        print $c $msg;
+        close $c;
+        return;
+    }
+
 
     $conns{$c} = IO::Socket::INET->new(
         PeerAddr => "localhost:$port"
