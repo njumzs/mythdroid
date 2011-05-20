@@ -327,15 +327,13 @@ public class TVRemote extends Remote {
     }
 
     private void cleanup() {
-        try {
-            if (feMgr != null)
-                feMgr.disconnect();
-            feMgr = null;
+        if (feMgr != null)
+            feMgr.disconnect();
+        feMgr = null;
 
-            if (mddMgr != null)
-                mddMgr.shutdown();
-            mddMgr = null;
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        if (mddMgr != null)
+            mddMgr.shutdown();
+        mddMgr = null;
 
         if (timer != null) {
             timer.cancel();

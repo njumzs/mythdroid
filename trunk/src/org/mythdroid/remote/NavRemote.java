@@ -162,14 +162,12 @@ public class NavRemote extends Remote {
     }
 
     private void cleanup() {
-        try {
-            if (feMgr != null && !calledByRemote)
-                feMgr.disconnect();
-            feMgr = null;
-            if (mddMgr != null)
-                mddMgr.shutdown();
-            mddMgr = null;
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        if (feMgr != null && !calledByRemote)
+            feMgr.disconnect();
+        feMgr = null;
+        if (mddMgr != null)
+            mddMgr.shutdown();
+        mddMgr = null;
     }
 
     @Override

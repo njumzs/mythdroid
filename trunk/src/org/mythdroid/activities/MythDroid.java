@@ -124,16 +124,9 @@ public class MythDroid extends MDListActivity implements
 
         super.onDestroy();
 
-        try {
-            Globals.destroyBackend();
-            Globals.destroyFrontend();
-        } catch (IOException e) {
-            ErrUtil.err(this, e);
-        }
-
-        Globals.destroyWorker();
+        Globals.destroyBackend();
+        Globals.destroyFrontend();
         FrontendDB.close();
-        crecv.dispose(Globals.appContext);
 
     }
 

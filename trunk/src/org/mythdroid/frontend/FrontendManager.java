@@ -213,9 +213,9 @@ public class FrontendManager {
     }
 
     /** Disconnect from the frontend */
-    public void disconnect() throws IOException {
+    public void disconnect() {
         if (cmgr == null) return;
-        cmgr.dispose();
+        cmgr.disconnect();
         cmgr = null;
     }
 

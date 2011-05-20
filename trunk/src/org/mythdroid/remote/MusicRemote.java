@@ -273,14 +273,12 @@ public class MusicRemote extends Remote {
     }
 
     private void cleanup() {
-        try {
-            if (feMgr != null)
-                feMgr.disconnect();
-            feMgr = null;
-            if (mddMgr != null)
-                mddMgr.shutdown();
-            mddMgr = null;
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        if (feMgr != null)
+            feMgr.disconnect();
+        feMgr = null;
+        if (mddMgr != null)
+            mddMgr.shutdown();
+        mddMgr = null;
     }
 
     @Override
