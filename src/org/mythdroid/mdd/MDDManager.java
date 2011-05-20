@@ -91,7 +91,7 @@ public class MDDManager {
             line = cmgr.readLine();
         }
 
-        cmgr.dispose();
+        cmgr.disconnect();
         return cmds;
     }
 
@@ -102,7 +102,7 @@ public class MDDManager {
      */
     public static void mddCommand(String addr, String cmd) throws IOException {
         final ConnMgr cmgr = sendMsgNoMux(addr, "COMMAND " + cmd); //$NON-NLS-1$
-        cmgr.dispose();
+        cmgr.disconnect();
     }
 
     /**
@@ -131,7 +131,7 @@ public class MDDManager {
         }
 
         videos.trimToSize();
-        cmgr.dispose();
+        cmgr.disconnect();
         return videos;
 
     }
@@ -153,7 +153,7 @@ public class MDDManager {
             "STREAM " + w + "x" + h + " VB " + vb + " AB " + ab + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             " SG " + sg + " FILE " + file  //$NON-NLS-1$ //$NON-NLS-2$
         );
-        cmgr.dispose();
+        cmgr.disconnect();
     }
 
     /**
@@ -162,7 +162,7 @@ public class MDDManager {
      */
     public static void stopStream(String addr) throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "STOPSTREAM"); //$NON-NLS-1$
-        cmgr.dispose();
+        cmgr.disconnect();
     }
 
     /**
@@ -175,7 +175,7 @@ public class MDDManager {
         throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "RECTYPE " + recid); //$NON-NLS-1$
         final RecType rt = RecType.get(Integer.parseInt(cmgr.readLine()));
-        cmgr.dispose();
+        cmgr.disconnect();
         return rt;
     }
 
@@ -188,7 +188,7 @@ public class MDDManager {
     public static String getStorageGroup(String addr, int recid) throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "STORGROUP " + recid); //$NON-NLS-1$
         String sg = cmgr.readLine();
-        cmgr.dispose();
+        cmgr.disconnect();
         return sg;
     }
 
@@ -208,7 +208,7 @@ public class MDDManager {
             groups.add(line);
         }
 
-        cmgr.dispose();
+        cmgr.disconnect();
         return groups.toArray(new String[groups.size()]);
     }
 
@@ -228,7 +228,7 @@ public class MDDManager {
             groups.add(line);
         }
 
-        cmgr.dispose();
+        cmgr.disconnect();
         return groups.toArray(new String[groups.size()]);
     }
 
@@ -251,7 +251,7 @@ public class MDDManager {
 
         final ConnMgr cmgr = sendMsg(addr, msg);
         int recid = Integer.parseInt(cmgr.readLine());
-        cmgr.dispose();
+        cmgr.disconnect();
         return recid;
     }
 
@@ -264,7 +264,7 @@ public class MDDManager {
     public static void deleteRecording(String addr, int recid)
         throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "DELREC " + recid); //$NON-NLS-1$
-        cmgr.dispose();
+        cmgr.disconnect();
     }
 
     /**
@@ -316,8 +316,8 @@ public class MDDManager {
     }
 
     /** Disconnect from MDD and clean up internal resources */
-    public void shutdown() throws IOException {
-        cmgr.dispose();
+    public void shutdown() {
+        cmgr.disconnect();
     }
 
     private static ConnMgr sendMsg(String addr, String msg) throws IOException {

@@ -268,9 +268,8 @@ public class BackendManager {
     }
 
     /** Disconnect from the backend */
-    public void done() throws IOException {
-        cmgr.sendString("DONE"); //$NON-NLS-1$
-        cmgr.dispose();
+    public void done() {
+        cmgr.disconnect();
     }
 
     /**

@@ -29,7 +29,6 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -88,7 +87,7 @@ public class ConnMgr {
     /** Is this socket in use, connected and ready for IO? */
     private boolean                 inUse            = false;
     /** Date of last use */
-    private Date                    lastUsed         = null;
+    private long                    lastUsed         = -1;
     /** Is a reconnect pending due to connectivity changes? */
     private boolean                 reconnectPending = false;
     /** The most recently transmitted message */
@@ -425,15 +424,23 @@ public class ConnMgr {
     public boolean isConnected() {
         return sock.isConnected() && inUse;
     }
+    
+    /**
+     * Call when finished with the ConnMgr, doesn't actually disconnect the
+     * socket since the ConnMgr will be cached in case it can be reused
+     */
+    public void disconnect() {
+        inUse = false;
+        lastUsed = System.currentTimeMillis();
 
-    /** Disconnect and clean up internal resources */
+        if (wifiLock != null && wifiLock.isHeld())
+            wifiLock.release();
+    }
+
+    /** Disconnect the socket immediately and clean up internal resources */
     public void dispose() throws IOException {
         disconnect();
-        if (!sock.isClosed()) {
-            if (Globals.debug)
-                Log.d("ConnMgr", "Disconnecting from " + addr); //$NON-NLS-1$ //$NON-NLS-2$
-            sock.close();
-        }
+        doDisconnect();
         conns.remove(weakThis);
     }
 
@@ -447,12 +454,11 @@ public class ConnMgr {
                 if (r == null) continue;
                 ConnMgr c = r.get();
                 if (c == null) continue;
-                c.disconnect();
-                if (Globals.debug)
-                    Log.d("ConnMgr", "Disconnecting from " + c.addr); //$NON-NLS-1$ //$NON-NLS-2$
-                if (!c.sock.isClosed())
-                    c.sock.close();
                 c.reconnectPending = true;
+                if (c.inUse)
+                    c.doDisconnect();
+                else
+                    c.dispose();
 
             }
 
@@ -478,9 +484,12 @@ public class ConnMgr {
 
     }
     
+    /** Dispose of cached connections that haven't been used recently */
     static public void reapOld() {
         
-        long now = new Date().getTime();
+        if (conns == null || conns.isEmpty()) return;
+        
+        long now = System.currentTimeMillis();
         
         synchronized (conns) {
             
@@ -489,7 +498,7 @@ public class ConnMgr {
                 if (r == null) continue;
                 ConnMgr c = r.get();
                 if (c == null) continue;
-                if (c.inUse == false && c.lastUsed.getTime() + 60000 < now)
+                if (c.inUse == false && c.lastUsed + 60000 < now)
                     try {
                         c.dispose();
                     } catch (IOException e) {}
@@ -580,13 +589,13 @@ public class ConnMgr {
 
     }
 
-    private void disconnect() {
-
-        inUse = false;
-        lastUsed = new Date();
-
-        if (wifiLock != null && wifiLock.isHeld())
-            wifiLock.release();
+    private void doDisconnect() throws IOException {
+        
+        if (sock.isClosed())
+            return;
+        if (Globals.debug)
+            Log.d("ConnMgr", "Disconnecting from " + addr); //$NON-NLS-1$ //$NON-NLS-2$
+        sock.close();
 
     }
 

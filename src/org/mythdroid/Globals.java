@@ -83,9 +83,7 @@ public class Globals {
         if (feMgr != null && feMgr.isConnected()) {
             if (name.equals(feMgr.name))
                 return feMgr;
-            try {
-                feMgr.disconnect();
-            } catch (IOException e) {}
+            feMgr.disconnect();
             feMgr = null;
         }
 
@@ -161,20 +159,30 @@ public class Globals {
 
         if (wHandler == null)
             wHandler = new Handler(hThread.getLooper());
+        
+        wHandler.postDelayed(
+            new Runnable() {
+                @Override
+                public void run() {
+                    ConnMgr.reapOld();
+                    wHandler.postDelayed(this, 30000);
+                }
+            }, 30000
+        );
 
         return wHandler;
 
     }
 
     /** Disconnect and dispose of the currently connected frontend */
-    public static void destroyFrontend() throws IOException {
+    public static void destroyFrontend() {
          if (feMgr != null && feMgr.isConnected())
              feMgr.disconnect();
          feMgr = null;
     }
 
     /** Disconnect and dispose of the currently connected backend */
-    public static void destroyBackend() throws IOException {
+    public static void destroyBackend() {
         if (beMgr != null)
             beMgr.done();
         beMgr = null;
