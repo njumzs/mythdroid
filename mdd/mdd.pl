@@ -37,7 +37,7 @@ use MDD::CMux;
 sub usage();
 sub handleMdConn($);
 sub handleDisconnect($);
-sub readCommands();
+sub readConfig();
 sub clientMsg($);
 sub sendMsg($);
 sub sendMsgs($);
@@ -53,6 +53,7 @@ sub killKids();
 my $lcdServerPort = 6545;
 my $listenPort    = 16546;
 
+my %config;
 my ($backend, $debug);
 
 # Check for and strip arguments intended for us
@@ -76,7 +77,16 @@ foreach my $idx (0 .. $#ARGV) {
 
 @ARGV = grep { defined } @ARGV;
 
-my $log = MDD::Log->new('/tmp/mdd.log', $debug);
+readConfig();
+
+$debug |= exists $config{debug} && $config{debug} =~ /true/i;
+print STDERR 'Debug mode is ' . ($debug ? 'on' : 'off') . "\n";
+
+my $logfile = $config{logfile} || '/tmp/mdd.log';
+my $log = MDD::Log->new($logfile, $debug);
+
+$backend |= exists $config{backendonly} && $config{backendonly} =~ /true/i;
+$log->dbg('Running in ' . ($backend ? 'backend only' : 'combined') . ' mode');
 
 # Install ourselves if necessary
 install() unless ($0 =~ /mythlcdserver$/ || ($backend && $0 =~ /^\/usr\/bin/));
@@ -90,7 +100,7 @@ my @clients;
 
 my (%commands, %videos, %storageGroups);
 
-my $stream_cmd = 
+my $stream_cmd = $config{stream} ||
     '/usr/bin/vlc -vvv -I oldrc --rc-host 0.0.0.0:16547 ' .
     '--file-caching=2000 --demux=avformat %FILE% ' . 
     '--sout=\'#transcode{vcodec=h264,venc=x264{no-cabac,level=30,keyint=50,' .
@@ -128,17 +138,20 @@ my @clientMsgs = (
     },
 ); 
 
-eval "use MDD::XOSD";
+
+eval 'use MDD::XOSD';
 $no_xosd++ if $@;
 
 # Get rid of old streaming log files in case root owns them
 unlink (qw(/tmp/ffmpeg.out /tmp/vlc.out));
 
+my $user = $config{user} || 'mdd';
 # Change euid/uid
-my @pwent = getpwnam 'mdd';
+my @pwent = getpwnam $user;
 if (@pwent) { $< = $> = $pwent[2] }
+else { $log->warn("Failed to chuid to user $user") }
 
-$log->warn("WARNING: mdd is running as root - streaming will not work\n")
+$log->warn('mdd is running as root - streaming will not work')
     if ($> == 0);
 
 if ($backend && !$debug) {
@@ -172,20 +185,21 @@ elsif (!$backend) {
 
 }
 
-MDD::CMux->new($log);
+if (exists $config{cmux}) {
+    if ($config{cmux} =~ /true/i) { MDD::CMux->new($log) }
+}
+else { MDD::CMux->new($log) }
 
 # Forking is done.. install our signal handlers
 
 # Kill off the real mythlcdserver when we are killed
 $SIG{INT} = $SIG{TERM} = $SIG{KILL} = \&killKids; 
 # Re-read mdd.conf if we are HUP'd
-$SIG{HUP} = \&readCommands;
+$SIG{HUP} = \&readConfig;
 $SIG{CHLD} = 'IGNORE';
 sub END { killKids() }
 
 $mythdb = MDD::MythDB->new($log);;
-
-readCommands();
 
 $log->dbg("Listen on port $listenPort/tcp");
 
@@ -328,29 +342,44 @@ sub handleDisconnect($) {
 }
 
 # Parse MDD commands from /etc/mdd.conf
-sub readCommands() {
+sub readConfig() {
 
-    %commands = ();
+    %config = ();
     
     open F, '</etc/mdd.conf' or return;
 
     my $line = 0;
 
     while (<F>) {
+
         $line++;
         s/^\s+//;
         s/\s+$//;
         next if /^#/;
         s/#.*$//;
-        my ($name, $cmd) = /(.*)=>(.*)/;
-        if (!($name && $cmd)) {
+        my ($name, $value) = /(.*?)=(.*)/;
+        unless ($name && $value) {
             $log->err("Error parsing line $line of /etc/mdd.conf, ignoring");
             next;
         }
         $name =~ s/\s+$//;
-        $cmd =~ s/^\s+//;
-        $commands{$name} = $cmd;
-        $log->dbg("Add MDD command $name: $cmd");
+        $value =~ s/^\s+//;
+        $value .= readline F if ($value =~ s/\\$//);
+
+        if ($name =~ /command/i) {
+            my ($cm, $cv) = $value =~ /(.*)=>(.*)/;
+            unless ($cm && $cv) {
+                $log->err(
+                    "Error parsing command on line $line of " .
+                    "/etc/mdd.conf, ignoring"
+                );
+                next;
+            }
+            $commands{$cm} = $cv;
+        }
+
+        $config{$name} = $value;
+
     }
 
     close F;
@@ -413,7 +442,7 @@ sub runCommand($) {
 sub osdMsg($) {
 
     if ($no_xosd) {
-        $log->err("Can't display OSD - X::Osd isn't installed");
+        $log->err("Can't display OSD message - X::Osd isn't installed");
         return;
     }
 
@@ -741,6 +770,8 @@ sub install_init_script() {
 
 sub install {
 
+    $log->fatal("$0 must be run as root to install") unless ($> == 0);
+
     print "Installing mdd..\n";
 
     my ($path, $dst);
@@ -779,6 +810,12 @@ sub install {
     copy($0, $path) or die "$!\n";
     chmod(0755, $path) 
         or warn "chmod of $path failed\n";
+
+    unless (-e '/etc/mdd.conf') {
+        print "cp mdd.conf -> /etc/mdd.conf\n";
+        copy('mdd.conf', '/etc/mdd.conf') or die "$!\n";
+        chmod(0644, '/etc/mdd.conf') or warn "chmod of /etc/mdd.conf failed\n";
+    }
 
     check_lcd_settings();
 

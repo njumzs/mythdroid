@@ -6,4 +6,3 @@ On a box that is used only as a backend, as root:
 
     # perl mdd.pl --backend
 
-    Then run /usr/bin/mdd and arrange for it to be run at boot.
