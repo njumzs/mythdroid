@@ -80,7 +80,7 @@ foreach my $idx (0 .. $#ARGV) {
 readConfig();
 
 $debug |= exists $config{debug} && $config{debug} =~ /true/i;
-print STDERR 'Debug mode is ' . ($debug ? 'on' : 'off') . "\n";
+print STDERR 'MDD: Debug mode is ' . ($debug ? 'on' : 'off') . "\n";
 
 my $logfile = $config{logfile} || '/tmp/mdd.log';
 my $log = MDD::Log->new($logfile, $debug);
@@ -346,7 +346,8 @@ sub readConfig() {
 
     %config = ();
     
-    open F, '</etc/mdd.conf' or return;
+    my $f = '/etc/mdd.conf';
+    open F, "<$f" or return;
 
     my $line = 0;
 
@@ -357,22 +358,25 @@ sub readConfig() {
         s/\s+$//;
         next if /^#/;
         s/#.*$//;
+        next unless length;
         my ($name, $value) = /(.*?)=(.*)/;
         unless ($name && $value) {
-            $log->err("Error parsing line $line of /etc/mdd.conf, ignoring");
+            print STDERR "MDD: Error parsing line $line of $f, ignoring\n";
             next;
         }
         $name =~ s/\s+$//;
         $value =~ s/^\s+//;
-        $value .= readline F if ($value =~ s/\\$//);
+
+        while ($value =~ s/\\$//) { 
+            chomp $value;
+            $value .= readline F;
+        }
 
         if ($name =~ /command/i) {
             my ($cm, $cv) = $value =~ /(.*)=>(.*)/;
             unless ($cm && $cv) {
-                $log->err(
-                    "Error parsing command on line $line of " .
-                    "/etc/mdd.conf, ignoring"
-                );
+                print STDERR "MDD: Error parsing command on line $line of " .
+                             "$f, ignoring\n";
                 next;
             }
             $commands{$cm} = $cv;
