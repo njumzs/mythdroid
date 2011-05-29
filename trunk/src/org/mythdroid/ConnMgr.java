@@ -163,9 +163,10 @@ public class ConnMgr {
                     public void onConnect(ConnMgr cmgr) throws IOException {
                         byte[] buf = new byte[512];
                         cmgr.write(String.valueOf(port).getBytes());
-                        int read = cmgr.read(buf, 0, 512);
-                        if (read == 2 && buf[0] == 'O' && buf[1] == 'K')
+                        cmgr.read(buf, 0, 2);
+                        if (buf[0] == 'O' && buf[1] == 'K')
                             return;
+                        cmgr.read(buf, 2, 510);
                         throw new IOException(new String(buf));
                     }
                 }
