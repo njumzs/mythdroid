@@ -85,11 +85,11 @@ public class FrontendDB {
             return new ArrayList<String>(namesList);
         
         namesList = new ArrayList<String>();
-        cached.moveToFirst();
-        
-        do  {
-            namesList.add(cached.getString(NAME));
-        } while(cached.moveToNext());
+        if (cached.moveToFirst()) { 
+            do  {
+                namesList.add(cached.getString(NAME));
+            } while(cached.moveToNext());
+        }
         
         return new ArrayList<String>(namesList);
         
