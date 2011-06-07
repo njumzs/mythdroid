@@ -448,6 +448,8 @@ public class ConnMgr {
     /** Disconnect all currently connected connections */
     static public synchronized void disconnectAll() throws IOException {
 
+        ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
+        
         synchronized(conns) {
 
             for (WeakReference<ConnMgr> r : conns) {
@@ -459,11 +461,16 @@ public class ConnMgr {
                 if (c.inUse)
                     c.doDisconnect();
                 else
-                    c.dispose();
+                    dispose.add(c);
 
             }
 
         }
+        
+        for (ConnMgr r : dispose)
+            try {
+                r.dispose();
+            } catch (IOException e) {}
 
     }
 
@@ -492,9 +499,9 @@ public class ConnMgr {
         
         long now = System.currentTimeMillis();
         
+        ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
+        
         synchronized (conns) {
-            
-            ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
             
             for (WeakReference<ConnMgr> r : conns) {
 
@@ -506,12 +513,12 @@ public class ConnMgr {
                     
             }
             
-            for (ConnMgr r : dispose)
-                try {
-                    r.dispose();
-                } catch (IOException e) {}
-            
         }
+        
+        for (ConnMgr r : dispose)
+            try {
+                r.dispose();
+            } catch (IOException e) {}
         
     }
     
