@@ -442,7 +442,7 @@ public class ConnMgr {
     public void dispose() throws IOException {
         disconnect();
         doDisconnect();
-        conns.remove(weakThis);
+        synchronized (conns) { conns.remove(weakThis); }
     }
 
     /** Disconnect all currently connected connections */
@@ -494,17 +494,22 @@ public class ConnMgr {
         
         synchronized (conns) {
             
+            ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
+            
             for (WeakReference<ConnMgr> r : conns) {
 
                 if (r == null) continue;
                 ConnMgr c = r.get();
                 if (c == null) continue;
                 if (c.inUse == false && c.lastUsed + 60000 < now)
-                    try {
-                        c.dispose();
-                    } catch (IOException e) {}
+                    dispose.add(c);
                     
             }
+            
+            for (ConnMgr r : dispose)
+                try {
+                    r.dispose();
+                } catch (IOException e) {}
             
         }
         
