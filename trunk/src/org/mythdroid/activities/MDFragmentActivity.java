@@ -261,6 +261,11 @@ public abstract class MDFragmentActivity extends FragmentActivity {
             return;
         }
         
+        if (f == null) {
+            ErrUtil.err(this, Messages.getString("MDFragmentActivity.0")); //$NON-NLS-1$
+            return;
+        }
+        
         Bundle args = f.getArguments();
         try {
             f = f.getClass().newInstance();
