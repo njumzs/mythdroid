@@ -310,6 +310,9 @@ public class Recordings extends MDFragmentActivity {
         
         fm.beginTransaction().replace(R.id.reclistframe, listFragment).commit();
         fm.executePendingTransactions();
+        
+        if (hasRecordings())
+            listFragment.setAdapter(recordings);
 
     }
     
