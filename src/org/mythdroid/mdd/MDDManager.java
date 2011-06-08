@@ -123,6 +123,9 @@ public class MDDManager {
                     "VIDEOLIST " + viddir + " " + //$NON-NLS-1$ //$NON-NLS-2$
                     (subdir == null ? "ROOT" : subdir)); //$NON-NLS-1$
 
+        // Uncached SQL queries can take some time with lots of videos
+        cmgr.setTimeout(7500);
+        
         while (true) {
             String line = cmgr.readLine();
             if (line.equals("VIDEOLIST DONE")) //$NON-NLS-1$
