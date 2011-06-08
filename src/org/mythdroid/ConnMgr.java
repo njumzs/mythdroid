@@ -24,7 +24,6 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -70,7 +69,7 @@ public class ConnMgr {
     /** Our socket */
     private Socket                  sock             = null;
     /** The sockaddr of the remote host */
-    private SocketAddress           sockAddr         = null;
+    private InetSocketAddress       sockAddr         = null;
     /** Our outputstream */
     private OutputStream            os               = null;
     /** Our inputstream */
@@ -193,6 +192,9 @@ public class ConnMgr {
                 .getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock("MythDroid"); //$NON-NLS-1$
             wifiLock.acquire();
+            if (sockAddr.getAddress().isLoopbackAddress())
+                // SSH port forward I guess - probably tethered to a slow link
+                timeout *= 8;
         }
         else
             timeout *= 8;
