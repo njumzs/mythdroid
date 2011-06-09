@@ -156,15 +156,19 @@ public class ConnMgr {
     ) throws IOException {
 
         if (mux)
+        	// Add a callback that sets up the muxed connection
             oCLs.add(
                 new onConnectListener() {
                     @Override
                     public void onConnect(ConnMgr cmgr) throws IOException {
                         byte[] buf = new byte[512];
+                        // Tell CMux which port we want to connect to
                         cmgr.write(String.valueOf(port).getBytes());
+                        // Get the response
                         cmgr.read(buf, 0, 2);
                         if (buf[0] == 'O' && buf[1] == 'K')
                             return;
+                        // There was a problem, read the rest of the error msg
                         cmgr.read(buf, 2, 510);
                         throw new IOException(new String(buf));
                     }
@@ -201,6 +205,7 @@ public class ConnMgr {
 
         doConnect(timeout);
 
+        // Add a weak reference to ourselves to the static connection list
         weakThis = new WeakReference<ConnMgr>(this);
         synchronized (conns) { conns.add(weakThis); }
         
@@ -401,7 +406,7 @@ public class ConnMgr {
     }
 
     /**
-     * Read a stringlist from the socket (unbuffered)
+     * Read a MythTV style stringlist from the socket (unbuffered)
      * @return List of strings
      */
     public synchronized String[] readStringList() throws IOException {
@@ -450,7 +455,11 @@ public class ConnMgr {
     /** Disconnect all currently connected connections */
     static public synchronized void disconnectAll() throws IOException {
 
-        ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
+        /* 
+         * Local array of connections to dispose of once we've finished
+         * iterating over conns (and dropped the lock on it)
+         */
+    	ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
         
         synchronized(conns) {
 
@@ -501,6 +510,10 @@ public class ConnMgr {
         
         long now = System.currentTimeMillis();
         
+        /* 
+         * Local array of connections to dispose of once we've finished
+         * iterating over conns (and dropped the lock on it)
+         */
         ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
         
         synchronized (conns) {
@@ -524,6 +537,9 @@ public class ConnMgr {
         
     }
     
+    /** 
+     * Find an existing, unused connection to the specified sockaddr
+     */
     static private ConnMgr findExisting(String host, int port) {
         
         synchronized (conns) {
@@ -604,6 +620,9 @@ public class ConnMgr {
 
     }
 
+    /**
+     * Actually disconnect the socket
+     */
     private void doDisconnect() throws IOException {
         
         if (sock.isClosed())
