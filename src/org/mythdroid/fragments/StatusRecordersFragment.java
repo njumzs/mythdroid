@@ -124,7 +124,6 @@ public class StatusRecordersFragment extends ListFragment {
         };
 
         public int     id;
-        public boolean local;
         public String  hostname, state;
         public Program program;
 
@@ -132,9 +131,6 @@ public class StatusRecordersFragment extends ListFragment {
 
             NamedNodeMap attr = item.getAttributes();
             id = Integer.parseInt(attr.getNamedItem("id").getNodeValue()); //$NON-NLS-1$
-            local =
-                attr.getNamedItem("local").getNodeValue().equals("1") //$NON-NLS-1$ //$NON-NLS-2$
-                    ? true : false;
             hostname = attr.getNamedItem("hostname").getNodeValue(); //$NON-NLS-1$
             
             int s = Integer.parseInt(attr.getNamedItem("state").getNodeValue());  //$NON-NLS-1$
@@ -205,16 +201,18 @@ public class StatusRecordersFragment extends ListFragment {
             Encoder enc = encoders.get(pos);
 
             vHolder.encoder.setText(
-                Messages.getString("StatusRecorders.12") + enc.id + "    (" + //$NON-NLS-1$ //$NON-NLS-2$
-                (enc.local ? Messages.getString("StatusRecorders.14") +  //$NON-NLS-1$
-                enc.hostname : Messages.getString("StatusRecorders.15")) + ")" //$NON-NLS-1$ //$NON-NLS-2$
+                String.format(
+                    Messages.getString("StatusRecorders.12"), //$NON-NLS-1$
+                    enc.id, enc.hostname
+                )
             );
             vHolder.state.setText(enc.state);
             if (enc.program != null) {
                 vHolder.program.setText(
-                    enc.program.Title +
-                    Messages.getString("StatusRecorders.0") + // on //$NON-NLS-1$
-                    enc.program.Channel
+                    String.format(
+                        Messages.getString("StatusRecorders.0"), //$NON-NLS-1$
+                        enc.program.Title, enc.program.Channel
+                    )
                 );
                 vHolder.endTime.setText(
                         Messages.getString("StatusRecorders.18") +  //$NON-NLS-1$

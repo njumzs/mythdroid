@@ -224,9 +224,10 @@ public class StatusJobsFragment extends ListFragment {
             vHolder.title.setText(j.program.Title);
             vHolder.type.setText(j.type.msg());
             vHolder.details.setText(
-                Messages.getString("StatusJobs.9") + // Started //$NON-NLS-1$
-                Globals.dispFmt.format(j.startTime) +
-                Messages.getString("StatusJobs.25") + j.hostname // on //$NON-NLS-1$
+                String.format(
+                    Messages.getString("StatusJobs.9"), //$NON-NLS-1$
+                    Globals.dispFmt.format(j.startTime), j.hostname 
+                )
             );
             vHolder.comments.setText(j.comments);
 

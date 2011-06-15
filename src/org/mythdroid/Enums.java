@@ -31,7 +31,7 @@ public class Enums {
 
     /** Intent extras  */
     public enum Extras {
-        /** We want livetv please (TVRemtoe)*/
+        /** We want livetv please (TVRemote)*/
         LIVETV,
         /** The channel we'd like to view (TVRemote) */
         JUMPCHAN,
@@ -113,17 +113,17 @@ public class Enums {
 
     /** Recording types, with reverse lookup by code */
     public enum RecType {
-        NOT         (0,     "Don't record this program"), //$NON-NLS-1$
-        SINGLE      (1,     "This showing only"), //$NON-NLS-1$
-        CHANNEL     (3,     "At any time on this channel"), //$NON-NLS-1$
-        ALL         (4,     "At any time on any channel"), //$NON-NLS-1$
-        TIMESLOT    (2,     "At this time every day"), //$NON-NLS-1$
-        WEEKSLOT    (5,     "At this time every week"), //$NON-NLS-1$
-        FINDONE     (6,     "Find one showing"), //$NON-NLS-1$
-        FINDDAILY   (9,     "Find one showing daily"), //$NON-NLS-1$
-        FINDWEEKLY  (10,    "Find one showing weekly"), //$NON-NLS-1$
-        OVERRIDE    (7,     "Manual override"), //$NON-NLS-1$
-        DONT        (8,     "Don't record this showing"); //$NON-NLS-1$
+        NOT         (0,     Messages.getString("Program.35")), //$NON-NLS-1$
+        SINGLE      (1,     Messages.getString("Program.1")), //$NON-NLS-1$
+        CHANNEL     (3,     Messages.getString("Program.2")), //$NON-NLS-1$
+        ALL         (4,     Messages.getString("Program.3")), //$NON-NLS-1$
+        TIMESLOT    (2,     Messages.getString("Program.4")), //$NON-NLS-1$
+        WEEKSLOT    (5,     Messages.getString("Program.5")), //$NON-NLS-1$
+        FINDONE     (6,     Messages.getString("Program.6")), //$NON-NLS-1$
+        FINDDAILY   (9,     Messages.getString("Program.7")), //$NON-NLS-1$
+        FINDWEEKLY  (10,    Messages.getString("Program.8")), //$NON-NLS-1$
+        OVERRIDE    (7,     Messages.getString("Program.9")), //$NON-NLS-1$
+        DONT        (8,     Messages.getString("Program.10")); //$NON-NLS-1$
 
         private int     code;
         private String  msg;
@@ -167,9 +167,9 @@ public class Enums {
 
     /** Recording duplicate search types, with reverse lookup by code */
     public enum RecDupIn {
-        RECORDED    (0x01,     "In current recordings only"), //$NON-NLS-1$
-        OLDRECORDED (0x02,     "In old recordings only"), //$NON-NLS-1$
-        ALL         (0x0f,     "In current and old recordings"); //$NON-NLS-1$
+        RECORDED    (0x01,     Messages.getString("Program.11")), //$NON-NLS-1$
+        OLDRECORDED (0x02,     Messages.getString("Program.12")), //$NON-NLS-1$
+        ALL         (0x0f,     Messages.getString("Program.36")); //$NON-NLS-1$
 
         private int     code;
         private String  msg;
@@ -211,13 +211,13 @@ public class Enums {
         }
     }
 
-    /** Recording epsidode filters, with reverse lookup by code */
+    /** Recording episode filters, with reverse lookup by code */
     public enum RecEpiFilter {
-        NONE        (0x00,     "Record all episodes"), //$NON-NLS-1$
-        NEW         (0x10,     "Record new episodes only"), //$NON-NLS-1$
-        EXREPEATS   (0x20,     "Exclude old episodes"), //$NON-NLS-1$
-        EXGENERIC   (0x40,     "Exclude unidentified episodes"), //$NON-NLS-1$
-        FIRSTNEW    (0x80,     "Record 1st showings of new episodes"); //$NON-NLS-1$
+        NONE        (0x00,     Messages.getString("Program.37")), //$NON-NLS-1$
+        NEW         (0x10,     Messages.getString("Program.38")), //$NON-NLS-1$
+        EXREPEATS   (0x20,     Messages.getString("Program.39")), //$NON-NLS-1$
+        EXGENERIC   (0x40,     Messages.getString("Program.40")), //$NON-NLS-1$
+        FIRSTNEW    (0x80,     Messages.getString("Program.41")); //$NON-NLS-1$
 
         private int     code;
         private String  msg;
@@ -261,11 +261,11 @@ public class Enums {
 
     /** Recording duplicate matching methods, with reverse lookup by code */
     public enum RecDupMethod {
-        NONE        (1,     "Nothing"), //$NON-NLS-1$
-        SUB         (2,     "Subtitle"), //$NON-NLS-1$
-        DESC        (4,     "Description"), //$NON-NLS-1$
-        SUBANDDESC  (6,     "Subtitle and description"), //$NON-NLS-1$
-        SUBTHENDESC (8,     "Subtitle then description"); //$NON-NLS-1$
+        NONE        (1,     Messages.getString("Program.42")), //$NON-NLS-1$
+        SUB         (2,     Messages.getString("Program.43")), //$NON-NLS-1$
+        DESC        (4,     Messages.getString("Program.44")), //$NON-NLS-1$
+        SUBANDDESC  (6,     Messages.getString("Program.45")), //$NON-NLS-1$
+        SUBTHENDESC (8,     Messages.getString("Program.46")); //$NON-NLS-1$
 
         private int     code;
         private String  msg;

@@ -641,9 +641,8 @@ public class ConnMgr {
             ret = is.read(buf, off, len);
         } catch (SocketTimeoutException e) {
             
-            final String msg = Messages.getString("ConnMgr.5") + //$NON-NLS-1$ 
-                               addr +
-                               Messages.getString("ConnMgr.6");  //$NON-NLS-1$
+            final String msg = 
+                String.format(Messages.getString("ConnMgr.5"), addr); //$NON-NLS-1$ 
 
             if (Globals.debug)
                 Log.d("ConnMgr", msg); //$NON-NLS-1$
