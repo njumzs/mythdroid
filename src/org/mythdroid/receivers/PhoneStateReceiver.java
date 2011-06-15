@@ -28,13 +28,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.telephony.gsm.SmsMessage;
+import android.telephony.SmsMessage;
 
 /**
  * A BroadcastReceiver that looks for incoming calls / SMS
  * and displays them on the MythTV OSD
  */
-@SuppressWarnings("deprecation")
 public class PhoneStateReceiver extends BroadcastReceiver {
 
     @Override
