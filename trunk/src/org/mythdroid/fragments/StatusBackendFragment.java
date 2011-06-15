@@ -155,9 +155,10 @@ public class StatusBackendFragment extends Fragment {
 
             if ((days = attr.getNamedItem("guideDays")) != null) //$NON-NLS-1$
                 ((TextView)view.findViewById(R.id.guide_length)).setText(
-                    days.getNodeValue() +
-                    Messages.getString("StatusBackend.30") + // days (until //$NON-NLS-1$
-                    Globals.dispFmt.format(when) + ")" //$NON-NLS-1$
+                    String.format(
+                        Messages.getString("StatusBackend.30"), //$NON-NLS-1$
+                        days.getNodeValue(), Globals.dispFmt.format(when)
+                    )
                 );
 
             if ((lastRun = attr.getNamedItem("status")) != null) //$NON-NLS-1$
