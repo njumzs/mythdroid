@@ -25,6 +25,7 @@ import java.util.WeakHashMap;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
+import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Video;
 import org.mythdroid.data.VideoAdapter;
 import org.mythdroid.mdd.MDDManager;
@@ -69,11 +70,22 @@ public class Videos extends MDActivity implements
         public void run() {
 
             try {
+                BackendManager beMgr = Globals.getBackend();
+                if (beMgr == null) {
+                    ErrUtil.postErr(
+                        ctx, new Exception(Messages.getString("Videos.2")) //$NON-NLS-1$
+                    );
+                    finish();
+                    return;
+                }
+                
                 videos = MDDManager.getVideos(
                     Globals.getBackend().addr, viddir, path
                 );
             } catch (IOException e) {
-                ErrUtil.postErr(ctx, new Exception(Messages.getString("Videos.1"))); //$NON-NLS-1$
+                ErrUtil.postErr(
+                    ctx, new Exception(Messages.getString("Videos.1")) //$NON-NLS-1$
+                );
                 finish();
                 return;
             }
