@@ -117,6 +117,9 @@ public abstract class Remote extends Activity implements View.OnClickListener {
             MotionEvent start, MotionEvent end, float dX, float dY
         ) {
 
+            if (start == null || end == null)
+                return true;
+            
             if (
                 start.getRawX() != lastStartX ||
                 start.getRawY() != lastStartY
