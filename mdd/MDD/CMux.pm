@@ -69,6 +69,15 @@ sub setup {
     $self->{select} = IO::Select->new($self->{listen});
 }
 
+sub addAllowedPorts {
+
+    foreach my $port (@_) {
+        next unless ($port =~ /^\d+$/);
+        push @allowed_ports, $port;
+    }
+
+}
+
 sub initConn {
     
     my $self = shift;

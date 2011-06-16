@@ -142,8 +142,8 @@ my @clientMsgs = (
 eval 'use MDD::XOSD';
 $no_xosd++ if $@;
 
-# Get rid of old streaming log files in case root owns them
-unlink (qw(/tmp/ffmpeg.out /tmp/vlc.out));
+# Get rid of old log files in case root owns them
+unlink '/tmp/vlc.out';
 
 my $user = $config{user} || 'mdd';
 # Change euid/uid
@@ -185,6 +185,9 @@ elsif (!$backend) {
 
 }
 
+if (exists $config{cmux_extra_ports}) {
+    MDD::CMux->addAllowedPorts(split ' ', $config{cmux_extra_ports});
+}
 if (exists $config{cmux}) {
     if ($config{cmux} =~ /true/i) { MDD::CMux->new($log) }
 }
