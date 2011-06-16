@@ -145,11 +145,13 @@ sub getVideos($) {
     my %videos;
     my @vids;
 
+    $log->dbg("$videoSQL - $regex");
     $videoSth = execute($videoSth, \$videoSQL, $regex);
 
     while (my $aref = $videoSth->fetchrow_arrayref) {
         my $path = $aref->[8];
         $upnpVideoSth = execute($upnpVideoSth, \$upnpVideoSQL, $path);
+        $log->dbg("$upnpVideoSQL - $path");
         my $upnparef = $upnpVideoSth->fetchrow_arrayref;
         next unless $upnparef;
         my $id = $upnparef->[0];
