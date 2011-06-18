@@ -207,6 +207,7 @@ public class VideoPlayer extends MDActivity {
             return;
         }
         
+        // Give MDD a chance to exec vlc and vlc a chance to start streaming
         new Handler().postDelayed(
             new Runnable() {
                 @Override
@@ -261,6 +262,7 @@ public class VideoPlayer extends MDActivity {
                     public void onSeek() {
                         showDialog(DIALOG_LOAD);
                         mplayer.pause();
+                        // Dump the buffer
                         mplayer.reset();
                         try {
                             mplayer.setDataSource(ctx, url);

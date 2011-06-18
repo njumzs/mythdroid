@@ -18,6 +18,7 @@
 
 package org.mythdroid.data;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -109,19 +110,15 @@ public class Video {
                 "/Myth/GetVideoArt?" +  //$NON-NLS-1$
                 "Id=" + id  //$NON-NLS-1$
             );
-        } catch (Exception e) {}
-
-        if (url == null)
-            return;
+        } catch (MalformedURLException e) { return; } 
+          catch (IOException e) { return; }
         
         try {
             url = new URL(
                 url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
                 ":16550" + url.getFile()  //$NON-NLS-1$
             );
-        } catch (MalformedURLException e1) {
-           return;
-        }
+        } catch (MalformedURLException e1) { return; }
 
         Bitmap bm = null;
 
@@ -136,8 +133,7 @@ public class Video {
             is.close();
         } catch (Exception e) {}
 
-        if (bm == null)
-            return;
+        if (bm == null) return;
 
         int width = bm.getWidth();
         int height = bm.getHeight();

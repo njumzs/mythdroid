@@ -39,10 +39,11 @@ public class FrontendManager {
 	/** String containing the hostname or IP address of the frontend */
 	public  String  addr = null;
 	
-    private ConnMgr cmgr = null;
-    private IOException connectionGone = 
+	final private IOException connectionGone = 
         new IOException(Messages.getString("FrontendManager.0")); //$NON-NLS-1$
-
+	
+	private ConnMgr cmgr = null;
+    
     /**
      * Constructor
      * @param name name of frontend
@@ -161,9 +162,9 @@ public class FrontendManager {
      * @return HashMap<String,String> of locations -> descriptions
      */
     public synchronized HashMap<String,String> getLocs() throws IOException {
-        HashMap<String,String> locs = new HashMap<String,String>(64);
+        final HashMap<String,String> locs = new HashMap<String,String>(64);
         cmgr.writeLine("help jump"); //$NON-NLS-1$
-        String[] lines = getResponse();
+        final String[] lines = getResponse();
         int numlines = lines.length;
         for (int i = 0; i < numlines; i++) {
             if (!lines[i].matches(".*\\s+-\\s+.*")) continue; //$NON-NLS-1$
@@ -219,6 +220,10 @@ public class FrontendManager {
         cmgr = null;
     }
 
+    /**
+     * Read lines from until we get a prompt
+     * @return array of lines read
+     */
     private synchronized String[] getResponse() throws IOException {
         final ArrayList<String> resp = new ArrayList<String>(64);
         String msg = ""; //$NON-NLS-1$
@@ -231,18 +236,27 @@ public class FrontendManager {
         return resp.toArray(new String[resp.size()]);
     }
 
+    /**
+     * Read a single line response via the supplied ConnMgr
+     * @param cmgr ConnMgr to read via
+     * @return the first line read
+     */
     @SuppressWarnings("null")
     private synchronized String getSingleLineResponse(ConnMgr cmgr)
         throws IOException {
-        String line = cmgr.readLine();
+        final String line = cmgr.readLine();
         while (cmgr != null)
             if (cmgr.readLine().equals("#")) break; //$NON-NLS-1$
         return line;
     }
 
+    /**
+     * Read a single line response
+     * @return the first line read
+     */
     private synchronized String getSingleLineResponse() throws IOException {
         if (cmgr == null) throw connectionGone;
-        String line = cmgr.readLine();
+        final String line = cmgr.readLine();
         while (cmgr != null)
             if (cmgr.readLine().equals("#")) break; //$NON-NLS-1$
         return line;

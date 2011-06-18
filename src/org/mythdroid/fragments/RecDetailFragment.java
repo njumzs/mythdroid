@@ -182,6 +182,7 @@ public class RecDetailFragment extends Fragment {
             }
         );
 
+        // The rest only apply to non-livetv recordings
         if (livetv) return;
 
         switch (prog.Status) {

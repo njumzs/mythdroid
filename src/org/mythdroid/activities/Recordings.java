@@ -85,6 +85,7 @@ public class Recordings extends MDFragmentActivity {
             if (recordings == null)
                 return;
 
+            // Filter the recordings?
             if (filter != null) {
                 Program[] recs =
                     recordings.toArray(new Program[recordings.size()]);

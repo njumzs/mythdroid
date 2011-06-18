@@ -69,8 +69,10 @@ public class RecListFragment extends ListFragment
         if (!activity.hasRecordings())
             activity.refresh();
         
-        /* Find out if we should push another fragment on the stack during
-           showDetails() to restore state post configuration change */
+        /* 
+         * Find out if we should push another fragment on the stack during
+         * showDetails() to restore state post configuration change 
+         */
         Bundle args = getArguments();
         if (args != null) {
             detailsFragClass  = args.getString("detailsFragClass");      //$NON-NLS-1$
@@ -99,6 +101,7 @@ public class RecListFragment extends ListFragment
         AdapterView<?> adapter, View item, int pos, long itemid
     ) {
         Globals.curProg = (Program)adapter.getItemAtPosition(pos);
+        activity.index = pos;
         activity.nextActivity = TVRemote.class;
         activity.showDialog(Recordings.FRONTEND_CHOOSER);
         return true;
@@ -106,7 +109,7 @@ public class RecListFragment extends ListFragment
     
     /**
      * Populate the list 
-     * @param recordings - list of recordings
+     * @param recordings ArrayList of Programs
      */
     public void setAdapter(ArrayList<Program> recordings) {
         setListAdapter(

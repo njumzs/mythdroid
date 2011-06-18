@@ -365,6 +365,7 @@ public class RecEditFragment extends Fragment {
             save.setEnabled(false);
     }
 
+    // Save the changes and reschedule the rule
     private void doSave() {
 
         int recid = -1;
@@ -431,6 +432,7 @@ public class RecEditFragment extends Fragment {
             return;
         }
 
+        // Send the schedule updates to MDD, get back the (new) recid
         try {
             recid = MDDManager.updateRecording(beMgr.addr, prog, updates);
         } catch (IOException e) {
@@ -445,6 +447,7 @@ public class RecEditFragment extends Fragment {
             return;
         }
 
+        // Tell the backend to reschedule this rule
         try {
             beMgr.reschedule(recid);
         } catch (IOException e) {
@@ -456,6 +459,10 @@ public class RecEditFragment extends Fragment {
 
     }
 
+    /**
+     * Add to the list of schedule updates to send to MDD 
+     * @param update new schedule update
+     */
     private void addUpdate(String update) {
         if (updates.length() > 0)
             updates += ", "; //$NON-NLS-1$

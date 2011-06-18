@@ -47,8 +47,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 
-/** Base class for activities that display frontend choosers
- * and/or loading dialogs - same as MDActivity except for some sym visibility */
+/** 
+ * Base class for activities that display frontend choosers
+ * and/or loading dialogs - same as MDActivity except for some sym visibility
+ */
 public abstract class MDFragmentActivity extends FragmentActivity {
 
     /** Frontend chooser and loading dialogs */
@@ -220,7 +222,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         ArrayList<String> list = FrontendDB.getFrontendNames(this);
 
         if (hereActivity != null)
-            list.add(Messages.getString("MDActivity.1")); // Here //$NON-NLS-1$
+            list.add(Messages.getString("MDActivity.0")); // Here //$NON-NLS-1$
         
         if (list.isEmpty()) {
             ErrUtil.errDialog(ctx, dialog, R.string.no_fes);

@@ -114,7 +114,7 @@ public class Channel implements Comparable<Channel> {
     /** integer representing channel ID */
     public int ID;
     /** ArrayList of Programs */
-    public ArrayList<Program> programs = new ArrayList<Program>();
+    final public ArrayList<Program> programs = new ArrayList<Program>();
 
     /** Construct an empty Channel */
     public Channel() {}
