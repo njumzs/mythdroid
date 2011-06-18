@@ -121,13 +121,10 @@ public class MythDroid extends MDListActivity implements
 
     @Override
     public void onDestroy() {
-
         super.onDestroy();
-
         Globals.destroyBackend();
         Globals.destroyFrontend();
         FrontendDB.close();
-
     }
 
     @Override
@@ -304,7 +301,6 @@ public class MythDroid extends MDListActivity implements
         super.onConfigurationChanged(config);
     }
 
-
     private Dialog createGuideDialog() {
 
         final AlertDialog d = new AlertDialog.Builder(ctx)
@@ -347,7 +343,8 @@ public class MythDroid extends MDListActivity implements
                     }
 
                 }
-        });
+            }
+        );
 
         return d;
     }

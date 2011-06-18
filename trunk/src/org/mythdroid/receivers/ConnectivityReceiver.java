@@ -32,7 +32,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
      */
     public ConnectivityReceiver(Context ctx) {
 
-        ConnectivityManager cm =
+        final ConnectivityManager cm =
             (ConnectivityManager)
                 ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -55,7 +55,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
         if (!intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION))
             return;
 
-        NetworkInfo info = (NetworkInfo)intent.getExtras().get(
+        final NetworkInfo info = (NetworkInfo)intent.getExtras().get(
             ConnectivityManager.EXTRA_NETWORK_INFO
         );
 
@@ -131,11 +131,11 @@ public class ConnectivityReceiver extends BroadcastReceiver {
 
         if (ctx == null) return;
         
-        ConnectivityManager cm =
+        final ConnectivityManager cm =
             (ConnectivityManager)
                 ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        WifiManager wm =
+        final WifiManager wm =
             (WifiManager)
                 ctx.getSystemService(Context.WIFI_SERVICE);
 
@@ -149,8 +149,8 @@ public class ConnectivityReceiver extends BroadcastReceiver {
         ) {
 
             final Thread thisThread = Thread.currentThread();
-
-            Timer timer = new Timer();
+            final Timer timer = new Timer();
+            
             timer.schedule(
                 new TimerTask() {
                     @Override

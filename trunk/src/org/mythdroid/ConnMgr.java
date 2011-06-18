@@ -64,6 +64,9 @@ public class ConnMgr {
 
     /** Receive buffer size */
     final private static int        rbufSize         = 128;
+    /** Maximum age of unused connections in milliseconds */
+    final private static int        maxAge           = 60000; 
+    
     /** A weak reference to ourself */
     private WeakReference<ConnMgr>  weakThis         = null;
     /** Our socket */
@@ -213,8 +216,8 @@ public class ConnMgr {
     
 
     /**
-     * Set the socket timeout
-     * @param timeout in milliseconds
+     * Set the read timeout
+     * @param timeout read timeout in milliseconds
      */
     public void setTimeout(int timeout) {
         try {
@@ -411,6 +414,7 @@ public class ConnMgr {
      */
     public synchronized String[] readStringList() throws IOException {
 
+        // First 8 bytes are the length
         byte[] bytes = new byte[8];
         if (read(bytes, 0, 8) == -1) {
             if (Globals.debug)
@@ -440,7 +444,6 @@ public class ConnMgr {
     public void disconnect() {
         inUse = false;
         lastUsed = System.currentTimeMillis();
-
         if (wifiLock != null && wifiLock.isHeld())
             wifiLock.release();
     }
@@ -478,6 +481,7 @@ public class ConnMgr {
 
         }
         
+        // Dispose of the cached conns that weren't in use
         for (ConnMgr r : dispose)
             try {
                 r.dispose();
@@ -523,13 +527,14 @@ public class ConnMgr {
                 if (r == null) continue;
                 ConnMgr c = r.get();
                 if (c == null) continue;
-                if (c.inUse == false && c.lastUsed + 60000 < now)
+                if (c.inUse == false && c.lastUsed + maxAge < now)
                     dispose.add(c);
                     
             }
             
         }
         
+        // Dispose of conns that hadn't been used during the last maxAge ms
         for (ConnMgr r : dispose)
             try {
                 r.dispose();
@@ -537,8 +542,11 @@ public class ConnMgr {
         
     }
     
-    /** 
-     * Find an existing, unused connection to the specified sockaddr
+    /**
+     * Find and return an existing, unused connection 
+     * @param host desired hostname or IP address
+     * @param port desired port number
+     * @return existing ConnMgr or null if none was found
      */
     static private ConnMgr findExisting(String host, int port) {
         
@@ -571,6 +579,7 @@ public class ConnMgr {
      */
     private synchronized void doConnect(int timeout) throws IOException {
 
+        // Wait for a maximum of 5s if a WiFi link is being established
         ConnectivityReceiver.waitForWifi(Globals.appContext, 5000);
 
         if (Globals.debug)
@@ -615,6 +624,7 @@ public class ConnMgr {
 
         inUse = true;
 
+        // Execute onConnectListeners
         for (onConnectListener oCL : oCLs)
             oCL.onConnect(this);
 

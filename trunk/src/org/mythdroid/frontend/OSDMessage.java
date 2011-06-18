@@ -1,8 +1,10 @@
 package org.mythdroid.frontend;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
@@ -50,12 +52,20 @@ final public class OSDMessage {
         timeFmt.setTimeZone(TimeZone.getDefault());
         dateFmt.setTimeZone(TimeZone.getDefault());
     }
+    
+    // Broadcast address (255.255.255.255)
+    private static InetAddress address;
+    static {
+        try {
+            address = InetAddress.getByAddress(new byte[] { -1, -1, -1, -1 });
+        } catch (UnknownHostException e) {}
+    }
 
     /**
      * Send an 'alert' message for display on OSD
      * @param message String containing message to display
      */
-    public static void Alert(String message) throws Exception {
+    public static void Alert(String message) throws IOException {
         String msg = alert.replace("%alert_text%", message); //$NON-NLS-1$
         send(msg);
     }
@@ -65,7 +75,8 @@ final public class OSDMessage {
      * @param message String containing the message
      * @param displaytime for display, in seconds
      */
-    public static void Scroller(String message, int displaytime) throws Exception {
+    public static void Scroller(String message, int displaytime)
+        throws IOException {
         String msg = scroll.replace("%scroll_text%", message); //$NON-NLS-1$
         if (displaytime != 1)
             msg = msg.replaceFirst("-1", String.valueOf(displaytime)); //$NON-NLS-1$
@@ -77,14 +88,13 @@ final public class OSDMessage {
      * @param name String containing the name of the caller
      * @param number String containing the number of the caller
      */
-    public static void Caller(String name, String number) throws Exception {
+    public static void Caller(String name, String number) throws IOException {
         String msg = cid.replace("%caller_name%", name); //$NON-NLS-1$
         msg = msg.replace("%caller_number%", number); //$NON-NLS-1$
         send(msg);
     }
 
-    private static void send(String message) throws Exception {
-        InetAddress address = InetAddress.getByName("255.255.255.255"); //$NON-NLS-1$
+    private static void send(String message) throws IOException {
         byte[] buf = message.getBytes("utf8"); //$NON-NLS-1$
         DatagramPacket dgram = new DatagramPacket(buf, buf.length, address, 6948);
         DatagramSocket sock = new DatagramSocket();

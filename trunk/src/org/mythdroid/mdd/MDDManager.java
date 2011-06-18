@@ -31,14 +31,20 @@ import org.mythdroid.data.Video;
 public class MDDManager {
 
     private ConnMgr cmgr = null;
-    private ArrayList<MDDMenuListener> menuListeners
+    
+    final private ArrayList<MDDMenuListener> menuListeners
         = new ArrayList<MDDMenuListener>();
-    private ArrayList<MDDMusicListener> musicListeners
+    final private ArrayList<MDDMusicListener> musicListeners
         = new ArrayList<MDDMusicListener>();
-    private ArrayList<MDDChannelListener> channelListeners
+    final private ArrayList<MDDChannelListener> channelListeners
         = new ArrayList<MDDChannelListener>();
-    private ArrayList<String> lineCache = new ArrayList<String>(4);
+    
+    final private ArrayList<String> lineCache = new ArrayList<String>(4);
 
+    /*
+     *  Listen for events from MDD and send them to the appropriate listener
+     *  Run in its own thread
+     */
     private Runnable recvTask = new Runnable() {
         @Override
         public void run() {

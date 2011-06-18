@@ -77,7 +77,10 @@ public class Guide extends MDActivity {
     final private static int MENU_DATE    = 0, MENU_TIME = 1;
     final private static int DIALOG_DATE  = 0, DIALOG_TIME = 1;
 
-    /** Change numHours to configure how many hours are displayed at a time */
+    /**
+     * Change numHours to configure how many hours are displayed at a time 
+     * This value is doubled for devices with one screen dimension > 1000 pixels 
+     */
     private static int numHours = 2, numTimes;
     final private static int colMins = 5, hdrSpan = 6;
 
@@ -150,18 +153,28 @@ public class Guide extends MDActivity {
                              */
                             if (i < maxChan - 1) {
 
+                                // Luckily, they're always adjacent
                                 Channel next = channels.get(i+1);
 
+                                /* 
+                                 * See if the next channel has the same num
+                                 * and callsign
+                                 */
                                 if (
                                     current.num.equals(next.num) &&
                                     current.callSign.equals(next.callSign)
                                 ) {
+                                    /* 
+                                     * It does, add all our programs to it and
+                                     * skip the current channel
+                                     */
                                     next.programs.addAll(current.programs);
                                     continue;
                                 }
 
                             }
 
+                            // Add a header every 7 rows
                             if (j++ == 7) {
                                 tbl.addView(getHeader());
                                 j = 0;
@@ -228,7 +241,7 @@ public class Guide extends MDActivity {
             getWindowManager().getDefaultDisplay().getWidth()  > 1000 ||
             getWindowManager().getDefaultDisplay().getHeight() > 1000
         )
-            numHours = 4;
+            numHours *= 2;
         
         numTimes = numHours * 60 / colMins;
         

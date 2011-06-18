@@ -75,11 +75,11 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             showSMS &&
             action.equals("android.provider.Telephony.SMS_RECEIVED") //$NON-NLS-1$
         ) {
-            Bundle bundle = intent.getExtras();
-            Object[] pdus = (Object[])bundle.get("pdus"); //$NON-NLS-1$
+            final Bundle bundle = intent.getExtras();
+            final Object[] pdus = (Object[])bundle.get("pdus"); //$NON-NLS-1$
             
             SmsMessage msg = SmsMessage.createFromPdu((byte[]) pdus[0]);
-            String from    = msg.getDisplayOriginatingAddress();
+            final String from = msg.getDisplayOriginatingAddress();
 
             String m = Messages.getString("BCastReceiver.5") + from + ": " + //$NON-NLS-1$ //$NON-NLS-2$
                        msg.getDisplayMessageBody();

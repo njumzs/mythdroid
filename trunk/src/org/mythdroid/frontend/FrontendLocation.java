@@ -116,7 +116,7 @@ public class FrontendLocation {
 
     private void parsePlaybackLoc(String loc) {
 
-        String[] tok = loc.split(" "); //$NON-NLS-1$
+        final String[] tok = loc.split(" "); //$NON-NLS-1$
         niceLocation = tok[0] + " " + tok[1]; //$NON-NLS-1$
         location = niceLocation;
         position = timeToInt(tok[2]);
@@ -164,7 +164,7 @@ public class FrontendLocation {
 
     private int timeToInt(String time) {
 
-        String tm[] = time.split(":"); //$NON-NLS-1$
+        final String tm[] = time.split(":"); //$NON-NLS-1$
 
         if (tm.length == 2)
             return Integer.parseInt(tm[0]) * 60 +

@@ -74,19 +74,21 @@ public class Globals {
      * @param ctx a Context
      * @return A FrontendManager connected to a frontend or null if there's a
      * problem
-     * @throws IOException
      */
     public static FrontendManager getFrontend(Context ctx) throws IOException {
 
         String name = defaultFrontend;
 
+        // Are we already connected to the desired frontend?
         if (feMgr != null && feMgr.isConnected()) {
             if (name.equals(feMgr.name))
                 return feMgr;
+            // Wrong frontend, disconnect
             feMgr.disconnect();
             feMgr = null;
         }
 
+        // If unspecified, connect to the first defined frontend
         if (name == null) {
             name = FrontendDB.getFirstFrontendName(ctx);
             if (name == null)
@@ -95,11 +97,14 @@ public class Globals {
                 new FrontendManager(name, FrontendDB.getFirstFrontendAddr(ctx));
         }
 
+        // Connect to the specified frontend
         else
             feMgr = new FrontendManager(
                 name, FrontendDB.getFrontendAddr(ctx, name)
             );
 
+        
+        // Set the default frontend to the newly connected frontend
         if (feMgr != null)
             defaultFrontend = feMgr.name;
 
@@ -118,19 +123,23 @@ public class Globals {
      */
     public static BackendManager getBackend() throws IOException {
 
+        // Check to see if we're already connected to a backend
         if (beMgr != null && beMgr.isConnected())
             return beMgr;
         
+        // SSH port forwarding? Mux conns via MDD's CMux if possible
         if (
             (backend.equals("127.0.0.1") || backend.equals("localhost")) && //$NON-NLS-1$ //$NON-NLS-2$
             testMuxConn()
         )
             muxConns = true;
 
+        // Connect to the specified backend
         if (backend != null && backend.length() > 0)
             try {
                 beMgr = new BackendManager(backend);
             } catch(IOException e) {
+                // Connection failed - see if we can locate a backend via UPnP
                 beMgr = BackendManager.locate();
                 muxConns = false;
             }
@@ -154,12 +163,13 @@ public class Globals {
 
         hThread.setDaemon(true);
         hThread.start();
-
+        // Wait for the thread to start
         while (!hThread.isAlive()) {}
 
         if (wHandler == null)
             wHandler = new Handler(hThread.getLooper());
         
+        // Reap unused, cached ConnMgrs every 30s
         wHandler.postDelayed(
             new Runnable() {
                 @Override
@@ -195,6 +205,7 @@ public class Globals {
         wHandler = null;
     }
     
+    /** Test muxed conns, return true if they're available, false otherwise */
     private static boolean testMuxConn() {
         ConnMgr cmgr = null;        
         try {
