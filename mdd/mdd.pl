@@ -53,6 +53,8 @@ sub killKids();
 my $lcdServerPort = 6545;
 my $listenPort    = 16546;
 
+my $mpid = $$;
+
 my %config;
 my ($backend, $debug);
 
@@ -630,6 +632,7 @@ sub streamFile($) {
     $log->dbg("Execute $cmd");
 
     if (($streampid = fork()) == 0) { 
+        setpgrp;
         system($cmd); 
         exit 0;
     }
@@ -641,9 +644,8 @@ sub stopStreaming() {
 
     return unless $streampid;
     $log->dbg("Stop streaming");
-
-    # I'd like to setpgrp in the child but that seems to cause vlc issues :(
-    kill 'KILL', $streampid, $streampid+1, $streampid+2;
+    # Kill the whole process group
+    kill -9, $streampid;
     waitpid $streampid, 0;
     undef $streampid;
 
@@ -671,6 +673,7 @@ sub getRecGroups() {
 
 # Kill the original mythlcdserver
 sub killKids() {
+    return unless ($$ == $mpid);
     my @ps = `ps ax | grep 'mythlc[d]'`;
     foreach my $ps (@ps) {
         if ($ps =~ /^\s*(\d+)/) {
