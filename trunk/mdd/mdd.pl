@@ -143,7 +143,7 @@ eval 'use MDD::XOSD';
 $no_xosd++ if $@;
 
 # Get rid of old log files in case root owns them
-unlink '/tmp/vlc.out';
+unlink '/tmp/vlc.out' or $log->warn("Can't remove old /tmp/vlc.out: $!");
 
 my $user = $config{user} || 'mdd';
 # Change euid/uid
