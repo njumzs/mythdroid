@@ -144,6 +144,9 @@ public class NavRemote extends Remote {
             return;
         }
 
+        // Preserve the menu item string through updateLoc(), if we have one
+        String itemSTmp = itemS;
+        
         try {
             if (jumpGuide)
                 feMgr.jumpTo("guidegrid"); //$NON-NLS-1$
@@ -159,6 +162,11 @@ public class NavRemote extends Remote {
                 mddMgr.setMenuListener(new mddListener());
             }
         }
+        
+        // Restore the menu item string that got wiped by updateLoc()
+        itemS = itemSTmp;
+        updateLocViews.run();
+        
     }
 
     private void cleanup() {
