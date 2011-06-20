@@ -2,6 +2,7 @@ org.mythdroid
 org.mythdroid.activities
 org.mythdroid.backend
 org.mythdroid.data
+org.mythdroid.fragments
 org.mythdroid.frontend
 org.mythdroid.mdd
 org.mythdroid.receivers
