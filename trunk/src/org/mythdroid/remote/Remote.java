@@ -236,13 +236,6 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        if (moveWake)
-            stopService(new Intent().setClassName(this, wakeService));
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         if (moveWake)
