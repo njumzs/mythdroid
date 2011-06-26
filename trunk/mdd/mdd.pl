@@ -490,6 +490,8 @@ sub videoListSG($) {
         }
     }
 
+    @dirs = sort @dirs;
+
     map { sendMsg("-1 DIRECTORY $_") } @dirs;
     map { sendMsg($_) } (@vids);
 
@@ -550,6 +552,8 @@ sub videoList($) {
     );
 
     $regex .= '[^/]+$';
+
+    @dirs = sort @dirs;
 
     map { sendMsg("$vd DIRECTORY $_") } @dirs;
     map { sendMsg($_) } (@{ $mythdb->getVideos($regex) });
