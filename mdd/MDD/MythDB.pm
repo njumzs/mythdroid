@@ -167,6 +167,8 @@ sub getVideos($) {
         push @vids, $msg;
     }
 
+    @vids = sort @vids;
+
     return \@vids;
 
 }
