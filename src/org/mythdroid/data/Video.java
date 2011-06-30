@@ -35,7 +35,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.BitmapFactory.Options;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 
 /** Represents a video or directory containing videos */
 public class Video {
@@ -47,7 +46,7 @@ public class Video {
     @SuppressWarnings("all")
     public int year, length, dir = -1, id = -1;
     @SuppressWarnings("all")
-    public Drawable poster = null;
+    public BitmapDrawable poster = null;
     
     final private static Options opts = new BitmapFactory.Options();
     static { opts.inSampleSize = 8; }
@@ -113,12 +112,13 @@ public class Video {
         } catch (MalformedURLException e) { return; } 
           catch (IOException e) { return; }
         
-        try {
-            url = new URL(
-                url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
-                ":16550" + url.getFile()  //$NON-NLS-1$
-            );
-        } catch (MalformedURLException e1) { return; }
+       if (Globals.muxConns)
+          try {
+              url = new URL(
+                  url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
+                  ":16550" + url.getFile()  //$NON-NLS-1$
+              );
+          } catch (MalformedURLException e1) { return; }
 
         Bitmap bm = null;
 
