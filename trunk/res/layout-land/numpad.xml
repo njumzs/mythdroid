@@ -74,7 +74,7 @@
         <ImageButton android:id="@+id/enter"
             android:layout_width="86px"
             android:layout_height="68px"
-            android:src="@drawable/enter"
+            android:src="@drawable/dial_enter"
             android:background="@drawable/btn_dial_small"/>
 
 </org.mythdroid.views.NumPadLayout>
