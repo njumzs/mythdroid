@@ -129,6 +129,7 @@ public class Globals {
         
         // SSH port forwarding? Mux conns via MDD's CMux if possible
         if (
+            backend != null &&
             (backend.equals("127.0.0.1") || backend.equals("localhost")) && //$NON-NLS-1$ //$NON-NLS-2$
             testMuxConn()
         )
@@ -138,11 +139,13 @@ public class Globals {
         if (backend != null && backend.length() > 0)
             try {
                 beMgr = new BackendManager(backend);
-            } catch(IOException e) {
-                // Connection failed - see if we can locate a backend via UPnP
-                beMgr = BackendManager.locate();
-                muxConns = false;
-            }
+            } catch(IOException e) {}
+            
+        if (beMgr == null) {
+            // See if we can locate a backend via UPnP
+            beMgr = BackendManager.locate();
+            muxConns = false;
+        }
 
         return beMgr;
 
