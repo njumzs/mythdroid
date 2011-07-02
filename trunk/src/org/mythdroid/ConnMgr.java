@@ -114,7 +114,7 @@ public class ConnMgr {
     }
         
     /**
-     * Constructor
+     * Make a connection
      * @param host String with hostname or dotted decimal IP address
      * @param port integer port number
      * @param ocl callback to call upon successful connection
@@ -130,7 +130,7 @@ public class ConnMgr {
     }
     
     /**
-     * Constructor
+     * Make a connection
      * @param host String with hostname or dotted decimal IP address
      * @param port integer port number
      * @param ocl callback to call upon successful connection
