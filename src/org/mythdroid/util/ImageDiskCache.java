@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.mythdroid.Globals;
+import org.mythdroid.resource.Messages;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -56,7 +57,7 @@ public class ImageDiskCache {
     public ImageDiskCache(String name, int maxSize) throws IOException {
         
         if (!checkStorageState(STORAGE_READABLE))
-            throw new IOException("External storage inaccessible");
+            throw new IOException(Messages.getString("ImageDiskCache.0")); //$NON-NLS-1$
         
         cacheDir = new File( 
             Environment.getExternalStorageDirectory().getAbsolutePath() +
@@ -65,10 +66,10 @@ public class ImageDiskCache {
         
         if (!cacheDir.exists()) {
             if (!checkStorageState(STORAGE_WRITABLE))
-                throw new IOException("External storage not writable");
+                throw new IOException(Messages.getString("ImageDiskCache.1")); //$NON-NLS-1$
             if (!cacheDir.mkdirs())
                 throw new IOException(
-                    "Failed to create cache dir at " +
+                    Messages.getString("ImageDiskCache.2") + //$NON-NLS-1$
                     cacheDir.getAbsolutePath()
                 );
             if (Globals.debug)
