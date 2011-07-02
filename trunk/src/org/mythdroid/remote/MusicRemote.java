@@ -24,7 +24,6 @@ import java.net.URL;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
@@ -33,6 +32,7 @@ import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.mdd.MDDMusicListener;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.ImageCache;
 import org.mythdroid.Enums.Key;
 
 import android.R.drawable;
@@ -80,8 +80,8 @@ public class MusicRemote extends Remote {
     final private Handler handler = new Handler();
     final private Context ctx     = this;
 
-    final private WeakHashMap<Integer, Bitmap> artCache =
-        new WeakHashMap<Integer, Bitmap>(8);
+    final private ImageCache artCache =
+        new ImageCache("music", 10, 100, 1024*1024*5); //$NON-NLS-1$
 
     private boolean         jump = true;
     private MDDManager      mddMgr  = null;
@@ -279,6 +279,7 @@ public class MusicRemote extends Remote {
         if (mddMgr != null)
             mddMgr.shutdown();
         mddMgr = null;
+        artCache.shutdown();
     }
 
     @Override

@@ -20,7 +20,6 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.WeakHashMap;
 
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
@@ -32,9 +31,11 @@ import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.ImageCache;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
@@ -47,8 +48,8 @@ import android.widget.TextView;
 public class Videos extends MDActivity implements
     ListView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
-    final private WeakHashMap<Integer, Drawable> artCache =
-        new WeakHashMap<Integer, Drawable>(32);
+    final private ImageCache artCache =
+        new ImageCache("videos", 20, 200, 1024*1024*10); //$NON-NLS-1$
 
     final private Handler handler   = new Handler();
     private Thread artThread        = null;
@@ -108,6 +109,7 @@ public class Videos extends MDActivity implements
                         }
                         fetchingArt = true;
                         artThread = new Thread(fetchArt);
+                        artThread.setName("videoArtFetcher"); //$NON-NLS-1$
                         artThread.start();
                         try {
                             dismissDialog(DIALOG_LOAD);
@@ -129,23 +131,25 @@ public class Videos extends MDActivity implements
             for (int i = 0; i < numvids; i++) {
                 if (!fetchingArt)
                     break;
-                if (vids[i].poster != null) continue;
-                Drawable d = artCache.get(vids[i].id);
-                if (d != null)
-                    vids[i].poster = d;
+                if (vids[i].poster != null || vids[i].id == -1) continue;
+                Bitmap bm = artCache.get(vids[i].id);
+                if (bm != null)
+                    vids[i].poster = new BitmapDrawable(bm);
                 else {
                     vids[i].getPoster(70 * scale + 0.5f, 110 * scale + 0.5f);
-                    artCache.put(vids[i].id, vids[i].poster);
+                    if (vids[i].poster != null)
+                        artCache.put(vids[i].id, vids[i].poster.getBitmap());
                 }
-                handler.post(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            ((VideoAdapter)lv.getAdapter())
-                                .notifyDataSetChanged();
+                if (vids[i].poster != null)
+                    handler.post(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                ((VideoAdapter)lv.getAdapter())
+                                    .notifyDataSetChanged();
+                            }
                         }
-                    }
-                );
+                    );
             }
 
         }
@@ -165,6 +169,12 @@ public class Videos extends MDActivity implements
 
         showDialog(DIALOG_LOAD);
         Globals.getWorker().post(getVideos);
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        artCache.shutdown();
     }
 
     @Override
