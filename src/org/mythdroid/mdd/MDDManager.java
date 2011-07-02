@@ -31,6 +31,7 @@ import org.mythdroid.data.Video;
 public class MDDManager {
 
     private ConnMgr cmgr = null;
+    private Thread recvThread = null;
     
     final private ArrayList<MDDMenuListener> menuListeners
         = new ArrayList<MDDMenuListener>();
@@ -40,7 +41,7 @@ public class MDDManager {
         = new ArrayList<MDDChannelListener>();
     
     final private ArrayList<String> lineCache = new ArrayList<String>(4);
-
+    
     /*
      *  Listen for events from MDD and send them to the appropriate listener
      *  Run in its own thread
@@ -86,11 +87,11 @@ public class MDDManager {
      * @return ArrayList<String> containing names of MDD commands
      */
     public static ArrayList<String> getCommands(String addr) throws IOException {
+        
         final ConnMgr cmgr = ConnMgr.connect(addr, 16546);
         final ArrayList<String> cmds = new ArrayList<String>();
-
+        
         String line = cmgr.readLine();
-
         while (line != null && !line.equals("COMMANDS DONE")) { //$NON-NLS-1$
             if (line.startsWith("COMMAND")) //$NON-NLS-1$
                 cmds.add(line.substring(line.indexOf("COMMAND") + 8)); //$NON-NLS-1$
@@ -99,6 +100,7 @@ public class MDDManager {
 
         cmgr.disconnect();
         return cmds;
+        
     }
 
     /**
@@ -278,25 +280,39 @@ public class MDDManager {
 
     /**
      * Construct a new MDDManager
-     * @param addr String containing address of frontend
+     * @param addr String containing address of host running MDD
      */
     public MDDManager(String addr) throws IOException {
-        cmgr = ConnMgr.connect(addr, 16546);
+        /* 
+         * Don't use persistent connections for 'listening' mdd connections
+         * We'll end up with an immortal recvThread since we can't interrupt
+         * the read therein
+         */
+        cmgr = new ConnMgr(addr, 16546, null, false);
         // Wait indefinitely for messages from MDD
         cmgr.setTimeout(0);
-        new Thread(recvTask).start();
+        recvThread = new Thread(recvTask);
+        recvThread.setName("MDDListener"); //$NON-NLS-1$
+        recvThread.start();
     }
     
     /**
      * Construct a new MDDManager
-     * @param addr String containing address of frontend
+     * @param addr String containing address of host running MDD
      * @param mux mux MDD connection via MDD if true
      */
     public MDDManager(String addr, boolean mux) throws IOException {
-        cmgr = ConnMgr.connect(addr, 16546, null, mux);
+        /* 
+         * Don't use persistent connections for 'listening' mdd connections
+         * We'll end up with an immortal recvThread since we can't interrupt
+         * the read therein
+         */
+        cmgr = new ConnMgr(addr, 16546, null, mux);
         // Wait indefinitely for messages from MDD
         cmgr.setTimeout(0);
-        new Thread(recvTask).start();
+        recvThread = new Thread(recvTask);
+        recvThread.setName("MDDListener"); //$NON-NLS-1$
+        recvThread.start();
     }
 
 
@@ -326,7 +342,9 @@ public class MDDManager {
 
     /** Disconnect from MDD and clean up internal resources */
     public void shutdown() {
-        cmgr.disconnect();
+        try {
+            cmgr.dispose();
+        } catch (IOException e) {}
     }
 
     private static ConnMgr sendMsg(String addr, String msg) throws IOException {
