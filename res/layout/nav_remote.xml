@@ -24,7 +24,7 @@
     	style="@style/MDButton72"
     	android:layout_alignLeft="@id/nav_up"
     	android:layout_below="@id/nav_up"
-    	android:src="@drawable/btn_dial"/>
+    	android:src="@drawable/center"/>
    	
    	<ImageButton android:id="@+id/nav_left"
     	style="@style/MDButton72"

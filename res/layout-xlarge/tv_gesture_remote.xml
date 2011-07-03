@@ -24,8 +24,10 @@
 		android:layout_toRightOf="@id/tv_guide"
 		android:layout_marginBottom="20dp"
 		android:gravity="center"
-		android:textSize="24sp"
-		android:text="123.."/>
+		android:textSize="30sp"
+		android:textStyle="bold"
+    	android:textColor="#ff333333"
+		android:text="123"/>
 		
 	<ImageButton android:id="@+id/tv_vol_mute"
 		style="@style/MDButton160"

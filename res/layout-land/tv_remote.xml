@@ -95,7 +95,7 @@
     	style="@style/MDButton58"
     	android:layout_toRightOf="@id/tv_left"
     	android:layout_alignTop="@id/tv_left"
-    	android:src="@drawable/btn_dial"/>
+    	android:src="@drawable/center"/>
     	
     <ImageButton android:id="@+id/tv_up"
     	style="@style/MDButton58"
@@ -125,7 +125,9 @@
     	style="@style/MDButton58"
     	android:layout_alignLeft="@id/tv_left"
     	android:layout_alignParentBottom="true"
-    	android:text="123..."
+    	android:text="123"
+    	android:textStyle="bold"
+    	android:textColor="#ff333333"
     	android:gravity="center"/>    
    
    <TextView android:id="@+id/tv_title"

@@ -34,8 +34,10 @@
 		android:layout_alignParentBottom="true"
 		android:layout_marginBottom="8dp"
 		android:gravity="center"
-		android:textSize="13sp"
-		android:text="123.."/>
+		android:textSize="16sp"
+		android:textStyle="bold"
+    	android:textColor="#ff333333"
+		android:text="123"/>
 		
 	<ImageButton android:id="@+id/tv_vol_mute"
 		style="@style/MDButton72"

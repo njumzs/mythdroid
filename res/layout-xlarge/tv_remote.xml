@@ -122,7 +122,7 @@
     	style="@style/MDButton160"
     	android:layout_alignLeft="@id/tv_up"
     	android:layout_below="@id/tv_up"
-    	android:src="@drawable/btn_dial"/>
+    	android:src="@drawable/center"/>
    	
    	<ImageButton android:id="@+id/tv_left"
     	style="@style/MDButton160"
@@ -146,8 +146,10 @@
     	style="@style/MDButton160"
     	android:layout_alignTop="@id/tv_vol_up"
     	android:layout_alignParentRight="true"
-    	android:textSize="24sp"
-    	android:text="123..."
+    	android:textSize="30sp"
+    	android:textStyle="bold"
+    	android:textColor="#ff333333"
+    	android:text="123"
     	android:gravity="center"/>    	
    
 </RelativeLayout>
