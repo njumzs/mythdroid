@@ -14,13 +14,16 @@
   			android:id="@+id/recorderframe"
   			android:layout_weight="1"
     		android:layout_width="0px"
-    		android:layout_height="fill_parent"/>
+    		android:layout_height="fill_parent"
+    		android:layout_marginRight="2dp"
+            android:background="@drawable/fragmentbackground"/>
 
     	<FrameLayout
   			android:id="@+id/backendframe"
   			android:layout_weight="1"
     		android:layout_width="0px"
-    		android:layout_height="fill_parent"/>
+    		android:layout_height="fill_parent"
+    		android:background="@drawable/fragmentbackground"/>
 
     </LinearLayout>
 
@@ -28,20 +31,23 @@
   		android:layout_weight="1.5"
   		android:layout_width="fill_parent"
   		android:layout_height="0px"
-  		android:layout_marginTop="10dp"
+  		android:layout_marginTop="8dp"
   		android:orientation="horizontal">
 
 		<FrameLayout
   			android:id="@+id/scheduledframe"
   			android:layout_weight="1"
     		android:layout_width="0px"
-    		android:layout_height="fill_parent"/>
+    		android:layout_height="fill_parent"
+    		android:layout_marginRight="2dp"
+    		android:background="@drawable/fragmentbackground"/>
 
     	<FrameLayout
   			android:id="@+id/jobframe"
   			android:layout_weight="1"
     		android:layout_width="0px"
-    		android:layout_height="fill_parent"/>
+    		android:layout_height="fill_parent"
+            android:background="@drawable/fragmentbackground"/>
 
     </LinearLayout>
 
