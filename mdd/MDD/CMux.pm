@@ -138,6 +138,9 @@ sub handleDisconnect {
 
     my $self = shift;
     my $c = shift;
+
+    return unless $c;
+
     my $c2 = $conns{$c};
     $log->dbg(
         "CMux: Closing connection to " . $c->peerhost . ":" . $c->peerport
@@ -160,6 +163,11 @@ sub mainloop {
     while (my @ready = $self->{select}->can_read) {
 
         foreach my $fd (@ready) {
+
+            unless ($fd->connected) {
+                $self->{select}->remove($fd);
+                next;
+            }
             
             if ($fd == $self->{listen}) {
                 # New connection
