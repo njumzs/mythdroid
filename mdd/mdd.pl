@@ -107,7 +107,7 @@ my $stream_cmd = $config{stream} ||
     '--file-caching=2000 --demux=avformat %FILE% ' . 
     '--sout=\'#transcode{vcodec=h264,venc=x264{no-cabac,level=30,keyint=50,' .
     'ref=4,bframes=0,bpyramid=none,profile=baseline,no-weightb,weightp=0,' .
-    'no-8x8dct,trellis=0,deinterlace},vb=%VB%,threads=%THR%,acodec=mp4a,' . 
+    'no-8x8dct,trellis=0},vb=%VB%,threads=%THR%,deinterlace,acodec=mp4a,' . 
     'samplerate=48000,ab=%AB%,channels=2,audio-sync}' .
     ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
 
