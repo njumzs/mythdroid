@@ -20,6 +20,8 @@ package org.mythdroid.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import org.mythdroid.Globals;
 import org.mythdroid.R;
@@ -42,12 +44,23 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TextView;
+import android.view.MenuItem;
+import android.view.View.OnClickListener;
+import android.view.LayoutInflater;
+import android.widget.LinearLayout;
+import android.view.Menu;
 
 /** 
  * Base class for activities that display frontend choosers
  * and/or loading dialogs - same as MDActivity
  */
 public abstract class MDListActivity extends ListActivity {
+
+    /** ActionBar Indicator for Frontend */
+    TextView frontendIndicator = null;
+
+    final static int MENU_FRONTEND = 0;
 
     /** Frontend chooser and loading dialogs */
     final protected static int
@@ -81,7 +94,7 @@ public abstract class MDListActivity extends ListActivity {
                             nextActivity == null
                         )
                     ) ||
-                    (onHere && hereActivity == null)
+                    (onHere && (hereActivity == null || nextActivity == null))
                 )
                     return;
                 final Intent intent = new Intent().setClass(
@@ -114,6 +127,11 @@ public abstract class MDListActivity extends ListActivity {
         switch (id) {
 
             case FRONTEND_CHOOSER:
+                //Reinitialize onHere to False. Incase we have called this function more than once
+                //For example by first calling the "Set Current Frontend" menu item and selecting here
+                //and then by long-pressing on Watch-TV
+                onHere=false;
+
                 final Dialog d = createFrontendDialog();
                 d.setOnDismissListener(dismissListener);
                 d.setOnCancelListener(cancelListener);
@@ -153,6 +171,10 @@ public abstract class MDListActivity extends ListActivity {
     @Override
     public void onResume() {
         super.onResume();
+        // Reset Frontend Indicator
+        if (frontendIndicator != null) {
+            frontendIndicator.setText(Globals.defaultFrontend);
+        }
         if (Globals.appContext == null)
             Globals.appContext = getApplicationContext();
     }
@@ -179,10 +201,10 @@ public abstract class MDListActivity extends ListActivity {
                     AdapterView<?> av, View v, int pos, long id
                 ) {
                     String fe = (String)av.getAdapter().getItem(pos);
+                    Globals.defaultFrontend = fe;
+                    if (frontendIndicator != null) frontendIndicator.setText(fe);
                     if (fe.equals(Messages.getString("MDListActivity.0"))) // Here //$NON-NLS-1$
                         onHere = true;
-                    else
-                        Globals.defaultFrontend = fe;
                     d.dismiss();
                 }
             }
@@ -195,7 +217,7 @@ public abstract class MDListActivity extends ListActivity {
 
         ArrayList<String> list = FrontendDB.getFrontendNames(this);
 
-        if (hereActivity != null)
+        if (hereActivity != null || nextActivity == null)
             list.add(Messages.getString("MDActivity.0")); // Here //$NON-NLS-1$
         
         if (list.isEmpty()) {
@@ -249,4 +271,52 @@ public abstract class MDListActivity extends ListActivity {
         stringExtras.put(name, value);
     }
 
+    public void addFrontendChooser(Menu menu) {
+        MenuItem item = menu.add(Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.set_def_fe)
+         .setIcon(drawable.ic_menu_upload_you_tube);
+
+        // Reflection Methods for ActionBar
+        final Class[] msetActionViewSig = new Class[] {
+         View.class};
+        final Class[] msetShowAsActionSig = new Class[] {
+         int.class};
+        Method msetActionView;
+        Method msetShowAsAction;
+        Object[] msetActionViewArgs = new Object[1];
+        Object[] msetShowAsActionArgs = new Object[1];
+
+        //If we can, add this to the action bar
+        try {
+            msetShowAsAction = MenuItem.class.getMethod("setShowAsAction",
+             msetShowAsActionSig);
+            msetShowAsActionArgs[0] = 2;
+            msetShowAsAction.invoke(item, msetShowAsActionArgs);
+
+            View vi = LayoutInflater.from(this).inflate(R.layout.frontend_indicator,null);
+
+            frontendIndicator = (TextView) vi.findViewById(R.id.text);
+            LinearLayout indicatorLL= (LinearLayout) vi.findViewById(R.id.layout);
+
+            indicatorLL.setFocusable(true);
+            indicatorLL.setBackgroundResource(R.drawable.list_selector_holo_dark);
+            frontendIndicator.setText(Globals.defaultFrontend);
+            indicatorLL.setOnClickListener(
+                new OnClickListener() {
+                    @Override
+                    public void onClick( View v ) {
+                       nextActivity=null;
+                       showDialog(FRONTEND_CHOOSER);
+                    }
+                }
+            );
+
+            msetActionView = MenuItem.class.getMethod("setActionView",
+             msetActionViewSig);
+            msetActionViewArgs[0] = vi;
+            msetActionView.invoke(item, msetActionViewArgs);
+        } catch (NoSuchMethodException e) {
+        } catch (IllegalAccessException e) {
+        } catch (InvocationTargetException e) {
+        }
+    }
 }

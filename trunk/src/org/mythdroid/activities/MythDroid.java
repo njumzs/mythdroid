@@ -20,6 +20,8 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
@@ -56,6 +58,9 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.view.View.OnClickListener;
+import android.view.LayoutInflater;
+import android.widget.LinearLayout;
 
 /**
  * MDListActivity for the main menu
@@ -66,7 +71,7 @@ public class MythDroid extends MDListActivity implements
 
     /** Menu IDs */
     final private static int
-        MENU_SETTINGS = 0, MENU_FRONTEND = 1, MENU_NAV = 2,
+        MENU_SETTINGS = 1, MENU_NAV = 2,
         MENU_WAKE = 3,     MENU_MDD = 4;
 
     /** Dialog IDs */
@@ -99,6 +104,10 @@ public class MythDroid extends MDListActivity implements
 
         Globals.appContext = getApplicationContext();
         
+        if (Globals.defaultFrontend == null) {
+            Globals.defaultFrontend = FrontendDB.getDefault(Globals.appContext);
+        }
+
         /* Allow network activity on UI thread - we only use it to connect to the
            backend, which we need to do before the UI is usable anyway */
         if (Integer.parseInt(Build.VERSION.SDK) >= 11)
@@ -156,13 +165,23 @@ public class MythDroid extends MDListActivity implements
         Class<?> activity = null;
 
         if      (action.equals(Messages.getString("MythDroid.7"))) //$NON-NLS-1$
-            activity = TVRemote.class;
+            if (Globals.defaultFrontend != null && !Globals.defaultFrontend.equals("Here")) {
+                activity = TVRemote.class;
+            } else {
+                onItemLongClick(list,item,pos,id);
+                return;
+            }
         else if (action.equals(Messages.getString("MythDroid.8"))) //$NON-NLS-1$
             activity = Recordings.class;
         else if (action.equals(Messages.getString("MythDroid.12"))) //$NON-NLS-1$
             activity = Videos.class;
         else if (action.equals(Messages.getString("MythDroid.9"))) //$NON-NLS-1$
-            activity = MusicRemote.class;
+            if (Globals.defaultFrontend != null && !Globals.defaultFrontend.equals("Here")) {
+                activity = MusicRemote.class;
+            } else {
+                onItemLongClick(list,item,pos,id);
+                return;
+            }
         else if (action.equals(Messages.getString("MythDroid.10"))) //$NON-NLS-1$
             activity = Guide.class;
         else if (action.equals(Messages.getString("MythDroid.11"))) //$NON-NLS-1$
@@ -243,10 +262,11 @@ public class MythDroid extends MDListActivity implements
     /** Populate the pop-up menu */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
+        addFrontendChooser(menu);
+
         menu.add(Menu.NONE, MENU_SETTINGS, Menu.NONE, R.string.settings)
             .setIcon(drawable.ic_menu_preferences);
-        menu.add(Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.set_def_fe)
-            .setIcon(drawable.ic_menu_upload_you_tube);
         menu.add(Menu.NONE, MENU_WAKE, Menu.NONE, R.string.wake_fe)
             .setIcon(drawable.ic_lock_power_off);
         menu.add(Menu.NONE, MENU_NAV, Menu.NONE, R.string.remote)
@@ -267,6 +287,7 @@ public class MythDroid extends MDListActivity implements
                 );
                 return true;
             case MENU_FRONTEND:
+                nextActivity=null;
                 showDialog(FRONTEND_CHOOSER);
                 return true;
             case MENU_WAKE:

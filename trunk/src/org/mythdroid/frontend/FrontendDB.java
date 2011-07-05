@@ -25,6 +25,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.SQLException;
+import android.util.Log;
+import android.database.CursorIndexOutOfBoundsException;
 
 /** Manage a sqlite database of frontends */
 public class FrontendDB {
@@ -33,8 +36,9 @@ public class FrontendDB {
     final public static int     ID = 0, ADDR = 1, NAME = 2, HWADDR = 3;
 
     final private static String DB_NAME        = "MythDroid.db"; //$NON-NLS-1$
-    final private static int    DB_VERSION     = 3;
+    final private static int    DB_VERSION     = 4;
     final private static String FRONTEND_TABLE = "frontends"; //$NON-NLS-1$
+    final private static String DEFAULT_TABLE = "defaultFE"; //$NON-NLS-1$
 
     private static SQLiteDatabase db           = null;
     private static Cursor         cached       = null;
@@ -49,15 +53,21 @@ public class FrontendDB {
         @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(
-                "CREATE TABLE " + FRONTEND_TABLE + //$NON-NLS-1$
+                "CREATE TABLE IF NOT EXISTS " + FRONTEND_TABLE + //$NON-NLS-1$
                 " (_id INTEGER PRIMARY KEY AUTOINCREMENT" + //$NON-NLS-1$
                 ", addr TEXT, name TEXT, hwaddr TEXT);" //$NON-NLS-1$
+            );
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS " + DEFAULT_TABLE + //$NON-NLS-1$
+                " (default_id INTEGER PRIMARY KEY AUTOINCREMENT" + //$NON-NLS-1$
+                ", name TEXT);" //$NON-NLS-1$
             );
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVer, int newVer) {
-            db.execSQL("DROP TABLE IF EXISTS " + FRONTEND_TABLE); //$NON-NLS-1$
+            //db.execSQL("DROP TABLE IF EXISTS " + FRONTEND_TABLE); //$NON-NLS-1$
+            db.execSQL("DROP TABLE IF EXISTS " + DEFAULT_TABLE); //$NON-NLS-1$
             onCreate(db);
         }
 
@@ -72,6 +82,32 @@ public class FrontendDB {
         return cached;
     }
     
+    public static boolean updateDefault(String newDefault, Context ctx) {
+        if (db == null) initDB(ctx);
+        try {
+            //Sending null as second argument deletes all rows in case there was more than one
+            db.delete(DEFAULT_TABLE, null, null);
+        } catch (SQLException e) {
+        }
+        ContentValues values = new ContentValues();
+        values.put("name",newDefault);
+        return (db.insert(DEFAULT_TABLE, null, values) > 0);
+    }
+
+    public static String getDefault(Context ctx) {
+        if (db == null) initDB(ctx);
+        String newDefault = null;
+        try {
+            Cursor c = db.query(DEFAULT_TABLE, new String[] { "default_id", "name"}, null, null, null, null, null);
+            c.moveToFirst();
+            newDefault = c.getString(1);
+            c.close();
+        } catch (CursorIndexOutOfBoundsException e) {
+        } catch (SQLException e) {
+        }
+        return newDefault;
+    }
+
     /**
      * Get an ArrayList of frontend names
      * @param ctx Context

@@ -231,11 +231,17 @@ public class RecDetailFragment extends Fragment {
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            startActivity(
-                                new Intent().setClass(
-                                    activity, TVRemote.class
-                                )
-                            );
+                            if (!Globals.defaultFrontend.equals("Here")) {
+                                startActivity(
+                                    new Intent().setClass(
+                                        activity, TVRemote.class
+                                    )
+                                );
+                            } else {
+                                final Intent intent = new Intent();
+                                intent.setClass(activity, VideoPlayer.class);
+                                startActivity(intent);
+                            }
                         }
                     }
                 );
