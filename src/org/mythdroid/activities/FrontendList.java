@@ -36,17 +36,26 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import android.R.drawable;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import java.util.ArrayList;
+
+
 /** ListActivity, displays, and lets the user manage, a list of frontends */
 public class FrontendList extends ListActivity implements
     DialogInterface.OnClickListener {
 
-    final static private int ADD_DIALOG  = 0, EDIT_DIALOG = 1;
+    final static private int ADD_DIALOG  = 0, DEFAULT_DIALOG = 1, EDIT_DIALOG = 2;
 
     final private Context ctx             = this;
 
     private AlertDialog   feEditor        = null;
     private int           clickedPosition = -1;
     private View          clickedView     = null;
+
+    private View          ftr             = null;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -62,6 +71,19 @@ public class FrontendList extends ListActivity implements
             .setText(R.string.click_add_fe);
 
         getListView().addHeaderView(hdr);
+
+        ftr = getLayoutInflater().inflate(
+            R.layout.frontend_list_item, null
+        );
+
+        ((TextView)(ftr.findViewById(R.id.fe_name_text)))
+            .setText(Messages.getString("FrontendList.7"));
+
+        ((TextView)(ftr.findViewById(R.id.fe_addr_text)))
+            .setText(Messages.getString("FrontendList.6") + " " + FrontendDB.getDefault(this));
+
+        getListView().addHeaderView(ftr);
+
         getListView().setPadding(0, 4, 0, 0);
 
         Cursor c = FrontendDB.getFrontends(this);
@@ -104,6 +126,9 @@ public class FrontendList extends ListActivity implements
                                .create();
                 break;
 
+            case DEFAULT_DIALOG:
+                final Dialog d = createFrontendDialog();
+                return d;
         }
 
         return feEditor;
@@ -140,6 +165,9 @@ public class FrontendList extends ListActivity implements
                 ((EditText)dialog.findViewById(R.id.fe_hwaddr)).setText(""); //$NON-NLS-1$
                 break;
 
+            case DEFAULT_DIALOG:
+                prepareFrontendDialog(dialog);
+                break;
         }
     }
 
@@ -147,13 +175,23 @@ public class FrontendList extends ListActivity implements
     public void onListItemClick(ListView list, View item, int pos, long itemid) {
         clickedPosition = pos;
         clickedView = item;
-        showDialog(pos == 0 ? ADD_DIALOG : EDIT_DIALOG);
+        switch (pos) {
+            case ADD_DIALOG:
+                showDialog(ADD_DIALOG);
+                break;
+            case DEFAULT_DIALOG:
+                showDialog(DEFAULT_DIALOG);
+                break;
+            default:
+                showDialog(EDIT_DIALOG);
+                break;
+        }
     }
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
 
-        long rowID = getListAdapter().getItemId(clickedPosition - 1);
+        long rowID = getListAdapter().getItemId(clickedPosition - 2);
 
         switch (which) {
 
@@ -194,4 +232,46 @@ public class FrontendList extends ListActivity implements
 
         dialog.dismiss();
     }
+
+    /** Create a dialog allowing user to choose default frontend */
+    private Dialog createFrontendDialog() {
+
+        final AlertDialog d = new AlertDialog.Builder(ctx)
+            .setItems(new String[] {}, null)
+            .setIcon(drawable.ic_menu_upload_you_tube)
+            .setTitle(R.string.ch_fe)
+            .create();
+
+        d.getListView().setOnItemClickListener(
+            new OnItemClickListener() {
+                @Override
+                public void onItemClick(
+                    AdapterView<?> av, View v, int pos, long id
+                ) {
+                    String fe = (String)av.getAdapter().getItem(pos);
+                    FrontendDB.updateDefault(fe,ctx);
+                    d.dismiss();
+                   ((TextView)(ftr.findViewById(R.id.fe_addr_text)))
+                    .setText(Messages.getString("FrontendList.6") + " " + FrontendDB.getDefault(ctx));
+                }
+            }
+        );
+
+        return d;
+    }
+
+    private void prepareFrontendDialog(final Dialog dialog) {
+
+        ArrayList<String> list = FrontendDB.getFrontendNames(this);
+
+        list.add(Messages.getString("MDActivity.0")); // Here //$NON-NLS-1$
+
+        ((AlertDialog)dialog).getListView().setAdapter(
+            new ArrayAdapter<String>(
+                ctx, R.layout.simple_list_item_1, list
+            )
+        );
+
+    }
+
 }

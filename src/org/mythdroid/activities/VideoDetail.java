@@ -37,6 +37,8 @@ import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.view.Menu;
+import android.view.MenuItem;
 
 /**
  * MDActivity displays details of a Video
@@ -123,12 +125,21 @@ public class VideoDetail extends MDActivity {
             new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(
-                        new Intent()
-                            .setClass(ctx, TVRemote.class)
-                            .putExtra(Extras.FILENAME.toString(), video.filename)
-                            .putExtra(Extras.TITLE.toString(), video.title)
-                    );
+                    if (!Globals.defaultFrontend.equals("Here")) {
+                        startActivity(
+                            new Intent()
+                                .setClass(ctx, TVRemote.class)
+                                .putExtra(Extras.FILENAME.toString(), video.filename)
+                                .putExtra(Extras.TITLE.toString(), video.title)
+                        );
+                    } else {
+                        startActivity(
+                            new Intent()
+                                .setClass(ctx, VideoPlayer.class)
+                                .putExtra(Extras.FILENAME.toString(), video.filename)
+                                .putExtra(Extras.TITLE.toString(), video.title)
+                        );
+                    }
                 }
             }
         );
@@ -154,5 +165,25 @@ public class VideoDetail extends MDActivity {
         setContentView(R.layout.video_detail);
         setViews();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        addFrontendChooser(menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case MENU_FRONTEND:
+                nextActivity=null;
+                showDialog(FRONTEND_CHOOSER);
+                return true;
+        }
+
+        return false;
+
+    }
+
 
 }

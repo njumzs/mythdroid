@@ -2,7 +2,7 @@
 <resources>
 	<string name="app_name">MythDroid</string>
 	<string name="settings">Settings</string>
-	<string name="set_def_fe">Set Default Frontend</string>
+	<string name="set_def_fe">Set Current Frontend</string>
 	<string name="no_be">No backends found</string>
 	<string name="no_be_detail">Configure one manually in settings perhaps?</string>
 	<string name="add_fe">Add a frontend</string>

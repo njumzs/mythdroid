@@ -55,7 +55,7 @@ public class Recordings extends MDFragmentActivity {
     final private static int FILTER_DIALOG  = 0;
 
     final private static int
-        MENU_REFRESH   = 0, MENU_FILTER = 1, MENU_FILTER_RESET = 2;
+        MENU_REFRESH   = 1, MENU_FILTER = 2, MENU_FILTER_RESET = 3;
     
     final private Handler handler = new Handler();
     
@@ -204,6 +204,9 @@ public class Recordings extends MDFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
+        addFrontendChooser(menu); 
+
         menu.add(Menu.NONE, MENU_REFRESH, Menu.NONE, R.string.refresh)
             .setIcon(R.drawable.ic_menu_refresh);
         menu.add(Menu.NONE, MENU_FILTER, Menu.NONE, R.string.filter)
@@ -217,6 +220,10 @@ public class Recordings extends MDFragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+            case MENU_FRONTEND:
+                nextActivity=null;
+                showDialog(FRONTEND_CHOOSER);
+                return true;
             case MENU_REFRESH:
                 refresh();
                 return true;
