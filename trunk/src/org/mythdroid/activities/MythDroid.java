@@ -20,8 +20,6 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
@@ -58,9 +56,6 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.view.View.OnClickListener;
-import android.view.LayoutInflater;
-import android.widget.LinearLayout;
 
 /**
  * MDListActivity for the main menu
@@ -165,7 +160,10 @@ public class MythDroid extends MDListActivity implements
         Class<?> activity = null;
 
         if      (action.equals(Messages.getString("MythDroid.7"))) //$NON-NLS-1$
-            if (Globals.defaultFrontend != null && !Globals.defaultFrontend.equals("Here")) {
+            if (
+                 Globals.defaultFrontend != null && 
+                !Globals.defaultFrontend.equals("Here") //$NON-NLS-1$
+             ) {
                 activity = TVRemote.class;
             } else {
                 onItemLongClick(list,item,pos,id);
@@ -176,7 +174,10 @@ public class MythDroid extends MDListActivity implements
         else if (action.equals(Messages.getString("MythDroid.12"))) //$NON-NLS-1$
             activity = Videos.class;
         else if (action.equals(Messages.getString("MythDroid.9"))) //$NON-NLS-1$
-            if (Globals.defaultFrontend != null && !Globals.defaultFrontend.equals("Here")) {
+            if (
+                 Globals.defaultFrontend != null && 
+                !Globals.defaultFrontend.equals("Here") //$NON-NLS-1$
+            ) {
                 activity = MusicRemote.class;
             } else {
                 onItemLongClick(list,item,pos,id);

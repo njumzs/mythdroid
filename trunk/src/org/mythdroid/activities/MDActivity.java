@@ -20,7 +20,6 @@ package org.mythdroid.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mythdroid.Globals;
@@ -271,52 +270,52 @@ public abstract class MDActivity extends Activity {
         stringExtras.put(name, value);
     }
 
+    /**
+     * Add a frontend chooser to the options menu (or action bar on >= 3.0)
+     * @param menu menu to add to
+     */
     public void addFrontendChooser(Menu menu) {
-        MenuItem item = menu.add(Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.set_def_fe)
-         .setIcon(drawable.ic_menu_upload_you_tube);
-
-        // Reflection Methods for ActionBar
-        final Class[] msetActionViewSig = new Class[] {
-         View.class};
-        final Class[] msetShowAsActionSig = new Class[] {
-         int.class};
-        Method msetActionView;
-        Method msetShowAsAction;
-        Object[] msetActionViewArgs = new Object[1];
-        Object[] msetShowAsActionArgs = new Object[1];
-
+        
+        MenuItem item = menu.add(
+            Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.set_def_fe
+        ).setIcon(drawable.ic_menu_upload_you_tube);
+     
         //If we can, add this to the action bar
         try {
-            msetShowAsAction = MenuItem.class.getMethod("setShowAsAction",
-             msetShowAsActionSig);
-            msetShowAsActionArgs[0] = 2;
-            msetShowAsAction.invoke(item, msetShowAsActionArgs);
+            MenuItem.class.getMethod(
+                "setShowAsAction",  int.class //$NON-NLS-1$
+            ).invoke(item, 2);
 
-            View vi = LayoutInflater.from(this).inflate(R.layout.frontend_indicator,null);
+            View vi = LayoutInflater.from(this).inflate(
+                R.layout.frontend_indicator, null
+            );
 
             frontendIndicator = (TextView) vi.findViewById(R.id.text);
-            LinearLayout indicatorLL= (LinearLayout) vi.findViewById(R.id.layout);
+            LinearLayout indicatorLL = 
+                (LinearLayout) vi.findViewById(R.id.layout);
 
             indicatorLL.setFocusable(true);
-            indicatorLL.setBackgroundResource(R.drawable.list_selector_holo_dark);
+            indicatorLL.setBackgroundResource(
+                R.drawable.list_selector_holo_dark
+            );
             frontendIndicator.setText(Globals.defaultFrontend);
             indicatorLL.setOnClickListener(
                 new OnClickListener() {
                     @Override
                     public void onClick( View v ) {
-                       nextActivity=null;
+                       nextActivity = null;
                        showDialog(FRONTEND_CHOOSER);
                     }
                 }
             );
 
-            msetActionView = MenuItem.class.getMethod("setActionView",
-             msetActionViewSig);
-            msetActionViewArgs[0] = vi;
-            msetActionView.invoke(item, msetActionViewArgs);
-        } catch (NoSuchMethodException e) {
-        } catch (IllegalAccessException e) {
-        } catch (InvocationTargetException e) {
-        }
+            MenuItem.class.getMethod(
+                "setActionView", View.class //$NON-NLS-1$
+            ).invoke(item, vi);
+        } catch (NoSuchMethodException e)     {}
+          catch (IllegalAccessException e)    {}
+          catch (InvocationTargetException e) {}
+          
     }
+    
 }
