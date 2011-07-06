@@ -89,7 +89,7 @@ public abstract class MDActivity extends Activity {
                 if (
                     (
                         !onHere && (
-                            Globals.defaultFrontend == null ||
+                            Globals.currentFrontend == null ||
                             nextActivity == null
                         )
                     ) ||
@@ -172,7 +172,7 @@ public abstract class MDActivity extends Activity {
         super.onResume();
         // Reset Frontend Indicator
         if (frontendIndicator != null) {
-            frontendIndicator.setText(Globals.defaultFrontend);
+            frontendIndicator.setText(Globals.currentFrontend);
         }  
         if (Globals.appContext == null)
             Globals.appContext = getApplicationContext();
@@ -200,7 +200,7 @@ public abstract class MDActivity extends Activity {
                     AdapterView<?> av, View v, int pos, long id
                 ) {
                     String fe = (String)av.getAdapter().getItem(pos);
-                    Globals.defaultFrontend = fe;
+                    Globals.currentFrontend = fe;
                     if (frontendIndicator != null) frontendIndicator.setText(fe);
                     if (fe.equals(Messages.getString("MDActivity.0")))  // Here //$NON-NLS-1$
                         onHere = true;
@@ -298,7 +298,7 @@ public abstract class MDActivity extends Activity {
             indicatorLL.setBackgroundResource(
                 R.drawable.list_selector_holo_dark
             );
-            frontendIndicator.setText(Globals.defaultFrontend);
+            frontendIndicator.setText(Globals.currentFrontend);
             indicatorLL.setOnClickListener(
                 new OnClickListener() {
                     @Override

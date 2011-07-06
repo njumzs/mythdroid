@@ -31,8 +31,8 @@ public class Globals {
     /** Application context */
     public static Context appContext = null;
 
-    /** The name of the current default frontend */
-    public static String defaultFrontend = null;
+    /** The name of the current frontend */
+    public static String currentFrontend = null;
 
     /** Backend address from preferences */
     public static String backend = null;
@@ -77,7 +77,7 @@ public class Globals {
      */
     public static FrontendManager getFrontend(Context ctx) throws IOException {
 
-        String name = defaultFrontend;
+        String name = currentFrontend;
 
         // Are we already connected to the desired frontend?
         if (feMgr != null && feMgr.isConnected()) {
@@ -102,11 +102,10 @@ public class Globals {
             feMgr = new FrontendManager(
                 name, FrontendDB.getFrontendAddr(ctx, name)
             );
-
         
-        // Set the default frontend to the newly connected frontend
+        // Set the current frontend to the newly connected frontend
         if (feMgr != null)
-            defaultFrontend = feMgr.name;
+            currentFrontend = feMgr.name;
 
         return feMgr;
 
