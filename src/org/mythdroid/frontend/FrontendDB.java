@@ -26,7 +26,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.SQLException;
-import android.util.Log;
 import android.database.CursorIndexOutOfBoundsException;
 
 /** Manage a sqlite database of frontends */
@@ -82,6 +81,12 @@ public class FrontendDB {
         return cached;
     }
     
+    /**
+     * Set the default frontend
+     * @param newDefault name of new default frontend
+     * @param ctx Context
+     * @return true if successful
+     */
     public static boolean updateDefault(String newDefault, Context ctx) {
         if (db == null) initDB(ctx);
         try {
@@ -90,15 +95,23 @@ public class FrontendDB {
         } catch (SQLException e) {
         }
         ContentValues values = new ContentValues();
-        values.put("name",newDefault);
+        values.put("name", newDefault); //$NON-NLS-1$
         return (db.insert(DEFAULT_TABLE, null, values) > 0);
     }
 
+    /**
+     * Get the name of the default frontend
+     * @param ctx Context
+     * @return name of the default frontend
+     */
     public static String getDefault(Context ctx) {
         if (db == null) initDB(ctx);
         String newDefault = null;
         try {
-            Cursor c = db.query(DEFAULT_TABLE, new String[] { "default_id", "name"}, null, null, null, null, null);
+            Cursor c = db.query(
+                DEFAULT_TABLE, new String[] { "default_id", "name"},  //$NON-NLS-1$ //$NON-NLS-2$
+                null, null, null, null, null
+            );
             c.moveToFirst();
             newDefault = c.getString(1);
             c.close();

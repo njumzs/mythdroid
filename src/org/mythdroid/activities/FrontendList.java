@@ -77,11 +77,14 @@ public class FrontendList extends ListActivity implements
         );
 
         ((TextView)(ftr.findViewById(R.id.fe_name_text)))
-            .setText(Messages.getString("FrontendList.7"));
+            .setText(Messages.getString("FrontendList.7")); //$NON-NLS-1$
 
         ((TextView)(ftr.findViewById(R.id.fe_addr_text)))
-            .setText(Messages.getString("FrontendList.6") + " " + FrontendDB.getDefault(this));
-
+            .setText(
+                Messages.getString("FrontendList.6") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
+                FrontendDB.getDefault(this)
+             );
+        
         getListView().addHeaderView(ftr);
 
         getListView().setPadding(0, 4, 0, 0);
@@ -252,7 +255,10 @@ public class FrontendList extends ListActivity implements
                     FrontendDB.updateDefault(fe,ctx);
                     d.dismiss();
                    ((TextView)(ftr.findViewById(R.id.fe_addr_text)))
-                    .setText(Messages.getString("FrontendList.6") + " " + FrontendDB.getDefault(ctx));
+                        .setText(
+                            Messages.getString("FrontendList.6") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                            FrontendDB.getDefault(ctx)
+                         );
                 }
             }
         );
