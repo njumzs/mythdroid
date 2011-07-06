@@ -96,7 +96,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
                 if (
                     (
                         !onHere && (
-                            Globals.defaultFrontend == null ||
+                            Globals.currentFrontend == null ||
                             nextActivity == null
                         )
                     ) ||
@@ -178,7 +178,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
     public void onResume() {
         // Reset Frontend Indicator
         if (frontendIndicator != null) {
-            frontendIndicator.setText(Globals.defaultFrontend);
+            frontendIndicator.setText(Globals.currentFrontend);
         }  
         super.onResume();
         if (Globals.appContext == null)
@@ -226,7 +226,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
                     AdapterView<?> av, View v, int pos, long id
                 ) {
                     String fe = (String)av.getAdapter().getItem(pos);
-                    Globals.defaultFrontend = fe;
+                    Globals.currentFrontend = fe;
                     if (frontendIndicator != null) frontendIndicator.setText(fe);
                     if (fe.equals(Messages.getString("MDActivity.0")))  // Here //$NON-NLS-1$
                         onHere = true;
@@ -361,7 +361,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
             indicatorLL.setBackgroundResource(
                 R.drawable.list_selector_holo_dark
             );
-            frontendIndicator.setText(Globals.defaultFrontend);
+            frontendIndicator.setText(Globals.currentFrontend);
             indicatorLL.setOnClickListener(
                 new OnClickListener() {
                     @Override

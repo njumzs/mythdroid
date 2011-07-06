@@ -25,11 +25,8 @@ import java.util.HashMap;
 import org.mythdroid.ConnMgr;
 import org.mythdroid.ConnMgr.onConnectListener;
 import org.mythdroid.Enums.Key;
-import org.mythdroid.Globals;
 import org.mythdroid.data.Program;
 import org.mythdroid.resource.Messages;
-
-import android.util.Log;
 
 /** Manages a frontend */
 public class FrontendManager {
@@ -50,9 +47,6 @@ public class FrontendManager {
      * @param host hostname or IP address of frontend
      */
     public FrontendManager(String name, String host) throws IOException {
-
-        if (Globals.debug)
-            Log.d("FrontendManager", "Connecting to " + host + ":6546"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         cmgr = ConnMgr.connect(host, 6546, new onConnectListener() {
                 @Override

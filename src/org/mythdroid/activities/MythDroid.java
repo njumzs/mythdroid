@@ -99,9 +99,8 @@ public class MythDroid extends MDListActivity implements
 
         Globals.appContext = getApplicationContext();
         
-        if (Globals.defaultFrontend == null) {
-            Globals.defaultFrontend = FrontendDB.getDefault(Globals.appContext);
-        }
+        if (Globals.currentFrontend == null)
+            Globals.currentFrontend = FrontendDB.getDefault(Globals.appContext);
 
         /* Allow network activity on UI thread - we only use it to connect to the
            backend, which we need to do before the UI is usable anyway */
@@ -161,8 +160,8 @@ public class MythDroid extends MDListActivity implements
 
         if      (action.equals(Messages.getString("MythDroid.7"))) //$NON-NLS-1$
             if (
-                 Globals.defaultFrontend != null && 
-                !Globals.defaultFrontend.equals("Here") //$NON-NLS-1$
+                 Globals.currentFrontend != null && 
+                !Globals.currentFrontend.equals("Here") //$NON-NLS-1$
              ) {
                 activity = TVRemote.class;
             } else {
@@ -175,8 +174,8 @@ public class MythDroid extends MDListActivity implements
             activity = Videos.class;
         else if (action.equals(Messages.getString("MythDroid.9"))) //$NON-NLS-1$
             if (
-                 Globals.defaultFrontend != null && 
-                !Globals.defaultFrontend.equals("Here") //$NON-NLS-1$
+                 Globals.currentFrontend != null && 
+                !Globals.currentFrontend.equals("Here") //$NON-NLS-1$
             ) {
                 activity = MusicRemote.class;
             } else {
@@ -375,10 +374,10 @@ public class MythDroid extends MDListActivity implements
 
         final ArrayList<String> items = new ArrayList<String>(3);
         items.add(Messages.getString("MythDroid.21"));  // Here //$NON-NLS-1$
-        if (Globals.defaultFrontend != null)
+        if (Globals.currentFrontend != null)
             // On <defaultFrontend>
             items.add(
-                Messages.getString("MythDroid.22") + Globals.defaultFrontend //$NON-NLS-1$
+                Messages.getString("MythDroid.22") + Globals.currentFrontend //$NON-NLS-1$
             );
         items.add(Messages.getString("MythDroid.23")); // Choose frontend //$NON-NLS-1$
 
@@ -413,7 +412,7 @@ public class MythDroid extends MDListActivity implements
                     try {
                         WakeOnLan.Wake(c.getString(FrontendDB.HWADDR));
                     } catch (Exception e) { ErrUtil.err(ctx, e); }
-                    Globals.defaultFrontend = c.getString(FrontendDB.NAME);
+                    Globals.currentFrontend = c.getString(FrontendDB.NAME);
                     c.close();
                     d.dismiss();
                 }
