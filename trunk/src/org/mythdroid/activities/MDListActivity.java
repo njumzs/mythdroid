@@ -274,7 +274,7 @@ public abstract class MDListActivity extends ListActivity {
      * Add a frontend chooser to the options menu (or action bar on >= 3.0)
      * @param menu menu to add to
      */
-    public void addFrontendChooser(Menu menu) {
+    protected void addFrontendChooser(Menu menu) {
         
         MenuItem item = menu.add(
             Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.set_def_fe
@@ -296,7 +296,7 @@ public abstract class MDListActivity extends ListActivity {
 
             indicatorLL.setFocusable(true);
             indicatorLL.setBackgroundResource(
-                R.drawable.list_selector_holo_dark
+                android.R.drawable.list_selector_background
             );
             frontendIndicator.setText(Globals.currentFrontend);
             indicatorLL.setOnClickListener(
