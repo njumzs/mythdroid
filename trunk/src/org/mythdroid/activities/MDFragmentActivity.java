@@ -59,10 +59,7 @@ import android.view.Menu;
  * and/or loading dialogs - same as MDActivity except for some sym visibility
  */
 public abstract class MDFragmentActivity extends FragmentActivity {
-
-    /** ActionBar Indicator for Frontend */
-    TextView frontendIndicator = null;
-
+ 
     final static int MENU_FRONTEND = 0;
 
     /** Frontend chooser and loading dialogs */
@@ -85,7 +82,10 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         new HashMap<String, Integer>();
     final private HashMap<String, String> stringExtras =
         new HashMap<String, String>();
-
+    
+    /** ActionBar Indicator for Frontend */
+    private TextView frontendIndicator = null;
+    
     private boolean onHere = false;
 
     /** Start nextActivity when the frontend dialog chooser is finished */
@@ -176,13 +176,15 @@ public abstract class MDFragmentActivity extends FragmentActivity {
 
     @Override
     public void onResume() {
-        // Reset Frontend Indicator
-        if (frontendIndicator != null) {
-            frontendIndicator.setText(Globals.currentFrontend);
-        }  
         super.onResume();
+        
+        // Reset Frontend Indicator
+        if (frontendIndicator != null)
+            frontendIndicator.setText(Globals.currentFrontend);
+        
         if (Globals.appContext == null)
             Globals.appContext = getApplicationContext();
+        
         isPaused = false;
         if (configChanged)
             resetContentView();
@@ -345,6 +347,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
      
         //If we can, add this to the action bar
         try {
+            
             MenuItem.class.getMethod(
                 "setShowAsAction",  int.class //$NON-NLS-1$
             ).invoke(item, 2);
@@ -353,15 +356,15 @@ public abstract class MDFragmentActivity extends FragmentActivity {
                 R.layout.frontend_indicator, null
             );
 
-            frontendIndicator = (TextView) vi.findViewById(R.id.text);
-            LinearLayout indicatorLL = 
-                (LinearLayout) vi.findViewById(R.id.layout);
-
+            frontendIndicator = (TextView)vi.findViewById(R.id.text);
+            frontendIndicator.setText(Globals.currentFrontend);
+            
+            LinearLayout indicatorLL =
+                (LinearLayout)vi.findViewById(R.id.layout);
             indicatorLL.setFocusable(true);
             indicatorLL.setBackgroundResource(
                 android.R.drawable.list_selector_background
             );
-            frontendIndicator.setText(Globals.currentFrontend);
             indicatorLL.setOnClickListener(
                 new OnClickListener() {
                     @Override
@@ -375,6 +378,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
             MenuItem.class.getMethod(
                 "setActionView", View.class //$NON-NLS-1$
             ).invoke(item, vi);
+            
         } catch (NoSuchMethodException e)     {}
           catch (IllegalAccessException e)    {}
           catch (InvocationTargetException e) {}
