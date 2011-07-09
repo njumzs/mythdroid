@@ -10,7 +10,8 @@ You must enable the 'Enable frontend network control' option in each frontend's 
 
 ==MDD==
 
-MDD extends the functionality of !MythDroid signficantly. See [MDD here] for more information, including installation notes.
+MDD extends the functionality of !MythDroid significantly. See [MDD here] for 
+more information, including installation notes.
 
 ==MythTV 0.22 Specific Notes==
 
