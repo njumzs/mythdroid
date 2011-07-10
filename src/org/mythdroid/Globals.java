@@ -68,6 +68,16 @@ public class Globals {
     private static Handler wHandler = null;
 
     /**
+     * Is the currentFrontend set to 'Here'? 
+     * @return true if so, false otherwise
+     */
+    public static boolean isCurrentFrontendHere() {
+        if (currentFrontend == null)
+            return false;
+        return currentFrontend.equals(Messages.getString("MDActivity.0")); //$NON-NLS-1$
+    }
+    
+    /**
      * Connect to defaultFrontend or the first frontend in the FrontendDB
      * if defaultFrontend is null, returns quickly if the defaultFrontend if
      * already connected

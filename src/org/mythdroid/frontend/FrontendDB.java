@@ -115,9 +115,8 @@ public class FrontendDB {
             c.moveToFirst();
             newDefault = c.getString(1);
             c.close();
-        } catch (CursorIndexOutOfBoundsException e) {
-        } catch (SQLException e) {
-        }
+        } catch (CursorIndexOutOfBoundsException e) {} 
+          catch (SQLException e) {}
         return newDefault;
     }
 
