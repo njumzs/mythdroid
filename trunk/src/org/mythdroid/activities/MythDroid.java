@@ -99,8 +99,11 @@ public class MythDroid extends MDListActivity implements
 
         Globals.appContext = getApplicationContext();
         
-        if (Globals.currentFrontend == null)
-            Globals.currentFrontend = FrontendDB.getDefault(Globals.appContext);
+        if (Globals.currentFrontend == null) {
+            Globals.currentFrontend = FrontendDB.getDefault(this);
+            if (Globals.currentFrontend == null)
+                Globals.currentFrontend = FrontendDB.getFirstFrontendName(this);
+        }
 
         /* Allow network activity on UI thread - we only use it to connect to the
            backend, which we need to do before the UI is usable anyway */

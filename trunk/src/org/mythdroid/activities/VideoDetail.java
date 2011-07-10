@@ -125,7 +125,7 @@ public class VideoDetail extends MDActivity {
             new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!Globals.currentFrontend.equals("Here")) { //$NON-NLS-1$
+                    if (!Globals.isCurrentFrontendHere()) {
                         startActivity(
                             new Intent()
                                 .setClass(ctx, TVRemote.class)
