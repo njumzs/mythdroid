@@ -149,14 +149,18 @@ public class VideoPlayer extends MDActivity {
 
                     switch (pos) {
                         case 0:
-                            vb = 448;
+                            vb = 1024;
                             ab = 128;
                             break;
                         case 1:
+                            vb = 448;
+                            ab = 128;
+                            break;
+                        case 2:
                             vb = 320;
                             ab = 96;
                             break;
-                        case 2:
+                        case 3:
                             vb = 192;
                             ab = 64;
                             break;
