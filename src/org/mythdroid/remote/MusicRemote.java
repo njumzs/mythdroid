@@ -279,7 +279,6 @@ public class MusicRemote extends Remote {
         if (mddMgr != null)
             mddMgr.shutdown();
         mddMgr = null;
-        artCache.shutdown();
     }
 
     @Override
@@ -292,6 +291,7 @@ public class MusicRemote extends Remote {
     public void onDestroy() {
        super.onDestroy();
        cleanup();
+       artCache.shutdown();
     }
 
     @Override
