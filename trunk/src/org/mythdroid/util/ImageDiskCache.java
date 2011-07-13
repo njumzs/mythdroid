@@ -28,13 +28,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.mythdroid.Globals;
 import org.mythdroid.resource.Messages;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
-import android.util.Log;
 
 /**
  * An external storage based cache
@@ -72,11 +70,10 @@ public class ImageDiskCache {
                     Messages.getString("ImageDiskCache.2") + //$NON-NLS-1$
                     cacheDir.getAbsolutePath()
                 );
-            if (Globals.debug)
-                Log.v("ImageDiskCache", "created new cache named " + name); //$NON-NLS-1$ //$NON-NLS-2$
+            LogUtil.debug("created new cache named " + name); //$NON-NLS-1$
         }
-        else if (Globals.debug) 
-                Log.v("ImageDiskCache", "using existing cache named " + name); //$NON-NLS-1$ //$NON-NLS-2$
+        else 
+            LogUtil.debug("using existing cache named " + name); //$NON-NLS-1$
         
         maxSizeOnDisk = maxSize;
         sizeOnDisk = getSizeOnDisk();
@@ -176,12 +173,10 @@ public class ImageDiskCache {
             long size = getFileSizeOnDisk(f);
             if (f.delete())
                 sizeOnDisk -= size;
-            if (Globals.debug)
-                Log.v(
-                    "ImageDiskCache", //$NON-NLS-1$
-                    "removed old file " + f.getName() + //$NON-NLS-1$
-                    " total size now " + sizeOnDisk + " bytes" //$NON-NLS-1$ //$NON-NLS-2$
-                );
+            LogUtil.debug(
+                "removed old file " + f.getName() + //$NON-NLS-1$
+                " total size now " + sizeOnDisk + " bytes" //$NON-NLS-1$ //$NON-NLS-2$
+            );
             i++;
         }
         
@@ -211,12 +206,10 @@ public class ImageDiskCache {
             if (!files[i].isFile()) continue;
             size += getFileSizeOnDisk(files[i]);
         }
-        if (Globals.debug)
-            Log.v(
-                "ImageDiskCache",  //$NON-NLS-1$
-                cacheDir.getName() + " cache contains " + num + //$NON-NLS-1$
-                " files, total size " + size + " bytes" //$NON-NLS-1$ //$NON-NLS-2$
-            ); 
+        LogUtil.debug(
+            cacheDir.getName() + " cache contains " + num + //$NON-NLS-1$
+            " files, total size " + size + " bytes" //$NON-NLS-1$ //$NON-NLS-2$
+        );
         
         return size;
     }

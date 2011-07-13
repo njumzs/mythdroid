@@ -39,13 +39,12 @@ import org.mythdroid.Globals;
 import org.mythdroid.data.Program;
 import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.LogUtil;
 import org.mythdroid.ConnMgr.onConnectListener;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-
-import android.util.Log;
 
 /**
  * A BackendManager locates and manages a master backend, providing
@@ -87,12 +86,10 @@ public class BackendManager {
             Globals.protoVersion = Globals.protoVersion % 1000;
         }
 
-        if (Globals.debug)
-            Log.d(
-                "BackendManager",  //$NON-NLS-1$
-                "Connecting to " + host +  //$NON-NLS-1$
-                ":6543 (ProtoVer " + Globals.protoVersion +")" //$NON-NLS-1$ //$NON-NLS-2$
-             );
+        LogUtil.debug(
+            "Connecting to " + host +  //$NON-NLS-1$
+            ":6543 (ProtoVer " + Globals.protoVersion +")" //$NON-NLS-1$ //$NON-NLS-2$
+        );
 
         cmgr = ConnMgr.connect(host, 6543, new onConnectListener() {
                 @Override
@@ -134,11 +131,7 @@ public class BackendManager {
 
         ConnectivityReceiver.waitForWifi(Globals.appContext, 5000);
 
-        if (Globals.debug)
-            Log.d(
-                "BackendManager",  //$NON-NLS-1$
-                "Sending UPNP M-SEARCH to 239.255.255.250:1900" //$NON-NLS-1$
-            );
+        LogUtil.debug("Sending UPNP M-SEARCH to 239.255.255.250:1900"); //$NON-NLS-1$
 
         sock.setReuseAddress(true);
         sock.bind(isa);
@@ -149,16 +142,14 @@ public class BackendManager {
         try {
             sock.receive(rpkt);
         } catch (SocketTimeoutException e) {
-            if (Globals.debug)
-                Log.d("BackendManager", "Timeout waiting for UPNP response"); //$NON-NLS-1$ //$NON-NLS-2$
+            LogUtil.debug("Timeout waiting for UPNP response"); //$NON-NLS-1$
             return null;
         }
 
         sock.close();
 
         final String msg = new String(rpkt.getData(), 0, rpkt.getLength());
-        if (Globals.debug)
-            Log.d("BackendManager", "UPNP Response received: " + msg); //$NON-NLS-1$ //$NON-NLS-2$
+        LogUtil.debug("UPNP Response received: " + msg); //$NON-NLS-1$
 
         if (!msg.contains(BACKEND_UPNP_ID)) return null;
 
@@ -184,8 +175,7 @@ public class BackendManager {
      * @return String containing the URL
      */
     public String getStatusURL() {
-        if (Globals.debug)
-            Log.d("BackendManager", "statusURL is " + statusURL); //$NON-NLS-1$ //$NON-NLS-2$
+        LogUtil.debug("statusURL is " + statusURL); //$NON-NLS-1$
         return statusURL;
     }
 

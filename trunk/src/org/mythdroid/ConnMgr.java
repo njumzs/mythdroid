@@ -33,12 +33,12 @@ import java.util.TimerTask;
 
 import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.LogUtil;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
-import android.util.Log;
 
 /**
  * A TCP connection manager
@@ -238,7 +238,7 @@ public class ConnMgr {
             write(str.getBytes());
         }
 
-        if (Globals.debug) Log.d("ConnMgr", "writeLine: " + str); //$NON-NLS-1$ //$NON-NLS-2$
+        LogUtil.debug("writeLine: " + str); //$NON-NLS-1$
 
     }
 
@@ -250,7 +250,7 @@ public class ConnMgr {
 
         str = String.format("%-8d", str.length()) + str; //$NON-NLS-1$
 
-        if (Globals.debug) Log.d("ConnMgr", "sendString: " + str); //$NON-NLS-1$ //$NON-NLS-2$
+        LogUtil.debug("sendString: " + str); //$NON-NLS-1$
 
         write(str.getBytes());
 
@@ -299,7 +299,7 @@ public class ConnMgr {
                 rbuf = null;
                 rbufIdx = -1;
             }
-            if (Globals.debug) Log.d("ConnMgr", "readLine: #");  //$NON-NLS-1$ //$NON-NLS-2$
+            LogUtil.debug("readLine: #");  //$NON-NLS-1$
             return "#"; //$NON-NLS-1$
         }
 
@@ -312,14 +312,13 @@ public class ConnMgr {
                 // Nope
                 rbuf = line.substring(r + 1, rbufIdx + 1).getBytes();
                 rbufIdx -= r + 1;
-                if (Globals.debug)
-                    Log.d("ConnMgr", "readLine: " + line.substring(0,r)); //$NON-NLS-1$ //$NON-NLS-2$
+                LogUtil.debug("readLine: " + line.substring(0,r)); //$NON-NLS-1$
                 return line.substring(0, r).trim();
             }
             // Yup
             rbuf = null;
             rbufIdx = -1;
-            if (Globals.debug) Log.d("ConnMgr", "readLine: " + line); //$NON-NLS-1$ //$NON-NLS-2$
+            LogUtil.debug("readLine: " + line); //$NON-NLS-1$
             return line.trim();
         }
 
@@ -343,7 +342,7 @@ public class ConnMgr {
                 line.length() == 2 &&
                 line.charAt(0) == '#' && line.charAt(1) == ' '
             ) {
-                if (Globals.debug) Log.d("ConnMgr", "readLine: #"); //$NON-NLS-1$ //$NON-NLS-2$
+                LogUtil.debug("readLine: #"); //$NON-NLS-1$
                 return "#"; //$NON-NLS-1$
             }
 
@@ -362,14 +361,13 @@ public class ConnMgr {
             // Nope, buffer the rest
             rbuf = line.substring(r + 1, tot + 1).getBytes();
             rbufIdx = tot - (r + 1);
-            if (Globals.debug)
-                Log.d("ConnMgr", "readLine: " + line.substring(0,r)); //$NON-NLS-1$ //$NON-NLS-2$
+            LogUtil.debug("readLine: " + line.substring(0,r)); //$NON-NLS-1$
             return line.substring(0, r).trim();
         }
         // Yup
         rbuf = null;
         rbufIdx = -1;
-        if (Globals.debug) Log.d("ConnMgr", "readLine: " + line); //$NON-NLS-1$ //$NON-NLS-2$
+        LogUtil.debug("readLine: " + line); //$NON-NLS-1$
         return line.trim();
 
     }
@@ -402,8 +400,7 @@ public class ConnMgr {
 
         }
 
-        if (Globals.debug)
-            Log.d("ConnMgr", "readBytes read " + read + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        LogUtil.debug("readBytes read " + read + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$
 
         return bytes;
     }
@@ -417,8 +414,7 @@ public class ConnMgr {
         // First 8 bytes are the length
         byte[] bytes = new byte[8];
         if (read(bytes, 0, 8) == -1) {
-            if (Globals.debug)
-                Log.d("ConnMgr", "readStringList from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            LogUtil.debug("readStringList from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$
             disconnect();
             throw disconnected;
         }
@@ -563,6 +559,9 @@ public class ConnMgr {
                 ) {
                     c.inUse = true;
                     c.wifiLock.acquire();
+                    LogUtil.debug(
+                        "Reusing an existing connection to " + host + ":" + port //$NON-NLS-1$ //$NON-NLS-2$
+                    );
                     return c;
                 }
                     
@@ -582,12 +581,10 @@ public class ConnMgr {
         // Wait for a maximum of 5s if a WiFi link is being established
         ConnectivityReceiver.waitForWifi(Globals.appContext, 5000);
 
-        if (Globals.debug)
-            Log.d("ConnMgr", "Connecting to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
+        LogUtil.debug("Connecting to " + addr); //$NON-NLS-1$
 
         if (sock != null && sock.isConnected() && inUse) {
-            if (Globals.debug)
-                Log.d("ConnMgr", addr + " is already connected"); //$NON-NLS-1$ //$NON-NLS-2$
+            LogUtil.debug(addr + " is already connected"); //$NON-NLS-1$
             return;
         }
 
@@ -619,8 +616,7 @@ public class ConnMgr {
         os = sock.getOutputStream();
         is = sock.getInputStream();
 
-        if (Globals.debug)
-            Log.d("ConnMgr", "Connection to " + addr + " successful"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        LogUtil.debug("Connection to " + addr + " successful"); //$NON-NLS-1$ //$NON-NLS-2$
 
         inUse = true;
 
@@ -637,8 +633,7 @@ public class ConnMgr {
         
         if (sock.isClosed())
             return;
-        if (Globals.debug)
-            Log.d("ConnMgr", "Disconnecting from " + addr); //$NON-NLS-1$ //$NON-NLS-2$
+        LogUtil.debug("Disconnecting from " + addr); //$NON-NLS-1$
         sock.close();
 
     }
@@ -654,8 +649,7 @@ public class ConnMgr {
             final String msg = 
                 String.format(Messages.getString("ConnMgr.5"), addr); //$NON-NLS-1$ 
 
-            if (Globals.debug)
-                Log.d("ConnMgr", msg); //$NON-NLS-1$
+            LogUtil.debug(msg);
 
             if (!sock.isConnected() || !inUse) {
                 waitForConnection(timeout * 4);
@@ -667,8 +661,8 @@ public class ConnMgr {
 
         }
 
-        if (ret == -1 && Globals.debug)
-            Log.d("ConnMgr", "read from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        if (ret == -1)
+            LogUtil.debug("read from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$
 
         return ret;
 
@@ -707,15 +701,13 @@ public class ConnMgr {
             }, timeout
         );
 
-        if (Globals.debug)
-            Log.d("ConnMgr", "Waiting for a connection to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
+        LogUtil.debug("Waiting for a connection to " + addr); //$NON-NLS-1$
 
         while (!sock.isConnected() || !inUse)
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
-                if (Globals.debug)
-                    Log.d("ConnMgr", "Timed out waiting for connection to " + addr); //$NON-NLS-1$ //$NON-NLS-2$
+                LogUtil.debug("Timed out waiting for connection to " + addr); //$NON-NLS-1$
                 inUse = false;
                 timer.cancel();
                 throw new IOException(Messages.getString("ConnMgr.3") + addr); //$NON-NLS-1$
