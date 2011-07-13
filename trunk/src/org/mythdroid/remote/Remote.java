@@ -26,9 +26,15 @@ import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.util.ErrUtil;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.view.GestureDetector;
 import android.view.KeyCharacterMap;
@@ -59,6 +65,8 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     private boolean alt = false, shift = false, moveWake = true;
 
     private GestureDetector gDetector;
+    private ServiceConnection wakeConnection = null;
+    private Messenger wakeMessenger = null;
 
     private class RemoteGestureListener extends SimpleOnGestureListener {
 
@@ -212,11 +220,35 @@ public abstract class Remote extends Activity implements View.OnClickListener {
 
     @Override
     public void onCreate(Bundle icicle) {
+        
         super.onCreate(icicle);
+
         scale    = getResources().getDisplayMetrics().density;
         moveWake = PreferenceManager.getDefaultSharedPreferences(this)
                        .getBoolean("moveWake", true); //$NON-NLS-1$
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        
+        if (moveWake) {
+            wakeConnection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(
+                    ComponentName name, IBinder service
+                ) {
+                    wakeMessenger = new Messenger(service);
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    wakeConnection = null;
+                }
+                
+            };
+            bindService(
+                new Intent().setClassName(this, wakeService),
+                wakeConnection, BIND_AUTO_CREATE
+            );
+        }
+        
     }
 
     @Override
@@ -224,24 +256,34 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         super.onResume();
         if (Globals.appContext == null)
             Globals.appContext = getApplicationContext();
-        if (moveWake)
-            stopService(new Intent().setClassName(this, wakeService));
+        if (wakeMessenger != null && wakeConnection != null) 
+            try {
+                Message msg = new Message();
+                msg.what = WakeService.MSG_STOP;
+                wakeMessenger.send(msg);
+            } catch (RemoteException e) { ErrUtil.err(this, e); }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (moveWake)
-            startService(new Intent().setClassName(this, wakeService));
+        if (wakeMessenger != null && wakeConnection != null && !isFinishing()) 
+            try {
+                Message msg = new Message();
+                msg.what = WakeService.MSG_START;
+                wakeMessenger.send(msg);
+            } catch (RemoteException e) { ErrUtil.err(this, e); }
     }
-
+    
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (moveWake)
-            stopService(new Intent().setClassName(this, wakeService));
+        if (isFinishing() && wakeConnection != null)
+            try {
+                unbindService(wakeConnection);
+            } catch (IllegalArgumentException e) {}
     }
-
+    
     @Override
     public void onOptionsMenuClosed(Menu menu) {
         super.onOptionsMenuClosed(menu);

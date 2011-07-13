@@ -178,14 +178,16 @@ public class TVRemote extends Remote {
                 try {
                     dismissDialog(DIALOG_LOAD);
                 } catch (IllegalArgumentException e) {}
-            setupStatus();
-            if (mddMgr == null) {
-                updateStatus = new UpdateStatusTask();
-                if (timer == null) timer = new Timer();
-                timer.scheduleAtFixedRate(updateStatus, 8000, 8000);
+            if (feMgr != null) {
+                setupStatus();
+                if (mddMgr == null) {
+                    updateStatus = new UpdateStatusTask();
+                    if (timer == null) timer = new Timer();
+                    timer.scheduleAtFixedRate(updateStatus, 8000, 8000);
+                }
+                else
+                    mddMgr.setChannelListener(new mddListener());
             }
-            else
-                mddMgr.setChannelListener(new mddListener());
         }
     };
 
@@ -193,30 +195,36 @@ public class TVRemote extends Remote {
         @Override
         public void run() {
 
+            if (feMgr == null)
+                return;
+            
             try {
-                if (livetv) {
-                    if (!feMgr.getLoc().livetv)
-                        feMgr.jumpTo("livetv"); //$NON-NLS-1$
-
-                    if (!feMgr.getLoc().livetv) {
-                        ErrUtil.postErr(ctx, Messages.getString("TVRemote.1")); //$NON-NLS-1$
-                        done();
-                        return;
+                synchronized (feMgr) {
+                    if (livetv) {
+                        if (!feMgr.getLoc().livetv)
+                            feMgr.jumpTo("livetv"); //$NON-NLS-1$
+    
+                        if (!feMgr.getLoc().livetv) {
+                            ErrUtil.postErr(
+                                ctx, Messages.getString("TVRemote.1") //$NON-NLS-1$
+                            );
+                            done();
+                            return;
+                        }
+                        if (jumpChan >= 0) {
+                            while(feMgr.getLoc().position < 1)
+                                Thread.sleep(500);
+                            feMgr.playChan(jumpChan);
+                        }
                     }
-                    if (jumpChan >= 0) {
-                        while(feMgr.getLoc().position < 1)
-                            Thread.sleep(500);
-                        feMgr.playChan(jumpChan);
-                    }
+                    else if (filename != null)
+                        feMgr.playFile(filename);
+                    else
+                        feMgr.playRec(Globals.curProg);
                 }
-                else if (filename != null)
-                    feMgr.playFile(filename);
-                else
-                    feMgr.playRec(Globals.curProg);
             } catch (IOException e) {
                 ErrUtil.postErr(ctx, e);
             } catch (InterruptedException e) {}
-
             handler.post(ready);
 
         }
@@ -257,7 +265,6 @@ public class TVRemote extends Remote {
 
         @Override
         public void onExit() {
-            if (feMgr != null && feMgr.isConnected())
                 done();
         }
 
@@ -267,7 +274,6 @@ public class TVRemote extends Remote {
     public void onCreate(Bundle icicle) {
 
         super.onCreate(icicle);
-
         Intent intent = getIntent();
 
         livetv = intent.hasExtra(Extras.LIVETV.toString());
@@ -311,12 +317,13 @@ public class TVRemote extends Remote {
             return;
         }
 
-        try {
-            mddMgr = new MDDManager(feMgr.addr);
-        } catch (IOException e) {
-            mddMgr = null;
-            timer = new Timer();
-        }
+        if (mddMgr == null)
+            try {
+                mddMgr = new MDDManager(feMgr.addr);
+            } catch (IOException e) {
+                mddMgr = null;
+                timer = new Timer();
+            }
 
         if (jump && !wasPaused) {
             showDialog(DIALOG_LOAD);
@@ -327,13 +334,12 @@ public class TVRemote extends Remote {
     }
 
     private void cleanup() {
-        if (feMgr != null)
-            feMgr.disconnect();
-        feMgr = null;
 
-        if (mddMgr != null)
-            mddMgr.shutdown();
-        mddMgr = null;
+        if (feMgr != null)
+            synchronized (feMgr) {
+                feMgr.disconnect();
+                feMgr = null;
+            }
 
         if (timer != null) {
             timer.cancel();
@@ -353,6 +359,9 @@ public class TVRemote extends Remote {
     public void onDestroy() {
         super.onDestroy();
         cleanup();
+        if (mddMgr != null)
+            mddMgr.shutdown();
+        mddMgr = null;
     }
 
     @Override

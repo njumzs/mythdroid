@@ -18,6 +18,8 @@
 
 package org.mythdroid.remote;
 
+import org.mythdroid.util.LogUtil;
+
 import android.app.KeyguardManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -28,7 +30,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
@@ -38,19 +43,36 @@ import android.os.PowerManager.WakeLock;
  */
 public class WakeService extends Service implements SensorEventListener {
 
+    /** Message value to send to start monitoring the sensor */
+    final public static int MSG_START = 1;
+    /** Message value to send to stop monitoring the sensor */
+    final public static int MSG_STOP  = 2;
+    
     final private static String tag   = "MythDroid";  //$NON-NLS-1$
     final private static int wakeTime = 10000; // ms
-    private SensorManager sensorMgr;
-    private Sensor sensor;
-    private PowerManager pm = null;
-    private WakeLock partialLock = null;
-    private float last0 = 0, last1 = 0, last2 = 0;
-
+    
+    final private static IntentFilter filter =
+        new IntentFilter(Intent.ACTION_SCREEN_OFF);
+    static {
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+    }
+     
+    final private Messenger messenger = new Messenger(new MessageHandler());
+    
+    private SensorManager   sensorMgr = null;
+    private Sensor          sensor = null;
+    private PowerManager    pm = null;
+    private KeyguardManager km = null;
+    private WakeLock        partialLock = null;
+    private float           last0 = 0, last1 = 0, last2 = 0;
+    private boolean         isStarted = false;
+    private long            startTime = 0;
+    
     /**
      * Re-register the sensor event listener when the screen is turned off
      * to work around a bug in Android
      */
-    public BroadcastReceiver screenStateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver screenStateReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -62,7 +84,7 @@ public class WakeService extends Service implements SensorEventListener {
                     partialLock.release();
                 return;
             }
-
+           
             sensorMgr.registerListener(
                 WakeService.this, sensor, SensorManager.SENSOR_DELAY_NORMAL
             );
@@ -72,41 +94,73 @@ public class WakeService extends Service implements SensorEventListener {
         }
 
     };
+    
+    private class MessageHandler extends Handler {
+        @Override
+        public synchronized void handleMessage(Message msg) {
+            
+            switch (msg.what) {
+             
+                case MSG_START:
+                    if (isStarted) return;
+                    LogUtil.debug("Start monitoring"); //$NON-NLS-1$
+                    registerReceiver(screenStateReceiver, filter);
+                    sensorMgr.registerListener(
+                        WakeService.this, sensor,
+                        SensorManager.SENSOR_DELAY_NORMAL
+                    );
+                    partialLock.acquire();
+                    startTime = System.currentTimeMillis();
+                    isStarted = true;
+                    break;
+                
+                case MSG_STOP:
+                    if (!isStarted) return;
+                    LogUtil.debug("Stop monitoring"); //$NON-NLS-1$
+                    if (partialLock.isHeld())
+                        partialLock.release();
+                    unregisterReceiver(screenStateReceiver);
+                    sensorMgr.unregisterListener(WakeService.this);
+                    isStarted = false;
+                    break;
+                    
+                default:
+                    
+            }
+        }
+    }
 
     @Override
     public void onCreate() {
 
         super.onCreate();
-
+        
         sensorMgr = (SensorManager)getApplicationContext()
                         .getSystemService(Context.SENSOR_SERVICE);
 
         sensor = sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-        sensorMgr.registerListener(
-            this, sensor, SensorManager.SENSOR_DELAY_NORMAL
-        );
-
+        
+        km = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
         pm = (PowerManager)getSystemService(POWER_SERVICE);
 
         partialLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, tag);
-        partialLock.acquire();
-
-        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
-        filter.addAction(Intent.ACTION_SCREEN_ON);
-        registerReceiver(screenStateReceiver, filter);
+        
     }
-
-
+    
     @Override
     public void onDestroy() {
-
         super.onDestroy();
-        if (partialLock.isHeld())
-            partialLock.release();
-        unregisterReceiver(screenStateReceiver);
-        sensorMgr.unregisterListener(this);
+        if (isStarted) {
+            unregisterReceiver(screenStateReceiver);
+            sensorMgr.unregisterListener(WakeService.this);
+            if (partialLock.isHeld())
+                partialLock.release();
+        }
+    }
 
+    @Override
+    public IBinder onBind(Intent intent) {
+        return messenger.getBinder();
     }
 
     @Override
@@ -129,18 +183,14 @@ public class WakeService extends Service implements SensorEventListener {
     }
 
     @Override
-    public IBinder onBind(Intent intent) { return null; }
-
-    @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
     private void wakeUp() {
 
-        KeyguardManager km =
-            (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
-
-        PowerManager pm = (PowerManager)getSystemService(POWER_SERVICE);
-
+        // Ignore wake ups that are so soon after going to sleep
+        if (System.currentTimeMillis() < startTime + 500)
+            return;
+        
         pm.newWakeLock(
             PowerManager.SCREEN_BRIGHT_WAKE_LOCK |
             PowerManager.ACQUIRE_CAUSES_WAKEUP,
