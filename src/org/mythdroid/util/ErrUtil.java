@@ -19,6 +19,7 @@
 package org.mythdroid.util;
 
 import org.mythdroid.R;
+import org.mythdroid.resource.Messages;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -26,6 +27,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.util.Log;
 import android.widget.Toast;
 
 /** General utility methods */
@@ -37,7 +39,13 @@ final public class ErrUtil {
      * @param e exception whose message we will display
      */
     static public void err(final Context c, final Exception e) {
-        Toast.makeText(c, e.getMessage(), Toast.LENGTH_SHORT).show();
+        String msg = e.getMessage();
+        if (msg == null) {
+            msg = e.getClass().getName();
+            LogUtil.error(msg);
+            msg = Messages.getString("ErrUtil.0"); //$NON-NLS-1$
+        }
+        Toast.makeText(c, msg, Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -47,6 +55,7 @@ final public class ErrUtil {
      */
     static public void err(final Context c, final String e) {
         Toast.makeText(c, e, Toast.LENGTH_SHORT).show();
+        Log.e("Error", e); //$NON-NLS-1$
     }
 
     /**
@@ -59,8 +68,13 @@ final public class ErrUtil {
             new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(c, e.getMessage(), Toast.LENGTH_SHORT).show();
-
+                    String msg = e.getMessage();
+                    if (msg == null) {
+                        msg = e.getClass().getName();
+                        LogUtil.error(msg);
+                        msg = Messages.getString("ErrUtil.0"); //$NON-NLS-1$
+                    }
+                    Toast.makeText(c, msg, Toast.LENGTH_SHORT).show();
                 }
             }
         );
@@ -77,7 +91,7 @@ final public class ErrUtil {
                 @Override
                 public void run() {
                     Toast.makeText(c, e, Toast.LENGTH_SHORT).show();
-
+                    Log.e("Error", e); //$NON-NLS-1$
                 }
             }
         );
