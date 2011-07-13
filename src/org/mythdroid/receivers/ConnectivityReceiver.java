@@ -5,7 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.mythdroid.ConnMgr;
-import org.mythdroid.Globals;
+import org.mythdroid.util.LogUtil;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,7 +15,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.NetworkInfo.State;
 import android.net.wifi.WifiManager;
-import android.util.Log;
 
 /**
  * Broadcast receiver for ConnectivityManager.CONNECTIVITY_ACTION events
@@ -62,12 +61,10 @@ public class ConnectivityReceiver extends BroadcastReceiver {
         int type = info.getType();
         State state = info.getState();
 
-        if (Globals.debug)
-            Log.d(
-                "ConnectivityReceiver",   //$NON-NLS-1$
-                "wasConnected " + connected + " type " + info.getTypeName() + //$NON-NLS-1$ //$NON-NLS-2$
-                " state " + state //$NON-NLS-1$
-            );
+        LogUtil.debug(
+            "wasConnected " + connected + " type " + info.getTypeName() + //$NON-NLS-1$ //$NON-NLS-2$
+            " state " + state //$NON-NLS-1$
+        );
 
         /* Ignore irrelevant connectivity changes */
         if (
@@ -165,10 +162,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
                 winfo.getState() == NetworkInfo.State.CONNECTING
             ) {
 
-                if (Globals.debug)
-                    Log.d(
-                        "ConnectivityReceiver", "Waiting for WiFi link" //$NON-NLS-1$ //$NON-NLS-2$
-                    );
+                LogUtil.debug("Waiting for WiFi link"); //$NON-NLS-1$
 
                 try {
                     Thread.sleep(500);
@@ -184,10 +178,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
 
             while (netType != ConnectivityManager.TYPE_WIFI || connected == false) {
 
-                if (Globals.debug)
-                    Log.d(
-                        "ConnectivityReceiver", "Waiting for WiFi connection" //$NON-NLS-1$ //$NON-NLS-2$
-                    );
+                LogUtil.debug("Waiting for WiFi connection"); //$NON-NLS-1$
 
                 try {
                     Thread.sleep(200);

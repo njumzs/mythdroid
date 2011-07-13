@@ -22,10 +22,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
-import org.mythdroid.Globals;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 /**
  * A two level cache for images
@@ -57,8 +55,7 @@ public class ImageCache {
         try {
             diskCache = new ImageDiskCache(name, diskMaxSize);
         } catch (IOException e) {
-            if (Globals.debug)
-                Log.v("ImageCache", "Disk cache disabled: " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+            LogUtil.debug("Disk cache disabled: " + e.getMessage()); //$NON-NLS-1$
         }
         
         if (diskCache != null && diskCacheThread == null)
@@ -144,10 +141,8 @@ public class ImageCache {
                        try {
                            r.run();
                        } catch (RuntimeException e) {
-                           Log.v(
-                               "ImageCache", //$NON-NLS-1$
-                               "Exception in diskCacheThread: " + //$NON-NLS-1$
-                                   e.getMessage()
+                           LogUtil.debug(
+                               "Exception in diskCacheThread: " + e.getMessage() //$NON-NLS-1$
                            );
                        }
                    }

@@ -22,9 +22,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import org.mythdroid.Globals;
-
-import android.util.Log;
+import org.mythdroid.util.LogUtil;
 
 /** Send WakeOnLan packets */
 public class WakeOnLan {
@@ -42,12 +40,10 @@ public class WakeOnLan {
             buf[i] = (byte)0xff;
         for (int i = 6; i < buf.length; i += 6)
             System.arraycopy(addr, 0, buf, i, 6);
-        if (Globals.debug)
-            Log.d(
-                "WakeOnLAN",  //$NON-NLS-1$
-                "Sending WOL packets to 255.255.255.255 " +  //$NON-NLS-1$
-                "ports 7, 9 for MAC address " + hwaddr //$NON-NLS-1$
-            );
+        LogUtil.debug(
+            "Sending WOL packets to 255.255.255.255 " +  //$NON-NLS-1$
+            "ports 7, 9 for MAC address " + hwaddr //$NON-NLS-1$
+        );
         InetAddress address = InetAddress.getByName("255.255.255.255"); //$NON-NLS-1$
         DatagramPacket dgram = new DatagramPacket(buf, buf.length, address, 9);
         DatagramSocket sock = new DatagramSocket();

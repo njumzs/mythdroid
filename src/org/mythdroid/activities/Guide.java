@@ -38,6 +38,7 @@ import org.mythdroid.data.XMLHandler.Element;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.LogUtil;
 import org.xml.sax.SAXException;
 
 import android.R.drawable;
@@ -53,7 +54,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.sax.EndTextElementListener;
 import android.util.Xml;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -477,8 +477,7 @@ public class Guide extends MDActivity {
                 "&StartChanId=0" + "&NumOfChannels=-1" + "&Details=1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             );
 
-            if (Globals.debug)
-                Log.d("Guide", "Fetching XML from " + url.toExternalForm()); //$NON-NLS-1$ //$NON-NLS-2$
+            LogUtil.debug("Fetching XML from " + url.toExternalForm()); //$NON-NLS-1$
             
             if (Globals.muxConns)
                 url = new URL(
