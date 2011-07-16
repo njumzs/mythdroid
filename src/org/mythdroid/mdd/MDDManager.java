@@ -270,7 +270,6 @@ public class MDDManager {
      * Delete a recording rule
      * @param addr String containing IP address of MDD
      * @param recid RecID of the rule to delete
-     * @throws IOException
      */
     public static void deleteRecording(String addr, int recid)
         throws IOException {
@@ -291,8 +290,7 @@ public class MDDManager {
         cmgr = new ConnMgr(addr, 16546, null, false);
         // Wait indefinitely for messages from MDD
         cmgr.setTimeout(0);
-        recvThread = new Thread(recvTask);
-        recvThread.setName("MDDListener"); //$NON-NLS-1$
+        recvThread = new Thread(recvTask, "MDDListener"); //$NON-NLS-1$
         recvThread.start();
     }
     
@@ -310,8 +308,7 @@ public class MDDManager {
         cmgr = new ConnMgr(addr, 16546, null, mux);
         // Wait indefinitely for messages from MDD
         cmgr.setTimeout(0);
-        recvThread = new Thread(recvTask);
-        recvThread.setName("MDDListener"); //$NON-NLS-1$
+        recvThread = new Thread(recvTask, "MDDListener"); //$NON-NLS-1$
         recvThread.start();
     }
 
