@@ -108,8 +108,7 @@ public class Videos extends MDActivity implements
                             } catch (InterruptedException e) {}
                         }
                         fetchingArt = true;
-                        artThread = new Thread(fetchArt);
-                        artThread.setName("videoArtFetcher"); //$NON-NLS-1$
+                        artThread = new Thread(fetchArt, "videoArtFetcher"); //$NON-NLS-1$
                         artThread.start();
                         try {
                             dismissDialog(DIALOG_LOAD);
