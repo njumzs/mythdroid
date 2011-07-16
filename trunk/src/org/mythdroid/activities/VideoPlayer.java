@@ -219,7 +219,7 @@ public class VideoPlayer extends MDActivity {
                     playVideo();
                 }
                 
-            }, 3000
+            }, 4000
         );
 
     }    
@@ -244,7 +244,7 @@ public class VideoPlayer extends MDActivity {
            sdpAddr = sdpPublicAddr;
 
         url = Uri.parse("rtsp://" + sdpAddr + ":5554/stream"); //$NON-NLS-1$ //$NON-NLS-2$
-        
+
         videoView.setVideoURI(url);
         
         videoView.setOnCompletionListener(
@@ -266,7 +266,7 @@ public class VideoPlayer extends MDActivity {
                     public void onSeek() {
                         showDialog(DIALOG_LOAD);
                         mplayer.pause();
-                        // Dump the buffer
+                        // Dump the buffer, no better way of doing it :(
                         mplayer.reset();
                         try {
                             mplayer.setDataSource(ctx, url);
@@ -309,4 +309,5 @@ public class VideoPlayer extends MDActivity {
         );
         
     }
+
 }
