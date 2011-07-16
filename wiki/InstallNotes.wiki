@@ -6,7 +6,8 @@
 
 ==MythTV Configuration==
 
-You must enable the 'Enable frontend network control' option in each frontend's general settings.
+You must enable the 'Enable frontend network control' option in each frontend's 
+general settings.
 
 ==MDD==
 
@@ -15,13 +16,18 @@ more information, including installation notes.
 
 ==MythTV 0.22 Specific Notes==
 
-MythTV 0.22 has some bugs in the network control feature. Apply [http://mythdroid.googlecode.com/files/myth-netcontrol-2.patch this patch] so that !MythDroid is able to initiate recording playback properly. 
+MythTV 0.22 has some bugs in the network control feature. Apply 
+[http://mythdroid.googlecode.com/files/myth-netcontrol-2.patch this patch] so 
+that !MythDroid is able to initiate recording playback properly. 
 
-The bugs were fixed by MythTV rev 23381 so users of MythTV 0.23 or above need not apply any patches. 
+The bugs were fixed by MythTV rev 23381 so users of MythTV 0.23 or above need 
+not apply any patches. 
 
 ==MythTV 0.21 Specific Notes==
 
-For the program guide viewer to function correctly, you must apply [http://mythdroid.googlecode.com/files/xml-guide.patch this patch] to the MythTV 0.21 fixes source code.
+For the program guide viewer to function correctly, you must apply 
+[http://mythdroid.googlecode.com/files/xml-guide.patch this patch] to the 
+MythTV 0.21 fixes source code.
 
 Once you have checked out a copy of release-0-21-fixes, apply the patch like so:
 
@@ -36,8 +42,16 @@ and then follow the normal steps to configure, build and install MythTV.
 
 ==== !MythDroid 0.4 ====
 
-Download the latest [http://mythdroid.googlecode.com/files/MythDroid-0.4.0.apk MythDroid APK] and install using adb (from the Android SDK) or an application from the Market. Alternatively check out the 0.4 source using subversion URL http://mythdroid.googlecode.com/svn/branches/0.4 mythdroid-read-only
+Download the latest 
+[http://mythdroid.googlecode.com/files/MythDroid-0.4.0.apk MythDroid APK] 
+and install using adb (from the Android SDK) or an application from the Market. 
+Alternatively check out the 0.4 source using subversion URL 
+http://mythdroid.googlecode.com/svn/branches/0.4 mythdroid-read-only
 
 ==== !MythDroid trunk ====
 
-You can install !MythDroid trunk to your device by checking out the source code (via Eclipse with the [http://subclipse.tigris.org/ SubClipse] and [http://developer.android.com/sdk/installing.html Android ADT] plugins), connecting your device and running !MythDroid on it. The subversion URL for trunk is http://mythdroid.googlecode.com/svn/trunk/ mythdroid-read-only
+You can install !MythDroid trunk to your device by checking out the source code 
+(via Eclipse with the [http://subclipse.tigris.org/ SubClipse] and 
+[http://developer.android.com/sdk/installing.html Android ADT] plugins), 
+connecting your device and running !MythDroid on it. The subversion URL for 
+trunk is http://mythdroid.googlecode.com/svn/trunk/ mythdroid-read-only

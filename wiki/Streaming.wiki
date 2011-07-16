@@ -2,13 +2,20 @@
 
 == Streaming ==
 
-Streaming of recordings and video is performed via MDD on the backend, which uses vlc to transcode and stream the media. For this to work, you'll need [MDD MDD] and vlc installed on your backend.
+Streaming of recordings and video is performed via MDD on the backend, which 
+uses vlc to transcode and stream the media. For this to work, you'll need 
+[MDD MDD] and vlc installed on your backend.
 
-In !MythDroid, stream a recording or video by selecting "Here" from a frontend chooser (found by long pressing a recording or video or the 'play' button in a recording or video detail page).
+In !MythDroid, stream a recording or video by selecting "Here" from a frontend 
+chooser (found by long pressing a recording or video or the 'play' button in a 
+recording or video detail page).
 
-Transcoding the video requires a hefty cpu on the backend; a reasonable dual-core is probably the minimum. 
+Transcoding the video requires a hefty cpu on the backend; a reasonable 
+dual-core is probably the minimum. 
 
-You should be able to stream any recording or video that vlc can demux and decode (dvds ripped to iso won't work). If you have problems, check /tmp/vlc.out for more information. 
+You should be able to stream any recording or video that vlc can demux and 
+decode (dvds ripped to iso won't work). If you have problems, check 
+/tmp/vlc.out for more information. 
 
 To stream over the Internet, you'll need to:
 
@@ -17,4 +24,8 @@ To stream over the Internet, you'll need to:
  * Configure the public address of your backend in the manual backend configuration of !MythDroid
  * Hope that your carrier doesn't block RTSP or RTP streams
 
-We recommend forwarding ports via SSH for the sake of security. We use [http://code.google.com/p/connectbot/ ConnectBot] for this. Note that 5554/tcp must not be forwarded via SSH and must be port forwarded at your router. In addition, the public address of your backend (i.e. of your router) must be configured in the !MythDroid manual backend configuration.
+We recommend forwarding ports via SSH for the sake of security. We use 
+[http://code.google.com/p/connectbot/ ConnectBot] for this. Note that 5554/tcp  
+must not be forwarded via SSH and must be port forwarded at your router.  
+In addition, the public address of your backend (i.e. of your router) must be  
+configured in the !MythDroid manual backend configuration.
