@@ -558,7 +558,8 @@ public class ConnMgr {
                     c.inUse == false
                 ) {
                     c.inUse = true;
-                    c.wifiLock.acquire();
+                    if (c.wifiLock != null)
+                        c.wifiLock.acquire();
                     LogUtil.debug(
                         "Reusing an existing connection to " + host + ":" + port //$NON-NLS-1$ //$NON-NLS-2$
                     );
