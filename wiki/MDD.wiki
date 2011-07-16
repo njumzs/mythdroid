@@ -13,7 +13,7 @@ In addition MDD can run arbitrary commands on frontends (see below) and allows
 
 Whilst !MythDroid will work if MDD is not installed many features will not be 
 available and performance will suffer. We therefore strongly recommend taking 
- a few minutes to install and setup MDD.
+a few minutes to install and setup MDD.
 
 == Installation ==
 
@@ -35,11 +35,11 @@ MDD will check these settings during installation and let you know if you need
 to take action.
 
 So, to install, checkout or download 
-[http://code.google.com/p/mythdroid/downloads/detail?name=mdd-0.4.2.tgz mdd] to 
+[http://code.google.com/p/mythdroid/downloads/detail?name=mdd-0.4.4.tgz mdd] to 
 each frontend (or combined backend/frontend) and then (as root):
 
 {{{
-tar zxf mdd-0.4.2.tgz
+tar zxf mdd-0.4.4.tgz
 cd mdd
 perl mdd.pl
 }}}
@@ -50,7 +50,7 @@ details below for the reason.
 On a box that serves only as a backend:
 
 {{{
-tar zxf mdd-0.4.2.tgz
+tar zxf mdd-0.4.4.tgz
 cd mdd
 perl mdd.pl --backend
 }}}
