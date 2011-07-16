@@ -104,12 +104,12 @@ my (%commands, %videos, %storageGroups);
 
 my $stream_cmd = $config{stream} ||
     '/usr/bin/vlc -vvv -I oldrc --rc-host 0.0.0.0:16547 --rc-fake-tty ' .
-    '--file-caching=2000 --demux=avformat %FILE% ' . 
+    '--file-caching=2000 %FILE% ' . 
     '--sout=\'#transcode{vcodec=h264,venc=x264{no-cabac,level=30,keyint=50,' .
     'ref=4,bframes=0,bpyramid=none,profile=baseline,no-weightb,weightp=0,' .
     'no-8x8dct,trellis=0},vb=%VB%,threads=%THR%,deinterlace,acodec=mp4a,' . 
     'samplerate=48000,ab=%AB%,channels=2,audio-sync}' .
-    ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' >/tmp/vlc.out 2>&1';
+    ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' 2>&1';
 
 # List of regex to match messages we might get from MythDroid
 # and refs to subroutines that will handle them
@@ -637,9 +637,18 @@ sub streamFile($) {
 
     $log->dbg("Execute $cmd");
 
+    $cmd .= ' |';
+
     if (($streampid = fork()) == 0) { 
         setpgrp;
-        system($cmd); 
+        open OUT, ">/tmp/vlc.out" or $log->fatal("Can't open /tmp/vlc.out: $!");
+        select OUT;
+        $| = 1;
+        open VLC, $cmd or $log->fatal($!); 
+        while (<VLC>) {
+            print;
+            $log->warn("VLC: $_") if /error/i;
+        }
         exit 0;
     }
 
