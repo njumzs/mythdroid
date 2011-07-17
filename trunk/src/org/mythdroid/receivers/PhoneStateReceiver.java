@@ -87,8 +87,9 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             if (pdus.length > 1) {
                 for (int i = 1; i < pdus.length; i++){
                     msg = SmsMessage.createFromPdu((byte[]) pdus[i]);
-                    if (!msg.getDisplayOriginatingAddress().equals(from))
-                        continue;
+                    String f = msg.getDisplayOriginatingAddress();
+                    if (f == null || !f.equals(from))
+                        break;
                     m += msg.getDisplayMessageBody();
                 }
             }
