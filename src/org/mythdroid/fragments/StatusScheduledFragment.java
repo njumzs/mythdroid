@@ -40,7 +40,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-/** ListActivity displays scheduled recordings */
+/** Displays scheduled recordings */
 public class StatusScheduledFragment extends ListFragment {
 
     private ArrayList<Program> recordings = new ArrayList<Program>(10);

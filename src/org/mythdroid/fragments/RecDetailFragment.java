@@ -52,7 +52,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * MDActivity showing a Recording's details
+ * Shows a Recording's details.
  * Allows user to stop, delete or play the recording
  */
 public class RecDetailFragment extends Fragment {

@@ -38,7 +38,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 /**
- * A Fragment that displays the list of recordings
+ * Displays a list of recordings
  */
 public class RecListFragment extends ListFragment
     implements AdapterView.OnItemLongClickListener {

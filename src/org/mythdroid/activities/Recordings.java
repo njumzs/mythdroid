@@ -45,7 +45,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 
 /**
- * MDFragmentActivity shows list of Recordings
+ * MDFragmentActivity, shows list of Recordings
  */
 public class Recordings extends MDFragmentActivity {
 

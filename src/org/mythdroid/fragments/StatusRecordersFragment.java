@@ -49,7 +49,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-/** ListActivity displays status of recorders */
+/** Displays the status of recorders */
 public class StatusRecordersFragment extends ListFragment {
 
     final private static int REFRESH_NEEDED = Activity.RESULT_FIRST_USER;

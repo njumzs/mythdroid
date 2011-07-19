@@ -17,7 +17,7 @@ import android.net.NetworkInfo.State;
 import android.net.wifi.WifiManager;
 
 /**
- * Broadcast receiver for ConnectivityManager.CONNECTIVITY_ACTION events
+ * A BroadcastReceiver for connectivity events
  */
 public class ConnectivityReceiver extends BroadcastReceiver {
 

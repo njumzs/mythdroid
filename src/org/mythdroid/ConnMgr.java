@@ -42,11 +42,13 @@ import android.net.wifi.WifiManager.WifiLock;
 
 /**
  * A TCP connection manager
- * It's probably a bad idea to mix buffered and unbuffered reads
  */
 public class ConnMgr {
 
-    /** A callback that'll be called upon a successful connection */
+    /** 
+     * Implement this to create a callback that'll be called upon a 
+     * successful connection 
+     */
     public interface onConnectListener {
         /**
          * Called when the connection has been successfully established

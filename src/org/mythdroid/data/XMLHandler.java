@@ -28,7 +28,8 @@ import android.sax.EndElementListener;
 import android.sax.EndTextElementListener;
 import android.sax.StartElementListener;
 
-/** Custom SAX Handler - much like android.sax
+/** 
+ * Custom SAX Handler - much like android.sax
  * but allows both child elements and text listeners
  */
 public class XMLHandler extends DefaultHandler {

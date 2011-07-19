@@ -8,7 +8,7 @@ import android.provider.ContactsContract;
 /**
  * Wrap classes that are only present in newer SDK versions
  *  so that we can test for their presence and use them if
- *  they're there..
+ *  they're there
  */
 public class Reflection {
     

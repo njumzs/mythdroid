@@ -37,7 +37,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-/** Activity displays backend status */
+/** Displays backend status */
 public class StatusBackendFragment extends Fragment {
 
     private MDFragmentActivity activity = null;

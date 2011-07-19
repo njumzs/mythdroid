@@ -31,7 +31,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 /**
- * ListActivity lists other StatusFragment activities
+ * Lists other StatusFragment fragments.
  * Houses static method to fetch the status XML
  */
 public class StatusFragment extends ListFragment {

@@ -17,7 +17,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
 
-/** Contains all globals */
+/** Global static variables and methods */
 public class Globals {
 
      /** Debug? */
