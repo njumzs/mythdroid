@@ -332,7 +332,7 @@ public class ConnMgr {
             r = read(buf, 0, rbufSize);
 
             if (r == -1) {
-                disconnect();
+                doDisconnect();
                 throw disconnected;
             }
 
@@ -385,7 +385,7 @@ public class ConnMgr {
         int read = read(bytes, 0, len);
 
         if (read == -1) {
-            disconnect();
+            doDisconnect();
             throw disconnected;
         }
 
@@ -394,7 +394,7 @@ public class ConnMgr {
         while (read < len) {
 
             if ((got = read(bytes, read, len - read)) == -1) {
-                disconnect();
+                doDisconnect();
                 throw disconnected;
             }
 
@@ -417,7 +417,7 @@ public class ConnMgr {
         byte[] bytes = new byte[8];
         if (read(bytes, 0, 8) == -1) {
             LogUtil.debug("readStringList from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$
-            disconnect();
+            doDisconnect();
             throw disconnected;
         }
 
@@ -555,9 +555,10 @@ public class ConnMgr {
                 ConnMgr c = r.get();
                 if (c == null) continue;
                 if (
-                    c.addr.equals(host + ":" + port) && //$NON-NLS-1$
-                    c.sock.isConnected() &&
-                    c.inUse == false
+                     c.addr.equals(host + ":" + port) && //$NON-NLS-1$
+                     c.sock != null                   &&
+                     c.sock.isConnected()             &&
+                     c.inUse == false
                 ) {
                     c.inUse = true;
                     if (c.wifiLock != null)
@@ -633,12 +634,10 @@ public class ConnMgr {
      * Actually disconnect the socket
      */
     private void doDisconnect() throws IOException {
-        
-        if (sock.isClosed())
-            return;
         LogUtil.debug("Disconnecting from " + addr); //$NON-NLS-1$
-        sock.close();
-
+        if (!sock.isClosed())
+            sock.close();
+        sock = null;
     }
 
     private synchronized int read(byte[] buf, int off, int len) throws IOException {
