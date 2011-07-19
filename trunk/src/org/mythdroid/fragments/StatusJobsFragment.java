@@ -49,7 +49,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-/** ListActivity displays upcoming/recent jobs */
+/** Displays upcoming/recent jobs */
 public class StatusJobsFragment extends ListFragment {
      
     final private ArrayList<Job> jobs = new ArrayList<Job>(8);

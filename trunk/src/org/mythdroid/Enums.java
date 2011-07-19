@@ -26,7 +26,7 @@ import org.mythdroid.resource.Messages;
 
 @SuppressWarnings("all")
 
-/** Contains all enums */
+/** All the enums */
 public class Enums {
 
     /** Intent extras  */

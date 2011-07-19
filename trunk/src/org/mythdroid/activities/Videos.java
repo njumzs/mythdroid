@@ -44,7 +44,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-/** MDActivity displays browsable list of Videos */
+/** MDActivity displays a list of Videos */
 public class Videos extends MDActivity implements
     ListView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 

@@ -41,7 +41,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 /**
- * MDActivity displays details of a Video
+ * MDActivity displays details of a Video.
  * Allows user to play the Video or view further details at TVDB
  */
 public class VideoDetail extends MDActivity {

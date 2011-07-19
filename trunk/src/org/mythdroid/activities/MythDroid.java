@@ -58,8 +58,7 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 /**
- * MDListActivity for the main menu
- * Holds a number of public static members used as 'globals'
+ * MDListActivity, entry point, the 'main menu'
  */
 public class MythDroid extends MDListActivity implements
     AdapterView.OnItemLongClickListener {

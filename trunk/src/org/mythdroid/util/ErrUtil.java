@@ -30,7 +30,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.util.Log;
 import android.widget.Toast;
 
-/** General utility methods */
+/** Error reporting utility methods */
 final public class ErrUtil {
 
     /**

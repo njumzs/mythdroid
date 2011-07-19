@@ -42,8 +42,7 @@ import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 
 /**
- * ListActivity lists other Status activities
- * Houses static method to fetch the status XML
+ * MDFragmentActivity, houses status fragments
  */
 public class Status extends MDFragmentActivity {
 

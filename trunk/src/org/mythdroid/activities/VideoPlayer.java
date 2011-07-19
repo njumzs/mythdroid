@@ -56,7 +56,7 @@ import android.widget.AdapterView;
 import android.widget.MediaController;
 import android.widget.AdapterView.OnItemClickListener;
 
-/** MDActivity displays streamed Video */
+/** MDActivity that displays streamed Video */
 public class VideoPlayer extends MDActivity {
     
     final private Context ctx = this;
