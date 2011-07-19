@@ -8,6 +8,10 @@ import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
+import org.mythdroid.mdd.MDDManager;
+
+import android.content.Context;
+
 /** Format and display messages on the MythTV OSD */
 final public class OSDMessage {
 
@@ -92,6 +96,20 @@ final public class OSDMessage {
         String msg = cid.replace("%caller_name%", name); //$NON-NLS-1$
         msg = msg.replace("%caller_number%", number); //$NON-NLS-1$
         send(msg);
+    }
+    
+    /**
+     * Display a message via XOSD (via MDD)
+     * @param ctx Context
+     * @param msg Message to display
+     */
+    public static void XOSD(Context ctx, String msg) {
+        for (String fe : FrontendDB.getFrontendNames(ctx))
+            try {
+                MDDManager.osdMsg(
+                    FrontendDB.getFrontendAddr(ctx, fe), msg
+                );
+            } catch (IOException e) {}
     }
 
     private static void send(String message) throws IOException {
