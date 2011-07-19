@@ -58,6 +58,12 @@
     		android:summary="Uncheck to disable SMS scrolling"
     		android:dependency="osdSMS"
     		android:defaultValue="true"/>
+   		
+   		<CheckBoxPreference
+    		android:key="altOSD"
+    		android:title="Alternative OSD"
+    		android:summary="Use XOSD instead of MythTV OSD"
+    		android:defaultValue="false"/>
     		
     	</PreferenceScreen>
     	
