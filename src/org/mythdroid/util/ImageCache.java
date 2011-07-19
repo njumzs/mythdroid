@@ -26,9 +26,8 @@ import java.util.NoSuchElementException;
 import android.graphics.Bitmap;
 
 /**
- * A two level cache for images
- * The first level is a MemCache
- * The second level is an ImageDiskCache
+ * A two level cache for images.
+ * The first level is a MemCache, the second level is an ImageDiskCache.
  * Writes to the second level are lazy
  */
 public class ImageCache {
