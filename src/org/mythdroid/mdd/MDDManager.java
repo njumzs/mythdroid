@@ -109,13 +109,12 @@ public class MDDManager {
      * @param cmd String containing the name of the MDD command
      */
     public static void mddCommand(String addr, String cmd) throws IOException {
-        final ConnMgr cmgr = sendMsgNoMux(addr, "COMMAND " + cmd); //$NON-NLS-1$
-        cmgr.disconnect();
+        sendMsgNoMux(addr, "COMMAND " + cmd).disconnect(); //$NON-NLS-1$
     }
 
     /**
      * Static method, retrieves a list of Videos
-     * @param addr String containing IP address of MDD to retrieve video list from
+     * @param addr String containing address of MDD
      * @param viddir which video dir to look in (could be a : separated list in mythtv config)
      * @param subdir String containing directory to enumerate, pass "ROOT" for the root video directory
      * @return ArrayList of Videos
@@ -149,7 +148,7 @@ public class MDDManager {
 
     /**
      * Ask MDD to stream a file, SDP will be at http://addr:5554/stream
-     * @param addr String containing IP address of MDD
+     * @param addr String containing address of MDD
      * @param file String containing path to the file
      * @param w int representing desired width of video in pixels
      * @param h int representing desired height of video in pixels
@@ -159,12 +158,11 @@ public class MDDManager {
     public static void streamFile(
             String addr, String file, String sg, int w, int h, int vb, int ab
     ) throws IOException {
-        final ConnMgr cmgr = sendMsg(
+        sendMsg(
             addr,
             "STREAM " + w + "x" + h + " VB " + vb + " AB " + ab + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             " SG " + sg + " FILE " + file  //$NON-NLS-1$ //$NON-NLS-2$
-        );
-        cmgr.disconnect();
+        ).disconnect();
     }
 
     /**
@@ -172,13 +170,12 @@ public class MDDManager {
      * @param addr String containing IP address of MDD
      */
     public static void stopStream(String addr) throws IOException {
-        final ConnMgr cmgr = sendMsg(addr, "STOPSTREAM"); //$NON-NLS-1$
-        cmgr.disconnect();
+        sendMsg(addr, "STOPSTREAM").disconnect(); //$NON-NLS-1$
     }
 
     /**
      * Determine the RecType of a recording
-     * @param addr String containing IP address of MDD
+     * @param addr String containing address of MDD
      * @param recid int representing RecID of recording
      * @return - RecType
      */
@@ -192,7 +189,7 @@ public class MDDManager {
 
     /**
      * Determine the storage group of a recording
-     * @param addr String containing IP address of MDD
+     * @param addr String containing address of MDD
      * @param recid int representing RecID of recording
      * @return String contaning recording's storage group
      */
@@ -205,7 +202,7 @@ public class MDDManager {
 
     /**
      * Get a list of storage groups
-     * @param addr String containing IP address of MDD
+     * @param addr String containing address of MDD
      * @return String[] of storage groups
      */
     public static String[] getStorageGroups(String addr) throws IOException {
@@ -225,7 +222,7 @@ public class MDDManager {
 
     /**
      * Get a list of recording groups
-     * @param addr String containing IP address of MDD
+     * @param addr String containing address of MDD
      * @return String[] of recording groups
      */
     public static String[] getRecGroups(String addr) throws IOException {
@@ -245,7 +242,7 @@ public class MDDManager {
 
     /**
      * Create or update a recording rule
-     * @param addr String containing IP address of MDD
+     * @param addr String containing address of MDD
      * @param prog Program the rule relates to
      * @param updates a list of modifications to an existing or default rule
      * @return int representing the RecID of the new/updated recording rule
@@ -268,13 +265,21 @@ public class MDDManager {
 
     /**
      * Delete a recording rule
-     * @param addr String containing IP address of MDD
+     * @param addr String containing address of MDD
      * @param recid RecID of the rule to delete
      */
     public static void deleteRecording(String addr, int recid)
         throws IOException {
-        final ConnMgr cmgr = sendMsg(addr, "DELREC " + recid); //$NON-NLS-1$
-        cmgr.disconnect();
+        sendMsg(addr, "DELREC " + recid).disconnect(); //$NON-NLS-1$
+    }
+    
+    /**
+     * Display a message via XOSD
+     * @param addr String containing address of MDD
+     * @param msg Message to display
+     */
+    public static void osdMsg(String addr, String msg) throws IOException {
+        sendMsgNoMux(addr, "OSD " + msg).disconnect(); //$NON-NLS-1$
     }
 
     /**
@@ -345,7 +350,9 @@ public class MDDManager {
     }
 
     private static ConnMgr sendMsg(String addr, String msg) throws IOException {
-        final ConnMgr cmgr = ConnMgr.connect(addr, 16546, null, Globals.muxConns);
+        final ConnMgr cmgr = ConnMgr.connect(
+            addr, 16546, null, Globals.muxConns
+        );
         getMsgResponse(cmgr, msg);
         return cmgr;
     }

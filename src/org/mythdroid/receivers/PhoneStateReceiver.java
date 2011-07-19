@@ -44,6 +44,7 @@ public class PhoneStateReceiver extends BroadcastReceiver {
         final boolean showCalls = prefs.getBoolean("osdCalls",  true); //$NON-NLS-1$
         final boolean showSMS   = prefs.getBoolean("osdSMS",    true); //$NON-NLS-1$
         final boolean scrollSMS = prefs.getBoolean("scrollSMS", true); //$NON-NLS-1$
+        final boolean altOSD    = prefs.getBoolean("altOSD",    false); //$NON-NLS-1$
         final String action     = intent.getAction();
         String number, name     = null;
 
@@ -64,9 +65,16 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             if (number != null) {
                 name = PhoneUtil.nameFromNumber(ctx, number);
 
-                try {
-                    OSDMessage.Caller(name, number);
-                } catch (Exception e) {}
+                if (altOSD)
+                    OSDMessage.XOSD(
+                        ctx, 
+                        Messages.getString("PhoneStateReceiver.0") +  //$NON-NLS-1$
+                            name + " (" + number + ")"   //$NON-NLS-1$//$NON-NLS-2$
+                    );
+                else
+                    try {
+                        OSDMessage.Caller(name, number);
+                    } catch (Exception e) {}
             }
 
         }
@@ -94,12 +102,15 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                 }
             }
             
-            try {
-                if (scrollSMS)
-                    OSDMessage.Scroller(m, m.length() / 9 + 8);
-                else
-                    OSDMessage.Alert(m);
-            } catch (Exception e){}
+            if (altOSD)
+                OSDMessage.XOSD(ctx, m);
+            else
+                try {
+                    if (scrollSMS)
+                        OSDMessage.Scroller(m, m.length() / 9 + 8);
+                    else
+                        OSDMessage.Alert(m);
+                } catch (Exception e){}
         }
 
     }
