@@ -432,7 +432,7 @@ public class ConnMgr {
      * @return true if socket is connected, false otherwise
      */
     public boolean isConnected() {
-        return sock.isConnected() && inUse;
+        return sock != null && sock.isConnected() && inUse;
     }
     
     /**
@@ -587,7 +587,7 @@ public class ConnMgr {
 
         LogUtil.debug("Connecting to " + addr); //$NON-NLS-1$
 
-        if (sock != null && sock.isConnected() && inUse) {
+        if (isConnected()) {
             LogUtil.debug(addr + " is already connected"); //$NON-NLS-1$
             return;
         }
