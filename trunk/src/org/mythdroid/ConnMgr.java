@@ -653,7 +653,7 @@ public class ConnMgr {
 
             LogUtil.debug(msg);
 
-            if (!sock.isConnected() || !inUse) {
+            if (!isConnected()) {
                 waitForConnection(timeout * 4);
                 write(lastSent);
                 return read(buf, off, len);
@@ -672,7 +672,7 @@ public class ConnMgr {
 
     private synchronized void write(byte[] buf) throws IOException {
 
-        if (!sock.isConnected() || !inUse)
+        if (!isConnected())
             waitForConnection(timeout * 4);
 
         os.write(buf);
@@ -709,10 +709,11 @@ public class ConnMgr {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
-                LogUtil.debug("Timed out waiting for connection to " + addr); //$NON-NLS-1$
+                String msg = Messages.getString("ConnMgr.3") + addr; //$NON-NLS-1$
+                LogUtil.debug(msg);
                 inUse = false;
                 timer.cancel();
-                throw new IOException(Messages.getString("ConnMgr.3") + addr); //$NON-NLS-1$
+                throw new IOException(msg);
             }
         
         timer.cancel();
