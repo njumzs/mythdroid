@@ -41,6 +41,7 @@ sub readConfig();
 sub clientMsg($);
 sub sendMsg($);
 sub sendMsgs($);
+sub listCommands();
 sub runCommand($);
 sub osdMsg($);
 sub videoList($);
@@ -114,13 +115,14 @@ my $stream_cmd = $config{stream} ||
 # List of regex to match messages we might get from MythDroid
 # and refs to subroutines that will handle them
 my @clientMsgs = (
+    { regex => qr/^COMMANDS$/,       proc => \&listCommands              },
+    { regex => qr/^STOPSTREAM$/,     proc => \&stopStreaming             },
+    { regex => qr/^STORGROUPS$/,     proc => \&getStorGroups             },
+    { regex => qr/^RECGROUPS$/,      proc => \&getRecGroups              },
     { regex => qr/^COMMAND (.*)$/,   proc => sub { runCommand($1) }      },
     { regex => qr/^VIDEOLIST (.*)$/, proc => sub { videoList($1) }       },
     { regex => qr/^STREAM (.*)$/,    proc => sub { streamFile($1) }      },
     { regex => qr/^OSD (.*)$/,       proc => sub { osdMsg($1) }          },
-    { regex => qr/^STOPSTREAM$/,     proc => \&stopStreaming             },
-    { regex => qr/^STORGROUPS$/,     proc => \&getStorGroups             },
-    { regex => qr/^RECGROUPS$/,      proc => \&getRecGroups              },
     { regex => qr/^DELREC (\d+)$/,   proc => sub { $mythdb->delRec($1) } },
     {
         regex => qr/^RECTYPE (\d+)$/,  
@@ -314,10 +316,6 @@ sub handleMdConn($) {
     $s->add($client);
     push @clients, $client;
 
-    # Send a list of MDD commands
-    map { syswrite($client, "COMMAND $_\n") } (keys %commands);
-    syswrite($client, "COMMANDS DONE\n");
-
     return if $backend;
 
     # Send last LCD statuses 
@@ -434,6 +432,12 @@ sub clientMsg($) {
     $log->err("Unknown command $msg");
     sendMsg("UNKNOWN");
 
+}
+
+sub listCommands() {
+    # Send a list of MDD commands
+    map { sendMsg("COMMAND $_") } (keys %commands);
+    sendMsg("COMMANDS DONE");
 }
 
 # Run an MDD command
