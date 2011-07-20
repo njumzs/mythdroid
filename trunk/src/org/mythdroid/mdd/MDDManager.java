@@ -83,12 +83,12 @@ public class MDDManager {
 
     /**
      * Get a list of MDD commands from mdd
-     * @param addr String containing address of frontend
+     * @param addr String containing address of MDD
      * @return ArrayList<String> containing names of MDD commands
      */
     public static ArrayList<String> getCommands(String addr) throws IOException {
         
-        final ConnMgr cmgr = ConnMgr.connect(addr, 16546);
+        final ConnMgr cmgr = sendMsgNoMux(addr, "COMMANDS"); //$NON-NLS-1$
         final ArrayList<String> cmds = new ArrayList<String>();
         
         String line = cmgr.readLine();
@@ -133,11 +133,10 @@ public class MDDManager {
         // Uncached SQL queries can take some time with lots of videos
         cmgr.setTimeout(7500);
         
-        while (true) {
-            String line = cmgr.readLine();
-            if (line.equals("VIDEOLIST DONE")) //$NON-NLS-1$
-                break;
+        String line = cmgr.readLine();
+        while (line != null && !line.equals("VIDEOLIST DONE")) { //$NON-NLS-1$
             videos.add(new Video(line));
+            line = cmgr.readLine();
         }
 
         videos.trimToSize();
@@ -209,11 +208,10 @@ public class MDDManager {
         final ConnMgr cmgr = sendMsg(addr, "STORGROUPS"); //$NON-NLS-1$
         final ArrayList<String> groups = new ArrayList<String>();
 
-        while (true) {
-            String line = cmgr.readLine();
-            if (line.equals("STORGROUPS DONE")) //$NON-NLS-1$
-                break;
+        String line = cmgr.readLine();
+        while (line != null && !line.equals("STORGROUPS DONE")) { //$NON-NLS-1$
             groups.add(line);
+            line = cmgr.readLine();
         }
 
         cmgr.disconnect();
@@ -228,12 +226,11 @@ public class MDDManager {
     public static String[] getRecGroups(String addr) throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "RECGROUPS"); //$NON-NLS-1$
         final ArrayList<String> groups = new ArrayList<String>();
-
-        while (true) {
-            String line = cmgr.readLine();
-            if (line.equals("RECGROUPS DONE")) //$NON-NLS-1$
-                break;
+        
+        String line = cmgr.readLine();
+        while (line != null && !line.equals("RECGROUPS DONE")) { //$NON-NLS-1$
             groups.add(line);
+            line = cmgr.readLine();
         }
 
         cmgr.disconnect();
@@ -367,18 +364,16 @@ public class MDDManager {
     private static void getMsgResponse(ConnMgr cmgr, String msg)
         throws IOException {
         
-        String resp = null;
         cmgr.writeLine(msg);
-        while (true) {
+        String resp = null;
+        do {
             resp = cmgr.readLine();
-            if (resp.equals("OK")) //$NON-NLS-1$
-                return;
             if (resp.equals("UNKNOWN")) //$NON-NLS-1$
                 throw new IOException(
                     "MDD doesn't understand " + //$NON-NLS-1$
                     msg.substring(0, msg.indexOf(' '))
                 );
-        }
+        } while (!resp.equals("OK")); //$NON-NLS-1$
         
     }
 
