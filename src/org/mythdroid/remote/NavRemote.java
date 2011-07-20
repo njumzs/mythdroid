@@ -360,7 +360,7 @@ public class NavRemote extends Remote {
             locView.setText(locS);
             itemView.setText(itemS);
         }
-        else if (!newLoc.niceLocation.equals("Unknown")) { //$NON-NLS-1$
+        else if (locS != null && !locS.equals("Unknown")) { //$NON-NLS-1$
             /*
              * The location displays will be updated by MDD at some point but
              * if it happens to be >= a few ms after we set it from the 
