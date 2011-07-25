@@ -344,7 +344,7 @@ sub setting($$) {
         $ret = $aref->[0];
     }
     
-    $log->dbg("setting($value, $host) = $ret");
+    $log->dbg("setting($value, $host) = $ret") if (defined $ret);
 
     return $ret;
         

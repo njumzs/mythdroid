@@ -21,14 +21,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end comment
 =cut
 
+$VERSION = 0.5.0;
+
 use strict;
 use warnings;
 use IO::Socket::INET;
 use IO::Select;
 use POSIX qw(setsid);
-use File::Copy;
 use Sys::Hostname;
 use Config;
+use MDD::ConfigData;
 use MDD::LCD;
 use MDD::MythDB;
 use MDD::Log;
@@ -67,11 +69,7 @@ foreach my $idx (0 .. $#ARGV) {
     if ($ARGV[$idx] eq '-h' || $ARGV[$idx] eq '--help') {
         usage();
     }
-    elsif ($ARGV[$idx] eq '-b' || $ARGV[$idx] eq '--backend') {
-        $backend = 1;
-        $ARGV[$idx] = undef;
-    }
-    elsif ($ARGV[$idx] eq '-d' || $ARGV[$idx] eq '--debug') {
+    if ($ARGV[$idx] eq '-d' || $ARGV[$idx] eq '--debug') {
         $debug = 1;
         $ARGV[$idx] = undef;
     }
@@ -88,15 +86,14 @@ print STDERR 'MDD: Debug mode is ' . ($debug ? 'on' : 'off') . "\n";
 my $logfile = $config{logfile} || '/tmp/mdd.log';
 my $log = MDD::Log->new($logfile, $debug);
 
-$backend |= exists $config{backendonly} && $config{backendonly} =~ /true/i;
-$log->dbg('Running in ' . ($backend ? 'backend only' : 'combined') . ' mode');
-
-# Install ourselves if necessary
-install() unless ($0 =~ /mythlcdserver$/ || ($backend && $0 =~ /^\/usr\/bin/));
+$backend = ($0 =~ /mdd(?:\.pl)?$/);
+$log->dbg(
+    'Running in ' . ($backend ? 'backend only' : 'frontend/combined') . ' mode'
+);
 
 my (
     $data, $lcdClient, $lcdServer, $lcdListen, $lcd, $client, $videoDir,
-    $cpus, $streampid, $mythdb, $no_xosd
+    $cpus, $streampid, $mythdb
 );
 
 my @clients;
@@ -141,10 +138,6 @@ my @clientMsgs = (
         proc  => sub { sendMsg($mythdb->newRec($1, $2, $3)) }
     },
 ); 
-
-
-eval 'use MDD::XOSD';
-$no_xosd++ if $@;
 
 # Get rid of old log files in case root owns them
 if ( -e '/tmp/vlc.out') {
@@ -456,7 +449,7 @@ sub runCommand($) {
 
 sub osdMsg($) {
 
-    if ($no_xosd) {
+    unless (MDD::ConfigData->feature('xosd_support')) {
         $log->err("Can't display OSD message - X::Osd isn't installed");
         return;
     }
@@ -700,155 +693,4 @@ sub killKids() {
             kill 'KILL', $1;
         }
     }
-}
-
-sub create_user_account() {
-
-    my $user = 'mdd';
-
-    return if (getpwnam $user);
-    print "Creating $user user account..\n";
-    system("useradd -d /dev/null -c 'Added by MDD' -U $user -s /sbin/nologin");
-
-}
-
-
-sub install_modules() {
-
-    my @mods = (qw(LCD MythDB Log XOSD CMux));
-    
-    # Install modules
-    mkdir($Config{vendorlib} . "/MDD");
-    foreach my $mod (@mods) {
-        print "cp MDD/$mod.pm -> $Config{vendorlib}/MDD\n";
-        copy("MDD/$mod.pm", $Config{vendorlib} . "/MDD");
-    }
-
-}
-
-sub get_install_dir() {
-    
-    my $dir = (`which mythlcdserver`)[0];
-
-    if ($dir =~ /^which:/) {
-        print "Couldn't locate mythlcdserver. Aborted\n";
-        exit;
-    }
-
-    $dir =~ s/\/mythlcdserver$//;
-    chomp $dir;
-    return $dir;
-
-}
-
-sub check_lcd_settings() {
-
-    print "Check LCD settings..\n";
-    my $mythdb = MDD::MythDB->new($log);;
-    unless (
-        $mythdb->setting('LCDEnable', hostname)      &&
-        $mythdb->setting('LCDShowMenu', hostname)    &&
-        $mythdb->setting('LCDShowMusic', hostname)   &&
-        $mythdb->setting('LCDShowChannel', hostname) 
-    ) {
-        print "\nNOTICE: Please enable all MythTV LCD options\n";
-    }
-
-}
-
-sub install_init_script() {
-
-    my $init  = '/etc/init.d/mdd';
-    my $uinit = '/etc/init/mdd.conf'; 
-
-    my $running = (`ps aux | grep /usr/bin/mdd | grep -v grep`)[0];
-
-    if (-e '/usr/sbin/service' && -d '/etc/init') {
-        if (! -e $uinit) {
-            print "Installing upstart script\n";
-            copy('init/upstart', $uinit);
-        }
-        exec 'service', 'mdd', $running ? 'restart' : 'start';
-    }
-    
-    if (-e '/sbin/runscript' && -e '/sbin/start-stop-daemon') {
-        if (! -e $init) {
-            print "Installing gentoo init script\n";
-            copy('init/gentoo', $init);
-            chmod(0755, $init);
-            system 'rc-update add mdd default';
-        }
-        exec $init, 'restart';
-    }
-
-    if (-d '/etc/rc0.d') {
-        if (! -e $init) {
-            print "Installing sysv init script\n";
-            copy('init/sysv', $init);
-            chmod(0755, $init);
-            map { symlink $init, "/etc/rc$_.d/K01mdd" } (qw(0 1 6));
-            map { symlink $init, "/etc/rc$_.d/S98mdd" } (qw(2 3 4 5));
-        }
-        exec $init, $running ? 'restart' : 'start';
-    }
-
-    die "\nWARNING: Unknown init system - you'll have to manually arrange " .
-        "for '/usr/bin/mdd --backend' to be started at boot\n";
-
-}
-
-sub install {
-
-    $log->fatal("$0 must be run as root to install") unless ($> == 0);
-
-    print "Installing mdd..\n";
-
-    my ($path, $dst);
-
-    create_user_account();
-
-    install_modules();
-    
-    if ($backend) {
-        $dst = '/usr/bin/mdd';
-        print "cp $0 -> $dst\n";
-        copy($0, $dst);
-        chmod(0755, $dst) or warn "chmod of $dst failed\n";
-        install_init_script();
-        exit;
-    }
-
-    print "Stopping mythfrontend and mythlcdserver\n";
-
-    map { system("killall -9 $_ 2>/dev/null") } 
-        (qw(mythfrontend mythfrontend.real mythlcdserver mythlcd));
-
-    my $dir = get_install_dir();
-
-    $dst  = "$dir/mythlcd"; 
-    $path = "$dir/mythlcdserver";
-
-    unless ((`file $path`)[0] =~ /perl/) {
-        print "cp $path -> $dst\n";
-        copy($path, $dst) or die "$!\n";
-        chmod(0755, $dst) 
-            or warn "chmod of $dst failed\n";
-    }
-
-    print "cp $0 -> $path\n";
-    copy($0, $path) or die "$!\n";
-    chmod(0755, $path) 
-        or warn "chmod of $path failed\n";
-
-    unless (-e '/etc/mdd.conf') {
-        print "cp mdd.conf -> /etc/mdd.conf\n";
-        copy('mdd.conf', '/etc/mdd.conf') or die "$!\n";
-        chmod(0644, '/etc/mdd.conf') or warn "chmod of /etc/mdd.conf failed\n";
-    }
-
-    check_lcd_settings();
-
-    print "Done - you can restart mythfrontend now..\n";
-    exit;
-
 }

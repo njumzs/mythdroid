@@ -22,9 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package MDD::XOSD;
 use strict;
 use warnings;
-use Carp;
-eval 'use X::Osd';
-carp "X::Osd is not installed" if $@;
 use X::Osd;
 
 my $font = '-b&h-luxi sans-bold-*-normal-*-*-300-*-*-*-*-*-*';
