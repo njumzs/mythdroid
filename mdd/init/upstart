@@ -11,4 +11,4 @@ stop on stopping mythtv-backend
 expect fork
 respawn
 
-exec mdd
+exec mdd.pl
