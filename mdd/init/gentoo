@@ -10,13 +10,13 @@ depend() {
 
 start() {
 	ebegin "Starting MDD"
-	start-stop-daemon --start --quiet --exec /usr/bin/mdd -- --backend
+	start-stop-daemon --start --quiet --exec /usr/bin/mdd.pl
 	eend $?
 }
 
 stop() {
 	ebegin "Stopping MDD"
-	start-stop-daemon --stop --exec /usr/bin/mdd
+	start-stop-daemon --stop --exec /usr/bin/mdd.pl
 	eend $?
 }
 

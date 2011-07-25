@@ -1,8 +1,6 @@
-On a box that is used as a frontend, or combined frontend/backend, as root:
+As root:
 
-    # perl mdd.pl
-
-On a box that is used only as a backend, as root:
-
-    # perl mdd.pl --backend
+perl Build.PL
+./Build test
+./Build install
 

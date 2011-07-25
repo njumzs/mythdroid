@@ -3,7 +3,7 @@
 case "$1" in
   start)
     echo "Starting MDD..."
-    /usr/bin/mdd --backend
+    /usr/bin/mdd
     ;;
   stop)
     echo "Stopping MDD..."
