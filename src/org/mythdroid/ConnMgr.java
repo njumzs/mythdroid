@@ -98,13 +98,13 @@ public class ConnMgr {
     private byte[]                  lastSent         = null;
     /** An IOException with a message that we've been unexpectedly disconnected */
     private IOException             disconnected     = null;
-    /** contains our onConnect callback if there is one */
+    /** List of onConnect callbacks */
     private ArrayList<onConnectListener> oCLs = 
         new ArrayList<onConnectListener>();
 
     
     /**
-     * Make a connection
+     * Make a connection, reuse an existing connection if possible
      * @param host String with hostname or dotted decimal IP address
      * @param port integer port number
      */
@@ -116,7 +116,7 @@ public class ConnMgr {
     }
         
     /**
-     * Make a connection
+     * Make a connection, reuse an existing connection if possible
      * @param host String with hostname or dotted decimal IP address
      * @param port integer port number
      * @param ocl callback to call upon successful connection
@@ -132,7 +132,7 @@ public class ConnMgr {
     }
     
     /**
-     * Make a connection
+     * Make a connection, reuse an existing connection if possible
      * @param host String with hostname or dotted decimal IP address
      * @param port integer port number
      * @param ocl callback to call upon successful connection
