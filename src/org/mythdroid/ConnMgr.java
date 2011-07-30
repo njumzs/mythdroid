@@ -556,7 +556,6 @@ public class ConnMgr {
                 if (c == null) continue;
                 if (
                      c.addr.equals(host + ":" + port) && //$NON-NLS-1$
-                     c.sock != null                   &&
                      c.sock.isConnected()             &&
                      c.inUse == false
                 ) {
@@ -634,6 +633,7 @@ public class ConnMgr {
      * Actually disconnect the socket
      */
     private void doDisconnect() throws IOException {
+        if (sock == null) return;
         LogUtil.debug("Disconnecting from " + addr); //$NON-NLS-1$
         if (!sock.isClosed())
             sock.close();
