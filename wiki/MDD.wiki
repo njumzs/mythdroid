@@ -15,73 +15,19 @@ Whilst !MythDroid will work if MDD is not installed many features will not be
 available and performance will suffer. We therefore strongly recommend taking 
 a few minutes to install and setup MDD.
 
-== Installation ==
-
-MDD makes use of the MythTV perl bindings so they must be installed. If you 
-install MythTV from source, ensure that the --with-bindings=perl option was 
-passed to configure. If you install !MythTV from packages, ensure that the 
-perl bindings package is installed if available.
-
-For MDD to function, you must ensure that the following settings in the LCD 
-page under Setup -> Appearance are enabled on each frontend:
-
- * Enable LCD device
- * Display time
- * Display menus
- * Display music artist and title (items = Artist - Title) 
- * Display channel information
-
-MDD will check these settings during installation and let you know if you need 
-to take action.
-
-So, to install, checkout or download 
-[http://code.google.com/p/mythdroid/downloads/detail?name=mdd-0.4.4.tgz mdd] to 
-each frontend (or combined backend/frontend) and then (as root):
-
-{{{
-tar zxf mdd-0.4.4.tgz
-cd mdd
-perl mdd.pl
-}}}
-
-*Note:* You will need to reinstall mdd each time you upgrade MythTV. See the 
-details below for the reason. 
-
-On a box that serves only as a backend:
-
-{{{
-tar zxf mdd-0.4.4.tgz
-cd mdd
-perl mdd.pl --backend
-}}}
-
 == Configuration ==
 
-MDD requires no configuration. However, an example configuration file is 
-installed to /etc/mdd.conf and can be modified by advanced users. 
-
-== Frontend Commands ==
-
-If you'd like to be able to run arbitrary commands on frontends  
-('MDD commands' in !MythDroid), you'll need to define them. To do so, add 
-them to /etc/mdd.conf, one command per line, using the following format:
-
-{{{
-command = name of command => command to run
-}}}
-
-For example, the following allows me to put an Ubuntu frontend to sleep:
-
-{{{
-command = Sleep => dbus-send --system --dest=org.freedesktop.DeviceKit.Power /org/freedesktop/DeviceKit/Power org.freedesktop.DeviceKit.Power.Suspend
-}}}
-
-Commands are run as the user running mythfrontend or as the 'mdd' user if mdd 
-is run as root.
+No configuration is required but you might like to read 
+[MDDConf the MDD configuration guide] anyway. 
 
 == Details ==
 
-MDD operates by sitting between mythfrontend and mythlcdserver (during 
-installation mythlcdserver is renamed to mythlcd and mdd is installed as 
-mythlcdserver). MDD intercepts information that is sent to the LCD and makes it 
-available to !MythDroid. Note that you don't need an LCD for this to work. 
+When running on a frontend MDD operates by sitting between mythfrontend and 
+mythlcdserver (during installation mythlcdserver is renamed to mythlcd and mdd 
+is installed as mythlcdserver). MDD intercepts information that is sent to the 
+LCD and makes it available to !MythDroid. Note that you don't need an LCD for 
+this to work.
+
+On a backend-only system mdd just runs as a normal daemon and is usually 
+started at system boot.
+ 
