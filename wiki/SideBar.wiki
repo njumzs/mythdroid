@@ -4,15 +4,11 @@
    * [022Specific MythTV 0.22 Specific Notes]
    * [021Specific MythTV 0.21 Specific Notes]
    * [BuildGuide Building MythDroid from source]
-
-
   * [MDD MDD]
    * [MDDInstall MDD installation]
     * [MDD04Install MDD 0.4 and below installation]
    * [MDDConf MDD Configuration]
    * [CMux MDD's Connection Muxer]
-
-
   * [UserGuide User Guide]
    * [SettingsGuide Settings Guide]
    * [RemoteGuide Remotes Guide]
