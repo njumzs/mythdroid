@@ -1,6 +1,6 @@
 #summary Guide to MythDroid settings
 
-== MythDroid Settings ==
+== !MythDroid Settings ==
 
 === Manual Backend Config ===
 

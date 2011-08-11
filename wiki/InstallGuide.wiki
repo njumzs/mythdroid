@@ -10,8 +10,8 @@ You must enable the 'Enable frontend network control' option in each frontend's
 general settings. MDD requires additional configuration steps - see 
 [MDDInstall the MDD install guide].
 
-If you're running !MythTV 0.21 see the [021Specific 0.21 specific notes], if 
-you're running !MythTV 0.22 see the [022Specific 0.22 specific notes]. If 
+If you're running MythTV 0.21 see the [021Specific 0.21 specific notes], if 
+you're running MythTV 0.22 see the [022Specific 0.22 specific notes]. If 
 you're running any other version, you should be all set.
 
 ==Installation==
@@ -22,12 +22,8 @@ Download the latest
 [http://mythdroid.googlecode.com/files/MythDroid-0.4.4.apk MythDroid APK] 
 and install using adb (from the Android SDK) or an application from the Market. 
 Alternatively check out the latest 0.4 source using subversion URL 
-http://mythdroid.googlecode.com/svn/branches/0.4 mythdroid-read-only
+http://mythdroid.googlecode.com/svn/branches/0.4.
 
 ==== !MythDroid trunk ====
 
-You can install !MythDroid trunk to your device by checking out the source code 
-(via Eclipse with the [http://subclipse.tigris.org/ SubClipse] and 
-[http://developer.android.com/sdk/installing.html Android ADT] plugins), 
-connecting your device and running !MythDroid on it. The subversion URL for 
-trunk is http://mythdroid.googlecode.com/svn/trunk/ mythdroid-read-only
+See [BuildGuide the guide] to building !MythDroid from source.

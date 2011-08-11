@@ -19,11 +19,11 @@ decode (dvds ripped to iso won't work). If you have problems, check
 
 To stream over the Internet, you'll need to:
 
- * Forward port 16550/tcp (MDD's CMux) to your backend (either at your router or via SSH)
- * Forward port 5554/tcp to your backend (at your router - NOT via SSH)
- * Configure the public address of your backend in the manual backend configuration of !MythDroid
- * If !MythDroid is behind NAT, hope that it has a RTSP ALG
- * Hope that your carrier doesn't block RTSP or RTP streams
+  * Forward port 16550/tcp (MDD's CMux) to your backend (either at your router or via SSH)
+  * Forward port 5554/tcp to your backend (at your router - NOT via SSH)
+  * Configure the public address of your backend in the manual backend configuration of !MythDroid
+  * If !MythDroid is behind NAT, hope that it has a RTSP ALG
+  * Hope that your carrier doesn't block RTSP or RTP streams
 
 We recommend forwarding ports via SSH for the sake of security. We use 
 [http://code.google.com/p/connectbot/ ConnectBot] for this. Note that 5554/tcp  
