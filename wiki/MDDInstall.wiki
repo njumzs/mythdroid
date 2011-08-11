@@ -4,7 +4,7 @@
 
 MDD makes use of the MythTV perl bindings so they must be installed. If you 
 install MythTV from source, ensure that the --with-bindings=perl option was 
-passed to configure. If you install !MythTV from packages, ensure that the 
+passed to configure. If you install MythTV from packages, ensure that the 
 perl bindings package is installed if available.
 
 For MDD to function, you must ensure that the following settings in the LCD 

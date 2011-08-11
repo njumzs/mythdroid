@@ -5,7 +5,7 @@
 === Manual Backend Config ===
 
 Most users won't need to use this setting since !MythDroid should 
-automatically locate and connect to !MythTV backends that are on 
+automatically locate and connect to MythTV backends that are on 
 the same LAN. 
 
 If your backend is on a different network or you are connecting via a 
@@ -30,10 +30,10 @@ additional information.
 
 === OSD Settings ===
 
-!MythDroid can display incoming calls and SMS on the !MythTV OSD. You can 
+!MythDroid can display incoming calls and SMS on the MythTV OSD. You can 
 disable these features here. You can also specify that !MythDroid should 
 use the alternative XOSD-based method of displaying information (via MDD).
-The XOSD-based method is useful if you are using a version of !MythTV that 
+The XOSD-based method is useful if you are using a version of MythTV that 
 does not have support for OSD messages (e.g. 0.24) or if you would like 
 OSD messages to appear at all times (even when mythfrontend is not running).
 
