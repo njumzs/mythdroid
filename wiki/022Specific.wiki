@@ -1,4 +1,4 @@
-==MythTV 0.22 Specific Notes==
+==MythTV 0.22 Notes==
 
 MythTV 0.22 has some bugs in the network control feature. Apply 
 [http://mythdroid.googlecode.com/files/myth-netcontrol-2.patch this patch] so 

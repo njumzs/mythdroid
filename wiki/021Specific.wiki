@@ -1,4 +1,4 @@
-==MythTV 0.21 Specific Notes==
+==MythTV 0.21 Notes==
 
 For the program guide viewer to function correctly, you must apply 
 [http://mythdroid.googlecode.com/files/xml-guide.patch this patch] to the 
