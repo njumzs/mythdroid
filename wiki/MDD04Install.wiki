@@ -1,6 +1,6 @@
-#summary MDD 0.4.4 and below installation guide
+#summary MDD 0.4.4 and below
 
-== MDD 0.4 Installation ==
+== MDD 0.4.x Installation ==
 
 The steps required to install MDD 0.4.4 or below:
 
