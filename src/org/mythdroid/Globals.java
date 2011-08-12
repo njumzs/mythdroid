@@ -106,6 +106,9 @@ public class Globals {
             feMgr = 
                 new FrontendManager(name, FrontendDB.getFirstFrontendAddr(ctx));
         }
+        
+        else if (name.equals(Messages.getString("MDActivity.0"))) //$NON-NLS-1$
+            throw new IOException(Messages.getString("Globals.0")); //$NON-NLS-1$
 
         // Connect to the specified frontend
         else
