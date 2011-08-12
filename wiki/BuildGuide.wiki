@@ -17,7 +17,7 @@ checkout !MythDroid. To do so, click on 'New' -> 'Project' ->
 URL http://mythdroid.googlecode.com/svn. Then select the appropriate folder
 ('trunk' unless you want an older branch) and click finish.
 
-!MythDroid will be build automatically if all goes well.
+!MythDroid will build automatically if all goes well.
 
 == Install ==
 
