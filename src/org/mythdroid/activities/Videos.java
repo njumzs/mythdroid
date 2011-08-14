@@ -59,6 +59,7 @@ public class Videos extends MDActivity implements
     private String path             = "ROOT"; //$NON-NLS-1$
     private TextView dirText        = null;
     private boolean fetchingArt     = false;
+    private boolean largeScreen     = false;
     /** Scale factor for pixel values for different display densities */
     private float scale              = 1;
 
@@ -135,7 +136,9 @@ public class Videos extends MDActivity implements
                 if (bm != null)
                     vids[i].poster = new BitmapDrawable(bm);
                 else {
-                    vids[i].getPoster(70 * scale + 0.5f, 110 * scale + 0.5f);
+                    float w = (largeScreen ? 140 : 70) * scale + 0.5f;
+                    float h = (largeScreen ? 220 : 110) * scale + 0.5f;
+                    vids[i].getPoster(w, h); 
                     if (vids[i].poster != null)
                         artCache.put(vids[i].id, vids[i].poster.getBitmap());
                 }
@@ -165,6 +168,7 @@ public class Videos extends MDActivity implements
         lv.setOnItemLongClickListener(this);
 
         scale = getResources().getDisplayMetrics().density;
+        largeScreen = getResources().getDisplayMetrics().widthPixels > 1000;
 
         showDialog(DIALOG_LOAD);
         Globals.getWorker().post(getVideos);
