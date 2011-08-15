@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<org.mythdroid.views.CheckableRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="8sp">
+
+    <CheckedTextView android:id="@+id/reclist_title"
+     	android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/itemselector"
+        android:textStyle="bold"
+        android:textSize="20sp"/>
+
+    <TextView android:id="@+id/reclist_subtitle"
+    	android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/reclist_title"
+    	android:textStyle="italic"
+        android:textSize="18sp"/>
+        
+    <TextView android:id="@+id/reclist_channel"
+       	android:layout_width="wrap_content"
+       	android:layout_height="wrap_content"
+       	android:layout_below="@id/reclist_subtitle"
+       	android:layout_alignParentLeft="true"
+       	android:paddingTop="2dp"
+       	android:textSize="14sp"/>
+        	
+    <TextView android:id="@+id/reclist_date"
+       	android:layout_width="wrap_content"
+       	android:layout_height="wrap_content"
+       	android:layout_alignTop="@id/reclist_channel"
+       	android:layout_alignParentRight="true"
+       	android:layout_marginRight="4dp"
+       	android:paddingTop="2dp"
+       	android:textSize="14sp"/>
+       	
+	<ProgressBar android:id="@+id/reclist_rec"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentTop="true"
+		android:layout_alignParentRight="true"
+		android:indeterminateOnly="true"
+		style="?android:attr/progressBarStyleSmallTitle"/>
+
+</org.mythdroid.views.CheckableRelativeLayout>

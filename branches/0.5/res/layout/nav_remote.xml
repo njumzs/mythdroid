@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/nav_remote"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:background="@drawable/metal">
+    
+   	<ImageButton android:id="@+id/nav_back"
+    	style="@style/MDButton72"
+    	android:layout_alignParentTop="true"
+    	android:layout_alignParentLeft="true"
+    	android:src="@drawable/back"/>
+
+    <ImageButton android:id="@+id/nav_up"
+    	style="@style/MDButton72"
+    	android:layout_below="@id/nav_back"
+    	android:layout_centerHorizontal="true"
+    	android:layout_marginTop="28dp"
+    	android:src="@drawable/up"/>
+    	
+   	<ImageButton android:id="@+id/nav_enter"
+    	style="@style/MDButton72"
+    	android:layout_alignLeft="@id/nav_up"
+    	android:layout_below="@id/nav_up"
+    	android:src="@drawable/center"/>
+   	
+   	<ImageButton android:id="@+id/nav_left"
+    	style="@style/MDButton72"
+    	android:layout_toLeftOf="@id/nav_enter"
+    	android:layout_alignTop="@id/nav_enter"
+    	android:src="@drawable/left"/>
+    
+    <ImageButton android:id="@+id/nav_right"
+    	style="@style/MDButton72"
+    	android:layout_toRightOf="@id/nav_enter"
+    	android:layout_alignTop="@id/nav_enter"
+    	android:src="@drawable/right"/>
+    	
+    <ImageButton android:id="@+id/nav_down"
+    	style="@style/MDButton72"
+    	android:layout_alignLeft="@id/nav_enter"
+    	android:layout_below="@id/nav_enter"
+    	android:src="@drawable/down"/>
+
+   	<TextView android:id="@+id/nav_item"
+   		android:layout_width="fill_parent"
+   		android:layout_height="wrap_content"
+   		android:layout_alignParentBottom="true"
+   		android:gravity="center"
+   		android:focusable="false"
+   		android:textColor="@color/light_grey_text"
+   		android:textSize="18sp"/>
+   	
+   	<TextView android:id="@+id/nav_loc"
+   		android:layout_width="fill_parent"
+   		android:layout_height="wrap_content"
+   		android:layout_above="@id/nav_item"
+   		android:gravity="center"
+   		android:focusable="false"
+   		android:textColor="@color/light_grey_text"
+   		android:textSize="20sp"/>
+	
+</RelativeLayout>

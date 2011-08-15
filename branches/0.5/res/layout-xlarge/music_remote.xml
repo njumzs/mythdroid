@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/music_remote"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:background="@drawable/metal">
+    
+    <TextView android:id="@+id/music_title"
+   		android:layout_width="fill_parent"
+   		android:layout_height="wrap_content"
+		android:layout_alignParentTop="true"
+		android:layout_marginTop="8dp"
+   		android:gravity="center"
+   		android:focusable="false"
+   		android:textStyle="bold"
+   		android:textColor="@color/light_grey_text"
+   		android:textSize="24sp"/>
+   	
+   	<TextView android:id="@+id/music_details"
+   		android:layout_width="fill_parent"
+   		android:layout_height="wrap_content"
+   		android:layout_below="@id/music_title"
+   		android:layout_marginTop="10dp"
+   		android:gravity="center"
+   		android:focusable="false"
+	   	android:textStyle="italic"
+	   	android:textColor="@color/light_grey_text"
+   		android:textSize="22sp"/>
+   		
+     <ProgressBar android:id="@+id/music_progress"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_below="@id/music_details"
+    	android:layout_marginTop="20dp"
+    	android:layout_marginLeft="8dp"
+    	android:layout_marginRight="8dp"
+    	android:gravity="center"
+    	style="?android:attr/progressBarStyleHorizontal"/>
+    
+    <View android:id="@+id/music_pause"
+    	android:layout_width="160dp"
+    	android:layout_height="160dp"
+    	android:layout_alignParentBottom="true"
+    	android:layout_centerHorizontal="true"
+    	android:focusable="false"/>
+   	
+	<ImageButton android:id="@+id/music_skip_forward"
+    	style="@style/MDButton160"
+    	android:layout_alignTop="@id/music_pause"
+    	android:layout_toRightOf="@id/music_pause"
+    	android:src="@drawable/skip_forward"/>
+    
+    <ImageButton android:id="@+id/music_skip_back"
+		style="@style/MDButton160"
+    	android:layout_alignTop="@id/music_pause"
+    	android:layout_toLeftOf="@id/music_pause"
+    	android:src="@drawable/skip_back"/>
+    	
+   <ImageButton android:id="@+id/music_seek_forward"
+    	style="@style/MDButton160"
+    	android:layout_alignTop="@id/music_pause"
+    	android:layout_toRightOf="@id/music_skip_forward"
+    	android:src="@drawable/seek_forward"/>
+    
+    <ImageButton android:id="@+id/music_seek_back"
+    	style="@style/MDButton160"
+    	android:layout_alignTop="@id/music_pause"
+    	android:layout_toLeftOf="@id/music_skip_back"
+    	android:src="@drawable/seek_back"/>
+    	
+    <ImageView android:id="@+id/music_coverart"
+    	android:layout_width="fill_parent"
+    	android:layout_height="620dp"
+    	android:layout_alignWithParentIfMissing="true"
+    	android:layout_below="@id/music_progress"
+    	android:layout_margin="76dp"
+    	android:src="@drawable/mdmusic"
+    	android:scaleType="fitCenter"
+    	android:focusable="false"/>
+
+</RelativeLayout>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+   	android:layout_width="fill_parent"
+   	android:layout_height="fill_parent"
+   	android:paddingLeft="20dp"
+   	android:paddingRight="20dp">
+   	
+   	 <TextView
+		android:id="@+id/videoDTitle"
+ 		android:layout_width="fill_parent" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_alignParentTop="true"
+ 		android:layout_alignParentLeft="true"
+ 		android:paddingTop="10dp"
+ 		android:text="Title"
+ 		android:textStyle="bold"
+ 		android:textSize="24sp"/>
+ 		
+ 	<TextView
+		android:id="@+id/videoDSubtitle"
+ 		android:layout_width="fill_parent" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/videoDTitle"
+ 		android:layout_marginTop="6dp"
+ 		android:textSize="22sp"
+ 		android:text="SubTitle"
+ 		android:textStyle="italic"/>
+   	
+   	<ImageView
+		android:id="@+id/videoDPoster"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/videoDSubtitle"
+		android:layout_alignParentLeft="true"
+		android:layout_marginLeft="50dp"
+		android:minHeight="220dp"
+		android:layout_marginTop="50dp"/>
+ 		
+	<TextView	
+		android:id="@+id/videoDRating"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+		android:layout_alignTop="@id/videoDPoster"
+		android:layout_toRightOf="@id/videoDPoster"
+		android:layout_marginLeft="100dp"
+		android:layout_marginTop="30dp"
+ 		android:text="Rating"
+ 		android:textSize="20sp"/>
+		
+	<TextView	
+		android:id="@+id/videoDYear"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+		android:layout_below="@id/videoDRating"
+ 		android:layout_alignLeft="@id/videoDRating"
+ 		android:layout_marginTop="20dp"
+ 		android:text="Year"
+ 		android:textSize="20sp"/>
+ 		
+	<TextView	
+		android:id="@+id/videoDLength"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+		android:layout_below="@id/videoDYear"
+ 		android:layout_alignLeft="@id/videoDYear"
+ 		android:layout_marginTop="20dp"
+ 		 android:text="Length"
+		android:textSize="20sp"/>
+		
+	<TextView	
+		android:id="@+id/videoDDirector"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/videoDLength"
+ 		android:layout_alignLeft="@id/videoDYear"
+ 		android:layout_marginTop="20dp"
+ 		android:text="Director"
+ 		android:textSize="20sp"/>
+ 		
+ 	<TextView	
+ 		android:id="@+id/videoDPlotTitle"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/videoDPoster"
+		android:layout_alignParentLeft="true"
+ 		android:layout_marginTop="50dp"
+ 		android:layout_marginLeft="20dp"
+ 		android:text="Plot:"
+ 		android:textSize="20sp"/>
+		
+	<LinearLayout
+		android:id="@+id/videoDButtons"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:layout_centerHorizontal="true"
+		android:gravity="center"
+		android:paddingBottom="20dp"
+		android:orientation="horizontal">
+		
+		<Button
+ 			android:id="@+id/videoDPlay"
+ 			android:layout_width="wrap_content"
+ 			android:layout_height="wrap_content"
+ 			android:layout_marginRight="16dp"
+ 			android:minWidth="84dp"
+  			android:text="Play"/>
+  			
+		<Button
+ 			android:id="@+id/videoDTVDB"
+ 			android:layout_width="wrap_content"
+ 			android:layout_height="wrap_content"
+ 			android:minWidth="84dp"
+ 			android:layout_marginLeft="16dp"
+ 			android:text="TVDB"/>
+ 			
+ 	</LinearLayout>
+ 	
+ 	<ScrollView 
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_below="@id/videoDPlotTitle"
+		android:layout_above="@id/videoDButtons"
+		android:layout_alignLeft="@id/videoDPlotTitle"
+		android:layout_alignWithParentIfMissing="true"
+		android:paddingTop="18dp"
+		android:paddingBottom="24dp"
+		android:clipChildren="true">
+		
+		<TextView
+			android:id="@+id/videoDPlot"
+			android:layout_width="wrap_content" 
+ 			android:layout_height="wrap_content"
+ 			android:paddingRight="4dp"
+			android:textSize="18sp"/>
+			
+	</ScrollView>
+			
+</RelativeLayout>

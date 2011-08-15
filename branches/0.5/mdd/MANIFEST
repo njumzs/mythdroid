@@ -1,0 +1,14 @@
+bin/mdd.pl
+Build.PL
+build/Build/MDD.pm
+conf/mdd.conf
+init/gentoo
+init/sysv
+init/upstart
+lib/MDD/CMux.pm
+lib/MDD/LCD.pm
+lib/MDD/Log.pm
+lib/MDD/MythDB.pm
+lib/MDD/XOSD.pm
+MANIFEST			This list of files
+t/mdd.t

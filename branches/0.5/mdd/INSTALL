@@ -1,0 +1,6 @@
+As root:
+
+perl Build.PL
+./Build test
+./Build install
+

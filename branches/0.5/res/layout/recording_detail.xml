@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+   	android:layout_width="fill_parent"
+   	android:layout_height="fill_parent"
+   	android:orientation="vertical"
+   	android:paddingLeft="4dp"
+   	android:paddingRight="4dp">
+   	
+    <TextView
+		android:id="@+id/rec_title"
+ 		android:layout_width="fill_parent" 
+ 		android:layout_height="wrap_content"
+ 		android:paddingTop="8dp"
+ 		android:textSize="20sp"/>
+ 		
+ 	<TextView
+		android:id="@+id/rec_subtitle"
+ 		android:layout_width="fill_parent" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/rec_title"
+ 		android:textSize="16sp"
+ 		android:textStyle="italic"/>
+ 		
+ 	<ImageView
+		android:id="@+id/rec_thumb"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/rec_subtitle"
+		android:layout_centerHorizontal="true"
+		android:adjustViewBounds="true"
+		android:maxHeight="110dp"
+		android:paddingTop="10dp"
+		android:paddingBottom="10dp"/>
+		
+	<TextView	
+		android:id="@+id/rec_channel"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/rec_thumb"
+ 		android:layout_alignParentLeft="true"
+ 		android:textSize="17sp"/>
+ 		
+	<TextView	
+		android:id="@+id/rec_start"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+		android:layout_alignTop="@id/rec_channel"
+ 		android:layout_alignParentRight="true"
+		android:textSize="17sp"/>
+		
+	<TextView	
+		android:id="@+id/rec_category"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/rec_channel"
+ 		android:layout_alignParentLeft="true"
+ 		android:paddingTop="4dp"
+ 		android:textSize="15sp"/>
+ 		
+	<TextView	
+		android:id="@+id/rec_status"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+		android:layout_alignTop="@id/rec_category"
+ 		android:layout_alignParentRight="true"
+ 		android:paddingTop="4dp"
+		android:textSize="15sp"/>
+		
+	<LinearLayout
+		android:id="@+id/rec_buttons"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:layout_centerHorizontal="true"
+		android:gravity="center"
+		android:paddingBottom="2dp"
+		android:orientation="horizontal">
+		
+		<Button
+ 			android:id="@+id/rec_play"
+ 			android:layout_width="wrap_content"
+ 			android:layout_height="wrap_content"
+ 			android:layout_marginRight="3dp"
+ 			android:minWidth="76dp"
+			android:visibility="gone"
+  			android:text="Play"/>
+  			
+ 		<Button
+ 			android:id="@+id/rec_stop"
+ 			android:layout_width="wrap_content"
+ 			android:layout_height="wrap_content"
+ 			android:minWidth="76dp"
+			android:visibility="gone"
+ 			android:text="Stop Rec"/>
+ 			
+ 		<Button
+ 			android:id="@+id/rec_edit"
+ 			android:layout_width="wrap_content"
+ 			android:layout_height="wrap_content"
+ 			android:layout_marginLeft="3dp"
+ 			android:minWidth="76dp"
+ 			android:text="Schedule"/>
+ 			
+		<Button
+ 			android:id="@+id/rec_del"
+ 			android:layout_width="wrap_content"
+ 			android:layout_height="wrap_content"
+ 			android:minWidth="76dp"
+ 			android:layout_marginLeft="3dp"
+			android:visibility="gone"
+ 			android:text="Delete"/>
+ 			
+ 	</LinearLayout>
+ 	
+ 	<ScrollView 
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_below="@id/rec_category"
+		android:layout_above="@id/rec_buttons"
+		android:layout_alignWithParentIfMissing="true"
+		android:paddingTop="6dp"
+		android:paddingBottom="4dp"
+		android:clipChildren="true">
+		
+		<TextView
+			android:id="@+id/rec_desc"
+			android:layout_width="wrap_content" 
+ 			android:layout_height="wrap_content"
+ 			android:paddingRight="4dp"
+			android:textSize="16sp"/>
+			
+	</ScrollView>
+			
+</RelativeLayout>

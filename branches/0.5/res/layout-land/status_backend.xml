@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+   	android:layout_width="fill_parent"
+   	android:layout_height="fill_parent"
+   	android:orientation="vertical"
+   	android:paddingLeft="8dp"
+   	android:paddingRight="8dp">
+   	
+    <TextView
+    	android:id="@+id/storage"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_marginTop="10dp"
+ 		android:textStyle="bold"
+ 		android:textSize="20sp"
+ 		android:text="Storage"/>
+ 		
+ 	<TextView
+		android:id="@+id/storage_total"
+ 		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/storage"
+ 		android:layout_marginTop="10dp"
+ 		android:textSize="16sp"/>
+ 		
+ 	<TextView
+		android:id="@+id/storage_used"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/storage_total"
+ 		android:layout_marginTop="8dp"
+		android:textSize="16sp"/>
+		
+	<TextView	
+		android:id="@+id/storage_free"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/storage_used"
+ 		android:layout_marginTop="8dp"
+ 		android:textSize="16sp"/>
+ 		
+	<TextView	
+		android:id="@+id/load"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+		android:layout_below="@id/storage_free"
+ 		android:layout_marginTop="16dp"
+ 		android:textStyle="bold"
+		android:textSize="20sp"
+		android:text="Load"/>
+		
+	<TextView
+		android:id="@+id/load_1min"
+ 		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/load"
+ 		android:layout_marginTop="10dp"
+ 		android:textSize="16sp"/>
+ 		
+ 	<TextView
+		android:id="@+id/load_5min"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/load_1min"
+ 		android:layout_marginTop="8dp"
+		android:textSize="16sp"/>
+		
+	<TextView	
+		android:id="@+id/load_15min"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/load_5min"
+ 		android:layout_marginTop="8dp"
+ 		android:textSize="16sp"/>
+ 		
+ 	<TextView	
+		android:id="@+id/guide"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+		android:layout_alignTop="@id/load"
+  		android:layout_marginLeft="200dp"
+ 		android:textStyle="bold"
+		android:textSize="20sp"
+		android:text="Guide Data"/>
+		
+	<TextView
+		android:id="@+id/guide_length"
+ 		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/guide"
+ 		android:layout_marginTop="10dp"
+ 		android:layout_alignLeft="@id/guide"
+ 		android:textSize="16sp"/>
+ 		
+ 	<TextView
+		android:id="@+id/guide_last"
+		android:layout_width="wrap_content" 
+ 		android:layout_height="wrap_content"
+ 		android:layout_below="@id/guide_length"
+ 		android:layout_alignLeft="@id/guide"
+ 		android:layout_marginTop="8dp"
+		android:textSize="16sp"/>
+		
+</RelativeLayout>

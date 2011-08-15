@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<org.mythdroid.views.NumPadLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/numpad"
+    android:paddingLeft="10px"
+    android:paddingRight="10px"
+	android:paddingTop="2px"
+	android:paddingBottom="2px"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+        <ImageButton android:id="@+id/one"
+            style="@style/NumPadButton"
+            android:src="@drawable/dial_num_1_no_vm"/>
+            
+        <ImageButton android:id="@+id/two"
+            style="@style/NumPadButton"
+            android:src="@drawable/dial_num_2"/>
+
+        <ImageButton android:id="@+id/three"
+            style="@style/NumPadButton"
+            android:src="@drawable/dial_num_3"/>
+
+        <ImageButton android:id="@+id/four"
+            style="@style/NumPadButton"
+            android:src="@drawable/dial_num_4"/>
+        
+        <ImageButton android:id="@+id/five"
+            style="@style/NumPadButton"
+            android:src="@drawable/dial_num_5"/>
+
+        <ImageButton android:id="@+id/six"
+            style="@style/NumPadButton"
+            android:src="@drawable/dial_num_6"/>
+
+        <ImageButton android:id="@+id/seven"
+            style="@style/NumPadButton"
+            android:src="@drawable/dial_num_7"/>
+    
+        <ImageButton android:id="@+id/eight"
+            style="@style/NumPadButton"
+            android:src="@drawable/dial_num_8"/>
+
+        <ImageButton android:id="@+id/nine"
+	        style="@style/NumPadButton"
+            android:src="@drawable/dial_num_9"/>
+        
+        <View android:layout_width="96px" android:layout_height="76px"/>
+
+        <ImageButton android:id="@+id/zero"
+            style="@style/NumPadButton"
+            android:src="@drawable/dial_num_0"/>
+        
+        <ImageButton android:id="@+id/enter"
+            style="@style/NumPadButton"
+            android:src="@drawable/dial_enter"/>
+
+</org.mythdroid.views.NumPadLayout>
+

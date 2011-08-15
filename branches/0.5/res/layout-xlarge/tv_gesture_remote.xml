@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="@drawable/metal">
+	
+	<ImageButton android:id="@+id/tv_back"
+		style="@style/MDButton160"
+		android:layout_alignParentTop="true"
+		android:layout_alignParentLeft="true"
+		android:layout_marginTop="4dp"
+		android:src="@drawable/back"/>
+		
+	<ImageButton android:id="@+id/tv_guide"
+		style="@style/MDButton160"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentLeft="true"
+		android:layout_marginBottom="20dp"
+		android:src="@drawable/cal"/>
+		
+	<Button android:id="@+id/tv_num"
+		style="@style/MDButton160"
+		android:layout_alignTop="@id/tv_guide"
+		android:layout_toRightOf="@id/tv_guide"
+		android:layout_marginBottom="20dp"
+		android:gravity="center"
+		android:textSize="30sp"
+		android:textStyle="bold"
+    	android:textColor="#ff333333"
+		android:text="123"/>
+		
+	<ImageButton android:id="@+id/tv_vol_mute"
+		style="@style/MDButton160"
+		android:layout_alignTop="@id/tv_guide"
+		android:layout_toRightOf="@id/tv_num"
+		android:layout_marginBottom="20dp"
+		android:src="@drawable/vol_mute"/>
+		
+	<ImageButton android:id="@+id/tv_skip"
+		style="@style/MDButton160"
+		android:layout_alignTop="@id/tv_guide"
+		android:layout_alignParentRight="true"
+		android:layout_marginBottom="20dp"
+		android:src="@drawable/skip"/>
+				
+	<ImageButton android:id="@+id/tv_enter"
+		style="@style/MDButton160"
+		android:layout_alignTop="@id/tv_guide"
+		android:layout_toLeftOf="@id/tv_skip"
+		android:layout_marginBottom="20dp"
+		android:src="@drawable/enter"/>
+		
+	<ImageButton android:id="@+id/tv_info"
+		style="@style/MDButton160"
+		android:layout_alignTop="@id/tv_guide"
+		android:layout_toLeftOf="@id/tv_enter"
+		android:layout_marginBottom="20dp"
+		android:src="@drawable/info"/>
+		
+	<TextView android:id="@+id/tv_title"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_alignParentTop="true"
+    	android:layout_toRightOf="@id/tv_back"
+    	android:layout_marginTop="8dp"
+    	android:layout_marginLeft="4dp"
+    	android:layout_marginRight="164dp"
+    	android:gravity="center"
+      	android:textSize="24sp"
+    	android:textStyle="bold"
+    	android:textColor="@color/light_grey_text"/>
+    	
+    <ProgressBar android:id="@+id/tv_progress"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_below="@id/tv_back"
+    	android:layout_marginTop="8dp"
+    	android:layout_marginLeft="8dp"
+    	android:layout_marginRight="8dp"
+    	android:gravity="center"
+    	style="?android:attr/progressBarStyleHorizontal"/>
+    	
+	<ImageView android:id="@+id/tv_gesture"
+		android:layout_width="360dp"
+		android:layout_height="fill_parent"
+		android:layout_below="@id/tv_progress"
+		android:layout_marginTop="20dp"
+		android:layout_marginBottom="50dp"
+		android:scaleType="fitCenter"
+		android:layout_centerHorizontal="true"
+		android:src="@drawable/mdtv"/>
+		
+</RelativeLayout>
