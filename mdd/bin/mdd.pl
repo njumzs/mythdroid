@@ -624,8 +624,17 @@ sub streamFile($) {
     }
 
     $log->dbg("Streaming - resolved path is $file");
-
+    
     my $cmd = $stream_cmd;
+
+    # The default demuxer doesn't support get_length et al in ts
+    if (
+        $file =~ /\.mpg$/ || $file =~ /\.mpeg$/ ||
+        $file =~ /\.ts$/ || $file =~ /\.m2ts$/
+    ) {
+        $cmd =~ s/vlc /vlc --demux avformat /;
+    }
+
     $cmd =~ s/%FILE%/$file/;
     $cmd =~ s/%VB%/$vb/;
     $cmd =~ s/%AB%/$ab/;
