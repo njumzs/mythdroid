@@ -222,7 +222,33 @@ public class VideoPlayer extends MDActivity {
             }, 4000
         );
 
-    }    
+    }
+    
+    private VLCRemote getVLC() {
+        
+        int attempts = 0;
+        
+        while (attempts < 3 && vlc == null)
+            try {
+                vlc = new VLCRemote(beMgr.addr);
+            } catch (IOException e) { 
+                attempts++; 
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e1) {}
+            }
+            
+        if (vlc != null)
+            return vlc;
+        
+        try {
+            vlc = new VLCRemote(beMgr.addr);
+        } catch (IOException e) { 
+            ErrUtil.err(this, e);
+        }
+        
+        return vlc;
+    }
     
     private void playVideo() {
             
@@ -256,32 +282,27 @@ public class VideoPlayer extends MDActivity {
             }
         );
         
-        try {
-            vlc = new VLCRemote(beMgr.addr);
-            videoView.setVLC(vlc);
-            videoView.setMediaController(new MediaController(ctx, false));
-            videoView.setOnSeekListener(
-                new OnSeekListener() {
-                    @Override
-                    public void onSeek() {
-                        showDialog(DIALOG_LOAD);
-                        mplayer.pause();
-                        // Dump the buffer, no better way of doing it :(
-                        mplayer.reset();
-                        try {
-                            mplayer.setDataSource(ctx, url);
-                            mplayer.prepareAsync();
-                        } catch (Exception e) {
-                            ErrUtil.err(ctx, e);
-                            finish();
-                        }
+        videoView.setVLC(getVLC());
+        videoView.setMediaController(new MediaController(ctx, false));
+        videoView.setOnSeekListener(
+            new OnSeekListener() {
+                @Override
+                public void onSeek() {
+                    showDialog(DIALOG_LOAD);
+                    mplayer.pause();
+                    // Dump the buffer, no better way of doing it :(
+                    mplayer.reset();
+                    try {
+                        mplayer.setDataSource(ctx, url);
+                        mplayer.prepareAsync();
+                    } catch (Exception e) {
+                        ErrUtil.err(ctx, e);
+                        finish();
                     }
                 }
-            );
-        } catch (IOException e) {
-            ErrUtil.err(ctx, e);
-        }
-        
+            }
+        );
+  
         videoView.setOnPreparedListener(
             new OnPreparedListener() {
                 @Override
