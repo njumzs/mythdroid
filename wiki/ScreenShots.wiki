@@ -1,10 +1,20 @@
 #summary A selection of screenshots
 
+== Phone ==
+
 ||Main Menu||TV Remote||TV Remote (Gesture)||Nav Remote||
-||http://mythdroid.googlecode.com/files/MainMenu160-0.2.png||http://mythdroid.googlecode.com/files/TVRemote-0.2.png||http://mythdroid.googlecode.com/files/TVGestureRemote-0.2.png||http://mythdroid.googlecode.com/files/NavRemote-0.2.png||
+||http://mythdroid.googlecode.com/files/MainMenu-0.5.png||http://mythdroid.googlecode.com/files/TVRemote-0.5.png||http://mythdroid.googlecode.com/files/TVGRemote-0.5.png||http://mythdroid.googlecode.com/files/NavRemote-0.5.png||
 
-||Recordings||Program Detail||Frontend Chooser||Program Guide||
-||http://mythdroid.googlecode.com/files/Recordings.png||http://mythdroid.googlecode.com/files/RecordedDetail.png||http://mythdroid.googlecode.com/files/FrontendChooser.png||http://mythdroid.googlecode.com/files/Guide.png||
+||Recordings||Program Detail||Program Guide||Music||
+||http://mythdroid.googlecode.com/files/Recordings-0.5.png||http://mythdroid.googlecode.com/files/RecDetail-0.5.png||http://mythdroid.googlecode.com/files/Guide-0.5.png||http://mythdroid.googlecode.com/files/MusicRemote-0.2.png||
 
-||Music||Videos||Video Detail||
-||http://mythdroid.googlecode.com/files/MusicRemote-0.2.png||http://mythdroid.googlecode.com/files/Videos.png||http://mythdroid.googlecode.com/files/VideoDetail.png||
+||Videos||Video Detail||
+||http://mythdroid.googlecode.com/files/Videos-0.5.png||http://mythdroid.googlecode.com/files/VideoDetail-0.5.png||
+
+== Tablet ==
+
+||TV Remote||Nav Remote||Recordings||
+||http://mythdroid.googlecode.com/files/TabletTVBRemote-0.5.png||http://mythdroid.googlecode.com/files/TabletNavBRemote-0.5.png||http://mythdroid.googlecode.com/files/TabletRecordings-0.5.png||
+
+||Guide||Status||Settings||
+||http://mythdroid.googlecode.com/files/TabletGuide-0.5.png||http://mythdroid.googlecode.com/files/TabletStatus-0.5.png||http://mythdroid.googlecode.com/files/TabletSettings-0.5.png||
