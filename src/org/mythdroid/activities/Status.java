@@ -125,7 +125,7 @@ public class Status extends MDFragmentActivity {
             	getSupportFragmentManager().beginTransaction();
             ft.replace(android.R.id.content, new StatusFragment());
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         }
         else {
             FragmentTransaction ft =
@@ -135,7 +135,7 @@ public class Status extends MDFragmentActivity {
             ft.replace(R.id.scheduledframe, new StatusScheduledFragment());
             ft.replace(R.id.backendframe, new StatusBackendFragment());
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         }
 
     }
