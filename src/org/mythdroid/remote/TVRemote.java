@@ -396,9 +396,10 @@ public class TVRemote extends Remote {
             return;
         }
 
-        try {
-            feMgr.sendKey(key);
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        if (feMgr != null)
+            try {
+                feMgr.sendKey(key);
+            } catch (IOException e) { ErrUtil.err(this, e); }
 
         if (key == Key.GUIDE)
             startActivityForResult(
