@@ -64,6 +64,7 @@ public class VideoDetail extends MDActivity {
         if (video == null) {
             ErrUtil.err(this, Messages.getString("VideoDetail.2")); //$NON-NLS-1$
             finish();
+            return;
         }
             
         ((TextView)findViewById(R.id.videoDTitle))
