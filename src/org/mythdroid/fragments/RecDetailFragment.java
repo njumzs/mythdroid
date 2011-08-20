@@ -116,7 +116,8 @@ public class RecDetailFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (!embedded) activity.setResult(Activity.RESULT_OK);
+        if (!embedded && activity != null) 
+            activity.setResult(Activity.RESULT_OK);
     }
 
     @Override
