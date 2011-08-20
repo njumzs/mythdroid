@@ -133,6 +133,8 @@ public class RecListFragment extends ListFragment
      * Update which recording is selected
      */
     public void updateSelection() {
+        if (activity.index > lv.getCount() - 1)
+            activity.index = lv.getCount() - 1;
         Globals.curProg = (Program)lv.getItemAtPosition(activity.index);
         lv.setItemChecked(activity.index, true);
         lv.setSelection(activity.index);
