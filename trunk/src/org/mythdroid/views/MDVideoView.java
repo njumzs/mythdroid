@@ -75,6 +75,7 @@ public class MDVideoView extends android.widget.VideoView {
      
     @Override
     public int getDuration() {
+        if (vlc == null) return 0;
         if (duration == -1)
             try {
                 duration = vlc.getLength();
@@ -87,9 +88,8 @@ public class MDVideoView extends android.widget.VideoView {
     
     @Override
     public int getCurrentPosition() {
-        
-        if (paused)
-            return pausePos;
+        if (vlc == null) return 0;
+        if (paused)      return pausePos;
         try {
             return (int)(vlc.getTime() - pausedTime);
         } catch (IOException e) {
@@ -101,6 +101,7 @@ public class MDVideoView extends android.widget.VideoView {
     @Override
     public void pause() {
         super.pause();
+        if (vlc == null) return;
         paused = true;
         pauseStart = System.currentTimeMillis();
         try {
@@ -121,6 +122,7 @@ public class MDVideoView extends android.widget.VideoView {
     
     @Override
     public void seekTo(int msecs) {
+        if (vlc == null) return;
         try {
             vlc.seek(msecs);
         } catch (Exception e) {
