@@ -299,9 +299,10 @@ public class MusicRemote extends Remote {
 
         final Key key = (Key)v.getTag();
 
-        try {
-            feMgr.sendKey(key);
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        if (feMgr != null)
+            try {
+                feMgr.sendKey(key);
+            } catch (IOException e) { ErrUtil.err(this, e); }
 
         super.onClick(v);
 
