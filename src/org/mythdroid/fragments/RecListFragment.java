@@ -27,6 +27,7 @@ import org.mythdroid.activities.VideoPlayer;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.ProgramAdapter;
 import org.mythdroid.remote.TVRemote;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * Displays a list of recordings
@@ -61,6 +63,8 @@ public class RecListFragment extends ListFragment
         activity.addHereToFrontendChooser(VideoPlayer.class);
         lv.setOnItemLongClickListener(this);
         lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        
+        setEmptyText(Messages.getString("RecListFragment.0")); //$NON-NLS-1$
         
         View detailsFrame = getActivity().findViewById(R.id.recdetails);
         dualPane = detailsFrame != null && 
@@ -112,6 +116,11 @@ public class RecListFragment extends ListFragment
      * @param recordings ArrayList of Programs
      */
     public void setAdapter(ArrayList<Program> recordings) {
+        if (recordings.isEmpty()) {
+            setListAdapter(null);
+            return;
+        }
+            
         setListAdapter(
             new ProgramAdapter(
                 activity, R.layout.recording_list_item,
