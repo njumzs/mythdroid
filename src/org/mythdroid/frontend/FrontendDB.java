@@ -77,7 +77,7 @@ public class FrontendDB {
      * @return Cursor
      */
     public static Cursor getFrontends(Context ctx) {
-        if (db == null || cached == null) initDB(ctx);
+        if (db == null || cached == null || cached.isClosed()) initDB(ctx);
         return cached;
     }
     
@@ -127,7 +127,7 @@ public class FrontendDB {
      */
     public static ArrayList<String> getFrontendNames(Context ctx) {
         
-        if (db == null || cached == null) initDB(ctx);
+        if (db == null || cached == null || cached.isClosed()) initDB(ctx);
         
         if (namesList != null)
             return new ArrayList<String>(namesList);
@@ -149,7 +149,7 @@ public class FrontendDB {
      * @return name of the first frontend
      */
     public static String getFirstFrontendName(Context ctx) {
-        if (db == null || cached == null) initDB(ctx);
+        if (db == null || cached == null || cached.isClosed()) initDB(ctx);
         if (cached.getCount() < 1) 
             return null;
         cached.moveToFirst();
@@ -162,7 +162,7 @@ public class FrontendDB {
      * @return addr of the first frontend
      */
     public static String getFirstFrontendAddr(Context ctx) {
-        if (db == null || cached == null) initDB(ctx);
+        if (db == null || cached == null || cached.isClosed()) initDB(ctx);
         if (cached.getCount() < 1) 
             return null;
         cached.moveToFirst();
@@ -176,7 +176,7 @@ public class FrontendDB {
      * @return addr of the frontend
      */
     public static String getFrontendAddr(Context ctx, String name) {
-        if (db == null || cached == null) initDB(ctx);
+        if (db == null || cached == null || cached.isClosed()) initDB(ctx);
         cached.moveToFirst();
         while (!cached.isAfterLast()) {
             if (cached.getString(NAME).equals(name))
@@ -197,7 +197,7 @@ public class FrontendDB {
         Context ctx, String name, String addr, String hwaddr
     ) {
 
-        if (db == null) initDB(ctx);
+        if (db == null || cached == null || cached.isClosed()) initDB(ctx);
 
         final ContentValues cv = new ContentValues();
         cv.put("addr", addr.trim()); //$NON-NLS-1$
@@ -230,7 +230,7 @@ public class FrontendDB {
         Context ctx, long id, String name, String addr, String hwaddr
     ) {
 
-        if (db == null) initDB(ctx);
+        if (db == null || cached == null || cached.isClosed()) initDB(ctx);
 
         final ContentValues cv = new ContentValues();
         cv.put("addr", addr.trim()); //$NON-NLS-1$
@@ -248,7 +248,7 @@ public class FrontendDB {
      * @param id id of frontend record
      */
     public static void delete(Context ctx, long id) {
-        if (db == null) initDB(ctx);
+        if (db == null || cached == null || cached.isClosed()) initDB(ctx);
         db.delete(FRONTEND_TABLE, "_id = ?", //$NON-NLS-1$
             new String[] { String.valueOf(id) });
         cached.requery();

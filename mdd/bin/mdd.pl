@@ -35,7 +35,7 @@ use MDD::LCD;
 use MDD::MythDB;
 use MDD::Log;
 use MDD::CMux;
-eval { use MDD::XOSD };
+eval "use MDD::XOSD";
 
 sub usage();
 sub handleMdConn($);
