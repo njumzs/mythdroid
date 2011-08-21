@@ -182,6 +182,9 @@ public class ConnMgr {
         
         sockAddr = new InetSocketAddress(host, mux ? 16550 : port);
 
+        if (sockAddr == null || sockAddr.getAddress() == null)
+            throw new IOException(Messages.getString("ConnMgr.6") + host); //$NON-NLS-1$
+        
         hostname = host;
         addr = host + ":" + port; //$NON-NLS-1$
 
@@ -556,6 +559,7 @@ public class ConnMgr {
                 if (c == null) continue;
                 if (
                      c.addr.equals(host + ":" + port) && //$NON-NLS-1$
+                     c.sock != null                   &&
                      c.sock.isConnected()             &&
                      c.inUse == false
                 ) {

@@ -112,6 +112,9 @@ public class RecEditGroupsFragment extends Fragment {
 
     private void setViews() {
 
+        if (recGroups == null || storGroups == null)
+            return;
+        
         recGroupSpinner = 
             ((Spinner)view.findViewById(R.id.recedit_recGroup));
         final ArrayAdapter<String> recGroupAdapter = new ArrayAdapter<String>(
