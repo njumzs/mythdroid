@@ -571,7 +571,8 @@ public class TVRemote extends Remote {
         switch (item.getItemId()) {
             case MENU_OSDMENU:
                 try {
-                    feMgr.sendKey(Key.MENU);
+                    if (feMgr != null)
+                        feMgr.sendKey(Key.MENU);
                 } catch (IOException e) {
                     ErrUtil.err(this, e);
                 }
