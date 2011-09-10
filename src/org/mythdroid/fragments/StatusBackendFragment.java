@@ -51,8 +51,10 @@ public class StatusBackendFragment extends Fragment {
         activity = (MDFragmentActivity)getActivity();
         View view = inflater.inflate(R.layout.status_backend, null, false);
 
-        if (Status.statusDoc == null && !Status.getStatus(activity))
+        if (Status.statusDoc == null && !Status.getStatus(activity)) {
             activity.finish();
+            return view;
+        }
 
         Document doc = Status.statusDoc;
 
