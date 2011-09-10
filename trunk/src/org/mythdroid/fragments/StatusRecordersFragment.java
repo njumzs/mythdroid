@@ -67,6 +67,11 @@ public class StatusRecordersFragment extends ListFragment {
         public void run() {
 
             doc = Status.statusDoc;
+            
+            if (doc == null) {
+                activity.finish();
+                return;
+            }
 
             encoders.clear();
 
