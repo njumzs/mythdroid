@@ -148,7 +148,7 @@ public class RecEditFragment extends Fragment {
             ft.replace(R.id.recedit_schedoptframe, resf);
             ft.replace(R.id.recedit_groupoptframe, regf);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         }
 
         prog = Globals.curProg;
@@ -322,7 +322,7 @@ public class RecEditFragment extends Fragment {
                         ft.replace(containerId, new RecEditSchedFragment());
                         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                         ft.addToBackStack(null);
-                        ft.commit();
+                        ft.commitAllowingStateLoss();
                     }
                 }
             );
@@ -338,7 +338,7 @@ public class RecEditFragment extends Fragment {
                         ft.replace(containerId, new RecEditGroupsFragment());
                         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                         ft.addToBackStack(null);
-                        ft.commit();
+                        ft.commitAllowingStateLoss();
                     }
                 }
             );

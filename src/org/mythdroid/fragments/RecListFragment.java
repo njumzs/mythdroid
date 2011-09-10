@@ -163,7 +163,7 @@ public class RecListFragment extends ListFragment
         }
         
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.commit();
+        ft.commitAllowingStateLoss();
         
         if (detailsFragClass == null) return;
         
@@ -187,7 +187,7 @@ public class RecListFragment extends ListFragment
         ft.replace(dualPane ? R.id.recdetails : R.id.reclistframe, rdf);
         ft.addToBackStack(null);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.commit();
+        ft.commitAllowingStateLoss();
         detailsFragClass = null;
         
     }

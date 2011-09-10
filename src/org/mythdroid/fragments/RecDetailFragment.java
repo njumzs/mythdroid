@@ -125,7 +125,7 @@ public class RecDetailFragment extends Fragment {
         super.onResume();
         try {
             beMgr = Globals.getBackend();
-        } catch (Exception e) { ErrUtil.err(activity, e); }
+        } catch (Exception e) { ErrUtil.err(getActivity(), e); }
         prog = Globals.curProg;
         if (prog == null) {
             if (embedded) getFragmentManager().popBackStackImmediate(); 
@@ -178,7 +178,7 @@ public class RecDetailFragment extends Fragment {
                     ft.replace(containerId, new RecEditFragment());
                     ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                     ft.addToBackStack(null);
-                    ft.commit();
+                    ft.commitAllowingStateLoss();
                 }
             }
         );
