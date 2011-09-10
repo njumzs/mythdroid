@@ -272,6 +272,7 @@ public class Recordings extends MDFragmentActivity {
      */
     public void deleteRecording() {
         recordings.remove(index);
+        index--;
         invalidate();
     }
     
