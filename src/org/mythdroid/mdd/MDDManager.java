@@ -368,11 +368,14 @@ public class MDDManager {
         String resp = null;
         do {
             resp = cmgr.readLine();
-            if (resp.equals("UNKNOWN")) //$NON-NLS-1$
+            if (resp.equals("UNKNOWN")) { //$NON-NLS-1$
+                int idx = msg.indexOf(' ');
+                if (idx == -1) idx = msg.length();
                 throw new IOException(
                     "MDD doesn't understand " + //$NON-NLS-1$
-                    msg.substring(0, msg.indexOf(' '))
+                    msg.substring(0, idx)
                 );
+            }
         } while (!resp.equals("OK")); //$NON-NLS-1$
         
     }
