@@ -32,6 +32,7 @@ import org.mythdroid.util.ErrUtil;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.view.View;
@@ -115,6 +116,7 @@ public class RecListFragment extends ListFragment
      * @param recordings ArrayList of Programs
      */
     public void setAdapter(ArrayList<Program> recordings) {
+        
         if (recordings.isEmpty()) {
             setListAdapter(null);
             return;
@@ -126,7 +128,9 @@ public class RecListFragment extends ListFragment
                 recordings
             )
         );
+        
         updateSelection();
+        
     }
     
     /**
@@ -145,7 +149,9 @@ public class RecListFragment extends ListFragment
     private void showDetails() {
         
         Fragment rdf = null;
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        FragmentManager fm = getFragmentManager();
+        if (fm == null) return;
+        FragmentTransaction ft = fm.beginTransaction();
         
         rdf = RecDetailFragment.newInstance(false, false);
         
