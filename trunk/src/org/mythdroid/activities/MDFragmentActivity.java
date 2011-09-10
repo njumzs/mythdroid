@@ -302,7 +302,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         
         fm.popBackStackImmediate();
         fm.beginTransaction().replace(android.R.id.content, f)
-            .addToBackStack(null).commit();
+            .addToBackStack(null).commitAllowingStateLoss();
         fm.executePendingTransactions();
     }
 

@@ -120,7 +120,7 @@ public class Recordings extends MDFragmentActivity {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.reclistframe, listFragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.commit();
+        ft.commitAllowingStateLoss();
     }
     
     @Override
@@ -316,7 +316,8 @@ public class Recordings extends MDFragmentActivity {
         listFragment = new RecListFragment();
         listFragment.setArguments(args);
         
-        fm.beginTransaction().replace(R.id.reclistframe, listFragment).commit();
+        fm.beginTransaction().replace(R.id.reclistframe, listFragment)
+            .commitAllowingStateLoss();
         fm.executePendingTransactions();
         
         if (hasRecordings())
