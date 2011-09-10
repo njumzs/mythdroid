@@ -709,7 +709,7 @@ public class ConnMgr {
 
         LogUtil.debug("Waiting for a connection to " + addr); //$NON-NLS-1$
 
-        while (!sock.isConnected() || !inUse)
+        while (sock == null || !sock.isConnected() || !inUse)
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
