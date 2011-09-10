@@ -83,7 +83,7 @@ public class NavRemote extends Remote {
                        // Cancel any pending updates from updateLoc()
                        handler.removeCallbacks(updateLocViews);
                        
-                       if (menu != null && !menu.isEmpty()) {
+                       if (menu != null && menu.length() > 0) {
                            locView.setText(menu);
                            locS = menu;
                        }
