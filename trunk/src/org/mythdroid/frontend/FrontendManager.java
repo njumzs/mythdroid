@@ -109,6 +109,7 @@ public class FrontendManager {
      */
     public synchronized boolean sendKey(final Key key) throws IOException {
         if (cmgr == null) throw connectionGone;
+        if (key == null) return false;
         cmgr.writeLine("key " + key.str()); //$NON-NLS-1$
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
@@ -175,6 +176,7 @@ public class FrontendManager {
      */
     public synchronized boolean playRec(final Program prog) throws IOException {
         if (cmgr == null) throw connectionGone;
+        if (prog == null) return false;
         cmgr.writeLine("play prog " + prog.playbackID()); //$NON-NLS-1$
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
