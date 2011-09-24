@@ -128,7 +128,7 @@ public class RecDetailFragment extends Fragment {
         } catch (Exception e) { ErrUtil.err(getActivity(), e); }
         prog = Globals.curProg;
         if (prog == null) {
-            if (embedded) getFragmentManager().popBackStackImmediate(); 
+            if (embedded) getFragmentManager().popBackStack(); 
             else activity.finish();
             return;
         }

@@ -203,7 +203,7 @@ public class RecEditGroupsFragment extends Fragment {
     }
     
     private void done() {
-        if (embedded) getFragmentManager().popBackStackImmediate();
+        if (embedded) getFragmentManager().popBackStack();
         else activity.finish();
     }
     
