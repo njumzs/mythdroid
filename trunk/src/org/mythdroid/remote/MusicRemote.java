@@ -354,9 +354,10 @@ public class MusicRemote extends Remote {
                 break;
         }
 
-        try {
-            feMgr.sendKey(key);
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        if (feMgr != null)
+            try {
+                feMgr.sendKey(key);
+            } catch (IOException e) { ErrUtil.err(this, e); }
 
         if (activity != null)
             startActivityForResult(
