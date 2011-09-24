@@ -135,7 +135,11 @@ public class ImageDiskCache {
         File f = new File(cacheDir, key);
         if (!f.exists()) return null;
         f.setLastModified(System.currentTimeMillis());
-        return BitmapFactory.decodeFile(f.getAbsolutePath());
+        try {
+            return BitmapFactory.decodeFile(f.getAbsolutePath());
+        } catch (OutOfMemoryError e) {
+            return null;
+        }
         
     }
     
