@@ -65,6 +65,9 @@ my $delRecSQL =
 my $settingSQL = 
     'SELECT data FROM settings WHERE value = ? AND hostname = ?';
 
+my $settingNoHostSQL = 
+    'SELECT data FROM settings WHERE value = ? AND hostname IS NULL';
+
 my $getStorGroupsSQL = 'SELECT groupname,dirname FROM storagegroup';
 my $recTypeSQL       = 'SELECT type FROM record WHERE recordid = ?';
 my $storGroupSQL     = 'SELECT storagegroup FROM record WHERE recordid = ?';
@@ -80,7 +83,7 @@ my @videoFields = (
 my (
     $albumArtSth, $videoSth, $upnpVideoSth, $getStorGroupsSth,
     $getRecGroupsSth, $newRecSth, $progSth, $storGroupSth, $recTypeSth,
-    $delRecSth, $settingSth
+    $delRecSth, $settingSth, $settingNoHostSth
 );
 
 sub new {
@@ -92,7 +95,12 @@ sub new {
 
     $dbh = clone() unless $dbh;
 
-    return bless ($self, $class);
+    bless $self, $class;
+
+    $self->{VidDBVer} = $self->settingNoHost('mythvideo.DBSchemaVer');
+    $log->dbg("Video DB schema version is $self->{VidDBVer}") if $log;
+
+    return $self;
 }
 
 sub clone {
@@ -145,15 +153,24 @@ sub getVideos($) {
     my %videos;
     my @vids;
 
+    my $pathIdx = 8;
+
+    # MythTV 0.21 doesn't have the subtitle column
+    if ($self->{VidDBVer} < 1024) {
+        $videoSQL =~ s/subtitle, //;
+        $pathIdx = 7;
+    }
+
     $videoSth = execute($videoSth, \$videoSQL, $regex);
 
     while (my $aref = $videoSth->fetchrow_arrayref) {
-        my $path = $aref->[8];
+        my $path = $aref->[$pathIdx];
         $upnpVideoSth = execute($upnpVideoSth, \$upnpVideoSQL, $path);
         my $upnparef = $upnpVideoSth->fetchrow_arrayref;
         next unless $upnparef;
         my $id = $upnparef->[0];
         my %h;
+        splice @$aref, 1, 0, '' if ($self->{VidDBVer} < 1024);
         @h{@videoFields} = @$aref;
         $h{filename} = $upnparef->[1];
         $videos{$id} = \%h;
@@ -348,6 +365,25 @@ sub setting($$) {
 
     return $ret;
         
+}
+
+sub settingNoHost($) {
+    
+    my $self  = shift;
+    my $value = shift;
+
+    my $ret = undef;
+
+    $settingNoHostSth = execute($settingNoHostSth, \$settingNoHostSQL, $value);
+
+    if (my $aref = $settingNoHostSth->fetchrow_arrayref) {
+        $ret = $aref->[0];
+    }
+    
+    $log->dbg("settingNoHost($value) = $ret") if (defined $ret && $log);
+
+    return $ret;
+    
 }
 
 return 1;
