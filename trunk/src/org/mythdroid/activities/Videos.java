@@ -20,6 +20,7 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
@@ -50,6 +51,9 @@ public class Videos extends MDActivity implements
 
     final private ImageCache artCache =
         new ImageCache("videos", 20, 200, 1024*1024*10); //$NON-NLS-1$
+    
+    final private HashMap<Integer,String> viddirs = 
+        new HashMap<Integer, String>();
 
     final private Handler handler   = new Handler();
     private Thread artThread        = null;
@@ -81,8 +85,12 @@ public class Videos extends MDActivity implements
                     return;
                 }
                 
+                /* We use an empty string to denote the root of a 
+                   top-level directory */
+                String tmppath = path.length() > 0 ? path : "ROOT"; //$NON-NLS-1$
+                
                 videos = MDDManager.getVideos(
-                    Globals.getBackend().addr, viddir, path
+                    Globals.getBackend().addr, viddir, tmppath
                 );
             } catch (IOException e) {
                 ErrUtil.postErr(
@@ -159,6 +167,7 @@ public class Videos extends MDActivity implements
 
     @Override
     public void onCreate(Bundle icicle) {
+        
         super.onCreate(icicle);
         setContentView(R.layout.videos);
         addHereToFrontendChooser(VideoPlayer.class);
@@ -169,9 +178,10 @@ public class Videos extends MDActivity implements
 
         scale = getResources().getDisplayMetrics().density;
         largeScreen = getResources().getDisplayMetrics().widthPixels > 1000;
-
+        
         showDialog(DIALOG_LOAD);
         Globals.getWorker().post(getVideos);
+        
     }
     
     @Override
@@ -191,11 +201,24 @@ public class Videos extends MDActivity implements
         if (video.directory) {
 
             if (path.equals("ROOT")) //$NON-NLS-1$
-                path = video.title;
+                // Top top level?
+                if (video.dir == -1)
+                    path = video.title;
+                // The root of a top-level directory (multiple videodirs)
+                else {
+                    path = ""; //$NON-NLS-1$
+                    viddirs.put(video.dir, video.title);
+                }
+            else {
+                if (path.length() > 0)
+                    path += "/";  //$NON-NLS-1$
+                path += video.title;
+            }
+     
+            if (path.equals("")) //$NON-NLS-1$
+                dirText.setText(video.title);
             else
-                path += "/" + video.title; //$NON-NLS-1$
-
-            dirText.setText(currentDir(path));
+                dirText.setText(currentDir(path));
             viddir = video.dir;
             showDialog(DIALOG_LOAD);
             Globals.getWorker().post(getVideos);
@@ -234,15 +257,24 @@ public class Videos extends MDActivity implements
             int slash = path.lastIndexOf('/');
             if (slash == -1) {
                 // Check if we're going to list of videodirs (top top level)
-                if (path.equals("ROOT")) //$NON-NLS-1$
+                if (path.equals("ROOT") || path.equals("")) //$NON-NLS-1$ //$NON-NLS-2$
                     viddir = -1;
-                path = "ROOT"; //$NON-NLS-1$
-                dirText.setText(Messages.getString("Videos.0")); // Videos //$NON-NLS-1$
+                // Going to top top level
+                if (viddir == -1) {
+                    path = "ROOT"; //$NON-NLS-1$
+                    dirText.setText(Messages.getString("Videos.0")); //$NON-NLS-1$
+                }
+                // Going to root of a toplevel directory
+                else {
+                    path = "";  //$NON-NLS-1$
+                    dirText.setText(viddirs.get(viddir));
+                }
             }
             else {
                 path = path.substring(0, slash);
                 dirText.setText(currentDir(path));
             }
+            
             showDialog(DIALOG_LOAD);
             Globals.getWorker().post(getVideos);
             return true;
