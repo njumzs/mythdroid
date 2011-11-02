@@ -20,8 +20,8 @@ package org.mythdroid.data;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -32,28 +32,25 @@ import org.mythdroid.Globals;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.graphics.BitmapFactory.Options;
 import android.graphics.drawable.BitmapDrawable;
 
 /** Represents a video or directory containing videos */
 public class Video {
 
     @SuppressWarnings("all")
-    public String title, subtitle, director, plot, homepage, filename;
+    public String title, subtitle, director, plot, homepage, filename, coverfile;
     @SuppressWarnings("all")
     public float rating;
     @SuppressWarnings("all")
-    public int year, length, dir = -1, id = -1;
+    public int year, length, id, dir = -1;
+    @SuppressWarnings("all")
+    public boolean directory = false;
     @SuppressWarnings("all")
     public BitmapDrawable poster = null;
-    
-    final private static Options opts = new BitmapFactory.Options();
-    static { opts.inSampleSize = 8; }
 
     final private static int
         ID = 0, TITLE = 1, SUBTITLE = 2, DIRECTOR = 3, PLOT = 4, HOMEPAGE = 5,
-        YEAR = 6, USERRATING = 7, LENGTH = 8, FILENAME = 9;
+        YEAR = 6, USERRATING = 7, LENGTH = 8, FILENAME = 9, COVER = 10;
 
     /**
      * Constructor
@@ -64,14 +61,15 @@ public class Video {
         if (line.matches("^[0-9-]+ DIRECTORY .+")) { //$NON-NLS-1$
             dir   = Integer.valueOf(line.substring(0, line.indexOf(" "))); //$NON-NLS-1$
             title = line.substring(line.indexOf("DIRECTORY") + 10); //$NON-NLS-1$
+            directory = true;
             return;
         }
 
         String[] fields = line.split("\\|\\|"); //$NON-NLS-1$
 
-        if (fields.length < FILENAME + 1)
+        if (fields.length < COVER)
             return;
-
+        
         fields[0] = fields[0].replaceFirst("VIDEO ", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
         id          = Integer.valueOf(fields[ID]);
@@ -87,6 +85,8 @@ public class Video {
         length      = fields[LENGTH].matches("[0-9]+") ? //$NON-NLS-1$
                           Integer.valueOf(fields[LENGTH]) : 0;
         filename    = fields[FILENAME];
+        if (fields.length > COVER)
+            coverfile   = fields[COVER];
 
     }
 
@@ -99,52 +99,46 @@ public class Video {
      */
     public void getPoster(float x, float y) {
 
-        if (id == -1)
+        if (coverfile == null)
             return;
-
-        URL url = null;
+        
+        int w = Math.round(x);
+        int h = Math.round(y);
+        
+        URI uri = null;
         try {
-            url = new URL(
-                Globals.getBackend().getStatusURL() +
-                "/Myth/GetVideoArt?" +  //$NON-NLS-1$
-                "Id=" + id  //$NON-NLS-1$
-            );
-        } catch (MalformedURLException e) { return; } 
+            uri = new URI(
+                "http", null, Globals.getBackend().addr, 16551, coverfile, //$NON-NLS-1$
+                "width=" + w + "&height=" + h, null //$NON-NLS-1$ //$NON-NLS-2$
+            ); 
+        } catch (URISyntaxException e) { return; } 
           catch (IOException e) { return; }
         
        if (Globals.muxConns)
           try {
-              url = new URL(
-                  url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
-                  ":16550" + url.getFile()  //$NON-NLS-1$
+              uri = new URI(
+                  "http", null, uri.getHost(), 16550, //$NON-NLS-1$
+                  "/MDDHTTP" + uri.getPath(), uri.getQuery(), null //$NON-NLS-1$
               );
-          } catch (MalformedURLException e1) { return; }
+          } catch (URISyntaxException e) { return; }
 
         Bitmap bm = null;
 
         try {
             HttpClient client = new DefaultHttpClient();
-            HttpResponse resp = client.execute(new HttpGet(url.toURI()));
+            HttpResponse resp = client.execute(new HttpGet(uri));
             if (resp.getStatusLine().getStatusCode() == 404)
                 return;
             InputStream is = new BufferedHttpEntity(resp.getEntity())
                 .getContent();
-            bm = BitmapFactory.decodeStream(is, null, opts);
+            bm = BitmapFactory.decodeStream(is);
             is.close();
         } catch (Exception e) {}
+          catch (OutOfMemoryError e) {}
 
         if (bm == null) return;
 
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float wf = x / width;
-        float hf = y / height;
-        float factor = (wf < hf ? wf : hf);
-        Matrix matrix = new Matrix();
-        matrix.postScale(factor, factor);
-        poster = new BitmapDrawable(
-            Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true)
-        );
+        poster = new BitmapDrawable(bm);
 
     }
 

@@ -95,7 +95,7 @@ public class VideoAdapter extends ArrayAdapter<Object> {
             String.format("%.2f", video.rating) //$NON-NLS-1$
         );
 
-        if (video.id == -1) {
+        if (video.directory) {
             vHolder.poster.setImageDrawable(folderDrawable);
             vHolder.subtitle.setVisibility(View.GONE);
             vHolder.director.setVisibility(View.GONE);

@@ -88,7 +88,7 @@ public class VideoDetail extends MDActivity {
             );
         ((TextView)findViewById(R.id.videoDPlot))
             .setText(video.plot);
-        if (video.subtitle.length() > 0)
+        if (video.subtitle != null && video.subtitle.length() > 0)
             ((TextView)findViewById(R.id.videoDSubtitle))
                 .setText(video.subtitle);
         else
