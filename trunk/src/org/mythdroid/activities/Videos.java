@@ -131,13 +131,13 @@ public class Videos extends MDActivity implements
             for (int i = 0; i < numvids; i++) {
                 if (!fetchingArt)
                     break;
-                if (vids[i].poster != null || vids[i].id == -1) continue;
+                if (vids[i].poster != null || vids[i].directory) continue;
                 Bitmap bm = artCache.get(vids[i].id);
                 if (bm != null)
                     vids[i].poster = new BitmapDrawable(bm);
                 else {
-                    float w = (largeScreen ? 140 : 70) * scale + 0.5f;
-                    float h = (largeScreen ? 220 : 110) * scale + 0.5f;
+                    float w = (largeScreen ? 175 : 70) * scale + 0.5f;
+                    float h = (largeScreen ? 275 : 110) * scale + 0.5f;
                     vids[i].getPoster(w, h); 
                     if (vids[i].poster != null)
                         artCache.put(vids[i].id, vids[i].poster.getBitmap());
@@ -188,7 +188,7 @@ public class Videos extends MDActivity implements
         Video video = videos.get(pos);
 
         // A directory?
-        if (video.id == -1) {
+        if (video.directory) {
 
             if (path.equals("ROOT")) //$NON-NLS-1$
                 path = video.title;
@@ -213,7 +213,7 @@ public class Videos extends MDActivity implements
         AdapterView<?> adapter, View item, int pos, long itemid
     ) {
         Video video = videos.get(pos);
-        if (video.id == -1)
+        if (video.directory)
             return true;
         setExtra(Extras.FILENAME.toString(), video.filename);
         setExtra(Extras.TITLE.toString(), video.title);
