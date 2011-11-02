@@ -36,8 +36,9 @@ my $albumArtSQL =
     'music_albums.album_name = ? and music_albumart.imagetype = 1';
 
 my $videoSQL = 
-    'SELECT title, subtitle, director, plot, homepage, year, userrating, ' .
-    'length,filename FROM videometadata where filename REGEXP ?';
+    'SELECT intid, title, subtitle, director, plot, homepage, year, ' .
+    'userrating, length, filename, coverfile FROM videometadata where ' .
+    'filename REGEXP ?';
     
 my $getRecGroupsSQL = 
     'SELECT DISTINCT recgroup FROM recorded WHERE recgroup != "LiveTV" AND ' .
@@ -71,19 +72,11 @@ my $settingNoHostSQL =
 my $getStorGroupsSQL = 'SELECT groupname,dirname FROM storagegroup';
 my $recTypeSQL       = 'SELECT type FROM record WHERE recordid = ?';
 my $storGroupSQL     = 'SELECT storagegroup FROM record WHERE recordid = ?';
-my $upnpVideoSQL     =
-    'SELECT intid,filepath FROM upnpmedia WHERE filepath LIKE \'%\' ?';
 
-my @videoFields = (
-    qw(
-        title subtitle director plot homepage year userrating length filename
-    )
-);
-    
 my (
-    $albumArtSth, $videoSth, $upnpVideoSth, $getStorGroupsSth,
-    $getRecGroupsSth, $newRecSth, $progSth, $storGroupSth, $recTypeSth,
-    $delRecSth, $settingSth, $settingNoHostSth
+    $albumArtSth, $videoSth, $getStorGroupsSth, $getRecGroupsSth, $newRecSth,
+    $progSth, $storGroupSth, $recTypeSth, $delRecSth, $settingSth, 
+    $settingNoHostSth
 );
 
 sub new {
@@ -92,6 +85,8 @@ sub new {
     $log = shift;
 
     my $self = {};
+
+    $self->{httpserver} = shift;
 
     $dbh = clone() unless $dbh;
 
@@ -153,34 +148,14 @@ sub getVideos($) {
     my %videos;
     my @vids;
 
-    my $pathIdx = 8;
-
-    # MythTV 0.21 doesn't have the subtitle column
-    if ($self->{VidDBVer} < 1024) {
-        $videoSQL =~ s/subtitle, //;
-        $pathIdx = 7;
-    }
-
     $videoSth = execute($videoSth, \$videoSQL, $regex);
 
     while (my $aref = $videoSth->fetchrow_arrayref) {
-        my $path = $aref->[$pathIdx];
-        $upnpVideoSth = execute($upnpVideoSth, \$upnpVideoSQL, $path);
-        my $upnparef = $upnpVideoSth->fetchrow_arrayref;
-        next unless $upnparef;
-        my $id = $upnparef->[0];
-        my %h;
-        splice @$aref, 1, 0, '' if ($self->{VidDBVer} < 1024);
-        @h{@videoFields} = @$aref;
-        $h{filename} = $upnparef->[1];
-        $videos{$id} = \%h;
-    }
-    
-    foreach my $id (keys %videos) {
+        splice @$aref, 2, 0, '' if ($self->{VidDBVer} < 1024);
+        $self->{httpserver}->addFile($aref->[10]) if $self->{httpserver};
+        my $id = $aref->[0];
         my $msg = "VIDEO $id";
-        foreach my $f (
-            map { '||' . $videos{$id}{$_} } @videoFields
-        ) { $msg .= $f }
+        map { $msg .= '||' . $_ } @{$aref}[1 .. $#$aref];
         push @vids, $msg;
     }
 
