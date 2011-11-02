@@ -35,6 +35,7 @@ use MDD::LCD;
 use MDD::MythDB;
 use MDD::Log;
 use MDD::CMux;
+use MDD::HTTPServer;
 eval "use MDD::XOSD";
 
 sub usage();
@@ -193,6 +194,8 @@ if (exists $config{cmux}) {
 }
 else { MDD::CMux->new($log) }
 
+my $httpServer = MDD::HTTPServer->new($log);
+
 # Forking is done.. install our signal handlers
 
 # Kill off the real mythlcdserver when we are killed
@@ -202,7 +205,7 @@ $SIG{HUP} = \&readConfig;
 $SIG{CHLD} = 'IGNORE';
 sub END { killKids() }
 
-$mythdb = MDD::MythDB->new($log);;
+$mythdb = MDD::MythDB->new($log, $httpServer);;
 
 $log->dbg("Listen on port $listenPort/tcp");
 
@@ -506,7 +509,10 @@ sub videoList($) {
     %storageGroups = %{ $mythdb->getStorGroups() } 
         unless (scalar %storageGroups);
 
-    return videoListSG($subdir) if (exists $storageGroups{Videos});
+    if (exists $storageGroups{Videos}) {
+        $log->dbg("Videos SG exists");
+        return videoListSG($subdir);
+    }
 
     $videoDir = $mythdb->setting('VideoStartupDir', hostname)
         unless $videoDir;

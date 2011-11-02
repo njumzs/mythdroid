@@ -22,35 +22,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package MDD::CMux;
 use strict;
 use warnings;
+use threads;
 
 my %conns;
 my $mux_port = 16550;
 my $log;
 
-my @allowed_ports = ( 6543, 6544, 16546, 16547 );
+my @allowed_ports = ( 6543, 6544, 16546, 16547, 16551 );
 
 sub new {
 
     my $class = shift;
     $log = shift;
-    my $pid;
 
     my $self = {};
 
-    unless (defined($pid = fork)) {
-        $log->err("CMux: Couldn't fork: $!\n");
-        return undef;
-    }
-
-    $log->dbg("CMux: running in pid $pid") if $pid;
-
     bless($self, $class);
-    return $self if $pid;
-
-    %SIG = ();
+    
     $self->setup();
-    $self->mainloop();
-    exit 0;
+    
+    threads->create(sub { $self->mainloop })->detach;
+
+    return $self;
 }
 
 sub setup {
@@ -93,7 +86,12 @@ sub initConn {
 
     if ($port =~ /^GET/ || $port =~ /^POST/ || $port =~ /^HEAD/) {
         $data = $port;
-        $port = 6544;
+        if ($data =~ s#/MDDHTTP##) {
+            $port = 16551;
+        }
+        else {
+            $port = 6544;
+        }
     }
     else {
         chomp($port);
@@ -164,11 +162,6 @@ sub mainloop {
 
         foreach my $fd (@ready) {
 
-            unless ($fd->connected) {
-                $self->{select}->remove($fd);
-                next;
-            }
-            
             if ($fd == $self->{listen}) {
                 # New connection
                 $self->initConn($c) if ($c = $fd->accept); 
