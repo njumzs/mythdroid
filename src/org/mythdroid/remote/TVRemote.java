@@ -729,6 +729,7 @@ public class TVRemote extends Remote {
 
     @Override
     protected void onScrollDown() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.VOL_DOWN);
             feMgr.sendKey(Key.VOL_DOWN);
@@ -738,6 +739,7 @@ public class TVRemote extends Remote {
 
     @Override
     protected void onScrollLeft() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.SEEK_BACK);
         } catch (IOException e) { ErrUtil.err(this, e); }
@@ -746,6 +748,7 @@ public class TVRemote extends Remote {
 
     @Override
     protected void onScrollRight() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.SEEK_FORWARD);
         } catch (IOException e) { ErrUtil.err(this, e); }
@@ -754,6 +757,7 @@ public class TVRemote extends Remote {
 
     @Override
     protected void onScrollUp() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.VOL_UP);
             feMgr.sendKey(Key.VOL_UP);
@@ -763,6 +767,7 @@ public class TVRemote extends Remote {
 
     @Override
     protected void onTap() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.PAUSE);
         } catch (IOException e) { ErrUtil.err(this, e); }
