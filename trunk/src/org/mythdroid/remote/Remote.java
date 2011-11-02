@@ -408,6 +408,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
      * Default implementation sends Key.UP
      */
     protected void onFlingUp() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.UP);
         } catch (IOException e) { ErrUtil.err(this, e); }
@@ -419,6 +420,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
      * Default implementation sends Key.DOWN
      */
     protected void onFlingDown() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.DOWN);
         } catch (IOException e) { ErrUtil.err(this, e); }
@@ -430,6 +432,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
      * Default implementation sends Key.LEFT
      */
     protected void onFlingLeft() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.LEFT);
         } catch (IOException e) { ErrUtil.err(this, e); }
@@ -441,6 +444,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
      * Default implementation sends Key.RIGHT
      */
     protected void onFlingRight() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.RIGHT);
         } catch (IOException e) { ErrUtil.err(this, e); }
@@ -484,6 +488,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
      * Default implementation sends Key.ENTER
      */
     protected void onTap() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.ENTER);
         } catch (IOException e) { ErrUtil.err(this, e); }
