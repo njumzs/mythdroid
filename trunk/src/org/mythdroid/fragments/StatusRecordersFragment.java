@@ -253,6 +253,11 @@ public class StatusRecordersFragment extends ListFragment {
             refresh();
         return view;
     }
+    
+    @Override
+    public void onDestroy() {
+        Globals.getWorker().removeCallbacks(refreshEncoders);
+    }
 
     @Override
     public void onListItemClick(ListView list, View item, int pos, long id) {
@@ -281,6 +286,7 @@ public class StatusRecordersFragment extends ListFragment {
     }
 
     private void refresh() {
+        Globals.getWorker().removeCallbacks(getStatusTask);
         activity.showDialog(DIALOG_LOAD);
         Globals.getWorker().post(getStatusTask);
     }

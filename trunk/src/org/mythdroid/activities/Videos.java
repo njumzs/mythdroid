@@ -179,14 +179,14 @@ public class Videos extends MDActivity implements
         scale = getResources().getDisplayMetrics().density;
         largeScreen = getResources().getDisplayMetrics().widthPixels > 1000;
         
-        showDialog(DIALOG_LOAD);
-        Globals.getWorker().post(getVideos);
+        refresh();
         
     }
     
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Globals.getWorker().removeCallbacks(getVideos);
         artCache.shutdown();
     }
 
@@ -220,8 +220,7 @@ public class Videos extends MDActivity implements
             else
                 dirText.setText(currentDir(path));
             viddir = video.dir;
-            showDialog(DIALOG_LOAD);
-            Globals.getWorker().post(getVideos);
+            refresh();
             return;
 
         }
@@ -275,14 +274,19 @@ public class Videos extends MDActivity implements
                 dirText.setText(currentDir(path));
             }
             
-            showDialog(DIALOG_LOAD);
-            Globals.getWorker().post(getVideos);
+            refresh();
             return true;
 
         }
 
         return super.onKeyDown(code, event);
 
+    }
+    
+    private void refresh() {
+        Globals.getWorker().removeCallbacks(getVideos);
+        showDialog(DIALOG_LOAD);
+        Globals.getWorker().post(getVideos);
     }
 
     private String currentDir(String path) {
