@@ -252,6 +252,7 @@ public class Recordings extends MDFragmentActivity {
      * Empty the recordings list
      */
     public void empty() {
+        Globals.getWorker().removeCallbacks(getRecordings);
         if (recordings != null)
             recordings.clear();
         recordings = null;
