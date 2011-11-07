@@ -237,7 +237,7 @@ public class Videos extends MDActivity implements
         Video video = videos.get(pos);
         if (video.directory)
             return true;
-        setExtra(Extras.FILENAME.toString(), video.filename);
+        setExtra(Extras.FILENAME.toString(), video.getPath());
         setExtra(Extras.TITLE.toString(), video.title);
         nextActivity = TVRemote.class;
         showDialog(FRONTEND_CHOOSER);
