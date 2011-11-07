@@ -101,9 +101,6 @@ public class BackendManager {
                 }
             }, Globals.muxConns
         );
-        
-        // QUERY_RECORDINGS can take a few seconds..
-        cmgr.setTimeout(3000);
 
         addr = host;
 
@@ -203,6 +200,9 @@ public class BackendManager {
      */
     public ArrayList<Program> getRecordings() throws IOException {
 
+        // QUERY_RECORDINGS can take a few seconds..
+        cmgr.setTimeout(ConnMgr.timeOut.LONG);
+        
         cmgr.sendString("QUERY_RECORDINGS Play"); //$NON-NLS-1$
         final String[] resp = cmgr.readStringList();
 

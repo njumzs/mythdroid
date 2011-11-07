@@ -18,6 +18,7 @@
 
 package org.mythdroid.activities;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -74,7 +75,7 @@ public class Recordings extends MDFragmentActivity {
 
             try {
                 recordings = Globals.getBackend().getRecordings();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 ErrUtil.postErr(ctx, Messages.getString("Recordings.0")); //$NON-NLS-1$
                 try {
                     dismissDialog(DIALOG_LOAD);
