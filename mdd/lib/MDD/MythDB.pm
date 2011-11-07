@@ -57,6 +57,10 @@ my $newRecSQL =
     'FROM_UNIXTIME(?),FROM_UNIXTIME(?),FROM_UNIXTIME(?),FROM_UNIXTIME(?),' .
     '?,?,?,?,?,?,?,\'00:00:00\',\'00:00:00\',\'00:00:00\',1,1)';
 
+my $cutListSQL =
+    'SELECT type, mark FROM recordedmarkup WHERE chanid = ? AND ' . 
+    'starttime = FROM_UNIXTIME(?) AND (type = 4 OR type = 5) ORDER BY mark';
+
 my $updateRecSQL = 
     'UPDATE record SET %UPDATES% where recordid = %RECID%';
 
@@ -75,7 +79,7 @@ my $storGroupSQL     = 'SELECT storagegroup FROM record WHERE recordid = ?';
 
 my (
     $albumArtSth, $videoSth, $getStorGroupsSth, $getRecGroupsSth, $newRecSth,
-    $progSth, $storGroupSth, $recTypeSth, $delRecSth, $settingSth, 
+    $cutListSth, $progSth, $storGroupSth, $recTypeSth, $delRecSth, $settingSth,
     $settingNoHostSth
 );
 
@@ -182,6 +186,32 @@ sub getRecType($) {
     $log->dbg("getRecType($recid) = $ret");
     
     return $ret;
+}
+
+sub getCutList($$) {
+
+    my $self = shift;
+    my $chanid = shift;
+    my $start = shift;
+    
+    my ($tmp, @breaks);
+
+    $cutListSth = execute($cutListSth, \$cutListSQL, $chanid, $start);
+
+    while (my $aref = $cutListSth->fetchrow_arrayref) {
+        if ($aref->[0] == 4) {
+            $tmp = $aref->[1];
+        }
+        else {
+            next unless $tmp;
+            $tmp .= ' - ' . $aref->[1];
+            push @breaks, $tmp;
+            $tmp = undef;
+        }
+    }
+
+    return \@breaks;
+
 }
 
 # Get the storage group from a recid
