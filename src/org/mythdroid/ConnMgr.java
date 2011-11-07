@@ -45,6 +45,18 @@ import android.net.wifi.WifiManager.WifiLock;
  */
 public class ConnMgr {
 
+    /**
+     * Read timeout values for use with setTimeout()
+     */
+    public enum timeOut {
+        /** The default read timeout */
+        DEFAULT,
+        /** 5x the default read timeout */
+        LONG,
+        /** 10x the default read timeout */
+        EXTRALONG,
+    }
+    
     /** 
      * Implement this to create a callback that'll be called upon a 
      * successful connection 
@@ -96,6 +108,8 @@ public class ConnMgr {
     private boolean                 reconnectPending = false;
     /** The most recently transmitted message */
     private byte[]                  lastSent         = null;
+    /** The timeOut modifier for the next read */
+    private timeOut                 timeOutModifier  = timeOut.DEFAULT;
     /** An IOException with a message that we've been unexpectedly disconnected */
     private IOException             disconnected     = null;
     /** List of onConnect callbacks */
@@ -206,10 +220,10 @@ public class ConnMgr {
             wifiLock.acquire();
             if (sockAddr.getAddress().isLoopbackAddress())
                 // SSH port forward I guess - probably tethered to a slow link
-                timeout *= 8;
+                timeout *= 5;
         }
         else
-            timeout *= 8;
+            timeout *= 5;
 
         doConnect(timeout);
 
@@ -218,15 +232,21 @@ public class ConnMgr {
         synchronized (conns) { conns.add(weakThis); }
         
     }
-    
 
     /**
-     * Set the read timeout
-     * @param timeout read timeout in milliseconds
+     * Set the read timeout for the next read
+     * @param time a ConnMgr.timeOut value
      */
-    public void setTimeout(int timeout) {
+    public void setTimeout(timeOut time) {
+        timeOutModifier = time;
+    }
+    
+    /**
+     * Set the read timeout to infinity for all reads
+     */
+    public void setIndefiniteReads() {
         try {
-            sock.setSoTimeout(timeout);
+            sock.setSoTimeout(0);
         } catch (SocketException e) {}
     }
 
@@ -500,7 +520,7 @@ public class ConnMgr {
                 if (r == null) continue;
                 ConnMgr c = r.get();
                 if (c == null) continue;
-                c.doConnect(1000);
+                c.doConnect(c.timeout);
 
             }
 
@@ -588,8 +608,6 @@ public class ConnMgr {
         // Wait for a maximum of 5s if a WiFi link is being established
         ConnectivityReceiver.waitForWifi(Globals.appContext, 5000);
 
-        LogUtil.debug("Connecting to " + addr); //$NON-NLS-1$
-
         if (isConnected()) {
             LogUtil.debug(addr + " is already connected"); //$NON-NLS-1$
             return;
@@ -599,25 +617,33 @@ public class ConnMgr {
         sock.setTcpNoDelay(true);
         sock.setSoTimeout(timeout);
 
-        try {
-            sock.connect(sockAddr, timeout / 2);
-        } catch (UnknownHostException e) {
-            throw new IOException(Messages.getString("ConnMgr.1") + hostname); //$NON-NLS-1$
-        } catch (SocketTimeoutException e) {
-            throw
-                new IOException(
-                    Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
-                        Messages.getString("ConnMgr.4") //$NON-NLS-1$
+        for (int i = 0; i < 3; i++) {
+            LogUtil.debug("Connecting to " + addr); //$NON-NLS-1$
+            try {
+                sock.connect(sockAddr, timeout / 2);
+            } catch (UnknownHostException e) {
+                throw new IOException(
+                    Messages.getString("ConnMgr.1") + hostname //$NON-NLS-1$
                 );
-
-        } catch (IOException e) {
-            throw
-                new IOException(
-                    Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
-                        Messages.getString("ConnMgr.7") //$NON-NLS-1$
-                );
+            } catch (SocketTimeoutException e) {
+                if (i < 3)
+                    continue;
+                throw
+                    new IOException(
+                        Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
+                            Messages.getString("ConnMgr.4") //$NON-NLS-1$
+                    );
+            } catch (IOException e) {
+                throw
+                    new IOException(
+                        Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
+                            Messages.getString("ConnMgr.7") //$NON-NLS-1$
+                    );
+            }
+            if (sock.isConnected())
+                break;
         }
-
+        
         reconnectPending = false;
 
         os = sock.getOutputStream();
@@ -647,6 +673,20 @@ public class ConnMgr {
     private synchronized int read(byte[] buf, int off, int len) throws IOException {
 
         int ret = -1;
+        
+        int localtimeout = timeout;
+        
+        switch (timeOutModifier) {
+            case LONG:
+                localtimeout *= 5;
+                break;
+            case EXTRALONG:
+                localtimeout *= 10;
+                break;
+        }
+        
+        if (localtimeout != timeout)
+            sock.setSoTimeout(localtimeout);
 
         try {
             ret = is.read(buf, off, len);
@@ -663,12 +703,20 @@ public class ConnMgr {
                 return read(buf, off, len);
             }
             
+            dispose();
             throw new SocketTimeoutException(msg);
 
         }
 
-        if (ret == -1)
+        if (ret == -1) {
+            dispose();
             LogUtil.debug("read from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        
+        if (localtimeout != timeout) {
+            sock.setSoTimeout(timeout);
+            timeOutModifier = timeOut.DEFAULT;
+        }
 
         return ret;
 

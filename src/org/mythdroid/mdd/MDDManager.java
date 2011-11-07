@@ -131,7 +131,7 @@ public class MDDManager {
                     (subdir == null ? "ROOT" : subdir)); //$NON-NLS-1$
 
         // Uncached SQL queries can take some time with lots of videos
-        cmgr.setTimeout(7500);
+        cmgr.setTimeout(ConnMgr.timeOut.EXTRALONG);
         
         String line = cmgr.readLine();
         while (line != null && !line.equals("VIDEOLIST DONE")) { //$NON-NLS-1$
@@ -291,7 +291,7 @@ public class MDDManager {
          */
         cmgr = new ConnMgr(addr, 16546, null, false);
         // Wait indefinitely for messages from MDD
-        cmgr.setTimeout(0);
+        cmgr.setIndefiniteReads();
         recvThread = new Thread(recvTask, "MDDListener"); //$NON-NLS-1$
         recvThread.start();
     }
@@ -309,7 +309,7 @@ public class MDDManager {
          */
         cmgr = new ConnMgr(addr, 16546, null, mux);
         // Wait indefinitely for messages from MDD
-        cmgr.setTimeout(0);
+        cmgr.setIndefiniteReads();
         recvThread = new Thread(recvTask, "MDDListener"); //$NON-NLS-1$
         recvThread.start();
     }

@@ -60,9 +60,6 @@ public class FrontendManager {
         	throw new 
         		IOException(Messages.getString("FrontendManager.1") + name); //$NON-NLS-1$
 
-        // jump <loc> (e.g. where loc == livetv) can take a long time
-        cmgr.setTimeout(10000);
-
         this.name = name;
         addr = host;
 
@@ -84,6 +81,7 @@ public class FrontendManager {
     public synchronized boolean jumpTo(final String loc) throws IOException {
         if (cmgr == null) throw connectionGone;
         cmgr.writeLine("jump " + loc); //$NON-NLS-1$
+        cmgr.setTimeout(ConnMgr.timeOut.EXTRALONG);
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
         return false;
@@ -97,6 +95,7 @@ public class FrontendManager {
     public synchronized boolean jumpTo(FrontendLocation loc) throws IOException {
         if (cmgr == null || loc == null || loc.location == null) return false;
         cmgr.writeLine("jump " + loc.location.toLowerCase()); //$NON-NLS-1$
+        cmgr.setTimeout(ConnMgr.timeOut.EXTRALONG);
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
         return false;
