@@ -56,7 +56,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ProgressBar;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -109,7 +110,7 @@ public class TVRemote extends Remote {
     final private Handler    handler      = new Handler();
     final private Context    ctx          = this;
     private TextView         titleView    = null;
-    private ProgressBar      pBar         = null;
+    private SeekBar          pBar         = null;
     private Timer            timer        = null;
     private int              jumpChan     = -1,     lastProgress    = 0;
     private UpdateStatusTask updateStatus = null;
@@ -668,7 +669,7 @@ public class TVRemote extends Remote {
     private void setupStatus() {
 
         titleView = (TextView)findViewById(R.id.tv_title);
-        pBar = (ProgressBar)findViewById(R.id.tv_progress);
+        pBar = (SeekBar)findViewById(R.id.tv_progress);
         titleView.setFocusable(false);
         pBar.setFocusable(false);
 
@@ -682,6 +683,34 @@ public class TVRemote extends Remote {
                 titleView.setText(lastTitle);
             pBar.setMax(1000);
             pBar.setProgress(lastProgress);
+            pBar.setOnSeekBarChangeListener(
+                new OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(
+                        SeekBar seekBar, int progress, boolean fromUser
+                    ) {
+                       if (!fromUser)
+                           return;
+                       if (seekBar.getMax() <= 0)
+                           return;
+                       FrontendLocation loc = null;
+                       try {
+                           loc = feMgr.getLoc();
+                       } catch (IOException e1) { return; }
+                       if (loc.end <= 0)
+                           return;
+                       try {
+                           feMgr.seekTo(loc.end * progress / 1000);
+                       } catch (IOException e) {}
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {}
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {}
+                    
+                }
+            );
             return;
         }
 
@@ -701,7 +730,7 @@ public class TVRemote extends Remote {
             done();
             return;
         }
-
+        
         titleView.setText(prog.Title);
 
         if (livetv) {
@@ -711,7 +740,28 @@ public class TVRemote extends Remote {
 
         pBar.setMax(loc.end);
         pBar.setProgress(loc.position);
+        pBar.setOnSeekBarChangeListener(
+            new OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(
+                    SeekBar seekBar, int progress, boolean fromUser
+                ) {
+                   if (!fromUser)
+                       return;
+                   if (seekBar.getMax() <= 0)
+                       return;
+                   try {
+                       feMgr.seekTo(progress);
+                   } catch (IOException e) {}
+                }
 
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {}
+                
+            }
+        );
     }
 
     /** Call finish() but jump to lastLocation first, if possible */

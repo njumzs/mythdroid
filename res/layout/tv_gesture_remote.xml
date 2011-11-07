@@ -11,7 +11,7 @@
 		android:layout_marginTop="4dp"
 		android:src="@drawable/back"/>
 		
-	<ProgressBar android:id="@+id/tv_progress"
+	<SeekBar android:id="@+id/tv_progress"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     	android:layout_below="@id/tv_back"
