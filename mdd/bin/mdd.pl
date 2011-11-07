@@ -484,16 +484,15 @@ sub videoListSG($) {
     my $videos = $mythdb->getVideos("^$subdir");
 
     foreach my $vid (@$videos) {
-        my $file = ($vid =~ /\|\|([^\|]+)$/)[0];
+        my $file = (split /\|\|/, $vid)[9];
         map { $file =~ s/^$_\/?// } @{ $storageGroups{Videos} };
-        $file =~ s/^$subdir// unless $subdir eq '.';
-        if ($file =~ /(.+?)\//) {
+        next if ($file =~ /^\//);
+        $file =~ s/^$subdir\/?// unless $subdir eq '.';
+        if ($file =~ /^(.+?)\//) {
             push @dirs, $1 unless grep { $1 eq $_ } @dirs;
             next;
         }
-        else {
-            push @vids, $vid;
-        }
+        push @vids, $vid;
     }
 
     @dirs = sort @dirs;
@@ -607,12 +606,15 @@ sub streamFile($) {
 
     $log->dbg("Will use $cpus threads for transcode");
 
-    if ($file =~ /^myth:\/\//) {
+    if ($file =~ s/^myth:\/\///) {
 
         %storageGroups = %{ $mythdb->getStorGroups() } 
             unless (scalar %storageGroups);
     
-        $file =~ s/.*\//\//;
+        if ($file =~ /^(.+)@/) {
+            $sg = $1;
+        }
+        $file =~ s/.*?\///;
         my $filename = $file;
 
         if (exists $storageGroups{$sg}) {
@@ -629,10 +631,9 @@ sub streamFile($) {
         }
 
     }
-    else {
-        $file =~ s/ /\\ /g;
-        $file =~ s/'/\\'/g;
-    }
+
+    $file =~ s/ /\\ /g;
+    $file =~ s/'/\\'/g;
 
     $log->dbg("Streaming - resolved path is $file");
     
