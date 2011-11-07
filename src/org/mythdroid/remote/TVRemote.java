@@ -683,24 +683,21 @@ public class TVRemote extends Remote {
                 titleView.setText(lastTitle);
             pBar.setMax(1000);
             pBar.setProgress(lastProgress);
+            if (livetv) return;
             pBar.setOnSeekBarChangeListener(
                 new OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(
                         SeekBar seekBar, int progress, boolean fromUser
                     ) {
-                       if (!fromUser)
-                           return;
-                       if (seekBar.getMax() <= 0)
-                           return;
+                       if (!fromUser) return;
                        FrontendLocation loc = null;
                        try {
                            loc = feMgr.getLoc();
                        } catch (IOException e1) { return; }
-                       if (loc.end <= 0)
-                           return;
+                       if (loc.end <= 0) return;
                        try {
-                           feMgr.seekTo(loc.end * progress / 1000);
+                           feMgr.seekTo((loc.end * progress) / 1000);
                        } catch (IOException e) {}
                     }
 
@@ -746,10 +743,7 @@ public class TVRemote extends Remote {
                 public void onProgressChanged(
                     SeekBar seekBar, int progress, boolean fromUser
                 ) {
-                   if (!fromUser)
-                       return;
-                   if (seekBar.getMax() <= 0)
-                       return;
+                   if (!fromUser || seekBar.getMax() <= 0) return;
                    try {
                        feMgr.seekTo(progress);
                    } catch (IOException e) {}
