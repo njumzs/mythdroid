@@ -160,6 +160,7 @@ public class FrontendManager {
     public synchronized HashMap<String,String> getLocs() throws IOException {
         final HashMap<String,String> locs = new HashMap<String,String>(64);
         cmgr.writeLine("help jump"); //$NON-NLS-1$
+        cmgr.setTimeout(ConnMgr.timeOut.LONG);
         final String[] lines = getResponse();
         int numlines = lines.length;
         for (int i = 0; i < numlines; i++) {
