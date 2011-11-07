@@ -53,6 +53,7 @@ sub streamFile($);
 sub stopStreaming();
 sub getStorGroups();
 sub getRecGroups();
+sub getCutList($$);
 sub killKids();
 
 my $lcdServerPort = 6545;
@@ -138,6 +139,10 @@ my @clientMsgs = (
     {
         regex => qr/^NEWREC (\d+) (\d+) (.*)$/,
         proc  => sub { sendMsg($mythdb->newRec($1, $2, $3)) }
+    },
+    {
+        regex => qr/^CUTLIST (\d+) (.*)$/,
+        proc  => sub { getCutList($1, $2) }
     },
 ); 
 
@@ -697,6 +702,11 @@ sub getRecGroups() {
     map { sendMsg($_) } (@{$mythdb->getRecGroups()});
     sendMsg("RECGROUPS DONE");
 
+}
+
+sub getCutList($$) {
+    map { sendMsg($_) } (@{$mythdb->getCutList(shift, shift)});
+    sendMsg("CUTLIST DONE");
 }
 
 # Kill the original mythlcdserver
