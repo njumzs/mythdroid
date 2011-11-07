@@ -77,10 +77,21 @@ sub initConn {
     my $c = shift;
     my ($port, $data);
 
-    $log->dbg("CMux: New connection from " . $c->peerhost . ":" . $c->peerport);
+    my $peer = $c->peerhost . ':' . $c->peerport;
+
+    $log->dbg("CMux: New connection from $peer");
+
+    my $sel = IO::Select->new($c);
+
+    unless ($sel->can_read(2)) {
+        $log->dbg("Timeout waiting for port/data from $peer");
+        $c->close;
+        return;
+    }
 
     unless (sysread($c, $port, 512)) {
-        handleDisconnect($c);
+        $log->dbg("Failed to read port/data from $peer");
+        $c->close;
         return;
     }
 
