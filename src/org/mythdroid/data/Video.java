@@ -89,6 +89,20 @@ public class Video {
             coverfile   = fields[COVER];
 
     }
+    
+    /**
+     * Get a full path to the video (a myth:// URL if it's in a storage group)
+     * @return String containing path to the video
+     */
+    public String getPath() {
+        if (filename.startsWith("/")) //$NON-NLS-1$
+            return filename;
+        try {
+            return "myth://Videos@" + Globals.getBackend().addr + "/" + filename; //$NON-NLS-1$ //$NON-NLS-2$
+        } catch (IOException e) {
+            return null; 
+        }
+    }
 
 
     /**
