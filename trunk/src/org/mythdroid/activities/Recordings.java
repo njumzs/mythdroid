@@ -93,7 +93,7 @@ public class Recordings extends MDFragmentActivity {
                 int numrecs = recs.length;
                 ArrayList<Program> newList = new ArrayList<Program>(numrecs/10);
                 for (int i = 0; i < numrecs; i++)
-                    if (recs[i].Title.equals(filter))
+                    if (recs[i].Title.compareToIgnoreCase(filter) == 0)
                         newList.add(recs[i]);
                 recordings = newList;
             }
