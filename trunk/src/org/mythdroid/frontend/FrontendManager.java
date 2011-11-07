@@ -135,6 +135,7 @@ public class FrontendManager {
     public synchronized FrontendLocation getLoc() throws IOException {
         if (cmgr == null) throw connectionGone;
         cmgr.writeLine("query loc"); //$NON-NLS-1$
+        cmgr.setTimeout(ConnMgr.timeOut.LONG);
         String loc = getSingleLineResponse();
 
         int i = 0;
@@ -144,6 +145,7 @@ public class FrontendManager {
             } catch (InterruptedException e) {}
             if (cmgr == null) throw connectionGone;
             cmgr.writeLine("query loc"); //$NON-NLS-1$
+            cmgr.setTimeout(ConnMgr.timeOut.LONG);
             loc = getSingleLineResponse();
         }
 
@@ -177,6 +179,7 @@ public class FrontendManager {
         if (cmgr == null) throw connectionGone;
         if (prog == null) return false;
         cmgr.writeLine("play prog " + prog.playbackID()); //$NON-NLS-1$
+        cmgr.setTimeout(ConnMgr.timeOut.LONG);
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
         return false;
@@ -190,6 +193,7 @@ public class FrontendManager {
     public synchronized boolean playFile(final String file) throws IOException {
         if (cmgr == null) throw connectionGone;
         cmgr.writeLine("play file " + file); //$NON-NLS-1$
+        cmgr.setTimeout(ConnMgr.timeOut.LONG);
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
         return false;
@@ -198,11 +202,32 @@ public class FrontendManager {
     /**
      * Switch to a channel in livetv (must be in livetv to call)
      * @param chanid channel id to switch to
-     * @return boolean if we switched ok, false otherwise
+     * @return true if we switched ok, false otherwise
      */
     public synchronized boolean playChan(int chanid) throws IOException {
         if (cmgr == null) throw connectionGone;
         cmgr.writeLine("play chanid " + chanid); //$NON-NLS-1$
+        cmgr.setTimeout(ConnMgr.timeOut.LONG);
+        if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
+            return true;
+        return false;
+    }
+    
+    /**
+     * Seek to a specified position in the video
+     * @param pos position in seconds
+     * @return true if the seek was successful, false otherwise
+     */
+    public synchronized boolean seekTo(int pos) throws IOException {
+        if (cmgr == null) throw connectionGone;
+        int hours = pos / 3600;
+        pos -= hours * 3600;
+        int mins = pos / 60;
+        pos -= mins * 60;
+        int secs = pos;
+        cmgr.writeLine(
+            "play seek " + String.format("%02d:%02d:%02d", hours, mins, secs) //$NON-NLS-1$ //$NON-NLS-2$
+        );
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
         return false;
