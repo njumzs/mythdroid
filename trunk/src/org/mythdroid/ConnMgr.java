@@ -220,10 +220,10 @@ public class ConnMgr {
             wifiLock.acquire();
             if (sockAddr.getAddress().isLoopbackAddress())
                 // SSH port forward I guess - probably tethered to a slow link
-                timeout *= 5;
+                timeout *= 10;
         }
         else
-            timeout *= 5;
+            timeout *= 10;
 
         doConnect(timeout);
 
@@ -676,12 +676,17 @@ public class ConnMgr {
         
         int localtimeout = timeout;
         
-        switch (timeOutModifier) {
+        /* 
+         * See if a longer read timeout has been requested
+         * but don't increase it too much if we already have a long timeout due 
+         * to the use of a slow link
+         */
+        switch (timeOutModifier) {            
             case LONG:
-                localtimeout *= 5;
+                localtimeout *= (localtimeout > 5000 ? 2 : 5);
                 break;
             case EXTRALONG:
-                localtimeout *= 10;
+                localtimeout *= (localtimeout > 5000 ? 3 : 10);
                 break;
         }
         
