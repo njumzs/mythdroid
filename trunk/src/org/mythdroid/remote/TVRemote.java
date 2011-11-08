@@ -421,18 +421,15 @@ public class TVRemote extends Remote {
         switch (id) {
 
             case DIALOG_LOAD:
-
                 final ProgressDialog d = new ProgressDialog(this);
                 d.setIndeterminate(true);
                 d.setMessage(getResources().getString(R.string.loading));
                 return d;
 
             case DIALOG_NUMPAD:
-
                 final Dialog pad = new Dialog(this);
                 pad.setContentView(R.layout.numpad);
                 pad.findViewById(android.R.id.title).setVisibility(View.GONE);
-
                 View button;
                 for (int viewId : nums.keySet()) {
                     button = pad.findViewById(viewId);
@@ -442,7 +439,6 @@ public class TVRemote extends Remote {
                 return pad;
 
             case DIALOG_GUIDE:
-
                 return new AlertDialog.Builder(ctx)
                     .setIcon(drawable.ic_menu_upload_you_tube)
                     .setTitle(R.string.disp_guide)
@@ -455,13 +451,10 @@ public class TVRemote extends Remote {
                     .create();
 
             case DIALOG_QUIT:
-
                 OnClickListener cl = new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                         dialog.dismiss();
-
                         switch(which) {
                             case Dialog.BUTTON_POSITIVE:
                                 jump = true;
@@ -474,9 +467,7 @@ public class TVRemote extends Remote {
                                 return;
 
                         }
-
                         done();
-
                     }
                 };
 
@@ -639,23 +630,20 @@ public class TVRemote extends Remote {
 
                 if (key == Key.GUIDE) {
 
-                    if (livetv) {
-                        v.setOnLongClickListener(
-                            new OnLongClickListener() {
-                                @Override
-                                public boolean onLongClick(View v) {
-                                    showDialog(DIALOG_GUIDE);
-                                    return true;
-                                }
-
-                            }
-                       );
-                    }
-
-                    else {
+                    if (!livetv) {
                         v.setVisibility(View.INVISIBLE);
                         continue;
                     }
+                    
+                    v.setOnLongClickListener(
+                        new OnLongClickListener() {
+                            @Override
+                            public boolean onLongClick(View v) {
+                                showDialog(DIALOG_GUIDE);
+                                return true;
+                            }
+                        }
+                    );
 
                 }
 
@@ -725,9 +713,6 @@ public class TVRemote extends Remote {
         
         pBar.setMax(max);
         pBar.setProgress(progress);
-       
-        if (livetv)
-            return;
         
         pBar.setOnSeekBarChangeListener(
             new OnSeekBarChangeListener() {
