@@ -22,11 +22,14 @@ import java.io.IOException;
 
 import org.mythdroid.Enums.Key;
 import org.mythdroid.Globals;
+import org.mythdroid.R;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.Reflection;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -60,6 +63,9 @@ public abstract class Remote extends Activity implements View.OnClickListener {
 
     /** Result codes for when a remote is startActivityForResult()'d */
     final protected int REMOTE_RESULT_FINISH = RESULT_FIRST_USER;
+    
+    /** A loading dialog */
+    final protected int DIALOG_LOAD = -1;
 
     /** Scale factor for pixel values for different display densities */
     private float scale = 1;
@@ -305,6 +311,19 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         final boolean onPrepareOptionsMenu = super.onPrepareOptionsMenu(menu);
         setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
         return onPrepareOptionsMenu;
+    }
+    
+    @Override
+    public Dialog onCreateDialog(int id) {
+        switch (id) {
+            case DIALOG_LOAD:
+                final ProgressDialog d = new ProgressDialog(this);
+                d.setIndeterminate(true);
+                d.setMessage(getResources().getString(R.string.loading));
+                return d;
+        }
+        
+        return null;
     }
 
     @Override
