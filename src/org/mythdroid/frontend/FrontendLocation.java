@@ -31,7 +31,9 @@ public class FrontendLocation {
     @SuppressWarnings("all")
     public String  location  = null, niceLocation = null;
     @SuppressWarnings("all")
-    public int     position, end, fps = 0;
+    public int     position, end;
+    @SuppressWarnings("all")
+    public float   fps;
     @SuppressWarnings("all")
     public float   rate;
     @SuppressWarnings("all")
@@ -126,7 +128,7 @@ public class FrontendLocation {
                     tok[5].substring(0, tok[5].lastIndexOf('x'))
                 );
             filename = tok[9];
-            fps = Integer.valueOf(tok[10]);
+            fps = Float.parseFloat(tok[tok.length - 1]);
             if (tok[1].equals("livetv")) livetv = true; //$NON-NLS-1$
         }
         else if (tok[1].equals("video")) { //$NON-NLS-1$
@@ -138,7 +140,7 @@ public class FrontendLocation {
                     tok[3].substring(0, tok[3].lastIndexOf('x'))
                 );
             filename = "Video"; //$NON-NLS-1$
-            fps = Integer.valueOf(tok[6]);
+            fps = Float.parseFloat(tok[tok.length - 1]);
         }
         else {
             rate = loc.contains("pause") ? 0 : -1; //$NON-NLS-1$
