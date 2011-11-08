@@ -195,10 +195,12 @@ public class MDDManager {
      */
     public static int[][] getCutList(String addr, Program prog) 
         throws IOException {
+        
         final ConnMgr cmgr = sendMsg(
             addr, "CUTLIST " + prog.ChanID + " " + //$NON-NLS-1$ //$NON-NLS-2$ 
             prog.StartTime.getTime() / 1000 
         ); 
+        
         ArrayList<int[]> cuts = new ArrayList<int[]>(8);
         String line = cmgr.readLine();
         while (line != null && !line.equals("CUTLIST DONE")) { //$NON-NLS-1$
