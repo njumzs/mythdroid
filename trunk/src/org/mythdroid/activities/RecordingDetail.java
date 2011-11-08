@@ -23,7 +23,7 @@ import org.mythdroid.fragments.RecDetailFragment;
 import android.os.Bundle;
 
 /**
- * MDFragementActivity that houses a RecDetailFragment 
+ * MDFragmentActivity that houses a RecDetailFragment 
  */
 public class RecordingDetail extends MDFragmentActivity {
     
