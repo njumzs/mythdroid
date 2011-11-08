@@ -33,6 +33,7 @@ import org.mythdroid.mdd.MDDChannelListener;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.views.CutListDrawable;
 import org.mythdroid.activities.Guide;
 
 import android.R.drawable;
@@ -44,6 +45,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -112,11 +116,12 @@ public class TVRemote extends Remote {
     private TextView         titleView    = null;
     private SeekBar          pBar         = null;
     private Timer            timer        = null;
-    private int              jumpChan     = -1,     lastProgress    = 0;
+    private int              jumpChan     = -1,     lastProgress    = 0,
+                             endTime      = -1;
     private UpdateStatusTask updateStatus = null;
     private MDDManager       mddMgr       = null;
-    private String           lastFilename = null,   lastTitle       = null,
-                             filename     = null,   videoTitle      = null;
+    private String           lastFilename = null,   filename     = null,
+                             videoTitle   = null;
 
 
     private boolean
@@ -244,7 +249,6 @@ public class TVRemote extends Remote {
                     @Override
                     public void run() {
                         titleView.setText(title);
-                        lastTitle = title;
                     }
                 }
             );
@@ -673,52 +677,25 @@ public class TVRemote extends Remote {
         titleView.setFocusable(false);
         pBar.setFocusable(false);
 
-        if (livetv)
+        if (livetv || videoTitle != null)
             pBar.setVisibility(View.GONE);
-
-        if (mddMgr != null) {
-            if (videoTitle != null)
-                titleView.setText(videoTitle);
-            else
-                titleView.setText(lastTitle);
-            pBar.setMax(1000);
-            pBar.setProgress(lastProgress);
-            if (livetv) return;
-            pBar.setOnSeekBarChangeListener(
-                new OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(
-                        SeekBar seekBar, int progress, boolean fromUser
-                    ) {
-                       if (!fromUser) return;
-                       FrontendLocation loc = null;
-                       try {
-                           loc = feMgr.getLoc();
-                       } catch (IOException e1) { return; }
-                       if (loc.end <= 0) return;
-                       try {
-                           feMgr.seekTo((loc.end * progress) / 1000);
-                       } catch (IOException e) {}
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {}
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {}
-                    
-                }
-            );
+        
+        if (videoTitle != null) {
+            titleView.setText(videoTitle);
             return;
         }
 
         Program prog = null;
-
         FrontendLocation loc = null;
 
         try {
             loc = feMgr.getLoc();
             if (!loc.video) {
                 done();
+                return;
+            }
+            if (loc.filename.equals("Video")) { //$NON-NLS-1$ 
+                pBar.setVisibility(View.GONE);
                 return;
             }
             prog = Globals.getBackend().getRecording(loc.filename);
@@ -728,6 +705,8 @@ public class TVRemote extends Remote {
             return;
         }
         
+        endTime = loc.end;
+        
         titleView.setText(prog.Title);
 
         if (livetv) {
@@ -735,27 +714,66 @@ public class TVRemote extends Remote {
             return;
         }
 
-        pBar.setMax(loc.end);
-        pBar.setProgress(loc.position);
+        if (mddMgr != null)
+            setupProgressBar(1000, lastProgress, prog, loc.fps);
+        else
+            setupProgressBar(loc.end, loc.position, null, loc.fps);
+        
+    }
+    
+    private void setupProgressBar(int max, int progress, Program prog, float fps) {
+        
+        pBar.setMax(max);
+        pBar.setProgress(progress);
+       
+        if (livetv)
+            return;
+        
         pBar.setOnSeekBarChangeListener(
             new OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(
                     SeekBar seekBar, int progress, boolean fromUser
                 ) {
-                   if (!fromUser || seekBar.getMax() <= 0) return;
-                   try {
-                       feMgr.seekTo(progress);
-                   } catch (IOException e) {}
+                    if (!fromUser || seekBar.getMax() <= 0) return;
+                    if (mddMgr != null) {
+                        FrontendLocation loc = null;
+                        try {
+                            loc = feMgr.getLoc();
+                        } catch (IOException e) { return; }
+                        if (loc.end <= 0) return;
+                        progress = (loc.end * progress) / 1000;
+                    }
+                    try {
+                        feMgr.seekTo(progress);
+                    } catch (IOException e) {}
                 }
 
                 @Override
                 public void onStartTrackingTouch(SeekBar seekBar) {}
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {}
-                
+                    
             }
         );
+        
+        if (prog == null || endTime <= 0 || fps == 0) return;
+        
+        int[][] cuts = null;
+        try {
+            cuts = MDDManager.getCutList(feMgr.addr, prog);
+        } catch (IOException e) { return; }
+        
+        if (cuts.length < 1) return;
+        
+        Drawable[] layers = new Drawable[2];
+        layers[0] = pBar.getProgressDrawable();
+        Rect bounds = layers[0].getBounds();
+        layers[1] = new CutListDrawable(cuts, fps, endTime, bounds);
+        LayerDrawable lg = new LayerDrawable(layers);
+        lg.setBounds(bounds);
+        pBar.setProgressDrawable(lg);
+        
     }
 
     /** Call finish() but jump to lastLocation first, if possible */

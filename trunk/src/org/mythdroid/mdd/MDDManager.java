@@ -176,7 +176,7 @@ public class MDDManager {
      * Determine the RecType of a recording
      * @param addr String containing address of MDD
      * @param recid int representing RecID of recording
-     * @return - RecType
+     * @return RecType
      */
     public static RecType getRecType(String addr, int recid)
         throws IOException {
@@ -184,6 +184,38 @@ public class MDDManager {
         final RecType rt = RecType.get(Integer.parseInt(cmgr.readLine()));
         cmgr.disconnect();
         return rt;
+    }
+    
+    /**
+     * Get a cutlist for a recording
+     * @param addr String containing address of MDD
+     * @param prog Program to get cutlist for
+     * @return Array of cuts represented as 2 element arrays. 
+     * The first element is the start frame, the second is the end frame
+     */
+    public static int[][] getCutList(String addr, Program prog) 
+        throws IOException {
+        final ConnMgr cmgr = sendMsg(
+            addr, "CUTLIST " + prog.ChanID + " " + //$NON-NLS-1$ //$NON-NLS-2$ 
+            prog.StartTime.getTime() / 1000 
+        ); 
+        ArrayList<int[]> cuts = new ArrayList<int[]>(8);
+        String line = cmgr.readLine();
+        while (line != null && !line.equals("CUTLIST DONE")) { //$NON-NLS-1$
+            int[] cut = new int[2]; 
+            cut[0] = Integer.parseInt(
+                line.substring(0, line.indexOf('-')).trim()
+            );
+            cut[1] = Integer.parseInt(
+                line.substring(line.indexOf('-') + 1).trim()
+            );
+            cuts.add(cut);
+            line = cmgr.readLine();
+        }
+
+        cmgr.disconnect();
+        return cuts.toArray(new int[cuts.size()][2]);
+        
     }
 
     /**
