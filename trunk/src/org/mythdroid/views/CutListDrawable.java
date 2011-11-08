@@ -15,7 +15,7 @@ import android.os.Build;
  */
 public class CutListDrawable extends Drawable {
 
-    private int[][] cutlist          = null;
+    private int[][] cuts             = null;
     private float fps                = 0;
     private int end                  = 0;
     private Rect rect                = null;
@@ -30,18 +30,18 @@ public class CutListDrawable extends Drawable {
      * @param cuts
      */
     public CutListDrawable(int[][] cuts, float fps, int end, Rect rect) {
-        cutlist = cuts;
-        this.fps = fps;
-        this.end = end;
+        this.cuts = cuts;
+        this.fps  = fps;
+        this.end  = end;
         this.rect = rect;
+        paint     = new Paint();
         setBounds(rect);
-        paint = new Paint();
     }
     
     @Override
     public void draw(Canvas canvas) {
         
-        int top = rect.top;
+        int top    = rect.top;
         int bottom = rect.bottom;
         
         // Hacky? Honeycomb has a itty bitty progress bar
@@ -56,9 +56,9 @@ public class CutListDrawable extends Drawable {
             )
         );
         
-        for (int i = 0; i < cutlist.length; i++) {
-            float left  = rect.left + ((cutlist[i][0] / fps) * rect.right) / end;
-            float right = rect.left + ((cutlist[i][1] / fps) * rect.right) / end;
+        for (int i = 0; i < cuts.length; i++) {
+            float left  = rect.left + ((cuts[i][0] / fps) * rect.right) / end;
+            float right = rect.left + ((cuts[i][1] / fps) * rect.right) / end;
             canvas.drawRect(left, top, right, bottom, paint);
         }
     }
