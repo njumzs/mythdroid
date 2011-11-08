@@ -138,7 +138,7 @@ public class RecListFragment extends ListFragment
      */
     public void updateSelection() {
         
-        activity.index = Math.max(activity.index, lv.getCount() - 1);
+        activity.index = Math.min(activity.index, lv.getCount() - 1);
         int idx        = activity.index;
         
         if ((Globals.curProg = (Program)lv.getItemAtPosition(idx)) == null)
