@@ -21,13 +21,29 @@ package org.mythdroid.frontend;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.mythdroid.Globals;
 import org.mythdroid.util.LogUtil;
 
 /** Describes a location in the frontend */
 public class FrontendLocation {
 
+    /** True if the locations have been initialised, false otherwise */
+    public static boolean hasLocations = false;
+    /** A runnable that will populate the locations */
+    final public static Runnable getLocations = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                if (!hasLocations)
+                    populateLocations(Globals.getFrontend(Globals.appContext));
+            } catch (IOException e) {}
+        }
+    };
+    
+    private static Object locationsLock = new Object();
+    
     private static HashMap<String, String> locations = null;
-
+   
     @SuppressWarnings("all")
     public String  location  = null, niceLocation = null;
     @SuppressWarnings("all")
@@ -67,7 +83,7 @@ public class FrontendLocation {
 
         location = loc;
 
-        if (locations == null && !populateLocations(feMgr))
+        if (!hasLocations && !populateLocations(feMgr))
             return;
 
         loc = loc.toLowerCase();
@@ -94,20 +110,34 @@ public class FrontendLocation {
 
     }
 
-    private Boolean populateLocations(FrontendManager feMgr) {
+    /**
+     * Retrieve and parse the list of valid frontend locations
+     * @param feMgr a FrontendManager to use
+     * @return true if successful, false otherwise
+     */
+    public static synchronized Boolean populateLocations(FrontendManager feMgr) {
 
         if (feMgr == null || !feMgr.isConnected())
             return false;
-
-        try {
-            locations = feMgr.getLocs();
-        } catch (IOException e) { return false; }
         
-        int l = addLocs.length;
+        synchronized(locationsLock) {
         
-        for (int i = 0; i < l; i += 2)
-            locations.put(addLocs[i], addLocs[i+1]);
+	        if (hasLocations)
+    	        return false;
+        
+            try {
+                locations = feMgr.getLocs();
+            } catch (IOException e) { return false; }
+        
+            int l = addLocs.length;
+        
+            for (int i = 0; i < l; i += 2)
+                locations.put(addLocs[i], addLocs[i+1]);
 
+            hasLocations = true;
+            
+        }
+        
         return true;
 
     }

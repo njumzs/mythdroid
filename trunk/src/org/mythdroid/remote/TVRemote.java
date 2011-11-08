@@ -39,7 +39,6 @@ import org.mythdroid.activities.Guide;
 import android.R.drawable;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -419,12 +418,6 @@ public class TVRemote extends Remote {
     public Dialog onCreateDialog(int id) {
 
         switch (id) {
-
-            case DIALOG_LOAD:
-                final ProgressDialog d = new ProgressDialog(this);
-                d.setIndeterminate(true);
-                d.setMessage(getResources().getString(R.string.loading));
-                return d;
 
             case DIALOG_NUMPAD:
                 final Dialog pad = new Dialog(this);
