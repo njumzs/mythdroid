@@ -63,7 +63,8 @@ public class RecDetailFragment extends Fragment {
     private Button stop                 = null;
     private View view                   = null;
     private int containerId;
-    private boolean livetv = false, guide = false, embedded = false;
+    private boolean livetv   = false, guide    = false,
+                    embedded = false, dualPane = false;
     
     private OnClickListener no = new OnClickListener() {
         @Override
@@ -103,6 +104,9 @@ public class RecDetailFragment extends Fragment {
             guide  = args.getBoolean(Extras.GUIDE.toString());
         }
         
+        View detailsFrame = getActivity().findViewById(R.id.recdetails);
+        dualPane = detailsFrame != null && 
+                   detailsFrame.getVisibility() == View.VISIBLE;
         embedded = 
             activity.getClass().getName().endsWith("Recordings"); //$NON-NLS-1$
         if (!embedded)
@@ -128,8 +132,8 @@ public class RecDetailFragment extends Fragment {
         } catch (Exception e) { ErrUtil.err(getActivity(), e); }
         prog = Globals.curProg;
         if (prog == null) {
-            if (embedded) getFragmentManager().popBackStack(); 
-            else activity.finish();
+            if (!dualPane) getFragmentManager().popBackStack(); 
+            if (!embedded) activity.finish();
             return;
         }
         setViews();
@@ -279,8 +283,12 @@ public class RecDetailFragment extends Fragment {
                                     ErrUtil.err(activity, e);
                                 }
                                 dialog.dismiss();
-                                if (embedded)
+                                if (embedded) {
                                     ((Recordings)activity).deleteRecording();
+                                    if (!dualPane)
+                                        getFragmentManager()
+                                            .popBackStack();
+                                }
                                 else
                                     activity.finish();
                             }

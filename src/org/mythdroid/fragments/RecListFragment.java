@@ -35,9 +35,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * Displays a list of recordings
@@ -64,7 +67,12 @@ public class RecListFragment extends ListFragment
         lv.setOnItemLongClickListener(this);
         lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         
-        setEmptyText(Messages.getString("RecListFragment.0")); //$NON-NLS-1$
+        TextView emptyView = new TextView(activity);
+        emptyView.setText(Messages.getString("RecListFragment.0")); //$NON-NLS-1$
+        emptyView.setTextSize(20);
+        emptyView.setGravity(Gravity.CENTER);
+        ((ViewGroup)lv.getParent()).addView(emptyView);
+        lv.setEmptyView(emptyView);
         
         View detailsFrame = getActivity().findViewById(R.id.recdetails);
         dualPane = detailsFrame != null && 
