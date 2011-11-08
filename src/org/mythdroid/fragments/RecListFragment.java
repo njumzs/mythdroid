@@ -96,7 +96,7 @@ public class RecListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView list, View v, int pos, long id) {
         Globals.curProg = (Program)list.getItemAtPosition(pos);
-        activity.index = pos;
+        activity.index  = pos;
         showDetails();
     }
 
@@ -105,7 +105,7 @@ public class RecListFragment extends ListFragment
         AdapterView<?> adapter, View item, int pos, long itemid
     ) {
         Globals.curProg = (Program)adapter.getItemAtPosition(pos);
-        activity.index = pos;
+        activity.index  = pos;
         activity.nextActivity = TVRemote.class;
         activity.showDialog(Recordings.FRONTEND_CHOOSER);
         return true;
@@ -137,19 +137,24 @@ public class RecListFragment extends ListFragment
      * Update which recording is selected
      */
     public void updateSelection() {
-        if (activity.index > lv.getCount() - 1)
-            activity.index = lv.getCount() - 1;
-        Globals.curProg = (Program)lv.getItemAtPosition(activity.index);
-        lv.setItemChecked(activity.index, true);
-        lv.setSelection(activity.index);
+        
+        activity.index = Math.max(activity.index, lv.getCount() - 1);
+        int idx        = activity.index;
+        
+        if ((Globals.curProg = (Program)lv.getItemAtPosition(idx)) == null)
+            return;
+        
+        lv.setItemChecked(idx, true);
+        lv.setSelection(idx);
         if (dualPane || detailsFragClass != null) 
             showDetails();
+        
     }
     
     private void showDetails() {
         
-        Fragment rdf = null;
-        FragmentManager fm = getFragmentManager();
+        Fragment rdf           = null;
+        FragmentManager fm     = getFragmentManager();
         if (fm == null) return;
         FragmentTransaction ft = fm.beginTransaction();
         
