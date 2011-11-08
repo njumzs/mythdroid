@@ -256,6 +256,7 @@ public class StatusRecordersFragment extends ListFragment {
     
     @Override
     public void onDestroy() {
+        super.onDestroy();
         Globals.getWorker().removeCallbacks(refreshEncoders);
     }
 
