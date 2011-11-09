@@ -39,6 +39,9 @@ public class FrontendManager {
 	final private IOException connectionGone = 
         new IOException(Messages.getString("FrontendManager.0")); //$NON-NLS-1$
 	
+	final private IllegalArgumentException invalidParam =
+	    new IllegalArgumentException(Messages.getString("FrontendManager.2")); //$NON-NLS-1$
+	
 	private ConnMgr cmgr = null;
     
     /**
@@ -55,10 +58,6 @@ public class FrontendManager {
                 }
             }
         );
-
-        if (cmgr == null)
-        	throw new 
-        		IOException(Messages.getString("FrontendManager.1") + name); //$NON-NLS-1$
 
         this.name = name;
         addr = host;
@@ -79,7 +78,8 @@ public class FrontendManager {
      * @return true if we jumped ok, false otherwise
      */
     public synchronized boolean jumpTo(final String loc) throws IOException {
-        if (cmgr == null) throw connectionGone;
+        if (!isConnected()) throw connectionGone;
+        if (loc == null) throw invalidParam;
         cmgr.writeLine("jump " + loc); //$NON-NLS-1$
         cmgr.setTimeout(ConnMgr.timeOut.EXTRALONG);
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
@@ -93,7 +93,8 @@ public class FrontendManager {
      * @return true if we jumped ok, false otherwise
      */
     public synchronized boolean jumpTo(FrontendLocation loc) throws IOException {
-        if (cmgr == null || loc == null || loc.location == null) return false;
+        if (!isConnected()) throw connectionGone;
+        if (loc == null || loc.location == null) throw invalidParam;
         cmgr.writeLine("jump " + loc.location.toLowerCase()); //$NON-NLS-1$
         cmgr.setTimeout(ConnMgr.timeOut.EXTRALONG);
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
@@ -107,8 +108,8 @@ public class FrontendManager {
      * @return true if the frontend accepted the key, false otherwise
      */
     public synchronized boolean sendKey(final Key key) throws IOException {
-        if (cmgr == null) throw connectionGone;
-        if (key == null) return false;
+        if (!isConnected()) throw connectionGone;
+        if (key == null) throw invalidParam;
         cmgr.writeLine("key " + key.str()); //$NON-NLS-1$
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
@@ -121,7 +122,8 @@ public class FrontendManager {
      * @return true if the frontend accepted the key, false otherwise
      */
     public synchronized boolean sendKey(final String key) throws IOException {
-        if (cmgr == null) throw connectionGone;
+        if (!isConnected()) throw connectionGone;
+        if (key == null) throw invalidParam;
         cmgr.writeLine("key " + key); //$NON-NLS-1$
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
             return true;
@@ -133,7 +135,7 @@ public class FrontendManager {
      * @return a FrontendLocation
      */
     public synchronized FrontendLocation getLoc() throws IOException {
-        if (cmgr == null) throw connectionGone;
+        if (!isConnected()) throw connectionGone;
         cmgr.writeLine("query loc"); //$NON-NLS-1$
         cmgr.setTimeout(ConnMgr.timeOut.LONG);
         String loc = getSingleLineResponse();
@@ -143,7 +145,7 @@ public class FrontendManager {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {}
-            if (cmgr == null) throw connectionGone;
+            if (!isConnected()) throw connectionGone;
             cmgr.writeLine("query loc"); //$NON-NLS-1$
             cmgr.setTimeout(ConnMgr.timeOut.LONG);
             loc = getSingleLineResponse();
@@ -159,6 +161,7 @@ public class FrontendManager {
      */
     public synchronized HashMap<String,String> getLocs() throws IOException {
         final HashMap<String,String> locs = new HashMap<String,String>(64);
+        if (!isConnected()) throw connectionGone;
         cmgr.writeLine("help jump"); //$NON-NLS-1$
         cmgr.setTimeout(ConnMgr.timeOut.LONG);
         final String[] lines = getResponse();
@@ -177,8 +180,8 @@ public class FrontendManager {
      * @return true if starting playing ok, false otherwise
      */
     public synchronized boolean playRec(final Program prog) throws IOException {
-        if (cmgr == null) throw connectionGone;
-        if (prog == null) return false;
+        if (!isConnected()) throw connectionGone;
+        if (prog == null) throw invalidParam;
         cmgr.writeLine("play prog " + prog.playbackID()); //$NON-NLS-1$
         cmgr.setTimeout(ConnMgr.timeOut.LONG);
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
@@ -192,7 +195,8 @@ public class FrontendManager {
      * @return true if starting playing ok, false otherwise
      */
     public synchronized boolean playFile(final String file) throws IOException {
-        if (cmgr == null) throw connectionGone;
+        if (!isConnected()) throw connectionGone;
+        if (file == null) throw invalidParam;
         cmgr.writeLine("play file " + file); //$NON-NLS-1$
         cmgr.setTimeout(ConnMgr.timeOut.LONG);
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
@@ -206,7 +210,7 @@ public class FrontendManager {
      * @return true if we switched ok, false otherwise
      */
     public synchronized boolean playChan(int chanid) throws IOException {
-        if (cmgr == null) throw connectionGone;
+        if (!isConnected()) throw connectionGone;
         cmgr.writeLine("play chanid " + chanid); //$NON-NLS-1$
         cmgr.setTimeout(ConnMgr.timeOut.LONG);
         if (getSingleLineResponse().equals("OK")) //$NON-NLS-1$
@@ -220,7 +224,7 @@ public class FrontendManager {
      * @return true if the seek was successful, false otherwise
      */
     public synchronized boolean seekTo(int pos) throws IOException {
-        if (cmgr == null) throw connectionGone;
+        if (!isConnected()) throw connectionGone;
         int hours = pos / 3600;
         pos -= hours * 3600;
         int mins = pos / 60;
@@ -236,7 +240,7 @@ public class FrontendManager {
 
     /** Disconnect from the frontend */
     public void disconnect() {
-        if (cmgr == null) return;
+        if (!isConnected()) return;
         cmgr.disconnect();
         cmgr = null;
     }
@@ -276,7 +280,7 @@ public class FrontendManager {
      * @return the first line read
      */
     private synchronized String getSingleLineResponse() throws IOException {
-        if (cmgr == null) throw connectionGone;
+        if (!isConnected()) throw connectionGone;
         final String line = cmgr.readLine();
         while (cmgr != null)
             if (cmgr.readLine().equals("#")) break; //$NON-NLS-1$

@@ -138,12 +138,6 @@ public class NavRemote extends Remote {
             return;
         }
 
-        if (feMgr == null) {
-            ErrUtil.err(this, Messages.getString("TVRemote.5")); //$NON-NLS-1$
-            finish();
-            return;
-        }
-
         // Preserve the menu item string through updateLoc(), if we have one
         String itemSTmp = itemS;
         
@@ -231,6 +225,7 @@ public class NavRemote extends Remote {
                         break;
                 }
             } catch (IOException e) { ErrUtil.err(this, e); }
+              catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
 
         super.onClick(v);
 

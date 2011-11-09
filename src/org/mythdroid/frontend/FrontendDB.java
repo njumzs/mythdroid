@@ -20,6 +20,8 @@ package org.mythdroid.frontend;
 
 import java.util.ArrayList;
 
+import org.mythdroid.util.ErrUtil;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -83,17 +85,17 @@ public class FrontendDB {
     
     /**
      * Set the default frontend
-     * @param newDefault name of new default frontend
      * @param ctx Context
+     * @param newDefault name of new default frontend
      * @return true if successful
      */
-    public static boolean updateDefault(String newDefault, Context ctx) {
+    public static boolean updateDefault(Context ctx, String newDefault) {
         if (db == null) initDB(ctx);
         try {
-            //Sending null as second argument deletes all rows in case there was more than one
+            /* Sending null as second argument deletes all rows in case there 
+               was more than one */
             db.delete(DEFAULT_TABLE, null, null);
-        } catch (SQLException e) {
-        }
+        } catch (SQLException e) { ErrUtil.logWarn(e); }
         ContentValues values = new ContentValues();
         values.put("name", newDefault); //$NON-NLS-1$
         return (db.insert(DEFAULT_TABLE, null, values) > 0);
@@ -116,7 +118,7 @@ public class FrontendDB {
             newDefault = c.getString(1);
             c.close();
         } catch (CursorIndexOutOfBoundsException e) {} 
-          catch (SQLException e) {}
+          catch (SQLException e) { ErrUtil.logWarn(e); }
         return newDefault;
     }
 
@@ -249,10 +251,27 @@ public class FrontendDB {
      */
     public static void delete(Context ctx, long id) {
         if (db == null || cached == null || cached.isClosed()) initDB(ctx);
+        
+        String name = null;
+        cached.moveToFirst();
+        while (!cached.isAfterLast()) {
+            if (cached.getInt(ID) == id)
+                name = cached.getString(NAME);
+            cached.moveToNext();
+        }
+        
         db.delete(FRONTEND_TABLE, "_id = ?", //$NON-NLS-1$
             new String[] { String.valueOf(id) });
+        
         cached.requery();
         namesList = null;
+        
+        if (
+            getDefault(ctx) != null && name != null && 
+            name.equals(getDefault(ctx))
+        )
+            updateDefault(ctx, getFirstFrontendName(ctx));
+      
     }
 
     /** Close the frontend database */

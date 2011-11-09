@@ -139,8 +139,9 @@ public class BackendManager {
         try {
             sock.receive(rpkt);
         } catch (SocketTimeoutException e) {
+            sock.close();
             LogUtil.debug("Timeout waiting for UPNP response"); //$NON-NLS-1$
-            return null;
+            throw new IOException(Messages.getString("BackendManager.2")); //$NON-NLS-1$
         }
 
         sock.close();
@@ -148,7 +149,8 @@ public class BackendManager {
         final String msg = new String(rpkt.getData(), 0, rpkt.getLength());
         LogUtil.debug("UPNP Response received: " + msg); //$NON-NLS-1$
 
-        if (!msg.contains(BACKEND_UPNP_ID)) return null;
+        if (!msg.contains(BACKEND_UPNP_ID)) 
+            throw new IOException(Messages.getString("BackendManager.2")); //$NON-NLS-1$
 
         int locIdx = msg.indexOf(UPNP_LOCATION);
         int portIdx = msg.indexOf(":", locIdx + UPNP_LOCATION.length()); //$NON-NLS-1$

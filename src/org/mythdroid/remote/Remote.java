@@ -403,7 +403,8 @@ public abstract class Remote extends Activity implements View.OnClickListener {
             }
             onAction();
         } catch (IOException e) { ErrUtil.err(this, e); }
-
+          catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+          
         return true;
 
     }

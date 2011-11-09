@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.mythdroid.Globals;
+import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
 
 /** Describes a location in the frontend */
@@ -36,7 +37,7 @@ public class FrontendLocation {
             try {
                 if (!hasLocations)
                     populateLocations(Globals.getFrontend(Globals.appContext));
-            } catch (IOException e) {}
+            } catch (IOException e) { ErrUtil.logWarn(e); }
         }
     };
     

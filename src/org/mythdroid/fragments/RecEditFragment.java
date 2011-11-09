@@ -91,13 +91,12 @@ public class RecEditFragment extends Fragment {
         
         try {
             beMgr = Globals.getBackend();
-        } catch (Exception e) {
+        } catch (IOException e) {
         	initError(e);
         	return;
         }
         
-        prog = Globals.curProg;
-        if (prog == null) {
+        if ((prog = Globals.curProg) == null) {
         	initError(null);
             return;
         }
@@ -120,9 +119,7 @@ public class RecEditFragment extends Fragment {
                     storGroup = prog.StorGroup =
                         MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
                 }
-            } catch (IOException e) {
-                initError(e);
-            }
+            } catch (IOException e) { initError(e); }
         
     }
 
@@ -151,8 +148,7 @@ public class RecEditFragment extends Fragment {
             ft.commitAllowingStateLoss();
         }
 
-        prog = Globals.curProg;
-        if (prog == null) {
+        if ((prog = Globals.curProg) == null) {
             initError(null);
             return view;
         }
@@ -170,7 +166,7 @@ public class RecEditFragment extends Fragment {
         super.onResume();
         try {
             beMgr = Globals.getBackend();
-        } catch (Exception e) {
+        } catch (IOException e) {
             initError(e);
             return;
         }

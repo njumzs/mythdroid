@@ -25,7 +25,6 @@ import java.util.HashMap;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
-import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Video;
 import org.mythdroid.data.VideoAdapter;
 import org.mythdroid.mdd.MDDManager;
@@ -75,59 +74,57 @@ public class Videos extends MDActivity implements
         @Override
         public void run() {
 
+            String addr = null;
+            
             try {
-                BackendManager beMgr = Globals.getBackend();
-                if (beMgr == null) {
-                    ErrUtil.postErr(
-                        ctx, new Exception(Messages.getString("Videos.2")) //$NON-NLS-1$
-                    );
-                    finish();
-                    return;
-                }
-                
-                /* We use an empty string to denote the root of a 
-                   top-level directory */
-                String tmppath = path.length() > 0 ? path : "ROOT"; //$NON-NLS-1$
-                
-                videos = MDDManager.getVideos(
-                    Globals.getBackend().addr, viddir, tmppath
-                );
+                addr = Globals.getBackend().addr;
             } catch (IOException e) {
-                ErrUtil.postErr(
-                    ctx, new Exception(Messages.getString("Videos.1")) //$NON-NLS-1$
-                );
+                ErrUtil.postErr(ctx, e);
+                finish();
+                return;
+            }
+            
+            /* We use an empty string to denote the root of a 
+               top-level directory */
+            String tmppath = path.length() > 0 ? path : "ROOT"; //$NON-NLS-1$
+
+            try {
+                videos = MDDManager.getVideos(addr, viddir, tmppath);
+            } catch (IOException e) {
+                ErrUtil.postErr(ctx, e);
                 finish();
                 return;
             }
 
-            handler.post(
-                new Runnable() {
-                    @Override
-                     public void run() {
-                        lv.setAdapter(
-                            new VideoAdapter(
-                                ctx, R.layout.video, videos
-                            )
-                        );
-                        if (artThread != null) {
-                            fetchingArt = false;
-                            artThread.interrupt();
-                            try {
-                                artThread.join();
-                            } catch (InterruptedException e) {}
-                        }
-                        fetchingArt = true;
-                        artThread = new Thread(fetchArt, "videoArtFetcher"); //$NON-NLS-1$
-                        artThread.start();
-                        try {
-                            dismissDialog(DIALOG_LOAD);
-                        } catch (IllegalArgumentException e1) {}
-                    }
-                }
-            );
+            handler.post(gotVideos);
+                
         }
     };
-
+    
+    final private Runnable gotVideos = new Runnable() {
+        @Override
+        public void run() {
+            lv.setAdapter(
+                new VideoAdapter(
+                    ctx, R.layout.video, videos
+                )
+            );
+            if (artThread != null) {
+                fetchingArt = false;
+                artThread.interrupt();
+                try {
+                    artThread.join();
+                } catch (InterruptedException e) {}
+            }
+            fetchingArt = true;
+            artThread = new Thread(fetchArt, "videoArtFetcher"); //$NON-NLS-1$
+            artThread.start();
+            try {
+                dismissDialog(DIALOG_LOAD);
+            } catch (IllegalArgumentException e1) {}
+        }
+    };
+    
     /** Fetch posters for the current list of videos */
     final private Runnable fetchArt = new Runnable() {
         @Override
@@ -237,7 +234,12 @@ public class Videos extends MDActivity implements
         Video video = videos.get(pos);
         if (video.directory)
             return true;
-        setExtra(Extras.FILENAME.toString(), video.getPath());
+        try {
+            setExtra(Extras.FILENAME.toString(), video.getPath());
+        } catch(IOException e) {
+            ErrUtil.err(this, e);
+            return true;
+        }
         setExtra(Extras.TITLE.toString(), video.title);
         nextActivity = TVRemote.class;
         showDialog(FRONTEND_CHOOSER);

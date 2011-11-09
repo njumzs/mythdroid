@@ -247,12 +247,6 @@ public class MusicRemote extends Remote {
             return;
         }
 
-        if (feMgr == null) {
-            ErrUtil.err(this, Messages.getString("TVRemote.5")); //$NON-NLS-1$
-            finish();
-            return;
-        }
-
         try {
             mddMgr = new MDDManager(feMgr.addr);
         } catch (IOException e) { mddMgr = null; }
@@ -303,6 +297,7 @@ public class MusicRemote extends Remote {
             try {
                 feMgr.sendKey(key);
             } catch (IOException e) { ErrUtil.err(this, e); }
+              catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
 
         super.onClick(v);
 
@@ -354,10 +349,17 @@ public class MusicRemote extends Remote {
                 break;
         }
 
-        if (feMgr != null)
-            try {
-                feMgr.sendKey(key);
-            } catch (IOException e) { ErrUtil.err(this, e); }
+        if (feMgr == null) return true;
+        
+        try {
+            feMgr.sendKey(key);
+        } catch (IOException e) { 
+            ErrUtil.err(this, e);
+            return true;
+        } catch (IllegalArgumentException e) { 
+            ErrUtil.err(this, e);
+            return true;
+        }
 
         if (activity != null)
             startActivityForResult(
@@ -400,6 +402,9 @@ public class MusicRemote extends Remote {
                                     return;
                             }
                         } catch (IOException e) { ErrUtil.err(ctx, e); }
+                          catch (IllegalArgumentException e) {
+                              ErrUtil.err(ctx, e); 
+                          }
 
                         finish();
 
@@ -490,18 +495,19 @@ public class MusicRemote extends Remote {
                 "&Width=" + artView.getWidth() + //$NON-NLS-1$
                 "&Height=" + artView.getHeight() //$NON-NLS-1$
             );
-        } catch (Exception e) { url = null; }
-
-        if (url == null)
-            return null;
+        } catch (Exception e) { 
+            ErrUtil.logWarn(e);
+            return null; 
+        }
         
         if (Globals.muxConns) try {
             url = new URL(
                 url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
                 ":16550" + url.getFile()  //$NON-NLS-1$
             );
-        } catch (MalformedURLException e1) {
-           return null;
+        } catch (MalformedURLException e) {
+            ErrUtil.logWarn(e);
+            return null;
         }
 
         try {

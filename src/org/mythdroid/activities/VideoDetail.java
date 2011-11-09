@@ -18,6 +18,8 @@
 
 package org.mythdroid.activities;
 
+import java.io.IOException;
+
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
@@ -126,21 +128,26 @@ public class VideoDetail extends MDActivity {
             new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!Globals.isCurrentFrontendHere()) {
-                        startActivity(
-                            new Intent()
-                                .setClass(ctx, TVRemote.class)
-                                .putExtra(Extras.FILENAME.toString(), video.getPath()) 
-                                .putExtra(Extras.TITLE.toString(), video.title)
-                        );
-                    } else {
-                        startActivity(
-                            new Intent()
-                                .setClass(ctx, VideoPlayer.class)
-                                .putExtra(Extras.FILENAME.toString(), video.getPath()) 
-                                .putExtra(Extras.TITLE.toString(), video.title)
-                        );
+                    
+                    String filename = null;
+                    try {
+                        filename = video.getPath();
+                    } catch (IOException e) {
+                        ErrUtil.err(ctx, e);
+                        return;
                     }
+                    
+                    Class<?> nextClass = 
+                        Globals.isCurrentFrontendHere() 
+                            ? VideoPlayer.class : TVRemote.class;
+                    
+                    startActivity(
+                        new Intent()
+                            .setClass(ctx, nextClass)
+                            .putExtra(Extras.FILENAME.toString(), filename) 
+                            .putExtra(Extras.TITLE.toString(), video.title)
+                    );
+                    
                 }
             }
         );
@@ -149,7 +156,12 @@ public class VideoDetail extends MDActivity {
             new OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View arg0) {
-                    setExtra(Extras.FILENAME.toString(), video.getPath());
+                    try {
+                        setExtra(Extras.FILENAME.toString(), video.getPath());
+                    } catch (IOException e) {
+                        ErrUtil.err(ctx, e);
+                        return true;
+                    }
                     setExtra(Extras.TITLE.toString(), video.title);
                     nextActivity = TVRemote.class;
                     showDialog(FRONTEND_CHOOSER);

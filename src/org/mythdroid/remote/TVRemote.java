@@ -155,7 +155,7 @@ public class TVRemote extends Remote {
                                     Program prog =
                                         Globals.getBackend().getRecording(name);
                                     titleView.setText(prog.Title);
-                                } catch (Exception e) {
+                                } catch (IOException e) {
                                     ErrUtil.postErr(ctx, e);
                                     return;
                                 }
@@ -229,7 +229,14 @@ public class TVRemote extends Remote {
                 }
             } catch (IOException e) {
                 ErrUtil.postErr(ctx, e);
+                done();
+                return;
             } catch (InterruptedException e) {}
+              catch (IllegalArgumentException e) { 
+                  ErrUtil.postErr(ctx, e);
+                  done();
+                  return;
+              }
             handler.post(ready);
 
         }
@@ -311,12 +318,6 @@ public class TVRemote extends Remote {
             feMgr = Globals.getFrontend(this);
         } catch (IOException e) {
             ErrUtil.err(this, e);
-            finish();
-            return;
-        }
-
-        if (feMgr == null) {
-            ErrUtil.err(this, Messages.getString("TVRemote.5")); //$NON-NLS-1$
             finish();
             return;
         }
@@ -404,7 +405,8 @@ public class TVRemote extends Remote {
             try {
                 feMgr.sendKey(key);
             } catch (IOException e) { ErrUtil.err(this, e); }
-
+              catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+              
         if (key == Key.GUIDE)
             startActivityForResult(
                 new Intent().setClass(ctx, NavRemote.class), 0
@@ -680,7 +682,7 @@ public class TVRemote extends Remote {
                 return;
             }
             prog = Globals.getBackend().getRecording(loc.filename);
-        } catch (Exception e) {
+        } catch (IOException e) {
             ErrUtil.err(this, e);
             done();
             return;
@@ -759,9 +761,8 @@ public class TVRemote extends Remote {
         if (feMgr != null && feMgr.isConnected() && jump) {
             try {
                 feMgr.jumpTo(Globals.lastLocation);
-            } catch (IOException e) {
-                ErrUtil.postErr(this, e);
-            }
+            } catch (IOException e) { ErrUtil.postErr(this, e); }
+              catch (IllegalArgumentException e) { ErrUtil.postErr(this, e); }
         }
         jump = false;
         finish();
