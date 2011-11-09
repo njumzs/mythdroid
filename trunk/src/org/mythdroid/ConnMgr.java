@@ -174,6 +174,12 @@ public class ConnMgr {
         final String host, final int port, onConnectListener ocl, boolean mux
     ) throws IOException {
 
+        if (host == null || host.length() < 1)
+            throw new IOException(Messages.getString("ConnMgr.8")); //$NON-NLS-1$
+        
+        if (port < 0 || port > 65535)
+            throw new IOException(Messages.getString("ConnMgr.9") + port); //$NON-NLS-1$
+        
         if (mux)
         	// Add a callback that sets up the muxed connection
             oCLs.add(

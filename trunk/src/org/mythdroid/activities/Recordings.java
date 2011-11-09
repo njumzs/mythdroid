@@ -222,7 +222,7 @@ public class Recordings extends MDFragmentActivity {
 
         switch (item.getItemId()) {
             case MENU_FRONTEND:
-                nextActivity=null;
+                nextActivity = null;
                 showDialog(FRONTEND_CHOOSER);
                 return true;
             case MENU_REFRESH:

@@ -26,6 +26,8 @@ import org.mythdroid.Globals;
 import org.mythdroid.Enums.RecType;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.Video;
+import org.mythdroid.resource.Messages;
+import org.mythdroid.util.ErrUtil;
 
 /** Manage a connection to MDD */
 public class MDDManager {
@@ -135,7 +137,9 @@ public class MDDManager {
         
         String line = cmgr.readLine();
         while (line != null && !line.equals("VIDEOLIST DONE")) { //$NON-NLS-1$
-            videos.add(new Video(line));
+            try {
+                videos.add(new Video(line));
+            } catch (IllegalArgumentException e) { ErrUtil.logWarn(e); }
             line = cmgr.readLine();
         }
 
@@ -406,7 +410,7 @@ public class MDDManager {
                 int idx = msg.indexOf(' ');
                 if (idx == -1) idx = msg.length();
                 throw new IOException(
-                    "MDD doesn't understand " + //$NON-NLS-1$
+                    Messages.getString("MDDManager.0") + //$NON-NLS-1$
                     msg.substring(0, idx)
                 );
             }

@@ -28,7 +28,6 @@ import org.mythdroid.activities.Guide;
 import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.activities.Recordings;
 import org.mythdroid.activities.VideoPlayer;
-import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
@@ -58,7 +57,6 @@ import android.widget.TextView;
 public class RecDetailFragment extends Fragment {
     
     private MDFragmentActivity activity = null;
-    private BackendManager beMgr        = null;
     private Program prog                = null;
     private Button stop                 = null;
     private View view                   = null;
@@ -127,11 +125,7 @@ public class RecDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        try {
-            beMgr = Globals.getBackend();
-        } catch (Exception e) { ErrUtil.err(getActivity(), e); }
-        prog = Globals.curProg;
-        if (prog == null) {
+        if ((prog = Globals.curProg) == null) {
             if (!dualPane) getFragmentManager().popBackStack(); 
             if (!embedded) activity.finish();
             return;
@@ -278,9 +272,11 @@ public class RecDetailFragment extends Fragment {
                             public void onClick(
                                 DialogInterface dialog, int which) {
                                 try {
-                                    beMgr.deleteRecording(prog);
-                                } catch (Exception e) {
+                                    Globals.getBackend().deleteRecording(prog);
+                                } catch (IOException e) {
                                     ErrUtil.err(activity, e);
+                                    dialog.dismiss();
+                                    return;
                                 }
                                 dialog.dismiss();
                                 if (embedded) {
@@ -314,7 +310,7 @@ public class RecDetailFragment extends Fragment {
                                 DialogInterface dialog, int which
                             ) {
                                 try {
-                                    beMgr.stopRecording(prog);
+                                    Globals.getBackend().stopRecording(prog);
                                 } catch (IOException e) {
                                     ErrUtil.err(getActivity(), e);
                                     dialog.dismiss();

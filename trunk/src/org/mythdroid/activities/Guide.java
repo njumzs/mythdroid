@@ -493,7 +493,7 @@ public class Guide extends MDActivity {
             }
 
         } catch (SAXException e1) {
-            ErrUtil.err(this, Messages.getString("Guide.13")); // Guide XML parse error //$NON-NLS-1$
+            ErrUtil.err(this, Messages.getString("Guide.13")); //$NON-NLS-1$
         } catch (Exception e1) {
             ErrUtil.err(this, e1);
         }
