@@ -202,7 +202,7 @@ public class MDDManager {
         
         final ConnMgr cmgr = sendMsg(
             addr, "CUTLIST " + prog.ChanID + " " + //$NON-NLS-1$ //$NON-NLS-2$ 
-            prog.StartTime.getTime() / 1000 
+            prog.RecStartTime.getTime() / 1000 
         ); 
         
         ArrayList<int[]> cuts = new ArrayList<int[]>(8);
