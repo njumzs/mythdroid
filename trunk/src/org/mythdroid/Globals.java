@@ -10,9 +10,11 @@ import org.mythdroid.data.Video;
 import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.frontend.FrontendManager;
+import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
@@ -134,10 +136,15 @@ public class Globals {
         if (beMgr != null && beMgr.isConnected())
             return beMgr;
         
-        // SSH port forwarding? Mux conns via MDD's CMux if possible
+        /* SSH port forwarding or not connected to wifi? 
+           Mux conns via MDD's CMux if possible */
         if (
             backend != null &&
-            (backend.equals("127.0.0.1") || backend.equals("localhost")) && //$NON-NLS-1$ //$NON-NLS-2$
+            (
+            	backend.equals("127.0.0.1") || backend.equals("localhost") || //$NON-NLS-1$ //$NON-NLS-2$
+            	ConnectivityReceiver.networkType() ==
+            		ConnectivityManager.TYPE_MOBILE
+            ) && 
             testMuxConn()
         )
             muxConns = true;
