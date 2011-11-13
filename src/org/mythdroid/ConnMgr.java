@@ -212,26 +212,28 @@ public class ConnMgr {
 
         if (ocl != null)
             oCLs.add(ocl);
+        
+        boolean wifi = 
+        		ConnectivityReceiver.networkType() == 
+        			ConnectivityManager.TYPE_WIFI;
 
-        /*
-         * Increase default socket timeout if we're not on WiFi
-         * Grab a WifiLock if we are
-         */
-        if (
-            ConnectivityReceiver.networkType() == ConnectivityManager.TYPE_WIFI
-        ) {
-            wifiLock = ((WifiManager)Globals.appContext
-                .getSystemService(Context.WIFI_SERVICE))
-                .createWifiLock("MythDroid"); //$NON-NLS-1$
-            wifiLock.acquire();
+        // Increase default socket timeout if we're on a slow link
+        if (wifi) {
             if (sockAddr.getAddress().isLoopbackAddress())
-                // SSH port forward I guess - probably tethered to a slow link
+                // SSH port forward we guess
                 timeout *= 10;
         }
         else
             timeout *= 10;
 
         doConnect(timeout);
+        
+        if (wifi) { 
+        	wifiLock = ((WifiManager)Globals.appContext
+                .getSystemService(Context.WIFI_SERVICE))
+                .createWifiLock("MythDroid"); //$NON-NLS-1$
+            wifiLock.acquire();
+        }
 
         // Add a weak reference to ourselves to the static connection list
         weakThis = new WeakReference<ConnMgr>(this);
