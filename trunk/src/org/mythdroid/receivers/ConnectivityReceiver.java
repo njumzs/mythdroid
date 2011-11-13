@@ -137,6 +137,12 @@ public class ConnectivityReceiver extends BroadcastReceiver {
                 ctx.getSystemService(Context.WIFI_SERVICE);
 
         NetworkInfo winfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        
+        if (winfo == null)
+            return;
+        
+        connected = (winfo.getState() == NetworkInfo.State.CONNECTED);
+        netType   = winfo.getType();
 
         int wifiState = wm.getWifiState();
 
