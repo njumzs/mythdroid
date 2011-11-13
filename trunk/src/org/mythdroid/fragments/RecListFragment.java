@@ -28,7 +28,6 @@ import org.mythdroid.data.Program;
 import org.mythdroid.data.ProgramAdapter;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
-import org.mythdroid.util.ErrUtil;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -47,12 +46,10 @@ import android.widget.TextView;
  */
 public class RecListFragment extends ListFragment
     implements AdapterView.OnItemLongClickListener {
-
-    private Recordings activity = null;
-    private ListView lv = null;
-    private String detailsFragClass = null;
-    private Bundle detailsFragBundle = null;
-    private boolean dualPane = false;
+    
+    private Recordings activity      = null;
+    private ListView lv              = null;
+    private boolean dualPane         = false;
 
     @Override
     public void onActivityCreated(Bundle icicle) {
@@ -77,22 +74,24 @@ public class RecListFragment extends ListFragment
         View detailsFrame = getActivity().findViewById(R.id.recdetails);
         dualPane = detailsFrame != null && 
                    detailsFrame.getVisibility() == View.VISIBLE;
-        
+       
         if (!activity.hasRecordings())
             activity.refresh();
         
-        /* 
-         * Find out if we should push another fragment on the stack during
-         * showDetails() to restore state post configuration change 
-         */
-        Bundle args = getArguments();
-        if (args != null) {
-            detailsFragClass  = args.getString("detailsFragClass");      //$NON-NLS-1$
-            detailsFragBundle = args.getParcelable("detailsFragBundle"); //$NON-NLS-1$
-            if (detailsFragClass.equals(getClass().getName()))
-                detailsFragClass = null;
-        }
-        
+    }
+    
+    @Override
+    public void onResume() {
+    	super.onResume();
+    	lv.setSelection(activity.visibleIndex);
+    }
+    
+    @Override
+    public void onPause() {
+    	super.onPause();
+    	int vIdx = lv.getFirstVisiblePosition();
+    	if (vIdx != ListView.INVALID_POSITION && vIdx != 0)
+    		activity.visibleIndex = vIdx;
     }
     
     @Override
@@ -104,7 +103,7 @@ public class RecListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView list, View v, int pos, long id) {
         Globals.curProg = (Program)list.getItemAtPosition(pos);
-        activity.index  = pos;
+        activity.checkedIndex  = pos;
         showDetails();
     }
 
@@ -112,11 +111,19 @@ public class RecListFragment extends ListFragment
     public boolean onItemLongClick(
         AdapterView<?> adapter, View item, int pos, long itemid
     ) {
-        Globals.curProg = (Program)adapter.getItemAtPosition(pos);
-        activity.index  = pos;
+        Globals.curProg       = (Program)adapter.getItemAtPosition(pos);
+        activity.checkedIndex = pos;
         activity.nextActivity = TVRemote.class;
         activity.showDialog(Recordings.FRONTEND_CHOOSER);
         return true;
+    }
+    
+    /**
+     * Return our ListView's FirstVisiblePosition
+     * @return the index of the first visible Program
+     */
+    public int getFirstVisiblePosition() {
+        return lv.getFirstVisiblePosition();
     }
     
     /**
@@ -146,16 +153,35 @@ public class RecListFragment extends ListFragment
      */
     public void updateSelection() {
         
-        activity.index = Math.min(activity.index, lv.getCount() - 1);
-        int idx        = activity.index;
+        if (activity.checkedIndex < 0)
+            activity.checkedIndex = 0;
         
-        if ((Globals.curProg = (Program)lv.getItemAtPosition(idx)) == null)
-            return;
+        int maxIndex = lv.getCount() - 1;
         
-        lv.setItemChecked(idx, true);
-        lv.setSelection(idx);
-        if (dualPane || detailsFragClass != null) 
-            showDetails();
+        if (maxIndex >= 0) 
+            activity.checkedIndex = Math.min(activity.checkedIndex, maxIndex);
+        int cIdx = activity.checkedIndex;
+        
+        Program p = (Program)lv.getItemAtPosition(cIdx);
+        if (p == null) return;
+        Globals.curProg = p;
+
+        lv.setSelection(activity.visibleIndex);
+        
+        if (!dualPane) return;
+        
+        lv.setItemChecked(cIdx, true);
+        // Do we need to add / replace the fragment in the details view slot?
+        Fragment df = getFragmentManager().findFragmentById(R.id.recdetails);
+            
+        if (
+        	df == null || 
+        	(
+        		df.getClass().equals(RecDetailFragment.class) && 
+        		!((RecDetailFragment)df).getProg().equals(Globals.curProg)
+        	)
+        )
+        	showDetails();
         
     }
     
@@ -164,8 +190,9 @@ public class RecListFragment extends ListFragment
         Fragment rdf           = null;
         FragmentManager fm     = getFragmentManager();
         if (fm == null) return;
-        FragmentTransaction ft = fm.beginTransaction();
         
+        FragmentTransaction ft = fm.beginTransaction();
+  
         rdf = RecDetailFragment.newInstance(false, false);
         
         if (dualPane)
@@ -177,32 +204,7 @@ public class RecListFragment extends ListFragment
         
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         ft.commitAllowingStateLoss();
-        
-        if (detailsFragClass == null) return;
-        
-        if (detailsFragClass.endsWith("RecDetailFragment")) { //$NON-NLS-1$
-            detailsFragClass = null;
-            return;
-        }
-        
-        /* We need to push another fragment on the stack to restore
-           state post config change */
-        ft = getFragmentManager().beginTransaction();
-        
-        try {
-            rdf = (Fragment)Class.forName(detailsFragClass).newInstance();
-        } catch (Exception e) {
-            ErrUtil.err(activity, e);
-            return;
-        }
-        rdf.setArguments(detailsFragBundle);
-        
-        ft.replace(dualPane ? R.id.recdetails : R.id.reclistframe, rdf);
-        ft.addToBackStack(null);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.commitAllowingStateLoss();
-        detailsFragClass = null;
-        
+                
     }
     
 }

@@ -258,6 +258,14 @@ public class RecDetailFragment extends Fragment {
         }
     }
     
+    /**
+     * Get the Program under display
+     * @return Program being displayed
+     */
+    public Program getProg() {
+    	return prog;
+    }
+    
     private class deleteDialog extends DialogFragment {
 
         @Override
