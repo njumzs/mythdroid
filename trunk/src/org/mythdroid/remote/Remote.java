@@ -292,6 +292,12 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     }
     
     @Override
+    public void onSaveInstanceState(Bundle icicle) {
+        removeDialog(DIALOG_LOAD);
+        super.onSaveInstanceState(icicle);
+    }
+    
+    @Override
     public void onDestroy() {
         super.onDestroy();
         if (isFinishing() && wakeConnection != null)
