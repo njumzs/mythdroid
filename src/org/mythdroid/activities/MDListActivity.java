@@ -39,6 +39,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -173,7 +174,13 @@ public abstract class MDListActivity extends ListActivity {
         if (Globals.appContext == null)
             Globals.appContext = getApplicationContext();
     }
-
+    
+    @Override
+    public void onSaveInstanceState(Bundle icicle) {
+        removeDialog(DIALOG_LOAD);
+        super.onSaveInstanceState(icicle);
+    }
+    
     @Override
     public void onDestroy() {
         super.onDestroy();

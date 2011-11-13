@@ -187,6 +187,12 @@ public abstract class MDFragmentActivity extends FragmentActivity {
     }
     
     @Override
+    public void onSaveInstanceState(Bundle icicle) {
+        removeDialog(DIALOG_LOAD);
+        super.onSaveInstanceState(icicle);
+    }
+    
+    @Override
     public void onPause() {
         super.onPause();
         isPaused = true;
