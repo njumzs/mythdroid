@@ -34,7 +34,6 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
@@ -236,6 +235,8 @@ public abstract class Remote extends Activity implements View.OnClickListener {
                        .getBoolean("moveWake", true); //$NON-NLS-1$
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         
+        Reflection.setThreadPolicy();
+        
         if (moveWake) {
             wakeConnection = new ServiceConnection() {
                 @Override
@@ -271,13 +272,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
                 msg.what = WakeService.MSG_STOP;
                 wakeMessenger.send(msg);
             } catch (RemoteException e) { ErrUtil.err(this, e); }
-            
-         // Set strict mode policy in case it hasn't been set in the main activity
-        if (Integer.parseInt(Build.VERSION.SDK) >= 11)
-            try {
-                Reflection.rStrictMode.checkAvailable();
-                Reflection.rStrictMode.setThreadPolicy();
-            } catch (Exception e) {}
+
     }
 
     @Override

@@ -34,7 +34,6 @@ import org.mythdroid.remote.NavRemote;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
-import org.mythdroid.util.Reflection;
 
 import android.R.drawable;
 import android.R.id;
@@ -44,7 +43,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -103,14 +101,6 @@ public class MythDroid extends MDListActivity implements
             if (Globals.currentFrontend == null)
                 Globals.currentFrontend = FrontendDB.getFirstFrontendName(this);
         }
-
-        /* Allow network activity on UI thread - we only use it to connect to the
-           backend, which we need to do before the UI is usable anyway */
-        if (Integer.parseInt(Build.VERSION.SDK) >= 11)
-            try {
-                Reflection.rStrictMode.checkAvailable();
-                Reflection.rStrictMode.setThreadPolicy();
-            } catch (Exception e) {}
             
         setContentView(R.layout.mainmenu);
 
