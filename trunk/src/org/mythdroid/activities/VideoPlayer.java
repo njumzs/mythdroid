@@ -86,15 +86,11 @@ public class VideoPlayer extends MDActivity {
         } catch (IllegalArgumentException e) {}
         try {
             MDDManager.stopStream(beMgr.addr);
-        } catch (IOException e) {
-            ErrUtil.err(ctx, e);
-        }
+        } catch (IOException e) { ErrUtil.err(ctx, e); }
         if (vlc != null)
             try {
                 vlc.disconnect();
-            } catch (IOException e) {
-                ErrUtil.err(ctx, e);
-            }
+            } catch (IOException e) { ErrUtil.err(ctx, e); }
     }
 
     @Override
@@ -228,11 +224,11 @@ public class VideoPlayer extends MDActivity {
         
         int attempts = 0;
         
-        while (attempts < 3 && vlc == null)
+        while (attempts < 6 && vlc == null)
             try {
                 vlc = new VLCRemote(beMgr.addr);
             } catch (IOException e) { 
-                attempts++; 
+                attempts++;
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e1) {}
