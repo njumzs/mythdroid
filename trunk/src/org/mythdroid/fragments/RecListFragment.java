@@ -175,9 +175,15 @@ public class RecListFragment extends ListFragment
         // Do we need to add / replace the fragment in the details view slot?
         Fragment df = getFragmentManager().findFragmentById(R.id.recdetails);
         
-        if (df == null || df.getClass().equals(RecDetailFragment.class)) return;
+        if (
+        	df == null || !df.getClass().equals(RecDetailFragment.class) ||
+        	!df.isVisible()
+        ) {
+        	showDetails();
+        	return;
+        }
         Program prog = ((RecDetailFragment)df).getProg();
-        if (prog == null || !df.isVisible() || !prog.equals(Globals.curProg))
+        if (prog == null || !prog.equals(Globals.curProg))
         	showDetails();	
         
     }
