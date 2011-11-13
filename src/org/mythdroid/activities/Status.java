@@ -34,8 +34,6 @@ import org.mythdroid.util.ErrUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,14 +45,11 @@ import android.support.v4.app.FragmentTransaction;
 public class Status extends MDFragmentActivity {
 
     /** The status XML doc from the backend */
-    public static Document        statusDoc   = null;
+    public static Document   statusDoc   = null;
     /** Are we embedding the child fragments? */ 
-    public boolean                embed       = true;
-
-    final static private int      DIALOG_LOAD = 0;
-    
-    final private Context ctx     = this;
-    final private Handler handler = new Handler();
+    public boolean           embed       = true;
+    final private Context    ctx         = this;
+    final private Handler    handler     = new Handler();
 
     final private Runnable getStatusTask = new Runnable() {
         @Override
@@ -90,14 +85,6 @@ public class Status extends MDFragmentActivity {
         super.onDestroy();
         Globals.getWorker().removeCallbacks(getStatusTask);
         statusDoc = null;
-    }
-
-    @Override
-    public Dialog onCreateDialog(int id) {
-        ProgressDialog d = new ProgressDialog(this);
-        d.setIndeterminate(true);
-        d.setMessage(getResources().getString(R.string.loading));
-        return d;
     }
 
     /**
