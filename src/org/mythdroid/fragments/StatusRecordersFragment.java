@@ -55,12 +55,11 @@ public class StatusRecordersFragment extends ListFragment {
     final private static int REFRESH_NEEDED = Activity.RESULT_FIRST_USER;
     final private static int DIALOG_LOAD    = 0;
 
-    private MDFragmentActivity activity = null;
-
-    private Document doc = null;
-    private ArrayList<Encoder> encoders = new ArrayList<Encoder>();
-
-    final private Handler handler = new Handler();
+    final private Handler handler           = new Handler();
+    
+    private MDFragmentActivity activity     = null;
+    private Document doc                    = null;
+    private ArrayList<Encoder> encoders     = new ArrayList<Encoder>();
 
     final private Runnable refreshEncoders = new Runnable() {
         @Override
@@ -243,7 +242,7 @@ public class StatusRecordersFragment extends ListFragment {
         LayoutInflater inflater, ViewGroup container, Bundle icicle
     ) {
         if (container == null) return null;
-        activity = (MDFragmentActivity)getActivity();
+        activity  = (MDFragmentActivity)getActivity();
         View view = inflater.inflate(R.layout.status_recorders, null, false);
         ((TextView)view.findViewById(R.id.emptyMsg))
             .setText(R.string.no_recorders);
