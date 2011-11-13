@@ -171,17 +171,14 @@ public class RecListFragment extends ListFragment
         if (!dualPane) return;
         
         lv.setItemChecked(cIdx, true);
+        
         // Do we need to add / replace the fragment in the details view slot?
         Fragment df = getFragmentManager().findFragmentById(R.id.recdetails);
-            
-        if (
-        	df == null || 
-        	(
-        		df.getClass().equals(RecDetailFragment.class) && 
-        		!((RecDetailFragment)df).getProg().equals(Globals.curProg)
-        	)
-        )
-        	showDetails();
+        
+        if (df == null || df.getClass().equals(RecDetailFragment.class)) return;
+        Program prog = ((RecDetailFragment)df).getProg();
+        if (prog == null || !df.isVisible() || !prog.equals(Globals.curProg))
+        	showDetails();	
         
     }
     
