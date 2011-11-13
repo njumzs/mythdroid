@@ -27,6 +27,7 @@ import org.mythdroid.R;
 import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.Reflection;
 
 import android.R.drawable;
 import android.R.id;
@@ -162,7 +163,13 @@ public abstract class MDListActivity extends ListActivity {
                 super.onPrepareDialog(id, dialog);
         }
     }
-
+    
+    @Override
+    public void onCreate(Bundle icicle) {
+    	super.onCreate(icicle);
+    	Reflection.setThreadPolicy();
+    }
+    
     @Override
     public void onResume() {
         super.onResume();

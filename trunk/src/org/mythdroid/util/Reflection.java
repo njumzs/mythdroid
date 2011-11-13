@@ -1,6 +1,7 @@
 package org.mythdroid.util;
 
 import android.net.Uri;
+import android.os.Build;
 import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
 import android.provider.ContactsContract;
@@ -44,6 +45,20 @@ public class Reflection {
             );
         }
         
+    }
+    
+    /**
+     * Set a ThreadPolicy that permits network activity if
+     * we're on a sufficiently recent version of Android. 
+     * Has no effect on pre-Honeycomb devices
+     */
+    public static void setThreadPolicy() {
+    	/* Allow network activity on UI thread */
+    	if (Integer.parseInt(Build.VERSION.SDK) >= 11)
+    		try {
+    			rStrictMode.checkAvailable();
+    			rStrictMode.setThreadPolicy();
+    		} catch (Exception e) {}
     }
     
     /**
