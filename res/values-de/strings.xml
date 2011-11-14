@@ -32,13 +32,13 @@
     <string name="load">Load</string>
     <string name="guideData">Guide Data</string>
     <string name="scheduled">Scheduled</string>
-	<string name="encoders">Encoders</string>
-	<string name="jobs">Jobs</string>
-	<string name="plot">Plot:</string>
-	<string name="videos">Videos</string>
-	<string name="play">Play</string>
-	<string name="stopRec">Stop Rec</string> <!-- needs to be short to fit in a button -->
-	<string name="schedule">Schedule</string>   
+    <string name="encoders">Encoders</string>
+    <string name="jobs">Jobs</string>
+    <string name="plot">Plot:</string>
+    <string name="videos">Videos</string>
+    <string name="play">Play</string>
+    <string name="stopRec">Stop Rec</string> <!-- needs to be short to fit in a button -->
+    <string name="schedule">Schedule</string>   
     <string name="ok">OK</string>
     <string name="error">Fehler</string>
     <string name="yes">Ja</string>
@@ -71,17 +71,17 @@
     <string name="resetFilter">Filter zurücksetzen</string>
     <string name="wakeFe">Frontend Aufwecken</string>
     <string name="mddCmd">Befehl auf MDD ausfÃ¼hren</string>
-	<string name="mddCmds">MDD Befehle</string>
-	<string name="noMddCmds">Keine MDD Befehle definiert</string>
-	<string name="streamQuality">Select stream quality</string>
-	<string name="crash_notif_ticker_text">MythDroid has crashed, please send a report...</string>
-	<string name="crash_notif_title">MythDroid has crashed...</string>
-	<string name="crash_notif_text">Please click here to help fix the issue.</string>
-	<string name="crash_dialog_title">MythDroid has crashed</string>
-	<string name="crash_dialog_text">An unexpected error occurred forcing the
+    <string name="mddCmds">MDD Befehle</string>
+    <string name="noMddCmds">Keine MDD Befehle definiert</string>
+    <string name="streamQuality">Select stream quality</string>
+    <string name="crash_notif_ticker_text">MythDroid has crashed, please send a report...</string>
+    <string name="crash_notif_title">MythDroid has crashed...</string>
+    <string name="crash_notif_text">Please click here to help fix the issue.</string>
+    <string name="crash_dialog_title">MythDroid has crashed</string>
+    <string name="crash_dialog_text">An unexpected error occurred forcing the
         application to stop. Please help us fix this by sending us error data,
         all you have to do is click \'OK\'.</string>
-	<string name="mcrash_dialog_text">An unexpected error occurred. You were running
-		an unofficial copy of MythDroid with unknown modifications. Find the original,
-		open source project at http://mythdroid.googlecode.com</string>
+    <string name="mcrash_dialog_text">An unexpected error occurred. You were running
+	an unofficial copy of MythDroid with unknown modifications. Find the original,
+	open source project at http://mythdroid.googlecode.com</string>
 </resources>
