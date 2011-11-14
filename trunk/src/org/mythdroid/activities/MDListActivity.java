@@ -200,7 +200,7 @@ public abstract class MDListActivity extends ListActivity {
         final AlertDialog d = new AlertDialog.Builder(ctx)
             .setItems(new String[] {}, null)
             .setIcon(drawable.ic_menu_upload_you_tube)
-            .setTitle(R.string.ch_fe)
+            .setTitle(R.string.chFe)
             .create();
 
         d.getListView().setOnItemClickListener(
@@ -213,7 +213,7 @@ public abstract class MDListActivity extends ListActivity {
                     String fe = (String)av.getAdapter().getItem(pos);
                     Globals.currentFrontend = fe;
                     if (frontendIndicator != null) frontendIndicator.setText(fe);
-                    if (fe.equals(Messages.getString("MDListActivity.0"))) // Here //$NON-NLS-1$
+                    if (fe.equals(Messages.getString("MDActivity.0"))) // Here //$NON-NLS-1$
                         onHere = true;
                     d.dismiss();
                 }
@@ -231,8 +231,7 @@ public abstract class MDListActivity extends ListActivity {
             list.add(Messages.getString("MDActivity.0")); // Here //$NON-NLS-1$
         
         if (list.isEmpty()) {
-            ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
-            removeDialog(FRONTEND_CHOOSER);
+            ErrUtil.errDialog(ctx, dialog, R.string.noFes, FRONTEND_CHOOSER);
             return;
         }
 
@@ -286,10 +285,10 @@ public abstract class MDListActivity extends ListActivity {
      * Add a frontend chooser to the options menu (or action bar on >= 3.0)
      * @param menu menu to add to
      */
-    protected void addFrontendChooser(Menu menu) {
+protected void addFrontendChooser(Menu menu) {
         
         MenuItem item = menu.add(
-            Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.set_def_fe
+            Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.setCurFe
         ).setIcon(drawable.ic_menu_upload_you_tube);
      
         //If we can, add this to the action bar
@@ -306,13 +305,12 @@ public abstract class MDListActivity extends ListActivity {
             frontendIndicator = (TextView)vi.findViewById(R.id.text);
             frontendIndicator.setText(Globals.currentFrontend);
             
-            LinearLayout indicatorLL =
-                (LinearLayout)vi.findViewById(R.id.layout);
-            indicatorLL.setFocusable(true);
-            indicatorLL.setBackgroundResource(
+            LinearLayout l = (LinearLayout)vi.findViewById(R.id.layout);
+            l.setFocusable(true);
+            l.setBackgroundResource(
                 android.R.drawable.list_selector_background
             );
-            indicatorLL.setOnClickListener(
+            l.setOnClickListener(
                 new OnClickListener() {
                     @Override
                     public void onClick( View v ) {

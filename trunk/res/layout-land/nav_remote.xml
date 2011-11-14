@@ -7,42 +7,42 @@
     android:padding="8dp"
     android:background="@drawable/metal">
     	
-    <ImageButton android:id="@+id/nav_enter"
+    <ImageButton android:id="@+id/enter"
     	style="@style/MDButton72"
     	android:layout_centerInParent="true"
     	android:src="@drawable/center"/>
     
-    <ImageButton android:id="@+id/nav_up"
+    <ImageButton android:id="@+id/up"
     	style="@style/MDButton72"
-    	android:layout_above="@id/nav_enter"
-    	android:layout_alignLeft="@id/nav_enter"
+    	android:layout_above="@id/enter"
+    	android:layout_alignLeft="@id/enter"
     	android:src="@drawable/up"/>
 
-  	<ImageButton android:id="@+id/nav_left"
+  	<ImageButton android:id="@+id/left"
     	style="@style/MDButton72"
-    	android:layout_alignTop="@id/nav_enter"
-    	android:layout_toLeftOf="@id/nav_enter"
+    	android:layout_alignTop="@id/enter"
+    	android:layout_toLeftOf="@id/enter"
     	android:src="@drawable/left"/>
   
-    <ImageButton android:id="@+id/nav_right"
+    <ImageButton android:id="@+id/right"
     	style="@style/MDButton72"
-    	android:layout_toRightOf="@id/nav_enter"
-    	android:layout_alignTop="@id/nav_enter"
+    	android:layout_toRightOf="@id/enter"
+    	android:layout_alignTop="@id/enter"
     	android:src="@drawable/right"/>
     	
-    <ImageButton android:id="@+id/nav_down"
+    <ImageButton android:id="@+id/down"
     	style="@style/MDButton72"
-    	android:layout_alignLeft="@id/nav_enter"
-    	android:layout_below="@id/nav_enter"
+    	android:layout_alignLeft="@id/enter"
+    	android:layout_below="@id/enter"
     	android:src="@drawable/down"/>
    	
-   	<ImageButton android:id="@+id/nav_back"
+   	<ImageButton android:id="@+id/back"
     	style="@style/MDButton72"
     	android:layout_alignParentTop="true"
     	android:layout_alignParentLeft="true"
     	android:src="@drawable/back"/>
 
-    <TextView android:id="@+id/nav_item"
+    <TextView android:id="@+id/item"
    		android:layout_width="fill_parent"
    		android:layout_height="wrap_content"
    		android:layout_alignParentBottom="true"
@@ -51,11 +51,11 @@
    		android:textColor="@color/light_grey_text"
    		android:textSize="18sp"/>
     	
-   	<TextView android:id="@+id/nav_loc"
+   	<TextView android:id="@+id/loc"
    		android:layout_width="fill_parent"
    		android:layout_height="wrap_content"
-   		android:layout_above="@id/nav_item"
-   		android:layout_alignLeft="@id/nav_item"
+   		android:layout_above="@id/item"
+   		android:layout_alignLeft="@id/item"
    		android:textColor="@color/light_grey_text"
    		android:textSize="20sp"/>
 

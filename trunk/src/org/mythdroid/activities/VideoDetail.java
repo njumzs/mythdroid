@@ -69,42 +69,39 @@ public class VideoDetail extends MDActivity {
             return;
         }
             
-        ((TextView)findViewById(R.id.videoDTitle))
-            .setText(video.title);
-        ((TextView)findViewById(R.id.videoDDirector))
+        ((TextView)findViewById(R.id.title)).setText(video.title);
+        ((TextView)findViewById(R.id.director))
             .setText(Messages.getString("VideoDetail.0") + video.director); //$NON-NLS-1$
-        ((TextView)findViewById(R.id.videoDRating))
+        ((TextView)findViewById(R.id.rating))
             .setText(
                 Messages.getString("VideoDetail.1") + //$NON-NLS-1$
                 String.format("%.2f", video.rating) //$NON-NLS-1$
             );
-        ((TextView)findViewById(R.id.videoDYear))
+        ((TextView)findViewById(R.id.year))
             .setText(
                 Messages.getString("VideoDetail.3") + //$NON-NLS-1$
                 String.valueOf(video.year)
             );
-        ((TextView)findViewById(R.id.videoDLength))
+        ((TextView)findViewById(R.id.length))
             .setText(
                 Messages.getString("VideoDetail.4") + //$NON-NLS-1$
                 String.valueOf(video.length) + " mins" //$NON-NLS-1$
             );
-        ((TextView)findViewById(R.id.videoDPlot))
+        ((TextView)findViewById(R.id.plot))
             .setText(video.plot);
         if (video.subtitle != null && video.subtitle.length() > 0)
-            ((TextView)findViewById(R.id.videoDSubtitle))
-                .setText(video.subtitle);
+            ((TextView)findViewById(R.id.subtitle)).setText(video.subtitle);
         else
-            ((TextView)findViewById(R.id.videoDSubtitle))
-                .setVisibility(View.GONE);
+            ((TextView)findViewById(R.id.subtitle)).setVisibility(View.GONE);
 
         if (video.poster == null)
-            ((ImageView)findViewById(R.id.videoDPoster))
+            ((ImageView)findViewById(R.id.image))
                 .setImageResource(R.drawable.video);
         else
-            ((ImageView)findViewById(R.id.videoDPoster))
+            ((ImageView)findViewById(R.id.image))
                 .setImageDrawable(video.poster);
         
-        Button tvdb = ((Button)findViewById(R.id.videoDTVDB));
+        Button tvdb = ((Button)findViewById(R.id.TVDB));
         
         if (video.homepage == null || video.homepage.length() == 0)
             tvdb.setVisibility(View.GONE);
@@ -122,7 +119,7 @@ public class VideoDetail extends MDActivity {
                 }
             );
 
-        Button play = ((Button)findViewById(R.id.videoDPlay));
+        Button play = ((Button)findViewById(R.id.play));
 
         play.setOnClickListener(
             new OnClickListener() {

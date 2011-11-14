@@ -120,7 +120,7 @@ public class VideoPlayer extends MDActivity {
         final AlertDialog d = new AlertDialog.Builder(ctx)
             .setItems(R.array.streamingRates, null)
             .setIcon(drawable.ic_menu_upload_you_tube)
-            .setTitle(R.string.stream_quality)
+            .setTitle(R.string.streamQuality)
             .create();
 
         d.setOnDismissListener(

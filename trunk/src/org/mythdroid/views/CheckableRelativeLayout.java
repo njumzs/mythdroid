@@ -79,7 +79,7 @@ public class CheckableRelativeLayout extends RelativeLayout
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        ctv = (CheckedTextView)findViewById(R.id.reclist_title);
+        ctv = (CheckedTextView)findViewById(R.id.title);
     }
     
 }

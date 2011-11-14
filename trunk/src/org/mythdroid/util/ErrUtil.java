@@ -147,9 +147,9 @@ final public class ErrUtil {
      * @param msgId ID for a String resource containing the error message
      */
     static public void errDialog(
-        final Context c, final Dialog dialog, final int msgId
+        final Context c, final Dialog dialog, final int msgId, final int id
     ) {
-        errDialog(c, dialog, c.getResources().getString(msgId));
+        errDialog(c, dialog, c.getResources().getString(msgId), id);
     }
     
     /**
@@ -159,31 +159,31 @@ final public class ErrUtil {
      * @param msg String containing the error message
      */
     static public void errDialog(
-        final Context c, final Dialog dialog, final String msg
+        final Context c, final Dialog dialog, final String msg, final int id
     ) {
         
         AlertDialog ad = (AlertDialog)dialog;
         View v = LayoutInflater.from(c).inflate(R.layout.error_dialog, null);
         
-        ((TextView)v.findViewById(R.id.errMessage)).setText(msg);
+        ((TextView)v.findViewById(R.id.message)).setText(msg);
 
         ((Button)v.findViewById(R.id.errButton)).setOnClickListener(
             new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    dialog.dismiss();
+                    ((Activity)c).removeDialog(id);
                 }
             }
         );
         
-        if (msg.equals(c.getResources().getString(R.string.no_fes))) {
+        if (msg.equals(c.getResources().getString(R.string.noFes))) {
             
             Button edit = ((Button)v.findViewById(R.id.editButton));
             edit.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        dialog.dismiss();
+                        ((Activity)c).removeDialog(id);
                         c.startActivity(new Intent().setClass(c, FrontendList.class));
                     }
                 }

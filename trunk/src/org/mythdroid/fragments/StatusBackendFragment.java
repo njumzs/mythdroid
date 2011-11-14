@@ -115,13 +115,13 @@ public class StatusBackendFragment extends Fragment {
             }
         }
 
-        ((TextView)view.findViewById(R.id.storage_total)).setText(
+        ((TextView)view.findViewById(R.id.storageTotal)).setText(
             Messages.getString("StatusBackend.16") + stotal + " MB" //$NON-NLS-1$ //$NON-NLS-2$
         );
-        ((TextView)view.findViewById(R.id.storage_used)).setText(
+        ((TextView)view.findViewById(R.id.storageUsed)).setText(
             Messages.getString("StatusBackend.18") + sused + " MB" //$NON-NLS-1$ //$NON-NLS-2$
         );
-        ((TextView)view.findViewById(R.id.storage_free)).setText(
+        ((TextView)view.findViewById(R.id.storageFree)).setText(
             Messages.getString("StatusBackend.20") + sfree + " MB" //$NON-NLS-1$ //$NON-NLS-2$
         );
 
@@ -129,13 +129,13 @@ public class StatusBackendFragment extends Fragment {
 
             attr = LoadNode.getAttributes();
 
-            ((TextView)view.findViewById(R.id.load_1min)).setText(
+            ((TextView)view.findViewById(R.id.load1min)).setText(
                 "1 min: \t\t" + attr.getNamedItem("avg1").getNodeValue() //$NON-NLS-1$ //$NON-NLS-2$
             );
-            ((TextView)view.findViewById(R.id.load_5min)).setText(
+            ((TextView)view.findViewById(R.id.load5min)).setText(
                 "5 min: \t\t" + attr.getNamedItem("avg2").getNodeValue() //$NON-NLS-1$ //$NON-NLS-2$
             );
-            ((TextView)view.findViewById(R.id.load_15min)).setText(
+            ((TextView)view.findViewById(R.id.load15min)).setText(
                 "15 min:\t\t" + attr.getNamedItem("avg3").getNodeValue() //$NON-NLS-1$ //$NON-NLS-2$
             );
 
@@ -156,7 +156,7 @@ public class StatusBackendFragment extends Fragment {
             Node days, lastRun;
 
             if ((days = attr.getNamedItem("guideDays")) != null) //$NON-NLS-1$
-                ((TextView)view.findViewById(R.id.guide_length)).setText(
+                ((TextView)view.findViewById(R.id.guideLength)).setText(
                     String.format(
                         Messages.getString("StatusBackend.30"), //$NON-NLS-1$
                         days.getNodeValue(), Globals.dispFmt.format(when)
@@ -164,7 +164,7 @@ public class StatusBackendFragment extends Fragment {
                 );
 
             if ((lastRun = attr.getNamedItem("status")) != null) //$NON-NLS-1$
-                ((TextView)view.findViewById(R.id.guide_last)).setText(
+                ((TextView)view.findViewById(R.id.guideLast)).setText(
                     Messages.getString("StatusBackend.32") + // Last run:  //$NON-NLS-1$
                     lastRun.getNodeValue().toLowerCase()
                 );

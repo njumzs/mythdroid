@@ -7,144 +7,144 @@
     android:padding="8dp"
     android:background="@drawable/metal">
     
-    <ImageButton android:id="@+id/tv_back"
+    <ImageButton android:id="@+id/back"
     	style="@style/MDButton160"
     	android:layout_alignParentLeft="true"
     	android:layout_alignParentTop="true"
     	android:src="@drawable/back"/>
    	
-   	<ImageButton android:id="@+id/tv_guide"
+   	<ImageButton android:id="@+id/guide"
     	style="@style/MDButton160"
     	android:layout_alignParentRight="true"
     	android:layout_alignParentTop="true"
     	android:src="@drawable/cal"/>
     	
-    <TextView android:id="@+id/tv_title"
+    <TextView android:id="@+id/title"
     	android:layout_width="wrap_content"
     	android:layout_height="wrap_content"
-    	android:layout_toRightOf="@id/tv_back"
-    	android:layout_toLeftOf="@id/tv_guide"
+    	android:layout_toRightOf="@id/back"
+    	android:layout_toLeftOf="@id/guide"
     	android:layout_marginTop="10dp"
     	android:gravity="center"
       	android:textSize="24sp"
     	android:textStyle="bold"
     	android:textColor="@color/light_grey_text"/>
     
-    <SeekBar android:id="@+id/tv_progress"
+    <SeekBar android:id="@+id/progress"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
-    	android:layout_below="@id/tv_back"
+    	android:layout_below="@id/back"
     	android:layout_marginTop="8dp"
     	android:layout_marginLeft="8dp"
     	android:layout_marginRight="8dp"
     	android:gravity="center"
     	style="?android:attr/progressBarStyleHorizontal"/>
 
-    <ImageButton android:id="@+id/tv_rec"
+    <ImageButton android:id="@+id/rec"
     	style="@style/MDButton160"
     	android:layout_alignParentBottom="true"
     	android:layout_centerHorizontal="true"
     	android:src="@drawable/record"/>
     	
-   	<ImageButton android:id="@+id/tv_pause"
+   	<ImageButton android:id="@+id/pause"
     	style="@style/MDButton160"
-    	android:layout_alignLeft="@id/tv_rec"
-    	android:layout_above="@id/tv_rec"
+    	android:layout_alignLeft="@id/rec"
+    	android:layout_above="@id/rec"
     	android:src="@drawable/pause"/>
 	
-	<ImageButton android:id="@+id/tv_skip_forward"
+	<ImageButton android:id="@+id/skipForward"
     	style="@style/MDButton160"
-    	android:layout_alignTop="@id/tv_rec"
-    	android:layout_toRightOf="@id/tv_rec"
+    	android:layout_alignTop="@id/rec"
+    	android:layout_toRightOf="@id/rec"
     	android:src="@drawable/skip_forward"/>
     
-    <ImageButton android:id="@+id/tv_skip_back"
+    <ImageButton android:id="@+id/skipBack"
     	style="@style/MDButton160"
-    	android:layout_alignTop="@id/tv_rec"
-    	android:layout_toLeftOf="@id/tv_rec"
+    	android:layout_alignTop="@id/rec"
+    	android:layout_toLeftOf="@id/rec"
     	android:src="@drawable/skip_back"/>
     	
-   <ImageButton android:id="@+id/tv_seek_forward"
+   <ImageButton android:id="@+id/seekForward"
     	style="@style/MDButton160"
-    	android:layout_alignTop="@id/tv_rec"
-    	android:layout_toRightOf="@id/tv_skip_forward"
+    	android:layout_alignTop="@id/rec"
+    	android:layout_toRightOf="@id/skipForward"
     	android:src="@drawable/seek_forward"/>
     
-    <ImageButton android:id="@+id/tv_seek_back"
+    <ImageButton android:id="@+id/seekBack"
     	style="@style/MDButton160"
-    	android:layout_alignTop="@id/tv_rec"
-    	android:layout_toLeftOf="@id/tv_skip_back"
+    	android:layout_alignTop="@id/rec"
+    	android:layout_toLeftOf="@id/skipBack"
     	android:src="@drawable/seek_back"/>
  	
- 	<ImageButton android:id="@+id/tv_skip"
+ 	<ImageButton android:id="@+id/skip"
     	style="@style/MDButton160"
     	android:layout_alignParentRight="true"
-    	android:layout_above="@id/tv_seek_forward"
+    	android:layout_above="@id/seekForward"
     	android:layout_marginBottom="20dp"
     	android:layout_marginRight="25dp"
     	android:src="@drawable/skip"/>    	
     
-    <ImageButton android:id="@+id/tv_info"
+    <ImageButton android:id="@+id/info"
     	style="@style/MDButton160"
     	android:layout_alignParentLeft="true"
-    	android:layout_above="@id/tv_seek_back"
+    	android:layout_above="@id/seekBack"
     	android:layout_marginBottom="20dp"
     	android:layout_marginLeft="25dp"
     	android:src="@drawable/info"/>
     	    	
-    <ImageButton android:id="@+id/tv_vol_up"
+    <ImageButton android:id="@+id/volUp"
     	style="@style/MDButton160"
-    	android:layout_below="@id/tv_back"
-    	android:layout_alignLeft="@id/tv_back"
+    	android:layout_below="@id/back"
+    	android:layout_alignLeft="@id/back"
     	android:layout_marginTop="40dp"
     	android:src="@drawable/vol_up"/>
     
-    <ImageButton android:id="@+id/tv_vol_down"
+    <ImageButton android:id="@+id/volDown"
     	style="@style/MDButton160"
-    	android:layout_below="@id/tv_vol_up"
-    	android:layout_alignLeft="@id/tv_back"
+    	android:layout_below="@id/volUp"
+    	android:layout_alignLeft="@id/back"
     	android:src="@drawable/vol_down"/>
     
-    <ImageButton android:id="@+id/tv_vol_mute"
+    <ImageButton android:id="@+id/volMute"
     	style="@style/MDButton160"
-    	android:layout_below="@id/tv_vol_down"
-    	android:layout_alignLeft="@id/tv_back"
+    	android:layout_below="@id/volDown"
+    	android:layout_alignLeft="@id/back"
     	android:src="@drawable/vol_mute"/>
     	
-    <ImageButton android:id="@+id/tv_up"
+    <ImageButton android:id="@+id/up"
     	style="@style/MDButton160"
-    	android:layout_alignTop="@id/tv_vol_up"
+    	android:layout_alignTop="@id/volUp"
     	android:layout_centerHorizontal="true"
     	android:layout_marginTop="28dp"
     	android:src="@drawable/up"/>
     	
-   	<ImageButton android:id="@+id/tv_enter"
+   	<ImageButton android:id="@+id/enter"
     	style="@style/MDButton160"
-    	android:layout_alignLeft="@id/tv_up"
-    	android:layout_below="@id/tv_up"
+    	android:layout_alignLeft="@id/up"
+    	android:layout_below="@id/up"
     	android:src="@drawable/center"/>
    	
-   	<ImageButton android:id="@+id/tv_left"
+   	<ImageButton android:id="@+id/left"
     	style="@style/MDButton160"
-    	android:layout_toLeftOf="@id/tv_enter"
-    	android:layout_alignTop="@id/tv_enter"
+    	android:layout_toLeftOf="@id/enter"
+    	android:layout_alignTop="@id/enter"
     	android:src="@drawable/left"/>
     
-    <ImageButton android:id="@+id/tv_right"
+    <ImageButton android:id="@+id/right"
     	style="@style/MDButton160"
-    	android:layout_toRightOf="@id/tv_enter"
-    	android:layout_alignTop="@id/tv_enter"
+    	android:layout_toRightOf="@id/enter"
+    	android:layout_alignTop="@id/enter"
     	android:src="@drawable/right"/>
     	
-    <ImageButton android:id="@+id/tv_down"
+    <ImageButton android:id="@+id/down"
     	style="@style/MDButton160"
-    	android:layout_alignLeft="@id/tv_enter"
-    	android:layout_below="@id/tv_enter"
+    	android:layout_alignLeft="@id/enter"
+    	android:layout_below="@id/enter"
     	android:src="@drawable/down"/>
 	
-	<Button android:id="@+id/tv_num"
+	<Button android:id="@+id/num"
     	style="@style/MDButton160"
-    	android:layout_alignTop="@id/tv_vol_up"
+    	android:layout_alignTop="@id/volUp"
     	android:layout_alignParentRight="true"
     	android:textSize="30sp"
     	android:textStyle="bold"

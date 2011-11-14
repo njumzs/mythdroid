@@ -176,8 +176,8 @@ public class Recordings extends MDFragmentActivity {
 
                 if (recordings == null)
                 	return new AlertDialog.Builder(this)
-                		.setTitle(R.string.filter_rec)
-                		.setMessage(R.string.no_recs)
+                		.setTitle(R.string.filterRec)
+                		.setMessage(R.string.noRecs)
                 		.setPositiveButton(R.string.ok, no)
                 		.create();
                 
@@ -192,7 +192,7 @@ public class Recordings extends MDFragmentActivity {
 
                 return
                     new AlertDialog.Builder(this)
-                        .setTitle(R.string.filter_rec)
+                        .setTitle(R.string.filterRec)
                         .setAdapter(
                             new ArrayAdapter<String>(
                                 this, R.layout.simple_list_item_1, titles
@@ -226,7 +226,7 @@ public class Recordings extends MDFragmentActivity {
             .setIcon(R.drawable.ic_menu_refresh);
         menu.add(Menu.NONE, MENU_FILTER, Menu.NONE, R.string.filter)
             .setIcon(drawable.ic_menu_search);
-        menu.add(Menu.NONE, MENU_FILTER_RESET, Menu.NONE, R.string.reset_filter)
+        menu.add(Menu.NONE, MENU_FILTER_RESET, Menu.NONE, R.string.resetFilter)
             .setIcon(drawable.ic_menu_revert);
         return true;
     }

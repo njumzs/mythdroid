@@ -64,12 +64,11 @@ public class ProgramAdapter extends ArrayAdapter<Object> {
                 R.layout.recording_list_item, null
             );
             vHolder = new ViewHolder();
-            vHolder.title = (TextView)old.findViewById(R.id.reclist_title);
-            vHolder.subtitle =
-                (TextView)old.findViewById(R.id.reclist_subtitle);
-            vHolder.channel = (TextView)old.findViewById(R.id.reclist_channel);
-            vHolder.date = (TextView)old.findViewById(R.id.reclist_date);
-            vHolder.rec = (ProgressBar)old.findViewById(R.id.reclist_rec);
+            vHolder.title    = (TextView)old.findViewById(R.id.title);
+            vHolder.subtitle = (TextView)old.findViewById(R.id.subtitle);
+            vHolder.channel  = (TextView)old.findViewById(R.id.channel);
+            vHolder.date     = (TextView)old.findViewById(R.id.date);
+            vHolder.rec      = (ProgressBar)old.findViewById(R.id.progress);
             old.setTag(vHolder);
         }
         else

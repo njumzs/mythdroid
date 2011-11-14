@@ -7,37 +7,37 @@
    	android:paddingRight="8dp">
    	
    	<TextView	
-		android:id="@+id/recedit_recGroup_text"
+		android:id="@+id/recGroupText"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
  		android:layout_alignParentLeft="true"
 		android:textSize="16sp"
 		android:layout_marginTop="8dp"
-		android:text="Recording group:"/>
+		android:text="@string/recGroup"/>
    	
    	<Spinner
-		android:id="@+id/recedit_recGroup"
+		android:id="@+id/recGroup"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_below="@id/recedit_recGroup_text"
+		android:layout_below="@id/recGroupText"
 		android:layout_centerHorizontal="true"
 		android:layout_marginTop="8dp"/>
 	
 	<TextView	
-		android:id="@+id/recedit_storGroup_text"
+		android:id="@+id/storGroupText"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
-		android:layout_below="@id/recedit_recGroup"
+		android:layout_below="@id/recGroup"
  		android:layout_alignParentLeft="true"
 		android:textSize="16sp"
 		android:layout_marginTop="8dp"
-		android:text="Storage group:"/>
+		android:text="@string/storGroup"/>
 	
 	<Spinner
-		android:id="@+id/recedit_storGroup"
+		android:id="@+id/storGroup"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_below="@id/recedit_storGroup_text"
+		android:layout_below="@id/storGroupText"
 		android:layout_centerHorizontal="true"
 		android:layout_marginTop="8dp"/>
 	
