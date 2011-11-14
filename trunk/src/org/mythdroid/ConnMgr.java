@@ -262,7 +262,7 @@ public class ConnMgr {
      * Write a line of text to the socket
      * @param str string to write, will have '\n' appended if necessary
      */
-    public synchronized void writeLine(String str) throws IOException {
+    public void writeLine(String str) throws IOException {
 
         if (str.endsWith("\n")) //$NON-NLS-1$
             write(str.getBytes());
@@ -279,7 +279,7 @@ public class ConnMgr {
      * Write a string to the socket, prefixing with 8 chars of length
      * @param str string to write
      */
-    public synchronized void sendString(String str) throws IOException {
+    public void sendString(String str) throws IOException {
 
         str = String.format("%-8d", str.length()) + str; //$NON-NLS-1$
 
@@ -293,7 +293,7 @@ public class ConnMgr {
      * Separate and write a stringlist to the socket
      * @param list Array of strings to write
      */
-    public synchronized void sendStringList(String[] list) throws IOException {
+    public void sendStringList(String[] list) throws IOException {
 
         String str = list[0];
 
@@ -735,7 +735,7 @@ public class ConnMgr {
 
     }
 
-    private synchronized void write(byte[] buf) throws IOException {
+    private void write(byte[] buf) throws IOException {
 
         if (!isConnected())
             waitForConnection(timeout * 4);
