@@ -79,12 +79,9 @@ public class MDDManager {
                 handleData(line);
 
             }
-            
-            try {
-				cmgr.dispose();
-			} catch (IOException e) {}
 
         }
+        
     };
 
     /**
