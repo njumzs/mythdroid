@@ -71,10 +71,10 @@ public class MusicRemote extends Remote {
         ctrls = new HashMap<Integer, Key>(20);
 
     static {
-        ctrls.put(R.id.music_seek_back,    Key.MUSIC_REWIND);
-        ctrls.put(R.id.music_skip_back,    Key.MUSIC_PREV);
-        ctrls.put(R.id.music_skip_forward, Key.MUSIC_NEXT);
-        ctrls.put(R.id.music_seek_forward, Key.MUSIC_FFWD);
+        ctrls.put(R.id.seekBack,    Key.MUSIC_REWIND);
+        ctrls.put(R.id.skipBack,    Key.MUSIC_PREV);
+        ctrls.put(R.id.skipForward, Key.MUSIC_NEXT);
+        ctrls.put(R.id.seekForward, Key.MUSIC_FFWD);
     }
 
     final private Handler handler = new Handler();
@@ -305,17 +305,17 @@ public class MusicRemote extends Remote {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_SHUFFLE, Menu.NONE, R.string.shuffle_mode)
+        menu.add(Menu.NONE, MENU_SHUFFLE, Menu.NONE, R.string.shuffle)
             .setIcon(R.drawable.ic_menu_refresh);
-        menu.add(Menu.NONE, MENU_REPEAT, Menu.NONE, R.string.repeat_mode)
+        menu.add(Menu.NONE, MENU_REPEAT, Menu.NONE, R.string.repeat)
             .setIcon(drawable.ic_menu_revert);
-        menu.add(Menu.NONE, MENU_VISUALISE, Menu.NONE, R.string.tog_vis)
+        menu.add(Menu.NONE, MENU_VISUALISE, Menu.NONE, R.string.visualiser)
             .setIcon(drawable.ic_menu_upload_you_tube);
-        menu.add(Menu.NONE, MENU_CHANGE_VISUAL, Menu.NONE, R.string.chg_vis)
+        menu.add(Menu.NONE, MENU_CHANGE_VISUAL, Menu.NONE, R.string.chVisual)
             .setIcon(drawable.ic_menu_slideshow);
-        menu.add(Menu.NONE, MENU_EDIT, Menu.NONE, R.string.pl_edit)
+        menu.add(Menu.NONE, MENU_EDIT, Menu.NONE, R.string.plEdit)
             .setIcon(drawable.ic_menu_edit);
-        menu.add(Menu.NONE, MENU_OSDMENU, Menu.NONE, R.string.osd_menu)
+        menu.add(Menu.NONE, MENU_OSDMENU, Menu.NONE, R.string.osdMenu)
             .setIcon(drawable.ic_menu_more);
         return true;
     }
@@ -413,8 +413,8 @@ public class MusicRemote extends Remote {
 
                 return
                     new AlertDialog.Builder(ctx)
-                        .setTitle(R.string.leave_remote)
-                        .setMessage(R.string.halt_playback)
+                        .setTitle(R.string.leaveRemote)
+                        .setMessage(R.string.haltPlayback)
                         .setPositiveButton(R.string.yes, cl)
                         .setNeutralButton(R.string.no, cl)
                         .setNegativeButton(R.string.cancel, cl)
@@ -453,10 +453,10 @@ public class MusicRemote extends Remote {
             v.setTag(key);
         }
 
-        titleView = (TextView)findViewById(R.id.music_title);
-        detailView = (TextView)findViewById(R.id.music_details);
-        artView = (ImageView)findViewById(R.id.music_coverart);
-        pBar = (ProgressBar)findViewById(R.id.music_progress);
+        titleView  = (TextView)findViewById(R.id.title);
+        detailView = (TextView)findViewById(R.id.details);
+        artView    = (ImageView)findViewById(R.id.image);
+        pBar       = (ProgressBar)findViewById(R.id.progress);
 
         if (mddMgr == null) {
             titleView.setVisibility(View.GONE);

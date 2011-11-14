@@ -84,8 +84,7 @@ public class RecEditSchedFragment extends Fragment {
 
     private void setViews() {
 
-        dupMatchSpinner =
-            ((Spinner)view.findViewById(R.id.recedit_dupMatch));
+        dupMatchSpinner = ((Spinner)view.findViewById(R.id.dupMatch));
 
         final ArrayAdapter<String> dupMatchAdapter = new ArrayAdapter<String>(
             activity, android.R.layout.simple_spinner_item
@@ -116,8 +115,7 @@ public class RecEditSchedFragment extends Fragment {
             }
         );
 
-        dupInSpinner =
-            ((Spinner)view.findViewById(R.id.recedit_dupIn));
+        dupInSpinner = ((Spinner)view.findViewById(R.id.dupIn));
 
         final ArrayAdapter<String> dupInAdapter = new ArrayAdapter<String>(
             activity, android.R.layout.simple_spinner_item
@@ -148,8 +146,7 @@ public class RecEditSchedFragment extends Fragment {
             }
         );
 
-        epiFilterSpinner =
-            ((Spinner)view.findViewById(R.id.recedit_epiFilter));
+        epiFilterSpinner = ((Spinner)view.findViewById(R.id.epiFilter));
 
         ArrayAdapter<String> epiFilterAdapter = new ArrayAdapter<String>(
             activity, android.R.layout.simple_spinner_item

@@ -253,7 +253,7 @@ public class Guide extends MDActivity {
         rowHeight = (int)(60  * scale + 0.5f);
         chanWidth = (int)(100 * scale + 0.5f);
 
-        tbl = (TableLayout)findViewById(R.id.guide_table);
+        tbl = (TableLayout)findViewById(R.id.table);
 
         rowLayout.topMargin = rowLayout.bottomMargin = chanLayout.topMargin =
             chanLayout.bottomMargin = chanLayout.leftMargin =
@@ -296,9 +296,9 @@ public class Guide extends MDActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_DATE, Menu.NONE, R.string.ch_start_date)
+        menu.add(Menu.NONE, MENU_DATE, Menu.NONE, R.string.chStartDate)
             .setIcon(drawable.ic_menu_today);
-        menu.add(Menu.NONE, MENU_TIME, Menu.NONE, R.string.ch_start_time)
+        menu.add(Menu.NONE, MENU_TIME, Menu.NONE, R.string.chStartTime)
             .setIcon(drawable.ic_menu_recent_history);
         return true;
     }

@@ -117,8 +117,7 @@ public class RecEditGroupsFragment extends Fragment {
         if (recGroups == null || storGroups == null)
             return;
         
-        recGroupSpinner = 
-            ((Spinner)view.findViewById(R.id.recedit_recGroup));
+        recGroupSpinner = ((Spinner)view.findViewById(R.id.recGroup));
         final ArrayAdapter<String> recGroupAdapter = new ArrayAdapter<String>(
             activity, android.R.layout.simple_spinner_item, recGroups
         );
@@ -155,8 +154,7 @@ public class RecEditGroupsFragment extends Fragment {
             }
         );
 
-        storGroupSpinner =
-            ((Spinner)view.findViewById(R.id.recedit_storGroup));
+        storGroupSpinner = ((Spinner)view.findViewById(R.id.storGroup));
         final ArrayAdapter<String> storGroupAdapter = new ArrayAdapter<String>(
             activity, android.R.layout.simple_spinner_item, storGroups
         );

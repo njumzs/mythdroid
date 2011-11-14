@@ -7,55 +7,55 @@
    	android:paddingRight="8dp">
    	
    	<TextView	
-		android:id="@+id/recedit_dupMatch_text"
+		android:id="@+id/dupMatchText"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
  		android:layout_alignParentLeft="true"
 		android:textSize="16sp"
 		android:layout_marginTop="8dp"
-		android:text="Match duplicates using:"/>
+		android:text="@string/matchDups"/>
    	
    	<Spinner
-		android:id="@+id/recedit_dupMatch"
+		android:id="@+id/dupMatch"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_below="@id/recedit_dupMatch_text"
+		android:layout_below="@id/dupMatchText"
 		android:layout_centerHorizontal="true"
 		android:layout_marginTop="6dp"/>
 	
 	<TextView	
-		android:id="@+id/recedit_dupIn_text"
+		android:id="@+id/dupInText"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
-		android:layout_below="@id/recedit_dupMatch"
+		android:layout_below="@id/dupMatch"
  		android:layout_alignParentLeft="true"
 		android:textSize="16sp"
 		android:layout_marginTop="8dp"
-		android:text="Look for duplicates in:"/>
+		android:text="@string/lookDups"/>
 	
 	<Spinner
-		android:id="@+id/recedit_dupIn"
+		android:id="@+id/dupIn"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_below="@id/recedit_dupIn_text"
+		android:layout_below="@id/dupInText"
 		android:layout_centerHorizontal="true"
 		android:layout_marginTop="6dp"/>
 	
 	<TextView	
-		android:id="@+id/recedit_epiFilter_text"
+		android:id="@+id/epiFilterText"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
-		android:layout_below="@id/recedit_dupIn"
+		android:layout_below="@id/dupIn"
  		android:layout_alignParentLeft="true"
 		android:textSize="16sp"
 		android:layout_marginTop="8dp"
-		android:text="Episode filter:"/>
+		android:text="@string/epiFilter"/>
 	
 	<Spinner
-		android:id="@+id/recedit_epiFilter"
+		android:id="@+id/epiFilter"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_below="@id/recedit_epiFilter_text"
+		android:layout_below="@id/epiFilterText"
 		android:layout_centerHorizontal="true"
 		android:layout_marginTop="6dp"/>
 		

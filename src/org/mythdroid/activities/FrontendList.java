@@ -66,10 +66,8 @@ public class FrontendList extends ListActivity implements
             R.layout.frontend_list_item, null
         );
 
-        ((TextView)(hdr.findViewById(R.id.fe_name_text)))
-            .setText(R.string.add_fe);
-        ((TextView)(hdr.findViewById(R.id.fe_addr_text)))
-            .setText(R.string.click_add_fe);
+        ((TextView)(hdr.findViewById(R.id.name))).setText(R.string.addFe);
+        ((TextView)(hdr.findViewById(R.id.addr))).setText(R.string.clickAddFe);
 
         getListView().addHeaderView(hdr);
 
@@ -77,12 +75,11 @@ public class FrontendList extends ListActivity implements
             R.layout.frontend_list_item, null
         );
 
-        ((TextView)(ftr.findViewById(R.id.fe_name_text)))
-            .setText(Messages.getString("FrontendList.7")); //$NON-NLS-1$
+        ((TextView)(ftr.findViewById(R.id.name))).setText(R.string.setDefFe);
 
-        ((TextView)(ftr.findViewById(R.id.fe_addr_text)))
+        ((TextView)(ftr.findViewById(R.id.addr)))
             .setText(
-                Messages.getString("FrontendList.6") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
+                getResources().getString(R.string.curSetTo) +
                 FrontendDB.getDefault(this)
              );
         
@@ -96,9 +93,7 @@ public class FrontendList extends ListActivity implements
             new SimpleCursorAdapter(
                 this, R.layout.frontend_list_item, c,
                 new String[] { "addr", "name", "hwaddr" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                new int[] {
-                    R.id.fe_addr_text, R.id.fe_name_text, R.id.fe_hwaddr_text
-                }
+                new int[] { R.id.addr, R.id.name, R.id.hwaddr }
             )
         );
 
@@ -148,25 +143,22 @@ public class FrontendList extends ListActivity implements
                 if (clickedView == null) return;
 
                 CharSequence name = ((TextView)clickedView
-                                        .findViewById(R.id.fe_name_text))
-                                        .getText();
+                                        .findViewById(R.id.name)).getText();
                 CharSequence addr = ((TextView)clickedView
-                                        .findViewById(R.id.fe_addr_text))
-                                        .getText();
+                                        .findViewById(R.id.addr)).getText();
                 CharSequence hwaddr = ((TextView)clickedView
-                                        .findViewById(R.id.fe_hwaddr_text))
-                                        .getText();
+                                        .findViewById(R.id.hwaddr)).getText();
 
-                ((EditText)dialog.findViewById(R.id.fe_name)).setText(name);
-                ((EditText)dialog.findViewById(R.id.fe_addr)).setText(addr);
-                ((EditText)dialog.findViewById(R.id.fe_hwaddr)).setText(hwaddr);
+                ((EditText)dialog.findViewById(R.id.name)).setText(name);
+                ((EditText)dialog.findViewById(R.id.addr)).setText(addr);
+                ((EditText)dialog.findViewById(R.id.hwaddr)).setText(hwaddr);
                 break;
 
             case ADD_DIALOG:
 
-                ((EditText)dialog.findViewById(R.id.fe_name)).setText(""); //$NON-NLS-1$
-                ((EditText)dialog.findViewById(R.id.fe_addr)).setText(""); //$NON-NLS-1$
-                ((EditText)dialog.findViewById(R.id.fe_hwaddr)).setText(""); //$NON-NLS-1$
+                ((EditText)dialog.findViewById(R.id.name)).setText(""); //$NON-NLS-1$
+                ((EditText)dialog.findViewById(R.id.addr)).setText(""); //$NON-NLS-1$
+                ((EditText)dialog.findViewById(R.id.hwaddr)).setText(""); //$NON-NLS-1$
                 break;
 
             case DEFAULT_DIALOG:
@@ -201,12 +193,12 @@ public class FrontendList extends ListActivity implements
 
             case AlertDialog.BUTTON_POSITIVE:
 
-                String name   = ((EditText)feEditor.findViewById(R.id.fe_name))
+                String name   = ((EditText)feEditor.findViewById(R.id.name))
                                   .getText().toString();
-                String addr   = ((EditText)feEditor.findViewById(R.id.fe_addr))
+                String addr   = ((EditText)feEditor.findViewById(R.id.addr))
                                   .getText().toString();
                 String hwaddr =
-                    ((EditText)feEditor.findViewById(R.id.fe_hwaddr))
+                    ((EditText)feEditor.findViewById(R.id.hwaddr))
                         .getText().toString();
 
                 if (name.length() == 0 || addr.length() == 0) {
@@ -232,7 +224,7 @@ public class FrontendList extends ListActivity implements
             case AlertDialog.BUTTON_NEUTRAL:
 
                 FrontendDB.delete(this, rowID);
-                String n = ((EditText)feEditor.findViewById(R.id.fe_name))
+                String n = ((EditText)feEditor.findViewById(R.id.name))
                              .getText().toString();
                 if (Globals.currentFrontend.equals(n))
                     Globals.currentFrontend = FrontendDB.getDefault(ctx);
@@ -250,7 +242,7 @@ public class FrontendList extends ListActivity implements
         final AlertDialog d = new AlertDialog.Builder(ctx)
             .setItems(new String[] {}, null)
             .setIcon(drawable.ic_menu_upload_you_tube)
-            .setTitle(R.string.ch_fe)
+            .setTitle(R.string.chFe)
             .create();
 
         d.getListView().setOnItemClickListener(
@@ -285,9 +277,9 @@ public class FrontendList extends ListActivity implements
     private void setDefaultFrontend(String name) {
         FrontendDB.updateDefault(ctx, name);
         Globals.currentFrontend = name;
-        ((TextView)(ftr.findViewById(R.id.fe_addr_text)))
+        ((TextView)(ftr.findViewById(R.id.addr)))
             .setText(
-                Messages.getString("FrontendList.6") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                getResources().getString(R.string.curSetTo) +
                 FrontendDB.getDefault(ctx)
             );
     }

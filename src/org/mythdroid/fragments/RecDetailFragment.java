@@ -145,28 +145,23 @@ public class RecDetailFragment extends Fragment {
      */
     public void setViews() {
 
-        ((ImageView)view.findViewById(R.id.rec_thumb))
+        ((ImageView)view.findViewById(R.id.image))
             .setImageBitmap(prog.previewImage());
-        ((TextView)view.findViewById(R.id.rec_title))
-            .setText(prog.Title);
-        ((TextView)view.findViewById(R.id.rec_subtitle))
-            .setText(prog.SubTitle);
-        ((TextView)view.findViewById(R.id.rec_channel))
-            .setText(prog.Channel);
-        ((TextView)view.findViewById(R.id.rec_start))
-            .setText(prog.startString());
-        ((TextView)view.findViewById(R.id.rec_category))
+        ((TextView)view.findViewById(R.id.title)).setText(prog.Title);
+        ((TextView)view.findViewById(R.id.subtitle)).setText(prog.SubTitle);
+        ((TextView)view.findViewById(R.id.channel)).setText(prog.Channel);
+        ((TextView)view.findViewById(R.id.start)).setText(prog.startString());
+        ((TextView)view.findViewById(R.id.category))
             .setText(
                 Messages.getString("RecordingDetail.0") + prog.Category // type: //$NON-NLS-1$
             ); 
-        ((TextView)view.findViewById(R.id.rec_status))
+        ((TextView)view.findViewById(R.id.status))
             .setText(
                 Messages.getString("RecordingDetail.1") + prog.Status.msg() // status: //$NON-NLS-1$
             ); 
-        ((TextView)view.findViewById(R.id.rec_desc))
-            .setText(prog.Description);
+        ((TextView)view.findViewById(R.id.desc)).setText(prog.Description);
         
-        final Button edit = (Button)view.findViewById(R.id.rec_edit);
+        final Button edit = (Button)view.findViewById(R.id.edit);
         edit.setOnClickListener(
             new View.OnClickListener() {
                 @Override
@@ -187,7 +182,7 @@ public class RecDetailFragment extends Fragment {
         switch (prog.Status) {
 
             case RECORDING:
-                stop = (Button)view.findViewById(R.id.rec_stop);
+                stop = (Button)view.findViewById(R.id.stop);
                 stop.setVisibility(View.VISIBLE);
                 stop.setOnClickListener(
                     new View.OnClickListener() {
@@ -205,8 +200,7 @@ public class RecDetailFragment extends Fragment {
             case CURRENT:
 
                 if (!guide) {
-                    final Button del = 
-                        (Button)view.findViewById(R.id.rec_del);
+                    final Button del = (Button)view.findViewById(R.id.del);
                     
                     del.setVisibility(View.VISIBLE);
 
@@ -222,8 +216,7 @@ public class RecDetailFragment extends Fragment {
                     );
                 }
 
-                final Button play = 
-                    (Button)view.findViewById(R.id.rec_play);
+                final Button play = (Button)view.findViewById(R.id.play);
 
                 play.setVisibility(View.VISIBLE);
                 play.setOnClickListener(
@@ -272,7 +265,7 @@ public class RecDetailFragment extends Fragment {
         public Dialog onCreateDialog(Bundle icicle) {
             return
                 new AlertDialog.Builder(activity)
-                    .setTitle(R.string.del_rec)
+                    .setTitle(R.string.delRec)
                     .setMessage(R.string.sure)
                     .setPositiveButton(R.string.yes,
                         new OnClickListener() {
@@ -309,7 +302,7 @@ public class RecDetailFragment extends Fragment {
         public Dialog onCreateDialog(Bundle icicle) {
             return
                 new AlertDialog.Builder(activity)
-                    .setTitle(R.string.stop_rec)
+                    .setTitle(R.string.stopRecording)
                     .setMessage(R.string.sure)
                     .setPositiveButton(R.string.yes,
                         new OnClickListener() {

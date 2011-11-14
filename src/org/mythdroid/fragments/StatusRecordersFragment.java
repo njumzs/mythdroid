@@ -189,14 +189,11 @@ public class StatusRecordersFragment extends ListFragment {
                     R.layout.encoder_list_item, null
                 );
                 vHolder = new ViewHolder();
-                vHolder.encoder =
-                    (TextView)old.findViewById(R.id.enclist_encoder);
-                vHolder.state = (TextView)old.findViewById(R.id.enclist_state);
-                vHolder.program =
-                    (TextView)old.findViewById(R.id.enclist_program);
-                vHolder.endTime =
-                    (TextView)old.findViewById(R.id.enclist_endTime);
-                vHolder.rec = (ProgressBar)old.findViewById(R.id.enclist_rec);
+                vHolder.encoder = (TextView)old.findViewById(R.id.encoder);
+                vHolder.state   = (TextView)old.findViewById(R.id.state);
+                vHolder.program = (TextView)old.findViewById(R.id.program);
+                vHolder.endTime = (TextView)old.findViewById(R.id.endTime);
+                vHolder.rec = (ProgressBar)old.findViewById(R.id.progress);
                 old.setTag(vHolder);
             }
             else
@@ -245,7 +242,7 @@ public class StatusRecordersFragment extends ListFragment {
         activity  = (MDFragmentActivity)getActivity();
         View view = inflater.inflate(R.layout.status_recorders, null, false);
         ((TextView)view.findViewById(R.id.emptyMsg))
-            .setText(R.string.no_recorders);
+            .setText(R.string.noEncoders);
         if (((Status)activity).embed)
             handler.post(refreshEncoders);
         else

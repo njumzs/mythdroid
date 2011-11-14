@@ -12,21 +12,21 @@
 		android:padding="5sp">
 		
 		<TextView 
-			android:text="Name:"
+			android:text="@string/name"
 			android:textSize="20sp" 
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content"/>
 		
 		<EditText 
 			android:text="" 
-			android:id="@+id/fe_name" 
+			android:id="@+id/name" 
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content"
 			android:singleLine="true"
 			android:layout_marginTop="10dp"/>
 		
 		<TextView 
-			android:text="Address:"
+			android:text="@string/addr"
 			android:textSize="20sp" 
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content"
@@ -34,14 +34,14 @@
 		
 		<EditText 
 			android:text="" 
-			android:id="@+id/fe_addr" 
+			android:id="@+id/addr" 
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content"
 			android:singleLine="true"
 			android:layout_marginTop="10dp"/>
 		
 		<TextView 
-			android:text="MAC Address:"
+			android:text="@string/macAddr"
 			android:textSize="20sp" 
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
 		
 		<EditText 
 			android:text="" 
-			android:id="@+id/fe_hwaddr" 
+			android:id="@+id/hwaddr" 
 			android:layout_width="fill_parent" 
 			android:layout_height="wrap_content"
 			android:singleLine="true"

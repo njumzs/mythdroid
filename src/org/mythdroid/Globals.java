@@ -103,7 +103,7 @@ public class Globals {
         // If unspecified, connect to the first defined frontend
         if (name == null) {
             if ((name = FrontendDB.getFirstFrontendName(ctx)) == null)
-                throw new IOException(Messages.getString("MythDroid.26")); //$NON-NLS-1$
+                throw new IOException(Messages.getString("Globals.1")); //$NON-NLS-1$
             feMgr = 
                 new FrontendManager(name, FrontendDB.getFirstFrontendAddr(ctx));
         }
