@@ -13,8 +13,9 @@
 		<item>Gesten</item>
 	</string-array>
 	<string-array name="streamingRates">
-		<item>Video 448   Audio 128   (576 kb/s)</item>
-		<item>Video 320   Audio  96   (416 kb/s)</item>
-		<item>Video 192   Audio  64   (256 kb/s)</item>
+	    <item>Video 1024   Audio 128   (1152 kb/s)</item>
+		<item>Video  448   Audio 128    (576 kb/s)</item>
+		<item>Video  320   Audio  96    (416 kb/s)</item>
+		<item>Video  192   Audio  64    (256 kb/s)</item>
 	</string-array>
 </resources>
