@@ -18,12 +18,16 @@
 
 package org.mythdroid.data;
 
+import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
 import org.mythdroid.data.XMLHandler.Element;
+import org.mythdroid.mdd.MDDManager;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.Enums.RecDupIn;
 import org.mythdroid.Enums.RecEpiFilter;
@@ -150,7 +154,7 @@ public class Program implements Comparable<Program> {
             );
 
         }
-
+        
         @Override
         public void start(Attributes attr) {
 
@@ -172,6 +176,38 @@ public class Program implements Comparable<Program> {
 
         }
 
+    }
+    
+    /** Represents a commercial break or 'cut' */
+    static public class Commercial {
+    	/** Frame number of commercial start */
+    	public int start;
+    	/** Frame number of commercial end */
+    	public int end;
+    	
+    	/**
+    	 * Constructor
+    	 * @param start frame number of commercial start
+    	 * @param end frame number of commercial end
+    	 */
+    	public Commercial(int start, int end) {
+    		this.start = start;
+    		this.end   = end;
+    	}
+    	
+    	/**
+    	 * Constructor
+    	 * @param cut 2 element array, 1st is start frame, 2nd is end frame
+    	 */
+    	public Commercial(int[] cut) {
+    		if (cut.length != 2)
+    			throw new IllegalArgumentException(
+    				Messages.getString("Program.47") //$NON-NLS-1$
+    			);
+    		start = cut[0];
+    		end   = cut[1];
+    	}
+    			
     }
     
     @SuppressWarnings("all")
@@ -216,7 +252,9 @@ public class Program implements Comparable<Program> {
     @SuppressWarnings("all")
     public int          ChanID, RecID = -1, RecPrio = 0;
 
-    private String[] list  = null;
+    private String[] list  					  = null;
+    private ArrayList<Commercial> commercials = new ArrayList<Commercial>();
+    private boolean fetchedCutList			  = false;
     
     /**
      * Construct a Program from a stringlist
@@ -397,6 +435,25 @@ public class Program implements Comparable<Program> {
      */
     public String endString() {
         return Globals.dispFmt.format(EndTime);
+    }
+    
+    /**
+     * Get a list of Commercials
+     * @param addr address of mdd instance
+     * @return a list of Commercials, which might be empty
+     */
+    public ArrayList<Commercial> getCutList(String addr) {
+    	if (fetchedCutList)
+    		return commercials;
+    	try {
+			for (int[] cut : MDDManager.getCutList(addr, this)) {
+				try {
+					commercials.add(new Commercial(cut));
+				} catch (IllegalArgumentException e1) { continue; }
+			}
+		} catch (IOException e) { return commercials; }
+    	  finally { fetchedCutList = true; }
+    	return commercials;
     }
 
     /**

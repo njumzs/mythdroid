@@ -19,6 +19,7 @@
 package org.mythdroid.remote;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,6 +29,7 @@ import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Key;
 import org.mythdroid.data.Program;
+import org.mythdroid.data.Program.Commercial;
 import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.mdd.MDDChannelListener;
 import org.mythdroid.mdd.MDDManager;
@@ -739,12 +741,8 @@ public class TVRemote extends Remote {
         
         if (prog == null || endTime <= 0 || fps == 0) return;
         
-        int[][] cuts = null;
-        try {
-            cuts = MDDManager.getCutList(feMgr.addr, prog);
-        } catch (IOException e) { return; }
-        
-        if (cuts.length < 1) return;
+        ArrayList<Commercial> cuts = prog.getCutList(feMgr.addr);
+        if (cuts.isEmpty()) return;
         
         Drawable[] layers = new Drawable[2];
         layers[0] = pBar.getProgressDrawable();
