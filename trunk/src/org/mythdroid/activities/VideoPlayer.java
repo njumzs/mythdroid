@@ -303,9 +303,7 @@ public class VideoPlayer extends MDActivity {
             new OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    try {
-                        dismissDialog(DIALOG_LOAD);
-                    } catch (IllegalArgumentException e) {}
+                    dismissLoadingDialog();
                     vwidth = mp.getVideoWidth();
                     vheight = mp.getVideoHeight();
                     videoView.setVideoSize(vwidth, vheight);

@@ -268,6 +268,18 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         );
 
     }
+    
+    /** Show the loading dialog */
+    public void showLoadingDialog() {
+        showDialog(DIALOG_LOAD);
+    }
+
+    /** Dismiss the loading dialog */
+    public void dismissLoadingDialog() {
+        try {
+            dismissDialog(DIALOG_LOAD);
+        } catch (IllegalArgumentException e) {}
+    }
 
     /**
      * Add "Here" to the frontend chooser and start the provided
@@ -348,7 +360,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
      * Add a frontend chooser to the options menu (or action bar on >= 3.0)
      * @param menu menu to add to
      */
-protected void addFrontendChooser(Menu menu) {
+    protected void addFrontendChooser(Menu menu) {
         
         MenuItem item = menu.add(
             Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.setCurFe
@@ -392,5 +404,5 @@ protected void addFrontendChooser(Menu menu) {
           catch (InvocationTargetException e) {}
           
     }
-    
+        
 }

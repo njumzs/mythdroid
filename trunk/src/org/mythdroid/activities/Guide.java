@@ -129,9 +129,7 @@ public class Guide extends MDActivity {
                     @Override
                     public void run() {
 
-                        try {
-                            dismissDialog(DIALOG_LOAD);
-                        } catch (IllegalArgumentException e) {}
+                        dismissLoadingDialog();
 
                         tbl.addView(getHeader());
                         // this is necessary to get proper layout
