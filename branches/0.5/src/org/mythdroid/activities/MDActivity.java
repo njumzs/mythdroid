@@ -27,6 +27,7 @@ import org.mythdroid.R;
 import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.Reflection;
 
 import android.R.drawable;
 import android.R.id;
@@ -39,6 +40,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -173,6 +175,18 @@ public abstract class MDActivity extends Activity {
         if (Globals.appContext == null)
             Globals.appContext = getApplicationContext();
     }
+    
+    @Override
+    public void onCreate(Bundle icicle) {
+    	super.onCreate(icicle);
+    	Reflection.setThreadPolicy();
+    }
+    
+    @Override
+    public void onSaveInstanceState(Bundle icicle) {
+        removeDialog(DIALOG_LOAD);
+        super.onSaveInstanceState(icicle);
+    }
 
     @Override
     public void onDestroy() {
@@ -186,7 +200,7 @@ public abstract class MDActivity extends Activity {
         final AlertDialog d = new AlertDialog.Builder(ctx)
             .setItems(new String[] {}, null)
             .setIcon(drawable.ic_menu_upload_you_tube)
-            .setTitle(R.string.ch_fe)
+            .setTitle(R.string.chFe)
             .create();
 
         d.getListView().setOnItemClickListener(
@@ -217,8 +231,7 @@ public abstract class MDActivity extends Activity {
             list.add(Messages.getString("MDActivity.0")); // Here //$NON-NLS-1$
         
         if (list.isEmpty()) {
-            ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
-            removeDialog(FRONTEND_CHOOSER);
+            ErrUtil.errDialog(ctx, dialog, R.string.noFes, FRONTEND_CHOOSER);
             return;
         }
 
@@ -228,6 +241,18 @@ public abstract class MDActivity extends Activity {
             )
         );
 
+    }
+    
+    /** Show the loading dialog */
+    protected void showLoadingDialog() {
+        showDialog(DIALOG_LOAD);
+    }
+
+    /** Dismiss the loading dialog */
+    protected void dismissLoadingDialog() {
+        try {
+            dismissDialog(DIALOG_LOAD);
+        } catch (IllegalArgumentException e) {}
     }
 
     /**
@@ -275,7 +300,7 @@ public abstract class MDActivity extends Activity {
     protected void addFrontendChooser(Menu menu) {
         
         MenuItem item = menu.add(
-            Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.set_def_fe
+            Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.setCurFe
         ).setIcon(drawable.ic_menu_upload_you_tube);
      
         //If we can, add this to the action bar
@@ -292,13 +317,12 @@ public abstract class MDActivity extends Activity {
             frontendIndicator = (TextView)vi.findViewById(R.id.text);
             frontendIndicator.setText(Globals.currentFrontend);
             
-            LinearLayout indicatorLL =
-                (LinearLayout)vi.findViewById(R.id.layout);
-            indicatorLL.setFocusable(true);
-            indicatorLL.setBackgroundResource(
+            LinearLayout l = (LinearLayout)vi.findViewById(R.id.layout);
+            l.setFocusable(true);
+            l.setBackgroundResource(
                 android.R.drawable.list_selector_background
             );
-            indicatorLL.setOnClickListener(
+            l.setOnClickListener(
                 new OnClickListener() {
                     @Override
                     public void onClick( View v ) {

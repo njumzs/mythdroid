@@ -134,7 +134,7 @@ public class RecEditFragment extends Fragment {
         
         view = inflater.inflate(R.layout.recording_edit, null, false);
         
-        View schedOptFrame = view.findViewById(R.id.recedit_schedoptframe);
+        View schedOptFrame = view.findViewById(R.id.schedOptFrame);
         inlineOpts = schedOptFrame != null &&
                      schedOptFrame.getVisibility() == View.VISIBLE;
         
@@ -142,8 +142,8 @@ public class RecEditFragment extends Fragment {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             resf = RecEditSchedFragment.newInstance(getId());
             regf = RecEditGroupsFragment.newInstance(getId());
-            ft.replace(R.id.recedit_schedoptframe, resf);
-            ft.replace(R.id.recedit_groupoptframe, regf);
+            ft.replace(R.id.schedOptFrame, resf);
+            ft.replace(R.id.groupOptFrame, regf);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.commitAllowingStateLoss();
         }
@@ -202,17 +202,12 @@ public class RecEditFragment extends Fragment {
 
     private void setViews() {
 
-        ((TextView)view.findViewById(R.id.recedit_title))
-            .setText(prog.Title);
-        ((TextView)view.findViewById(R.id.recedit_subtitle))
-            .setText(prog.SubTitle);
-        ((TextView)view.findViewById(R.id.recedit_channel))
-            .setText(prog.Channel);
-        ((TextView)view.findViewById(R.id.recedit_start))
-            .setText(prog.startString());
+        ((TextView)view.findViewById(R.id.title)).setText(prog.Title);
+        ((TextView)view.findViewById(R.id.subtitle)).setText(prog.SubTitle);
+        ((TextView)view.findViewById(R.id.channel)).setText(prog.Channel);
+        ((TextView)view.findViewById(R.id.start)).setText(prog.startString());
 
-        final Spinner typeSpinner = ((Spinner)view.findViewById
-                                        (R.id.recedit_type));
+        final Spinner typeSpinner = ((Spinner)view.findViewById(R.id.type));
         final ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(
             activity, android.R.layout.simple_spinner_item
         );
@@ -271,7 +266,7 @@ public class RecEditFragment extends Fragment {
             }
         );
 
-        prioSpinner = ((Spinner)view.findViewById(R.id.recedit_prio));
+        prioSpinner = ((Spinner)view.findViewById(R.id.prio));
 
         final String[] prios = new String[21];
         for (int i = -10, j = 0; i < 11; i++)
@@ -308,7 +303,7 @@ public class RecEditFragment extends Fragment {
         prioSpinner.setEnabled(type == RecType.NOT ? false : true);
         
         if (!inlineOpts) {
-            schedOptions = (Button)view.findViewById(R.id.recedit_schedoptions);
+            schedOptions = (Button)view.findViewById(R.id.schedOptions);
             schedOptions.setOnClickListener(
                 new OnClickListener() {
                     @Override
@@ -324,7 +319,7 @@ public class RecEditFragment extends Fragment {
             );
             schedOptions.setEnabled(type == RecType.NOT ? false : true);
 
-            groupOptions = (Button)view.findViewById(R.id.recedit_groupoptions);
+            groupOptions = (Button)view.findViewById(R.id.groupOptions);
             groupOptions.setOnClickListener(
                 new OnClickListener() {
                     @Override
@@ -341,7 +336,7 @@ public class RecEditFragment extends Fragment {
             groupOptions.setEnabled(type == RecType.NOT ? false : true);
         }
 
-        save = (Button)view.findViewById(R.id.recedit_save);
+        save = (Button)view.findViewById(R.id.save);
         save.setOnClickListener(
             new OnClickListener() {
                 @Override

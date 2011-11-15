@@ -5,7 +5,7 @@
 	android:layout_height="fill_parent"
 	android:background="@drawable/metal">
 	
-	<ImageButton android:id="@+id/nav_back"
+	<ImageButton android:id="@+id/back"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
@@ -14,7 +14,7 @@
 		android:scaleType="center"
 		android:src="@drawable/back"/>
 		
-	<TextView android:id="@+id/nav_loc"
+	<TextView android:id="@+id/loc"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android_layout_alignParentTop="true"
@@ -24,20 +24,20 @@
    		android:textColor="@color/light_grey_text"
    		android:textSize="22sp"/>
    		
-   	<TextView android:id="@+id/nav_item"
+   	<TextView android:id="@+id/item"
    		android:layout_width="fill_parent"
    		android:layout_height="wrap_content"
-   		android:layout_below="@id/nav_loc"
+   		android:layout_below="@id/loc"
    		android:gravity="center"
    		android:focusable="false"
    		android:textColor="@color/light_grey_text"
    		android:textSize="20sp"/>
    		
-	<ImageView android:id="@+id/nav_gesture"
+	<ImageView android:id="@+id/gesture"
 		android:layout_width="400dp"
 		android:layout_height="fill_parent"
-		android:layout_above="@id/nav_back"
-		android:layout_below="@id/nav_item"
+		android:layout_above="@id/back"
+		android:layout_below="@id/item"
 		android:layout_margin="8dp"
 		android:scaleType="fitCenter"
 		android:layout_centerHorizontal="true"

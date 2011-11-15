@@ -7,90 +7,84 @@
    	android:paddingRight="20dp">
    	
    	 <TextView
-		android:id="@+id/videoDTitle"
+		android:id="@+id/title"
  		android:layout_width="fill_parent" 
  		android:layout_height="wrap_content"
  		android:layout_alignParentTop="true"
  		android:layout_alignParentLeft="true"
  		android:paddingTop="10dp"
- 		android:text="Title"
  		android:textStyle="bold"
  		android:textSize="24sp"/>
  		
  	<TextView
-		android:id="@+id/videoDSubtitle"
+		android:id="@+id/subtitle"
  		android:layout_width="fill_parent" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/videoDTitle"
+ 		android:layout_below="@id/title"
  		android:layout_marginTop="6dp"
  		android:textSize="22sp"
- 		android:text="SubTitle"
  		android:textStyle="italic"/>
    	
    	<ImageView
-		android:id="@+id/videoDPoster"
+		android:id="@+id/image"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/videoDSubtitle"
+ 		android:layout_below="@id/subtitle"
 		android:layout_alignParentLeft="true"
 		android:layout_marginLeft="50dp"
 		android:minHeight="220dp"
 		android:layout_marginTop="50dp"/>
  		
 	<TextView	
-		android:id="@+id/videoDRating"
+		android:id="@+id/rating"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
-		android:layout_alignTop="@id/videoDPoster"
-		android:layout_toRightOf="@id/videoDPoster"
+		android:layout_alignTop="@id/image"
+		android:layout_toRightOf="@id/image"
 		android:layout_marginLeft="100dp"
 		android:layout_marginTop="30dp"
- 		android:text="Rating"
  		android:textSize="20sp"/>
 		
 	<TextView	
-		android:id="@+id/videoDYear"
+		android:id="@+id/year"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
-		android:layout_below="@id/videoDRating"
- 		android:layout_alignLeft="@id/videoDRating"
+		android:layout_below="@id/rating"
+ 		android:layout_alignLeft="@id/rating"
  		android:layout_marginTop="20dp"
- 		android:text="Year"
  		android:textSize="20sp"/>
  		
 	<TextView	
-		android:id="@+id/videoDLength"
+		android:id="@+id/length"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
-		android:layout_below="@id/videoDYear"
- 		android:layout_alignLeft="@id/videoDYear"
+		android:layout_below="@id/year"
+ 		android:layout_alignLeft="@id/year"
  		android:layout_marginTop="20dp"
- 		 android:text="Length"
 		android:textSize="20sp"/>
 		
 	<TextView	
-		android:id="@+id/videoDDirector"
+		android:id="@+id/director"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/videoDLength"
- 		android:layout_alignLeft="@id/videoDYear"
+ 		android:layout_below="@id/length"
+ 		android:layout_alignLeft="@id/year"
  		android:layout_marginTop="20dp"
- 		android:text="Director"
  		android:textSize="20sp"/>
  		
  	<TextView	
- 		android:id="@+id/videoDPlotTitle"
+ 		android:id="@+id/plotTitle"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/videoDPoster"
+ 		android:layout_below="@id/image"
 		android:layout_alignParentLeft="true"
  		android:layout_marginTop="50dp"
  		android:layout_marginLeft="20dp"
- 		android:text="Plot:"
+ 		android:text="@string/plot"
  		android:textSize="20sp"/>
 		
 	<LinearLayout
-		android:id="@+id/videoDButtons"
+		android:id="@+id/buttons"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
@@ -100,15 +94,15 @@
 		android:orientation="horizontal">
 		
 		<Button
- 			android:id="@+id/videoDPlay"
+ 			android:id="@+id/play"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
  			android:layout_marginRight="16dp"
  			android:minWidth="84dp"
-  			android:text="Play"/>
+  			android:text="@string/play"/>
   			
 		<Button
- 			android:id="@+id/videoDTVDB"
+ 			android:id="@+id/TVDB"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
  			android:minWidth="84dp"
@@ -120,16 +114,16 @@
  	<ScrollView 
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
-		android:layout_below="@id/videoDPlotTitle"
-		android:layout_above="@id/videoDButtons"
-		android:layout_alignLeft="@id/videoDPlotTitle"
+		android:layout_below="@id/plotTitle"
+		android:layout_above="@id/buttons"
+		android:layout_alignLeft="@id/plotTitle"
 		android:layout_alignWithParentIfMissing="true"
 		android:paddingTop="18dp"
 		android:paddingBottom="24dp"
 		android:clipChildren="true">
 		
 		<TextView
-			android:id="@+id/videoDPlot"
+			android:id="@+id/plot"
 			android:layout_width="wrap_content" 
  			android:layout_height="wrap_content"
  			android:paddingRight="4dp"

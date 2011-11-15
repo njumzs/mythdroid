@@ -7,135 +7,135 @@
     android:padding="8dp"
     android:background="@drawable/metal">
     
-    <ImageButton android:id="@+id/tv_back"
+    <ImageButton android:id="@+id/back"
     	style="@style/MDButton58"
     	android:layout_alignParentLeft="true"
     	android:layout_alignParentTop="true"
     	android:src="@drawable/back"/>
     	
-   	<ImageButton android:id="@+id/tv_seek_forward"
+   	<ImageButton android:id="@+id/seekForward"
     	style="@style/MDButton58"
     	android:layout_alignParentBottom="true"
     	android:layout_alignParentRight="true"
     	android:layout_marginRight="20dp"
     	android:src="@drawable/seek_forward"/>
     	
-    <ImageButton android:id="@+id/tv_skip_forward"
+    <ImageButton android:id="@+id/skipForward"
     	style="@style/MDButton58"
-    	android:layout_alignTop="@id/tv_seek_forward"
-    	android:layout_toLeftOf="@id/tv_seek_forward"
+    	android:layout_alignTop="@id/seekForward"
+    	android:layout_toLeftOf="@id/seekForward"
     	android:src="@drawable/skip_forward"/>
     	
-    <ImageButton android:id="@+id/tv_rec"
+    <ImageButton android:id="@+id/rec"
     	style="@style/MDButton58"
-    	android:layout_toLeftOf="@id/tv_skip_forward"
-    	android:layout_alignTop="@id/tv_seek_forward"
+    	android:layout_toLeftOf="@id/skipForward"
+    	android:layout_alignTop="@id/seekForward"
     	android:src="@drawable/record"/>
     	
-   	<ImageButton android:id="@+id/tv_pause"
+   	<ImageButton android:id="@+id/pause"
     	style="@style/MDButton58"
-    	android:layout_alignLeft="@id/tv_rec"
-    	android:layout_above="@id/tv_rec"
+    	android:layout_alignLeft="@id/rec"
+    	android:layout_above="@id/rec"
     	android:src="@drawable/pause"/>
     
-    <ImageButton android:id="@+id/tv_skip_back"
+    <ImageButton android:id="@+id/skipBack"
     	style="@style/MDButton58"
-    	android:layout_alignTop="@id/tv_rec"
-    	android:layout_toLeftOf="@id/tv_rec"
+    	android:layout_alignTop="@id/rec"
+    	android:layout_toLeftOf="@id/rec"
     	android:src="@drawable/skip_back"/>
     	    
-    <ImageButton android:id="@+id/tv_seek_back"
+    <ImageButton android:id="@+id/seekBack"
     	style="@style/MDButton58"
-    	android:layout_alignTop="@id/tv_rec"
-    	android:layout_toLeftOf="@id/tv_skip_back"
+    	android:layout_alignTop="@id/rec"
+    	android:layout_toLeftOf="@id/skipBack"
     	android:src="@drawable/seek_back"/>
  	
- 	<ImageButton android:id="@+id/tv_skip"
+ 	<ImageButton android:id="@+id/skip"
     	style="@style/MDButton58"
     	android:layout_alignParentRight="true"
-    	android:layout_above="@id/tv_seek_forward"
+    	android:layout_above="@id/seekForward"
     	android:layout_marginBottom="8dp"
     	android:src="@drawable/skip"/>
     	
-    <ImageButton android:id="@+id/tv_guide"
+    <ImageButton android:id="@+id/guide"
     	style="@style/MDButton58"
-    	android:layout_above="@id/tv_skip"
+    	android:layout_above="@id/skip"
     	android:layout_alignParentRight="true"
     	android:layout_marginBottom="8dp"
     	android:src="@drawable/cal"/>    	
     	    	
-    <ImageButton android:id="@+id/tv_vol_up"
+    <ImageButton android:id="@+id/volUp"
     	style="@style/MDButton58"
-    	android:layout_below="@id/tv_back"
-    	android:layout_alignLeft="@id/tv_back"
+    	android:layout_below="@id/back"
+    	android:layout_alignLeft="@id/back"
     	android:layout_marginTop="20dp"
     	android:src="@drawable/vol_up"/>
     
-    <ImageButton android:id="@+id/tv_vol_down"
+    <ImageButton android:id="@+id/volDown"
     	style="@style/MDButton58"
-    	android:layout_below="@id/tv_vol_up"
-    	android:layout_alignLeft="@id/tv_back"
+    	android:layout_below="@id/volUp"
+    	android:layout_alignLeft="@id/back"
     	android:src="@drawable/vol_down"/>
     
-    <ImageButton android:id="@+id/tv_vol_mute"
+    <ImageButton android:id="@+id/volMute"
     	style="@style/MDButton58"
-    	android:layout_below="@id/tv_vol_down"
-    	android:layout_alignLeft="@id/tv_back"
+    	android:layout_below="@id/volDown"
+    	android:layout_alignLeft="@id/back"
     	android:src="@drawable/vol_mute"/>
     	
-   	<ImageButton android:id="@+id/tv_left"
+   	<ImageButton android:id="@+id/left"
     	style="@style/MDButton58"
-    	android:layout_toRightOf="@id/tv_back"
-    	android:layout_below="@id/tv_back"
+    	android:layout_toRightOf="@id/back"
+    	android:layout_below="@id/back"
     	android:layout_marginTop="12dp"
     	android:layout_marginLeft="16dp"
     	android:src="@drawable/left"/>
     	
-    <ImageButton android:id="@+id/tv_enter"
+    <ImageButton android:id="@+id/enter"
     	style="@style/MDButton58"
-    	android:layout_toRightOf="@id/tv_left"
-    	android:layout_alignTop="@id/tv_left"
+    	android:layout_toRightOf="@id/left"
+    	android:layout_alignTop="@id/left"
     	android:src="@drawable/center"/>
     	
-    <ImageButton android:id="@+id/tv_up"
+    <ImageButton android:id="@+id/up"
     	style="@style/MDButton58"
-    	android:layout_above="@id/tv_enter"
-    	android:layout_alignLeft="@id/tv_enter"
+    	android:layout_above="@id/enter"
+    	android:layout_alignLeft="@id/enter"
     	android:src="@drawable/up"/>
   
-    <ImageButton android:id="@+id/tv_right"
+    <ImageButton android:id="@+id/right"
     	style="@style/MDButton58"
-    	android:layout_toRightOf="@id/tv_enter"
-    	android:layout_alignTop="@id/tv_enter"
+    	android:layout_toRightOf="@id/enter"
+    	android:layout_alignTop="@id/enter"
     	android:src="@drawable/right"/>
     	
-    <ImageButton android:id="@+id/tv_down"
+    <ImageButton android:id="@+id/down"
     	style="@style/MDButton58"
-    	android:layout_alignLeft="@id/tv_enter"
-    	android:layout_below="@id/tv_enter"
+    	android:layout_alignLeft="@id/enter"
+    	android:layout_below="@id/enter"
     	android:src="@drawable/down"/>
     	
-   	<ImageButton android:id="@+id/tv_info"
+   	<ImageButton android:id="@+id/info"
     	style="@style/MDButton58"
-    	android:layout_alignTop="@id/tv_guide"
-    	android:layout_alignLeft="@id/tv_pause"
+    	android:layout_alignTop="@id/guide"
+    	android:layout_alignLeft="@id/pause"
     	android:src="@drawable/info"/>
 	
-	<Button android:id="@+id/tv_num"
+	<Button android:id="@+id/num"
     	style="@style/MDButton58"
-    	android:layout_alignLeft="@id/tv_left"
+    	android:layout_alignLeft="@id/left"
     	android:layout_alignParentBottom="true"
     	android:text="123"
     	android:textStyle="bold"
     	android:textColor="#ff333333"
     	android:gravity="center"/>    
    
-   <TextView android:id="@+id/tv_title"
+   <TextView android:id="@+id/title"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     	android:layout_alignParentTop="true"
     	android:layout_alignParentRight="true"
-    	android:layout_toRightOf="@id/tv_up"
+    	android:layout_toRightOf="@id/up"
     	android:layout_marginTop="4dp"
     	android:layout_marginRight="8dp"
     	android:layout_marginLeft="20dp"
@@ -144,12 +144,12 @@
     	android:textStyle="bold"
     	android:textColor="@color/light_grey_text"/>
     
-    <SeekBar android:id="@+id/tv_progress"
+    <SeekBar android:id="@+id/progress"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
-    	android:layout_toRightOf="@id/tv_right"
+    	android:layout_toRightOf="@id/right"
  		android:layout_alignParentRight="true"
-    	android:layout_below="@id/tv_title"
+    	android:layout_below="@id/title"
     	android:layout_marginTop="4dp"
     	android:layout_marginBottom="8dp"
     	android:gravity="center"

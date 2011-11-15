@@ -44,6 +44,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 /**
  * MDFragmentActivity, shows list of Recordings
@@ -51,8 +52,10 @@ import android.widget.ArrayAdapter;
 public class Recordings extends MDFragmentActivity {
 
     /** Currently selected index in the recordings list */
-    public int index = 0;
-
+    public int checkedIndex = 0;
+    /** The topmost visible view in the recordings list */
+    public int visibleIndex = 0;
+    
     final private static int FILTER_DIALOG  = 0;
 
     final private static int
@@ -77,9 +80,7 @@ public class Recordings extends MDFragmentActivity {
                 recordings = Globals.getBackend().getRecordings();
             } catch (IOException e) {
                 ErrUtil.postErr(ctx, Messages.getString("Recordings.0")); //$NON-NLS-1$
-                try {
-                    dismissDialog(DIALOG_LOAD);
-                } catch (IllegalArgumentException e1) {}
+                dismissLoadingDialog();
                 finish();
             }
 
@@ -102,9 +103,7 @@ public class Recordings extends MDFragmentActivity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        try {
-                            dismissDialog(DIALOG_LOAD);
-                        } catch (IllegalArgumentException e) {}
+                        dismissLoadingDialog();
                         listFragment.setAdapter(recordings);
                     }
                 }
@@ -116,6 +115,11 @@ public class Recordings extends MDFragmentActivity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        if (icicle != null) {
+            checkedIndex = icicle.getInt("checkedIndex"); //$NON-NLS-1$
+            visibleIndex = icicle.getInt("visibleIndex"); //$NON-NLS-1$
+            filter       = icicle.getString("filter"); //$NON-NLS-1$
+        }
         setContentView(R.layout.recordings);
         listFragment = new RecListFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -125,11 +129,15 @@ public class Recordings extends MDFragmentActivity {
     }
     
     @Override
-    public void onPause() {
-        super.onPause();
-         try {
-            dismissDialog(DIALOG_LOAD);
-        } catch (IllegalArgumentException e) {}
+    public void onSaveInstanceState(Bundle icicle) {
+        super.onSaveInstanceState(icicle);
+        if (icicle == null) return;
+        int vIdx = listFragment.getFirstVisiblePosition();
+        if (vIdx != ListView.INVALID_POSITION) visibleIndex = vIdx;
+        icicle.putInt("checkedIndex", checkedIndex); //$NON-NLS-1$
+        icicle.putInt("visibleIndex", visibleIndex); //$NON-NLS-1$
+        icicle.putString("filter", filter); //$NON-NLS-1$
+        
     }
     
     @Override
@@ -164,13 +172,15 @@ public class Recordings extends MDFragmentActivity {
 
                 if (recordings == null)
                 	return new AlertDialog.Builder(this)
-                		.setTitle(R.string.filter_rec)
-                		.setMessage(R.string.no_recs)
+                		.setTitle(R.string.filterRec)
+                		.setMessage(R.string.noRecs)
                 		.setPositiveButton(R.string.ok, no)
                 		.create();
                 
-                for (Program prog : recordings) {
-                    if (titles.contains(prog.Title)) continue;
+                RECORDINGSLOOP: for (Program prog : recordings) {
+                    for (String title : titles)
+                        if (title.compareToIgnoreCase(prog.Title) == 0)
+                            continue RECORDINGSLOOP;
                     titles.add(prog.Title);
                 }
 
@@ -178,7 +188,7 @@ public class Recordings extends MDFragmentActivity {
 
                 return
                     new AlertDialog.Builder(this)
-                        .setTitle(R.string.filter_rec)
+                        .setTitle(R.string.filterRec)
                         .setAdapter(
                             new ArrayAdapter<String>(
                                 this, R.layout.simple_list_item_1, titles
@@ -212,7 +222,7 @@ public class Recordings extends MDFragmentActivity {
             .setIcon(R.drawable.ic_menu_refresh);
         menu.add(Menu.NONE, MENU_FILTER, Menu.NONE, R.string.filter)
             .setIcon(drawable.ic_menu_search);
-        menu.add(Menu.NONE, MENU_FILTER_RESET, Menu.NONE, R.string.reset_filter)
+        menu.add(Menu.NONE, MENU_FILTER_RESET, Menu.NONE, R.string.resetFilter)
             .setIcon(drawable.ic_menu_revert);
         return true;
     }
@@ -273,9 +283,8 @@ public class Recordings extends MDFragmentActivity {
      * Remove a recording from the list
      */
     public void deleteRecording() {
-        if (index >= recordings.size()) return;
-        recordings.remove(index);
-        index = Math.min(index, recordings.size() - 1);
+        if (checkedIndex >= recordings.size()) return;
+        recordings.remove(checkedIndex);
         invalidate();
     }
     
@@ -292,39 +301,53 @@ public class Recordings extends MDFragmentActivity {
     protected void resetContentView() {
         
         final FragmentManager fm = getSupportFragmentManager();
-        final Bundle args = new Bundle();
         
-        Fragment lf = fm.findFragmentById(R.id.reclistframe);
-        Fragment df = fm.findFragmentById(R.id.recdetails);
-        
-        // The old backstack is useless now        
-        int backStackSize = fm.getBackStackEntryCount();
-        for (int i = 0; i < backStackSize; i++)
-            fm.popBackStackImmediate();
-        
-        setContentView(R.layout.recordings);
-        
+        ArrayList<String> backStackFrags = new ArrayList<String>();
         boolean dualPane = findViewById(R.id.recdetails) != null;
+                
+        /* The old backstack is useless now, save the relevant entries
+           At this stage dualPane reflects the old configuration */        
+        int backStackSize = fm.getBackStackEntryCount();
+        for (int i = 0; i < backStackSize; i++) {
+        	Fragment lf = fm.findFragmentById(R.id.reclistframe);
+            Fragment df = fm.findFragmentById(R.id.recdetails);
+            backStackFrags.add(0, (!dualPane || df == null ? lf : df).getClass().getName());
+        	fm.popBackStackImmediate();
+        }
         
-        args.putString(
-            "detailsFragClass",  //$NON-NLS-1$
-            (dualPane || df == null ? lf : df).getClass().getName()
-        );
-         
-        args.putParcelable(
-            "detailsFragBundle", //$NON-NLS-1$
-            (dualPane || df == null ? lf : df).getArguments()
-        );
-            
+        setContentView(R.layout.recordings);                
+        dualPane = findViewById(R.id.recdetails) != null;     
+        // Now dualPane reflects the new configuration
+   
         listFragment = new RecListFragment();
-        listFragment.setArguments(args);
         
         fm.beginTransaction().replace(R.id.reclistframe, listFragment)
             .commitAllowingStateLoss();
         fm.executePendingTransactions();
-        
+
         if (hasRecordings())
             listFragment.setAdapter(recordings);
+        
+        // Restore the backstack
+        for (String frag : backStackFrags) {
+        	// RecListFragment will handle this..
+        	if (dualPane && frag.endsWith("RecDetailFragment")) //$NON-NLS-1$
+        		continue;
+        	try {
+        		FragmentTransaction ft = fm.beginTransaction();
+        		ft.replace(
+        				(dualPane ? R.id.recdetails : R.id.reclistframe), 
+						(Fragment)Class.forName(frag).newInstance()
+				);
+				ft.addToBackStack(null);
+				ft.commitAllowingStateLoss();
+			} catch (Exception e) {
+				ErrUtil.err(this, e);
+				return;
+			}
+        }
+        	
+        fm.executePendingTransactions();
 
     }
     

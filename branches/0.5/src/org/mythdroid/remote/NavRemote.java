@@ -205,22 +205,22 @@ public class NavRemote extends Remote {
         if (feMgr != null)
             try {
                 switch (v.getId()) {
-                    case R.id.nav_back:
+                    case R.id.back:
                         feMgr.sendKey(Key.ESCAPE);
                         break;
-                    case R.id.nav_enter:
+                    case R.id.enter:
                         feMgr.sendKey(Key.ENTER);
                         break;
-                    case R.id.nav_up:
+                    case R.id.up:
                         feMgr.sendKey(Key.UP);
                         break;
-                    case R.id.nav_down:
+                    case R.id.down:
                         feMgr.sendKey(Key.DOWN);
                         break;
-                    case R.id.nav_left:
+                    case R.id.left:
                         feMgr.sendKey(Key.LEFT);
                         break;
-                    case R.id.nav_right:
+                    case R.id.right:
                         feMgr.sendKey(Key.RIGHT);
                         break;
                 }
@@ -233,9 +233,9 @@ public class NavRemote extends Remote {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_BUTTON, Menu.NONE, R.string.btn_iface)
+        menu.add(Menu.NONE, MENU_BUTTON, Menu.NONE, R.string.btnIface)
             .setIcon(android.R.drawable.ic_menu_add);
-        menu.add(Menu.NONE, MENU_GESTURE, Menu.NONE, R.string.gest_iface)
+        menu.add(Menu.NONE, MENU_GESTURE, Menu.NONE, R.string.gestIface)
             .setIcon(R.drawable.ic_menu_finger);
         return true;
     }
@@ -311,8 +311,8 @@ public class NavRemote extends Remote {
             gesture ? R.layout.nav_gesture_remote : R.layout.nav_remote
         );
 
-        locView = (TextView)findViewById(R.id.nav_loc);
-        itemView = (TextView)findViewById(R.id.nav_item);
+        locView = (TextView)findViewById(R.id.loc);
+        itemView = (TextView)findViewById(R.id.item);
         
         if (locS != null)
             locView.setText(locS);
@@ -325,7 +325,7 @@ public class NavRemote extends Remote {
             } catch (IOException e) { ErrUtil.err(this, e); }
 
         if (gesture) {
-            findViewById(R.id.nav_back).setOnClickListener(this);
+            findViewById(R.id.back).setOnClickListener(this);
             return;
         }
 

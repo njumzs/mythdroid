@@ -86,15 +86,11 @@ public class VideoPlayer extends MDActivity {
         } catch (IllegalArgumentException e) {}
         try {
             MDDManager.stopStream(beMgr.addr);
-        } catch (IOException e) {
-            ErrUtil.err(ctx, e);
-        }
+        } catch (IOException e) { ErrUtil.err(ctx, e); }
         if (vlc != null)
             try {
                 vlc.disconnect();
-            } catch (IOException e) {
-                ErrUtil.err(ctx, e);
-            }
+            } catch (IOException e) { ErrUtil.err(ctx, e); }
     }
 
     @Override
@@ -124,7 +120,7 @@ public class VideoPlayer extends MDActivity {
         final AlertDialog d = new AlertDialog.Builder(ctx)
             .setItems(R.array.streamingRates, null)
             .setIcon(drawable.ic_menu_upload_you_tube)
-            .setTitle(R.string.stream_quality)
+            .setTitle(R.string.streamQuality)
             .create();
 
         d.setOnDismissListener(
@@ -228,11 +224,11 @@ public class VideoPlayer extends MDActivity {
         
         int attempts = 0;
         
-        while (attempts < 3 && vlc == null)
+        while (attempts < 6 && vlc == null)
             try {
                 vlc = new VLCRemote(beMgr.addr);
             } catch (IOException e) { 
-                attempts++; 
+                attempts++;
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e1) {}
@@ -307,9 +303,7 @@ public class VideoPlayer extends MDActivity {
             new OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    try {
-                        dismissDialog(DIALOG_LOAD);
-                    } catch (IllegalArgumentException e) {}
+                    dismissLoadingDialog();
                     vwidth = mp.getVideoWidth();
                     vheight = mp.getVideoHeight();
                     videoView.setVideoSize(vwidth, vheight);

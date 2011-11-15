@@ -19,6 +19,7 @@
 package org.mythdroid.remote;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,6 +29,7 @@ import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Key;
 import org.mythdroid.data.Program;
+import org.mythdroid.data.Program.Commercial;
 import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.mdd.MDDChannelListener;
 import org.mythdroid.mdd.MDDManager;
@@ -79,35 +81,35 @@ public class TVRemote extends Remote {
         nums = new HashMap<Integer, Key>(12);
 
     static {
-        nums.put(R.id.one,              Key.ONE);
-        nums.put(R.id.two,              Key.TWO);
-        nums.put(R.id.three,            Key.THREE);
-        nums.put(R.id.four,             Key.FOUR);
-        nums.put(R.id.five,             Key.FIVE);
-        nums.put(R.id.six,              Key.SIX);
-        nums.put(R.id.seven,            Key.SEVEN);
-        nums.put(R.id.eight,            Key.EIGHT);
-        nums.put(R.id.nine,             Key.NINE);
-        nums.put(R.id.zero,             Key.ZERO);
-        nums.put(R.id.enter,            Key.ENTER);
-        ctrls.put(R.id.tv_back,         Key.ESCAPE);
-        ctrls.put(R.id.tv_num,          Key.NUMPAD);
-        ctrls.put(R.id.tv_vol_up,       Key.VOL_UP);
-        ctrls.put(R.id.tv_vol_down,     Key.VOL_DOWN);
-        ctrls.put(R.id.tv_vol_mute,     Key.VOL_MUTE);
-        ctrls.put(R.id.tv_up,           Key.UP);
-        ctrls.put(R.id.tv_down,         Key.DOWN);
-        ctrls.put(R.id.tv_left,         Key.LEFT);
-        ctrls.put(R.id.tv_right,        Key.RIGHT);
-        ctrls.put(R.id.tv_enter,        Key.ENTER);
-        ctrls.put(R.id.tv_pause,        Key.PAUSE);
-        ctrls.put(R.id.tv_seek_back,    Key.SEEK_BACK);
-        ctrls.put(R.id.tv_skip_back,    Key.SKIP_BACK);
-        ctrls.put(R.id.tv_skip_forward, Key.SKIP_FORWARD);
-        ctrls.put(R.id.tv_seek_forward, Key.SEEK_FORWARD);
-        ctrls.put(R.id.tv_info,         Key.INFO);
-        ctrls.put(R.id.tv_skip,         Key.SKIP_COMMERCIAL);
-        ctrls.put(R.id.tv_guide,        Key.GUIDE);
+        nums.put(R.id.one,          Key.ONE);
+        nums.put(R.id.two,          Key.TWO);
+        nums.put(R.id.three,        Key.THREE);
+        nums.put(R.id.four,         Key.FOUR);
+        nums.put(R.id.five,         Key.FIVE);
+        nums.put(R.id.six,          Key.SIX);
+        nums.put(R.id.seven,        Key.SEVEN);
+        nums.put(R.id.eight,        Key.EIGHT);
+        nums.put(R.id.nine,         Key.NINE);
+        nums.put(R.id.zero,         Key.ZERO);
+        nums.put(R.id.enter,        Key.ENTER);
+        ctrls.put(R.id.back,        Key.ESCAPE);
+        ctrls.put(R.id.num,         Key.NUMPAD);
+        ctrls.put(R.id.volUp,       Key.VOL_UP);
+        ctrls.put(R.id.volDown,     Key.VOL_DOWN);
+        ctrls.put(R.id.volMute,     Key.VOL_MUTE);
+        ctrls.put(R.id.up,          Key.UP);
+        ctrls.put(R.id.down,        Key.DOWN);
+        ctrls.put(R.id.left,        Key.LEFT);
+        ctrls.put(R.id.right,       Key.RIGHT);
+        ctrls.put(R.id.enter,       Key.ENTER);
+        ctrls.put(R.id.pause,       Key.PAUSE);
+        ctrls.put(R.id.seekBack,    Key.SEEK_BACK);
+        ctrls.put(R.id.skipBack,    Key.SKIP_BACK);
+        ctrls.put(R.id.skipForward, Key.SKIP_FORWARD);
+        ctrls.put(R.id.seekForward, Key.SEEK_FORWARD);
+        ctrls.put(R.id.info,        Key.INFO);
+        ctrls.put(R.id.skip,        Key.SKIP_COMMERCIAL);
+        ctrls.put(R.id.guide,       Key.GUIDE);
     }
 
     final private Handler    handler      = new Handler();
@@ -297,10 +299,7 @@ public class TVRemote extends Remote {
 
         setResult(RESULT_OK);
 
-        if (livetv)
-            ctrls.put(R.id.tv_rec, Key.RECORD);
-        else
-            ctrls.put(R.id.tv_rec, Key.EDIT);
+        ctrls.put(R.id.rec, livetv ? Key.RECORD : Key.EDIT);
 
         gesture = PreferenceManager.getDefaultSharedPreferences(this)
                       .getString("tvDefaultStyle", "") //$NON-NLS-1$ //$NON-NLS-2$
@@ -436,7 +435,7 @@ public class TVRemote extends Remote {
             case DIALOG_GUIDE:
                 return new AlertDialog.Builder(ctx)
                     .setIcon(drawable.ic_menu_upload_you_tube)
-                    .setTitle(R.string.disp_guide)
+                    .setTitle(R.string.dispGuide)
                     .setAdapter(
                         new ArrayAdapter<String>(
                             ctx, R.layout.simple_list_item_1, new String[] {}
@@ -468,8 +467,8 @@ public class TVRemote extends Remote {
 
                 return
                     new AlertDialog.Builder(ctx)
-                        .setTitle(R.string.leave_remote)
-                        .setMessage(R.string.halt_playback)
+                        .setTitle(R.string.leaveRemote)
+                        .setMessage(R.string.haltPlayback)
                         .setPositiveButton(R.string.yes, cl)
                         .setNeutralButton(R.string.no, cl)
                         .setNegativeButton(R.string.cancel, cl)
@@ -534,11 +533,11 @@ public class TVRemote extends Remote {
     /** Compose the menu */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_BUTTON, Menu.NONE, R.string.btn_iface)
+        menu.add(Menu.NONE, MENU_BUTTON, Menu.NONE, R.string.btnIface)
             .setIcon(drawable.ic_menu_add);
-        menu.add(Menu.NONE, MENU_GESTURE, Menu.NONE, R.string.gest_iface)
+        menu.add(Menu.NONE, MENU_GESTURE, Menu.NONE, R.string.gestIface)
             .setIcon(R.drawable.ic_menu_finger);
-        menu.add(Menu.NONE, MENU_OSDMENU, Menu.NONE, R.string.osd_menu)
+        menu.add(Menu.NONE, MENU_OSDMENU, Menu.NONE, R.string.osdMenu)
             .setIcon(drawable.ic_menu_more);
         return true;
     }
@@ -602,9 +601,9 @@ public class TVRemote extends Remote {
         if (gesture) {
             setContentView(R.layout.tv_gesture_remote);
             for (
-                int id : new int[] {
-                    R.id.tv_back, R.id.tv_num, R.id.tv_vol_mute,
-                    R.id.tv_enter, R.id.tv_info, R.id.tv_skip
+                int id : new int[] { 
+                    R.id.back,  R.id.num,  R.id.volMute,
+                    R.id.enter, R.id.info, R.id.skip
                 }
            ) {
                 View v = findViewById(id);
@@ -655,8 +654,8 @@ public class TVRemote extends Remote {
     /** Setup the status widgets (progress bar, program title) */
     private void setupStatus() {
 
-        titleView = (TextView)findViewById(R.id.tv_title);
-        pBar = (SeekBar)findViewById(R.id.tv_progress);
+        titleView = (TextView)findViewById(R.id.title);
+        pBar = (SeekBar)findViewById(R.id.progress);
         titleView.setFocusable(false);
         pBar.setFocusable(false);
 
@@ -739,12 +738,8 @@ public class TVRemote extends Remote {
         
         if (prog == null || endTime <= 0 || fps == 0) return;
         
-        int[][] cuts = null;
-        try {
-            cuts = MDDManager.getCutList(feMgr.addr, prog);
-        } catch (IOException e) { return; }
-        
-        if (cuts.length < 1) return;
+        ArrayList<Commercial> cuts = prog.getCutList(feMgr.addr);
+        if (cuts.isEmpty()) return;
         
         Drawable[] layers = new Drawable[2];
         layers[0] = pBar.getProgressDrawable();

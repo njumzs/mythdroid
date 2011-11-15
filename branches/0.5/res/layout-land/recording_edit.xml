@@ -8,112 +8,111 @@
    	android:paddingRight="4dp">
    	
     <TextView
-		android:id="@+id/recedit_title"
+		android:id="@+id/title"
  		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
  		android:layout_marginTop="6dp"
  		android:textSize="19sp"/>
  	
 	<TextView
-		android:id="@+id/recedit_title_spacer"
+		android:id="@+id/titleSpacer"
  		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_toRightOf="@id/recedit_title"
- 		android:layout_alignBottom="@id/recedit_title"
+ 		android:layout_toRightOf="@id/title"
+ 		android:layout_alignBottom="@id/title"
  		android:textSize="16sp"
  		android:textStyle="italic"
  		android:text="  -  "/>
  		
  	<TextView
-		android:id="@+id/recedit_subtitle"
+		android:id="@+id/subtitle"
  		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_toRightOf="@id/recedit_title_spacer"
- 		android:layout_alignBottom="@id/recedit_title"
+ 		android:layout_toRightOf="@id/titleSpacer"
+ 		android:layout_alignBottom="@id/title"
  		android:textSize="16sp"
  		android:textStyle="italic"/>
  		
 	<TextView	
-		android:id="@+id/recedit_channel"
+		android:id="@+id/channel"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/recedit_title"
+ 		android:layout_below="@id/title"
  		android:layout_alignParentLeft="true"
  		android:textSize="16sp"/>
  		
 	<TextView	
-		android:id="@+id/recedit_start"
+		android:id="@+id/start"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
-		android:layout_alignTop="@id/recedit_channel"
+		android:layout_alignTop="@id/channel"
  		android:layout_alignParentRight="true"
 		android:textSize="16sp"/>
 
 	<TextView	
-		android:id="@+id/recedit_type_text"
+		android:id="@+id/typeText"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
-		android:layout_below="@id/recedit_channel"
+		android:layout_below="@id/channel"
  		android:layout_alignParentLeft="true"
 		android:textSize="16sp"
 		android:layout_marginTop="5dp"
-		android:text="Recording type:"/>
+		android:text="@string/recType"/>
 	
 	<Spinner
-		android:id="@+id/recedit_type"
+		android:id="@+id/type"
 		android:layout_width="260dp"
 		android:layout_height="wrap_content"
-		android:layout_below="@id/recedit_type_text"
+		android:layout_below="@id/typeText"
 		android:layout_marginTop="3dp"/>
 
 	<TextView	
-		android:id="@+id/recedit_prio_text"
+		android:id="@+id/prioText"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
-		android:layout_below="@id/recedit_type"
+		android:layout_below="@id/type"
  		android:layout_alignParentLeft="true"
 		android:textSize="16sp"
 		android:layout_marginTop="3dp"
-		android:text="Recording priority:"/>
+		android:text="@string/recPrio"/>
 	
 	<Spinner
-		android:id="@+id/recedit_prio"
+		android:id="@+id/prio"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_alignLeft="@+id/recedit_type"
-		android:layout_alignRight="@+id/recedit_type"
-		android:layout_below="@id/recedit_prio_text"
+		android:layout_alignLeft="@id/type"
+		android:layout_alignRight="@id/type"
+		android:layout_below="@id/prioText"
 		android:layout_marginTop="3dp"/>
 		
 	<Button	
-		android:id="@+id/recedit_schedoptions"
+		android:id="@+id/schedOptions"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_alignTop="@id/recedit_type"
-		android:layout_toRightOf="@id/recedit_type"
+		android:layout_alignTop="@id/type"
+		android:layout_toRightOf="@id/type"
 		android:layout_marginLeft="20dp"
 		android:minWidth="180dp"
-		android:text="Scheduling Options"/>
+		android:text="@string/schedOpt"/>
 
 	<Button	
-		android:id="@+id/recedit_groupoptions"
+		android:id="@+id/groupOptions"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_alignTop="@id/recedit_prio"
-		android:layout_toRightOf="@id/recedit_prio"
+		android:layout_alignTop="@id/prio"
+		android:layout_toRightOf="@id/prio"
 		android:layout_marginLeft="20dp"
 		android:minWidth="180dp"
-		android:text="Group Options"/>
+		android:text="@string/groupOpt"/>
 
 	<Button
-		android:id="@+id/recedit_save"
+		android:id="@+id/save"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
 		android:layout_centerHorizontal="true"
 		android:gravity="center"
 		android:layout_marginBottom="3dp"
-		android:text="Save"/>
-		
+		android:text="@string/save"/>
 
 </RelativeLayout>

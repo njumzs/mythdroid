@@ -74,11 +74,11 @@ public class VideoAdapter extends ArrayAdapter<Object> {
                 R.layout.video, null
             );
             vHolder = new ViewHolder();
-            vHolder.title = (TextView)old.findViewById(R.id.videoTitle);
-            vHolder.subtitle = (TextView)old.findViewById(R.id.videoSubtitle);
-            vHolder.director = (TextView)old.findViewById(R.id.videoDirector);
-            vHolder.rating = (TextView)old.findViewById(R.id.videoRating);
-            vHolder.poster = (ImageView)old.findViewById(R.id.videoPoster);
+            vHolder.title = (TextView)old.findViewById(R.id.title);
+            vHolder.subtitle = (TextView)old.findViewById(R.id.subtitle);
+            vHolder.director = (TextView)old.findViewById(R.id.director);
+            vHolder.rating = (TextView)old.findViewById(R.id.rating);
+            vHolder.poster = (ImageView)old.findViewById(R.id.image);
             old.setTag(vHolder);
         }
         else
@@ -88,10 +88,10 @@ public class VideoAdapter extends ArrayAdapter<Object> {
         vHolder.title.setText(video.title);
         vHolder.subtitle.setText(video.subtitle);
         vHolder.director.setText(
-            Messages.getString("VideoAdapter.0") + video.director // Directed by //$NON-NLS-1$
+            Messages.getString("VideoDetail.0") + video.director // Directed by //$NON-NLS-1$
         );
         vHolder.rating.setText(
-            Messages.getString("VideoAdapter.1") + // Rating: //$NON-NLS-1$
+            Messages.getString("VideoDetail.1") + // Rating: //$NON-NLS-1$
             String.format("%.2f", video.rating) //$NON-NLS-1$
         );
 

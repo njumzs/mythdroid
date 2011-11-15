@@ -28,7 +28,7 @@
  		android:text="Storage"/>
  		
  	<TextView
-		android:id="@+id/storage_total"
+		android:id="@+id/storageTotal"
  		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
  		android:layout_below="@id/storage"
@@ -36,18 +36,18 @@
  		android:textSize="16sp"/>
  		
  	<TextView
-		android:id="@+id/storage_used"
+		android:id="@+id/storageUsed"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/storage_total"
+ 		android:layout_below="@id/storageTotal"
  		android:layout_marginTop="8dp"
 		android:textSize="16sp"/>
 		
 	<TextView	
-		android:id="@+id/storage_free"
+		android:id="@+id/storageFree"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/storage_used"
+ 		android:layout_below="@id/storageUsed"
  		android:layout_marginTop="8dp"
  		android:textSize="16sp"/>
  		
@@ -55,14 +55,14 @@
 		android:id="@+id/load"
 		android:layout_width="fill_parent" 
  		android:layout_height="wrap_content"
-		android:layout_below="@id/storage_free"
+		android:layout_below="@id/storageFree"
  		android:layout_marginTop="16dp"
  		android:textStyle="bold"
 		android:textSize="20sp"
-		android:text="Load"/>
+		android:text="@string/load"/>
 		
 	<TextView
-		android:id="@+id/load_1min"
+		android:id="@+id/load1min"
  		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
  		android:layout_below="@id/load"
@@ -70,18 +70,18 @@
  		android:textSize="16sp"/>
  		
  	<TextView
-		android:id="@+id/load_5min"
+		android:id="@+id/load5min"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/load_1min"
+ 		android:layout_below="@id/load1min"
  		android:layout_marginTop="8dp"
 		android:textSize="16sp"/>
 		
 	<TextView	
-		android:id="@+id/load_15min"
+		android:id="@+id/load15min"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/load_5min"
+ 		android:layout_below="@id/load5min"
  		android:layout_marginTop="8dp"
  		android:textSize="16sp"/>
  		
@@ -89,14 +89,14 @@
 		android:id="@+id/guide"
 		android:layout_width="fill_parent" 
  		android:layout_height="wrap_content"
-		android:layout_below="@id/load_15min"
+		android:layout_below="@id/load15min"
  		android:layout_marginTop="16dp"
  		android:textStyle="bold"
 		android:textSize="20sp"
-		android:text="Guide Data"/>
+		android:text="@string/guideData"/>
 		
 	<TextView
-		android:id="@+id/guide_length"
+		android:id="@+id/guideLength"
  		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
  		android:layout_below="@id/guide"
@@ -104,10 +104,10 @@
  		android:textSize="16sp"/>
  		
  	<TextView
-		android:id="@+id/guide_last"
+		android:id="@+id/guideLast"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/guide_length"
+ 		android:layout_below="@id/guideLength"
  		android:layout_marginTop="8dp"
 		android:textSize="16sp"/>
 		

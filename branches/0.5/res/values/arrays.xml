@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string-array name="remoteStyles">
-		<item>Button</item>
-		<item>Gesture</item>
-	</string-array>
-	<string-array name="streamingRates">
-		<item>Video 1024   Audio 128   (1152 kb/s)</item>
-		<item>Video  448   Audio 128    (576 kb/s)</item>
-		<item>Video  320   Audio  96    (416 kb/s)</item>
-		<item>Video  192   Audio  64    (256 kb/s)</item>
-	</string-array>
+    <string-array name="mainMenuItems">
+        <item>Watch TV</item>
+	<item>Recordings</item>
+	<item>Videos</item>
+	<item>Music</item>
+	<item>Guide</item>
+	<item>Status</item>
+    </string-array>
+    <string-array name="remoteStyles">
+	<item>Button</item>
+	<item>Gesture</item>
+    </string-array>
+    <string-array name="streamingRates">
+	<item>Video 1024   Audio 128   (1152 kb/s)</item>
+	<item>Video  448   Audio 128    (576 kb/s)</item>
+	<item>Video  320   Audio  96    (416 kb/s)</item>
+	<item>Video  192   Audio  64    (256 kb/s)</item>
+    </string-array>
 </resources>

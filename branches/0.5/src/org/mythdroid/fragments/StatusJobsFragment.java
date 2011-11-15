@@ -205,15 +205,12 @@ public class StatusJobsFragment extends ListFragment {
 
             if (old == null) {
                 old = activity.getLayoutInflater().inflate(R.layout.job_list_item, null);
-                vHolder = new ViewHolder();
-                vHolder.title = (TextView)old.findViewById(R.id.joblist_title);
-                vHolder.type = (TextView)old.findViewById(R.id.joblist_type);
-                vHolder.details =
-                    (TextView)old.findViewById(R.id.joblist_details);
-                vHolder.comments =
-                    (TextView)old.findViewById(R.id.joblist_comments);
-                vHolder.pBar =
-                    (ProgressBar)old.findViewById(R.id.joblist_prog);
+                vHolder          = new ViewHolder();
+                vHolder.title    = (TextView)old.findViewById(R.id.title);
+                vHolder.type     = (TextView)old.findViewById(R.id.type);
+                vHolder.details  = (TextView)old.findViewById(R.id.details);
+                vHolder.comments = (TextView)old.findViewById(R.id.comments);
+                vHolder.pBar     = (ProgressBar)old.findViewById(R.id.progress);
                 old.setTag(vHolder);
             }
             else
@@ -254,7 +251,7 @@ public class StatusJobsFragment extends ListFragment {
         activity = (MDFragmentActivity)getActivity();
         View view = inflater.inflate(R.layout.status_jobs, null, false);
         ((TextView)view.findViewById(R.id.emptyMsg))
-            .setText(R.string.no_jobs);
+            .setText(R.string.noJobs);
        
         if (Status.statusDoc == null && !Status.getStatus(activity)) {
             activity.finish();
