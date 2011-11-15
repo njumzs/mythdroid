@@ -126,11 +126,6 @@ public abstract class MDActivity extends Activity {
         switch (id) {
 
             case FRONTEND_CHOOSER:
-                //Reinitialize onHere to False. Incase we have called this function more than once
-                //For example by first calling the "Set Current Frontend" menu item and selecting here
-                //and then by long-pressing on Watch-TV
-                onHere=false;
-
                 final Dialog d = createFrontendDialog();
                 d.setOnDismissListener(dismissListener);
                 d.setOnCancelListener(cancelListener);
@@ -200,6 +195,7 @@ public abstract class MDActivity extends Activity {
                 public void onItemClick(
                     AdapterView<?> av, View v, int pos, long id
                 ) {
+                    onHere = false;
                     String fe = (String)av.getAdapter().getItem(pos);
                     Globals.currentFrontend = fe;
                     if (frontendIndicator != null) frontendIndicator.setText(fe);
@@ -222,6 +218,7 @@ public abstract class MDActivity extends Activity {
         
         if (list.isEmpty()) {
             ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
+            removeDialog(FRONTEND_CHOOSER);
             return;
         }
 

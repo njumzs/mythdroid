@@ -22,11 +22,14 @@ import java.io.IOException;
 
 import org.mythdroid.Enums.Key;
 import org.mythdroid.Globals;
+import org.mythdroid.R;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.Reflection;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -60,6 +63,9 @@ public abstract class Remote extends Activity implements View.OnClickListener {
 
     /** Result codes for when a remote is startActivityForResult()'d */
     final protected int REMOTE_RESULT_FINISH = RESULT_FIRST_USER;
+    
+    /** A loading dialog */
+    final protected int DIALOG_LOAD = -1;
 
     /** Scale factor for pixel values for different display densities */
     private float scale = 1;
@@ -306,6 +312,19 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
         return onPrepareOptionsMenu;
     }
+    
+    @Override
+    public Dialog onCreateDialog(int id) {
+        switch (id) {
+            case DIALOG_LOAD:
+                final ProgressDialog d = new ProgressDialog(this);
+                d.setIndeterminate(true);
+                d.setMessage(getResources().getString(R.string.loading));
+                return d;
+        }
+        
+        return null;
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent me) {
@@ -384,7 +403,8 @@ public abstract class Remote extends Activity implements View.OnClickListener {
             }
             onAction();
         } catch (IOException e) { ErrUtil.err(this, e); }
-
+          catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+          
         return true;
 
     }
@@ -408,6 +428,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
      * Default implementation sends Key.UP
      */
     protected void onFlingUp() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.UP);
         } catch (IOException e) { ErrUtil.err(this, e); }
@@ -419,6 +440,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
      * Default implementation sends Key.DOWN
      */
     protected void onFlingDown() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.DOWN);
         } catch (IOException e) { ErrUtil.err(this, e); }
@@ -430,6 +452,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
      * Default implementation sends Key.LEFT
      */
     protected void onFlingLeft() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.LEFT);
         } catch (IOException e) { ErrUtil.err(this, e); }
@@ -441,6 +464,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
      * Default implementation sends Key.RIGHT
      */
     protected void onFlingRight() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.RIGHT);
         } catch (IOException e) { ErrUtil.err(this, e); }
@@ -484,6 +508,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
      * Default implementation sends Key.ENTER
      */
     protected void onTap() {
+        if (feMgr == null) return;
         try {
             feMgr.sendKey(Key.ENTER);
         } catch (IOException e) { ErrUtil.err(this, e); }

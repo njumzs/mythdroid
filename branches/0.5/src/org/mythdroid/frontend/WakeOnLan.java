@@ -22,6 +22,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.LogUtil;
 
 /** Send WakeOnLan packets */
@@ -58,13 +59,15 @@ public class WakeOnLan {
         byte[] bytes = new byte[6];
         String[] hex = addr.split(":"); //$NON-NLS-1$
         if (hex.length != 6)
-            throw new IllegalArgumentException("Invalid MAC address"); //$NON-NLS-1$
+            throw new IllegalArgumentException(
+                Messages.getString("WakeOnLan.0")  //$NON-NLS-1$
+            );
         try {
             for (int i = 0; i < 6; i++)
                 bytes[i] = (byte)Integer.parseInt(hex[i], 16);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                "Invalid hex digit in MAC address" //$NON-NLS-1$
+                Messages.getString("WakeOnLan.1") //$NON-NLS-1$
             );
         }
         return bytes;

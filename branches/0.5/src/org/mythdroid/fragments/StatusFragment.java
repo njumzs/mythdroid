@@ -76,7 +76,7 @@ public class StatusFragment extends ListFragment {
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.addToBackStack(null);
-        ft.replace(android.R.id.content, f).commit();
+        ft.replace(android.R.id.content, f).commitAllowingStateLoss();
 
     }
 

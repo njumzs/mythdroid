@@ -18,6 +18,7 @@
 
 package org.mythdroid.activities;
 
+import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.resource.Messages;
@@ -130,7 +131,7 @@ public class FrontendList extends ListActivity implements
                 break;
 
             case DEFAULT_DIALOG:
-                final Dialog d = createFrontendDialog();
+                final Dialog d = createDefaultFrontendDialog();
                 return d;
         }
 
@@ -169,7 +170,7 @@ public class FrontendList extends ListActivity implements
                 break;
 
             case DEFAULT_DIALOG:
-                prepareFrontendDialog(dialog);
+                prepareDefaultFrontendDialog(dialog);
                 break;
         }
     }
@@ -219,6 +220,8 @@ public class FrontendList extends ListActivity implements
                         ErrUtil.err(
                             ctx, Messages.getString("FrontendList.5") + name //$NON-NLS-1$
                         );
+                    if (FrontendDB.getFrontendNames(ctx).size() == 1)
+                        setDefaultFrontend(name);
                 }
 
                 else
@@ -229,6 +232,11 @@ public class FrontendList extends ListActivity implements
             case AlertDialog.BUTTON_NEUTRAL:
 
                 FrontendDB.delete(this, rowID);
+                String n = ((EditText)feEditor.findViewById(R.id.fe_name))
+                             .getText().toString();
+                if (Globals.currentFrontend.equals(n))
+                    Globals.currentFrontend = FrontendDB.getDefault(ctx);
+                
                 break;
 
         }
@@ -237,7 +245,7 @@ public class FrontendList extends ListActivity implements
     }
 
     /** Create a dialog allowing user to choose default frontend */
-    private Dialog createFrontendDialog() {
+    private Dialog createDefaultFrontendDialog() {
 
         final AlertDialog d = new AlertDialog.Builder(ctx)
             .setItems(new String[] {}, null)
@@ -251,14 +259,8 @@ public class FrontendList extends ListActivity implements
                 public void onItemClick(
                     AdapterView<?> av, View v, int pos, long id
                 ) {
-                    String fe = (String)av.getAdapter().getItem(pos);
-                    FrontendDB.updateDefault(fe,ctx);
+                    setDefaultFrontend((String)av.getAdapter().getItem(pos));
                     d.dismiss();
-                   ((TextView)(ftr.findViewById(R.id.fe_addr_text)))
-                        .setText(
-                            Messages.getString("FrontendList.6") + " " + //$NON-NLS-1$ //$NON-NLS-2$
-                            FrontendDB.getDefault(ctx)
-                         );
                 }
             }
         );
@@ -266,7 +268,7 @@ public class FrontendList extends ListActivity implements
         return d;
     }
 
-    private void prepareFrontendDialog(final Dialog dialog) {
+    private void prepareDefaultFrontendDialog(final Dialog dialog) {
 
         ArrayList<String> list = FrontendDB.getFrontendNames(this);
 
@@ -278,6 +280,16 @@ public class FrontendList extends ListActivity implements
             )
         );
 
+    }
+    
+    private void setDefaultFrontend(String name) {
+        FrontendDB.updateDefault(ctx, name);
+        Globals.currentFrontend = name;
+        ((TextView)(ftr.findViewById(R.id.fe_addr_text)))
+            .setText(
+                Messages.getString("FrontendList.6") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                FrontendDB.getDefault(ctx)
+            );
     }
 
 }

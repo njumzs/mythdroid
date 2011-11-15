@@ -83,7 +83,7 @@ public class NavRemote extends Remote {
                        // Cancel any pending updates from updateLoc()
                        handler.removeCallbacks(updateLocViews);
                        
-                       if (menu != null && !menu.isEmpty()) {
+                       if (menu != null && menu.length() > 0) {
                            locView.setText(menu);
                            locS = menu;
                        }
@@ -134,12 +134,6 @@ public class NavRemote extends Remote {
             feMgr = Globals.getFrontend(this);
         } catch (IOException e) {
             ErrUtil.err(this, e);
-            finish();
-            return;
-        }
-
-        if (feMgr == null) {
-            ErrUtil.err(this, Messages.getString("TVRemote.5")); //$NON-NLS-1$
             finish();
             return;
         }
@@ -231,6 +225,7 @@ public class NavRemote extends Remote {
                         break;
                 }
             } catch (IOException e) { ErrUtil.err(this, e); }
+              catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
 
         super.onClick(v);
 

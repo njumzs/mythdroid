@@ -91,6 +91,7 @@ public class ProgramAdapter extends ArrayAdapter<Object> {
 
     @Override
     public Program getItem(int pos) {
+        if (pos >= programs.size()) return null;
         return programs.get(pos);
     }
 

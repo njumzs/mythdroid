@@ -376,7 +376,11 @@ public class Program implements Comparable<Program> {
                     ":16550" + url.getFile()  //$NON-NLS-1$
                 );
             return BitmapFactory.decodeStream(url.openStream());
-        } catch (Exception e) { return null; }
+        } catch (Exception e) { 
+            ErrUtil.logWarn(e); 
+            return null; 
+        }
+        
     }
 
     /**

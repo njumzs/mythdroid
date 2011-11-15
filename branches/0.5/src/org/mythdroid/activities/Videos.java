@@ -20,11 +20,11 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
-import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Video;
 import org.mythdroid.data.VideoAdapter;
 import org.mythdroid.mdd.MDDManager;
@@ -50,6 +50,9 @@ public class Videos extends MDActivity implements
 
     final private ImageCache artCache =
         new ImageCache("videos", 20, 200, 1024*1024*10); //$NON-NLS-1$
+    
+    final private HashMap<Integer,String> viddirs = 
+        new HashMap<Integer, String>();
 
     final private Handler handler   = new Handler();
     private Thread artThread        = null;
@@ -71,55 +74,57 @@ public class Videos extends MDActivity implements
         @Override
         public void run() {
 
+            String addr = null;
+            
             try {
-                BackendManager beMgr = Globals.getBackend();
-                if (beMgr == null) {
-                    ErrUtil.postErr(
-                        ctx, new Exception(Messages.getString("Videos.2")) //$NON-NLS-1$
-                    );
-                    finish();
-                    return;
-                }
-                
-                videos = MDDManager.getVideos(
-                    Globals.getBackend().addr, viddir, path
-                );
+                addr = Globals.getBackend().addr;
             } catch (IOException e) {
-                ErrUtil.postErr(
-                    ctx, new Exception(Messages.getString("Videos.1")) //$NON-NLS-1$
-                );
+                ErrUtil.postErr(ctx, e);
+                finish();
+                return;
+            }
+            
+            /* We use an empty string to denote the root of a 
+               top-level directory */
+            String tmppath = path.length() > 0 ? path : "ROOT"; //$NON-NLS-1$
+
+            try {
+                videos = MDDManager.getVideos(addr, viddir, tmppath);
+            } catch (IOException e) {
+                ErrUtil.postErr(ctx, e);
                 finish();
                 return;
             }
 
-            handler.post(
-                new Runnable() {
-                    @Override
-                     public void run() {
-                        lv.setAdapter(
-                            new VideoAdapter(
-                                ctx, R.layout.video, videos
-                            )
-                        );
-                        if (artThread != null) {
-                            fetchingArt = false;
-                            artThread.interrupt();
-                            try {
-                                artThread.join();
-                            } catch (InterruptedException e) {}
-                        }
-                        fetchingArt = true;
-                        artThread = new Thread(fetchArt, "videoArtFetcher"); //$NON-NLS-1$
-                        artThread.start();
-                        try {
-                            dismissDialog(DIALOG_LOAD);
-                        } catch (IllegalArgumentException e1) {}
-                    }
-                }
-            );
+            handler.post(gotVideos);
+                
         }
     };
-
+    
+    final private Runnable gotVideos = new Runnable() {
+        @Override
+        public void run() {
+            lv.setAdapter(
+                new VideoAdapter(
+                    ctx, R.layout.video, videos
+                )
+            );
+            if (artThread != null) {
+                fetchingArt = false;
+                artThread.interrupt();
+                try {
+                    artThread.join();
+                } catch (InterruptedException e) {}
+            }
+            fetchingArt = true;
+            artThread = new Thread(fetchArt, "videoArtFetcher"); //$NON-NLS-1$
+            artThread.start();
+            try {
+                dismissDialog(DIALOG_LOAD);
+            } catch (IllegalArgumentException e1) {}
+        }
+    };
+    
     /** Fetch posters for the current list of videos */
     final private Runnable fetchArt = new Runnable() {
         @Override
@@ -131,13 +136,13 @@ public class Videos extends MDActivity implements
             for (int i = 0; i < numvids; i++) {
                 if (!fetchingArt)
                     break;
-                if (vids[i].poster != null || vids[i].id == -1) continue;
+                if (vids[i].poster != null || vids[i].directory) continue;
                 Bitmap bm = artCache.get(vids[i].id);
                 if (bm != null)
                     vids[i].poster = new BitmapDrawable(bm);
                 else {
-                    float w = (largeScreen ? 140 : 70) * scale + 0.5f;
-                    float h = (largeScreen ? 220 : 110) * scale + 0.5f;
+                    float w = (largeScreen ? 175 : 70) * scale + 0.5f;
+                    float h = (largeScreen ? 275 : 110) * scale + 0.5f;
                     vids[i].getPoster(w, h); 
                     if (vids[i].poster != null)
                         artCache.put(vids[i].id, vids[i].poster.getBitmap());
@@ -159,6 +164,7 @@ public class Videos extends MDActivity implements
 
     @Override
     public void onCreate(Bundle icicle) {
+        
         super.onCreate(icicle);
         setContentView(R.layout.videos);
         addHereToFrontendChooser(VideoPlayer.class);
@@ -169,14 +175,15 @@ public class Videos extends MDActivity implements
 
         scale = getResources().getDisplayMetrics().density;
         largeScreen = getResources().getDisplayMetrics().widthPixels > 1000;
-
-        showDialog(DIALOG_LOAD);
-        Globals.getWorker().post(getVideos);
+        
+        refresh();
+        
     }
     
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Globals.getWorker().removeCallbacks(getVideos);
         artCache.shutdown();
     }
 
@@ -188,17 +195,29 @@ public class Videos extends MDActivity implements
         Video video = videos.get(pos);
 
         // A directory?
-        if (video.id == -1) {
+        if (video.directory) {
 
             if (path.equals("ROOT")) //$NON-NLS-1$
-                path = video.title;
+                // Top top level?
+                if (video.dir == -1)
+                    path = video.title;
+                // The root of a top-level directory (multiple videodirs)
+                else {
+                    path = ""; //$NON-NLS-1$
+                    viddirs.put(video.dir, video.title);
+                }
+            else {
+                if (path.length() > 0)
+                    path += "/";  //$NON-NLS-1$
+                path += video.title;
+            }
+     
+            if (path.equals("")) //$NON-NLS-1$
+                dirText.setText(video.title);
             else
-                path += "/" + video.title; //$NON-NLS-1$
-
-            dirText.setText(currentDir(path));
+                dirText.setText(currentDir(path));
             viddir = video.dir;
-            showDialog(DIALOG_LOAD);
-            Globals.getWorker().post(getVideos);
+            refresh();
             return;
 
         }
@@ -213,9 +232,14 @@ public class Videos extends MDActivity implements
         AdapterView<?> adapter, View item, int pos, long itemid
     ) {
         Video video = videos.get(pos);
-        if (video.id == -1)
+        if (video.directory)
             return true;
-        setExtra(Extras.FILENAME.toString(), video.filename);
+        try {
+            setExtra(Extras.FILENAME.toString(), video.getPath());
+        } catch(IOException e) {
+            ErrUtil.err(this, e);
+            return true;
+        }
         setExtra(Extras.TITLE.toString(), video.title);
         nextActivity = TVRemote.class;
         showDialog(FRONTEND_CHOOSER);
@@ -234,23 +258,37 @@ public class Videos extends MDActivity implements
             int slash = path.lastIndexOf('/');
             if (slash == -1) {
                 // Check if we're going to list of videodirs (top top level)
-                if (path.equals("ROOT")) //$NON-NLS-1$
+                if (path.equals("ROOT") || path.equals("")) //$NON-NLS-1$ //$NON-NLS-2$
                     viddir = -1;
-                path = "ROOT"; //$NON-NLS-1$
-                dirText.setText(Messages.getString("Videos.0")); // Videos //$NON-NLS-1$
+                // Going to top top level
+                if (viddir == -1) {
+                    path = "ROOT"; //$NON-NLS-1$
+                    dirText.setText(Messages.getString("Videos.0")); //$NON-NLS-1$
+                }
+                // Going to root of a toplevel directory
+                else {
+                    path = "";  //$NON-NLS-1$
+                    dirText.setText(viddirs.get(viddir));
+                }
             }
             else {
                 path = path.substring(0, slash);
                 dirText.setText(currentDir(path));
             }
-            showDialog(DIALOG_LOAD);
-            Globals.getWorker().post(getVideos);
+            
+            refresh();
             return true;
 
         }
 
         return super.onKeyDown(code, event);
 
+    }
+    
+    private void refresh() {
+        Globals.getWorker().removeCallbacks(getVideos);
+        showDialog(DIALOG_LOAD);
+        Globals.getWorker().post(getVideos);
     }
 
     private String currentDir(String path) {

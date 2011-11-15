@@ -18,6 +18,7 @@
 
 package org.mythdroid.activities;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -74,7 +75,7 @@ public class Recordings extends MDFragmentActivity {
 
             try {
                 recordings = Globals.getBackend().getRecordings();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 ErrUtil.postErr(ctx, Messages.getString("Recordings.0")); //$NON-NLS-1$
                 try {
                     dismissDialog(DIALOG_LOAD);
@@ -92,7 +93,7 @@ public class Recordings extends MDFragmentActivity {
                 int numrecs = recs.length;
                 ArrayList<Program> newList = new ArrayList<Program>(numrecs/10);
                 for (int i = 0; i < numrecs; i++)
-                    if (recs[i].Title.equals(filter))
+                    if (recs[i].Title.compareToIgnoreCase(filter) == 0)
                         newList.add(recs[i]);
                 recordings = newList;
             }
@@ -120,7 +121,7 @@ public class Recordings extends MDFragmentActivity {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.reclistframe, listFragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.commit();
+        ft.commitAllowingStateLoss();
     }
     
     @Override
@@ -221,7 +222,7 @@ public class Recordings extends MDFragmentActivity {
 
         switch (item.getItemId()) {
             case MENU_FRONTEND:
-                nextActivity=null;
+                nextActivity = null;
                 showDialog(FRONTEND_CHOOSER);
                 return true;
             case MENU_REFRESH:
@@ -252,6 +253,7 @@ public class Recordings extends MDFragmentActivity {
      * Empty the recordings list
      */
     public void empty() {
+        Globals.getWorker().removeCallbacks(getRecordings);
         if (recordings != null)
             recordings.clear();
         recordings = null;
@@ -271,7 +273,9 @@ public class Recordings extends MDFragmentActivity {
      * Remove a recording from the list
      */
     public void deleteRecording() {
+        if (index >= recordings.size()) return;
         recordings.remove(index);
+        index = Math.min(index, recordings.size() - 1);
         invalidate();
     }
     
@@ -315,7 +319,8 @@ public class Recordings extends MDFragmentActivity {
         listFragment = new RecListFragment();
         listFragment.setArguments(args);
         
-        fm.beginTransaction().replace(R.id.reclistframe, listFragment).commit();
+        fm.beginTransaction().replace(R.id.reclistframe, listFragment)
+            .commitAllowingStateLoss();
         fm.executePendingTransactions();
         
         if (hasRecordings())

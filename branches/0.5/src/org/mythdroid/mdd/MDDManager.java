@@ -26,6 +26,8 @@ import org.mythdroid.Globals;
 import org.mythdroid.Enums.RecType;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.Video;
+import org.mythdroid.resource.Messages;
+import org.mythdroid.util.ErrUtil;
 
 /** Manage a connection to MDD */
 public class MDDManager {
@@ -131,11 +133,13 @@ public class MDDManager {
                     (subdir == null ? "ROOT" : subdir)); //$NON-NLS-1$
 
         // Uncached SQL queries can take some time with lots of videos
-        cmgr.setTimeout(7500);
+        cmgr.setTimeout(ConnMgr.timeOut.EXTRALONG);
         
         String line = cmgr.readLine();
         while (line != null && !line.equals("VIDEOLIST DONE")) { //$NON-NLS-1$
-            videos.add(new Video(line));
+            try {
+                videos.add(new Video(line));
+            } catch (IllegalArgumentException e) { ErrUtil.logWarn(e); }
             line = cmgr.readLine();
         }
 
@@ -176,7 +180,7 @@ public class MDDManager {
      * Determine the RecType of a recording
      * @param addr String containing address of MDD
      * @param recid int representing RecID of recording
-     * @return - RecType
+     * @return RecType
      */
     public static RecType getRecType(String addr, int recid)
         throws IOException {
@@ -184,6 +188,40 @@ public class MDDManager {
         final RecType rt = RecType.get(Integer.parseInt(cmgr.readLine()));
         cmgr.disconnect();
         return rt;
+    }
+    
+    /**
+     * Get a cutlist for a recording
+     * @param addr String containing address of MDD
+     * @param prog Program to get cutlist for
+     * @return Array of cuts represented as 2 element arrays. 
+     * The first element is the start frame, the second is the end frame
+     */
+    public static int[][] getCutList(String addr, Program prog) 
+        throws IOException {
+        
+        final ConnMgr cmgr = sendMsg(
+            addr, "CUTLIST " + prog.ChanID + " " + //$NON-NLS-1$ //$NON-NLS-2$ 
+            prog.StartTime.getTime() / 1000 
+        ); 
+        
+        ArrayList<int[]> cuts = new ArrayList<int[]>(8);
+        String line = cmgr.readLine();
+        while (line != null && !line.equals("CUTLIST DONE")) { //$NON-NLS-1$
+            int[] cut = new int[2]; 
+            cut[0] = Integer.parseInt(
+                line.substring(0, line.indexOf('-')).trim()
+            );
+            cut[1] = Integer.parseInt(
+                line.substring(line.indexOf('-') + 1).trim()
+            );
+            cuts.add(cut);
+            line = cmgr.readLine();
+        }
+
+        cmgr.disconnect();
+        return cuts.toArray(new int[cuts.size()][2]);
+        
     }
 
     /**
@@ -291,7 +329,7 @@ public class MDDManager {
          */
         cmgr = new ConnMgr(addr, 16546, null, false);
         // Wait indefinitely for messages from MDD
-        cmgr.setTimeout(0);
+        cmgr.setIndefiniteReads();
         recvThread = new Thread(recvTask, "MDDListener"); //$NON-NLS-1$
         recvThread.start();
     }
@@ -309,7 +347,7 @@ public class MDDManager {
          */
         cmgr = new ConnMgr(addr, 16546, null, mux);
         // Wait indefinitely for messages from MDD
-        cmgr.setTimeout(0);
+        cmgr.setIndefiniteReads();
         recvThread = new Thread(recvTask, "MDDListener"); //$NON-NLS-1$
         recvThread.start();
     }
@@ -368,11 +406,14 @@ public class MDDManager {
         String resp = null;
         do {
             resp = cmgr.readLine();
-            if (resp.equals("UNKNOWN")) //$NON-NLS-1$
+            if (resp.equals("UNKNOWN")) { //$NON-NLS-1$
+                int idx = msg.indexOf(' ');
+                if (idx == -1) idx = msg.length();
                 throw new IOException(
-                    "MDD doesn't understand " + //$NON-NLS-1$
-                    msg.substring(0, msg.indexOf(' '))
+                    Messages.getString("MDDManager.0") + //$NON-NLS-1$
+                    msg.substring(0, idx)
                 );
+            }
         } while (!resp.equals("OK")); //$NON-NLS-1$
         
     }

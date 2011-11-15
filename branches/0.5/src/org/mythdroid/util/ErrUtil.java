@@ -19,15 +19,20 @@
 package org.mythdroid.util;
 
 import org.mythdroid.R;
+import org.mythdroid.activities.FrontendList;
 import org.mythdroid.resource.Messages;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /** Error reporting utility methods */
@@ -45,7 +50,7 @@ final public class ErrUtil {
             LogUtil.error(msg);
             msg = Messages.getString("ErrUtil.0"); //$NON-NLS-1$
         }
-        Toast.makeText(c, msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(c, msg, Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -54,7 +59,7 @@ final public class ErrUtil {
      * @param e message to display
      */
     static public void err(final Context c, final String e) {
-        Toast.makeText(c, e, Toast.LENGTH_SHORT).show();
+        Toast.makeText(c, e, Toast.LENGTH_LONG).show();
         Log.e("Error", e); //$NON-NLS-1$
     }
 
@@ -74,7 +79,7 @@ final public class ErrUtil {
                         LogUtil.error(msg);
                         msg = Messages.getString("ErrUtil.0"); //$NON-NLS-1$
                     }
-                    Toast.makeText(c, msg, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(c, msg, Toast.LENGTH_LONG).show();
                 }
             }
         );
@@ -90,11 +95,49 @@ final public class ErrUtil {
             new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(c, e, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(c, e, Toast.LENGTH_LONG).show();
                     Log.e("Error", e); //$NON-NLS-1$
                 }
             }
         );
+    }
+    
+    /**
+     * Send an error message to the device log
+     * @param e String containing error message
+     */
+    static public void logErr(final String e) {
+        LogUtil.error(e);
+    }
+    
+    /**
+     * Log an exception to the device log
+     * @param e Exception to log
+     */
+    static public void logErr(final Exception e) {
+        String msg = e.getMessage();
+        if (msg == null)
+            msg = e.getClass().getName();
+        LogUtil.error(msg);
+    }
+    
+    /**
+     * Send a warning message to the device log
+     * @param e String containing message
+     */
+    static public void logWarn(final String e) {
+        LogUtil.warn(e);
+    }
+    
+    /**
+     * Log an exception to the device log as a warning
+     * @param e Exception to log
+     */
+    static public void logWarn(final Exception e) {
+        String msg = e.getMessage();
+        if (msg == null)
+            msg = e.getClass().getName();
+        LogUtil.warn(msg);
     }
 
     /**
@@ -106,22 +149,52 @@ final public class ErrUtil {
     static public void errDialog(
         final Context c, final Dialog dialog, final int msgId
     ) {
-        ((AlertDialog)dialog).setMessage(
-            c.getResources().getString(msgId)
-        );
+        errDialog(c, dialog, c.getResources().getString(msgId));
+    }
+    
+    /**
+     * Put an error message and 'OK' button in a dialog
+     * @param c context
+     * @param dialog dialog to insert error message into
+     * @param msg String containing the error message
+     */
+    static public void errDialog(
+        final Context c, final Dialog dialog, final String msg
+    ) {
+        
+        AlertDialog ad = (AlertDialog)dialog;
+        View v = LayoutInflater.from(c).inflate(R.layout.error_dialog, null);
+        
+        ((TextView)v.findViewById(R.id.errMessage)).setText(msg);
 
-        ((AlertDialog)dialog).setButton(
-            AlertDialog.BUTTON_POSITIVE,
-            c.getResources().getString(R.string.ok),
-            new OnClickListener() {
+        ((Button)v.findViewById(R.id.errButton)).setOnClickListener(
+            new View.OnClickListener() {
                 @Override
-                public void onClick(
-                    DialogInterface dialog, int which
-                ) {
+                public void onClick(View v) {
                     dialog.dismiss();
                 }
             }
         );
+        
+        if (msg.equals(c.getResources().getString(R.string.no_fes))) {
+            
+            Button edit = ((Button)v.findViewById(R.id.editButton));
+            edit.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        c.startActivity(new Intent().setClass(c, FrontendList.class));
+                    }
+                }
+            );
+            edit.setVisibility(View.VISIBLE);
+        }
+        
+        ViewGroup vg = (ViewGroup)ad.findViewById(android.R.id.content);
+        vg.removeAllViews();
+        vg.addView(v);
+        
     }
 
 }

@@ -21,17 +21,36 @@ package org.mythdroid.frontend;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.mythdroid.Globals;
+import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
 
 /** Describes a location in the frontend */
 public class FrontendLocation {
 
+    /** True if the locations have been initialised, false otherwise */
+    public static boolean hasLocations = false;
+    /** A runnable that will populate the locations */
+    final public static Runnable getLocations = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                if (!hasLocations)
+                    populateLocations(Globals.getFrontend(Globals.appContext));
+            } catch (IOException e) { ErrUtil.logWarn(e); }
+        }
+    };
+    
+    private static Object locationsLock = new Object();
+    
     private static HashMap<String, String> locations = null;
-
+   
     @SuppressWarnings("all")
     public String  location  = null, niceLocation = null;
     @SuppressWarnings("all")
     public int     position, end;
+    @SuppressWarnings("all")
+    public float   fps;
     @SuppressWarnings("all")
     public float   rate;
     @SuppressWarnings("all")
@@ -65,7 +84,7 @@ public class FrontendLocation {
 
         location = loc;
 
-        if (locations == null && !populateLocations(feMgr))
+        if (!hasLocations && !populateLocations(feMgr))
             return;
 
         loc = loc.toLowerCase();
@@ -92,20 +111,34 @@ public class FrontendLocation {
 
     }
 
-    private Boolean populateLocations(FrontendManager feMgr) {
+    /**
+     * Retrieve and parse the list of valid frontend locations
+     * @param feMgr a FrontendManager to use
+     * @return true if successful, false otherwise
+     */
+    public static synchronized Boolean populateLocations(FrontendManager feMgr) {
 
         if (feMgr == null || !feMgr.isConnected())
             return false;
-
-        try {
-            locations = feMgr.getLocs();
-        } catch (IOException e) { return false; }
         
-        int l = addLocs.length;
+        synchronized(locationsLock) {
         
-        for (int i = 0; i < l; i += 2)
-            locations.put(addLocs[i], addLocs[i+1]);
+	        if (hasLocations)
+    	        return false;
+        
+            try {
+                locations = feMgr.getLocs();
+            } catch (IOException e) { return false; }
+        
+            int l = addLocs.length;
+        
+            for (int i = 0; i < l; i += 2)
+                locations.put(addLocs[i], addLocs[i+1]);
 
+            hasLocations = true;
+            
+        }
+        
         return true;
 
     }
@@ -126,6 +159,7 @@ public class FrontendLocation {
                     tok[5].substring(0, tok[5].lastIndexOf('x'))
                 );
             filename = tok[9];
+            fps = Float.parseFloat(tok[tok.length - 1]);
             if (tok[1].equals("livetv")) livetv = true; //$NON-NLS-1$
         }
         else if (tok[1].equals("video")) { //$NON-NLS-1$
@@ -137,6 +171,7 @@ public class FrontendLocation {
                     tok[3].substring(0, tok[3].lastIndexOf('x'))
                 );
             filename = "Video"; //$NON-NLS-1$
+            fps = Float.parseFloat(tok[tok.length - 1]);
         }
         else {
             rate = loc.contains("pause") ? 0 : -1; //$NON-NLS-1$

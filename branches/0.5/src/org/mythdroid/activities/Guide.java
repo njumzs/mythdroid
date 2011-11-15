@@ -18,6 +18,7 @@
 
 package org.mythdroid.activities;
 
+import java.net.SocketException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -485,10 +486,14 @@ public class Guide extends MDActivity {
                     ":16550" + url.getFile()  //$NON-NLS-1$
                 );
             
-            Xml.parse(url.openStream(), Xml.Encoding.UTF_8, handler);
+            try {
+                Xml.parse(url.openStream(), Xml.Encoding.UTF_8, handler);
+            } catch (SocketException e) {
+                ErrUtil.err(this, e);
+            }
 
         } catch (SAXException e1) {
-            ErrUtil.err(this, Messages.getString("Guide.13")); // Guide XML parse error //$NON-NLS-1$
+            ErrUtil.err(this, Messages.getString("Guide.13")); //$NON-NLS-1$
         } catch (Exception e1) {
             ErrUtil.err(this, e1);
         }
