@@ -5,34 +5,34 @@
     android:layout_height="wrap_content"
     android:padding="8sp">
 
-    <TextView android:id="@+id/enclist_encoder"
+    <TextView android:id="@+id/encoder"
      	android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="20sp"/>
 
-    <TextView android:id="@+id/enclist_state"
+    <TextView android:id="@+id/state"
     	android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/enclist_encoder"
+        android:layout_below="@id/encoder"
     	android:textStyle="italic"
         android:textSize="18sp"/>
         
-    <TextView android:id="@+id/enclist_program"
+    <TextView android:id="@+id/program"
        	android:layout_width="wrap_content"
        	android:layout_height="wrap_content"
-       	android:layout_below="@id/enclist_state"
+       	android:layout_below="@id/state"
        	android:paddingTop="2dp"
        	android:textSize="14sp"/>
         	
-    <TextView android:id="@+id/enclist_endTime"
+    <TextView android:id="@+id/endTime"
        	android:layout_width="wrap_content"
        	android:layout_height="wrap_content"
-       	android:layout_below="@id/enclist_program"
+       	android:layout_below="@id/program"
        	android:paddingTop="2dp"
        	android:textSize="14sp"/>
        	
-	<ProgressBar android:id="@+id/enclist_rec"
+	<ProgressBar android:id="@+id/progress"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_alignParentTop="true"

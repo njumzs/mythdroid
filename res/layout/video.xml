@@ -5,7 +5,7 @@
 	android:paddingTop="8dp"
 	android:paddingBottom="8dp">
   
-  	<ImageView android:id="@+id/videoPoster"
+  	<ImageView android:id="@+id/image"
     	android:layout_width="80dp"
     	android:layout_height="110dp"
     	android:layout_alignParentLeft="true"
@@ -16,10 +16,10 @@
   		android:paddingLeft="2dp"
   		android:paddingRight="2dp"/>
   		
-  	<TextView android:id="@+id/videoTitle"
+  	<TextView android:id="@+id/title"
   		android:layout_width="fill_parent"
   		android:layout_height="wrap_content"
-  		android:layout_toRightOf="@id/videoPoster"
+  		android:layout_toRightOf="@id/image"
   		android:layout_alignParentTop="true"
   		android:textColor="@color/light_grey_text"
   		android:gravity="center_vertical"
@@ -27,37 +27,33 @@
   		android:paddingTop="8dp"
   		android:layout_marginLeft="10dp"
   		android:textStyle="bold"
-  		android:text="title"
         android:textSize="16sp"/>
   		
-  	<TextView android:id="@+id/videoSubtitle"
+  	<TextView android:id="@+id/subtitle"
     	android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/videoTitle"
-        android:layout_alignLeft="@id/videoTitle"
+        android:layout_below="@id/title"
+        android:layout_alignLeft="@id/title"
         android:textColor="@color/light_grey_text"
         android:paddingBottom="2dp"
-    	android:text="subtitle"
         android:textSize="14sp"/>
         
-    <TextView android:id="@+id/videoDirector"
+    <TextView android:id="@+id/director"
        	android:layout_width="fill_parent"
        	android:layout_height="wrap_content"
-       	android:layout_below="@id/videoSubtitle"
-       	android:layout_alignLeft="@id/videoTitle"
+       	android:layout_below="@id/subtitle"
+       	android:layout_alignLeft="@id/title"
        	android:textColor="@color/light_grey_text"
        	android:paddingBottom="2dp"
-       	android:text="director"
        	android:textSize="12sp"/>
   		
- 	<TextView android:id="@+id/videoRating"
+ 	<TextView android:id="@+id/rating"
        	android:layout_width="fill_parent"
        	android:layout_height="wrap_content"
-       	android:layout_below="@id/videoDirector"
-       	android:layout_alignLeft="@id/videoTitle"
+       	android:layout_below="@id/director"
+       	android:layout_alignLeft="@id/title"
        	android:textColor="@color/light_grey_text"
        	android:paddingBottom="4dp"
-       	android:text="rating"
        	android:textSize="12sp"/>	
   
 </RelativeLayout>

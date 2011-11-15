@@ -1,5 +1,9 @@
 package org.mythdroid.views;
 
+import java.util.ArrayList;
+
+import org.mythdroid.data.Program.Commercial;
+
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.LinearGradient;
@@ -15,13 +19,13 @@ import android.os.Build;
  */
 public class CutListDrawable extends Drawable {
 
-    private int[][] cuts             = null;
-    private float fps                = 0;
-    private int end                  = 0;
-    private Rect rect                = null;
-    private Paint paint              = null;
-    private static float[] positions = new float[] { 0, 0.4f, 1 };
-    private static int[]   colors    =
+    private ArrayList<Commercial> cuts = null;
+    private float fps                  = 0;
+    private int end                    = 0;
+    private Rect rect                  = null;
+    private Paint paint                = null;
+    private static float[] positions   = new float[] { 0, 0.4f, 1 };
+    private static int[]   colors      =
         new int[] { 0xff604000, 0xff402000, 0xfff08000 };
     
     
@@ -29,7 +33,9 @@ public class CutListDrawable extends Drawable {
      * Create a new cut list drawable
      * @param cuts
      */
-    public CutListDrawable(int[][] cuts, float fps, int end, Rect rect) {
+    public CutListDrawable(
+    		ArrayList<Commercial> cuts, float fps, int end, Rect rect
+    ) {
         this.cuts = cuts;
         this.fps  = fps;
         this.end  = end;
@@ -56,9 +62,9 @@ public class CutListDrawable extends Drawable {
             )
         );
         
-        for (int i = 0; i < cuts.length; i++) {
-            float left  = rect.left + ((cuts[i][0] / fps) * rect.right) / end;
-            float right = rect.left + ((cuts[i][1] / fps) * rect.right) / end;
+        for (Commercial c : cuts) {
+            float left  = rect.left + ((c.start / fps) * rect.right) / end;
+            float right = rect.left + ((c.end / fps) * rect.right) / end;
             canvas.drawRect(left, top, right, bottom, paint);
         }
     }

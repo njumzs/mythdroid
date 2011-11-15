@@ -7,7 +7,7 @@
    	android:paddingRight="8dp">
    	
    	<ImageView
-		android:id="@+id/rec_thumb"
+		android:id="@+id/image"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
  		android:layout_alignParentRight="true"
@@ -17,62 +17,62 @@
 		android:paddingTop="8dp"/>
 		
     <TextView
-		android:id="@+id/rec_title"
+		android:id="@+id/title"
  		android:layout_width="fill_parent" 
  		android:layout_height="wrap_content"
- 		android:layout_toLeftOf="@id/rec_thumb"
+ 		android:layout_toLeftOf="@id/image"
  		android:paddingTop="8dp"
  		android:textSize="20sp"/>
  		
  	<TextView
-		android:id="@+id/rec_subtitle"
+		android:id="@+id/subtitle"
  		android:layout_width="fill_parent" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/rec_title"
+ 		android:layout_below="@id/title"
  		android:textSize="16sp"
  		android:textStyle="italic"/>
  		
 	<TextView	
-		android:id="@+id/rec_channel"
+		android:id="@+id/channel"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/rec_subtitle"
+ 		android:layout_below="@id/subtitle"
  		android:layout_alignParentLeft="true"
  		android:paddingTop="3dp"
  		android:textSize="16sp"/>
  		
 	<TextView	
-		android:id="@+id/rec_start"
+		android:id="@+id/start"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
-		android:layout_alignTop="@id/rec_channel"
- 		android:layout_toLeftOf="@id/rec_thumb"
+		android:layout_alignTop="@id/channel"
+ 		android:layout_toLeftOf="@id/image"
  		android:paddingRight="10dp"
  		android:paddingTop="3dp"
 		android:textSize="16sp"/>
 		
 	<TextView	
-		android:id="@+id/rec_category"
+		android:id="@+id/category"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
- 		android:layout_below="@id/rec_channel"
+ 		android:layout_below="@id/channel"
  		android:layout_alignParentLeft="true"
  		android:paddingTop="2dp"
  		android:paddingBottom="2dp"
  		android:textSize="15sp"/>
  		
 	<TextView	
-		android:id="@+id/rec_status"
+		android:id="@+id/status"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
-		android:layout_alignTop="@id/rec_category"
- 		android:layout_toLeftOf="@id/rec_thumb"
+		android:layout_alignTop="@id/category"
+ 		android:layout_toLeftOf="@id/image"
  		android:paddingRight="10dp"
  		android:paddingTop="2dp"
 		android:textSize="15sp"/>
 		
 	<LinearLayout
-		android:id="@+id/rec_buttons"
+		android:id="@+id/buttons"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
@@ -81,53 +81,53 @@
 		android:orientation="horizontal">
 		
 		<Button
- 			android:id="@+id/rec_play"
+ 			android:id="@+id/play"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
  			android:layout_marginRight="14dp"
  			android:minWidth="100dp"
  			android:visibility="gone"
-  			android:text="Play"/>
+  			android:text="@string/play"/>
   			
  		<Button
- 			android:id="@+id/rec_stop"
+ 			android:id="@+id/stop"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
  			android:minWidth="100dp"
  			android:layout_marginRight="14dp"
  			android:visibility="gone"
- 			android:text="Stop Rec"/>
+ 			android:text="@string/stopRec"/>
  			
  		<Button
- 			android:id="@+id/rec_edit"
+ 			android:id="@+id/edit"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
  			android:minWidth="100dp"
- 			android:text="Schedule"/>
+ 			android:text="@string/schedule"/>
  			
 		<Button
- 			android:id="@+id/rec_del"
+ 			android:id="@+id/del"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
  			android:minWidth="100dp"
  			android:layout_marginLeft="14dp"
  			android:visibility="gone"
- 			android:text="Delete"/>
+ 			android:text="@string/delete"/>
  			
  	</LinearLayout>
  	
  	<ScrollView 
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
-		android:layout_below="@id/rec_category"
-		android:layout_above="@id/rec_buttons"
+		android:layout_below="@id/category"
+		android:layout_above="@id/buttons"
 		android:layout_alignWithParentIfMissing="true"
 		android:paddingTop="6dp"
 		android:paddingBottom="4dp"
 		android:clipChildren="true">
 		
 		<TextView
-			android:id="@+id/rec_desc"
+			android:id="@+id/desc"
 			android:layout_width="wrap_content" 
  			android:layout_height="wrap_content"
  			android:paddingRight="4dp"

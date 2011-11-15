@@ -3,7 +3,7 @@
     package="org.mythdroid"
     android:versionCode="52" android:versionName="0.5.2">
       
-	<application android:icon="@drawable/logo" android:label="@string/app_name" android:name="MythDroid">
+	<application android:icon="@drawable/logo" android:label="@string/appName" android:name="MythDroid">
       	
       	<receiver android:name=".receivers.PhoneStateReceiver">
         	<intent-filter>
@@ -22,7 +22,7 @@
         	android:finishOnTaskLaunch="true"/>
       	
         <activity android:name=".activities.MythDroid" 
-        	android:label="@string/app_name"
+        	android:label="@string/appName"
         	android:configChanges="keyboardHidden|orientation">
           <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,7 +51,7 @@
         	android:configChanges="keyboardHidden|orientation"/>
         	
         <activity android:name=".activities.Prefs" 
-        	android:label="@string/app_name"/>
+        	android:label="@string/appName"/>
         	
         <activity android:name=".activities.FrontendList" 
         	android:label="Frontends"/>

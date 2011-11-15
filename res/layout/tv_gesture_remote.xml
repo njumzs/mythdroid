@@ -4,31 +4,31 @@
 	android:layout_height="fill_parent"
 	android:background="@drawable/metal">
 	
-	<ImageButton android:id="@+id/tv_back"
+	<ImageButton android:id="@+id/back"
 		style="@style/MDButton72"
 		android:layout_alignParentTop="true"
 		android:layout_alignParentLeft="true"
 		android:layout_marginTop="4dp"
 		android:src="@drawable/back"/>
 		
-	<SeekBar android:id="@+id/tv_progress"
+	<SeekBar android:id="@+id/progress"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
-    	android:layout_below="@id/tv_back"
+    	android:layout_below="@id/back"
     	android:layout_marginTop="8dp"
     	android:layout_marginLeft="8dp"
     	android:layout_marginRight="8dp"
     	android:gravity="center"
     	style="?android:attr/progressBarStyleHorizontal"/>
 		
-	<ImageButton android:id="@+id/tv_guide"
+	<ImageButton android:id="@+id/guide"
 		style="@style/MDButton72"
-		android:layout_below="@id/tv_progress"
+		android:layout_below="@id/progress"
 		android:layout_alignParentLeft="true"
 		android:layout_marginTop="8dp"
 		android:src="@drawable/cal"/>
 		
-	<Button android:id="@+id/tv_num"
+	<Button android:id="@+id/num"
 		style="@style/MDButton72"
 		android:layout_alignParentLeft="true"
 		android:layout_alignParentBottom="true"
@@ -39,38 +39,38 @@
     	android:textColor="#ff333333"
 		android:text="123"/>
 		
-	<ImageButton android:id="@+id/tv_vol_mute"
+	<ImageButton android:id="@+id/volMute"
 		style="@style/MDButton72"
-		android:layout_alignTop="@id/tv_num"
-		android:layout_toRightOf="@id/tv_num"
+		android:layout_alignTop="@id/num"
+		android:layout_toRightOf="@id/num"
 		android:layout_marginBottom="8dp"
 		android:src="@drawable/vol_mute"/>
 		
-	<ImageButton android:id="@+id/tv_skip"
+	<ImageButton android:id="@+id/skip"
 		style="@style/MDButton72"
-		android:layout_alignTop="@id/tv_num"
+		android:layout_alignTop="@id/num"
 		android:layout_alignParentRight="true"
 		android:layout_marginBottom="8dp"
 		android:src="@drawable/skip"/>
 				
-	<ImageButton android:id="@+id/tv_enter"
+	<ImageButton android:id="@+id/enter"
 		style="@style/MDButton72"
-		android:layout_alignTop="@id/tv_num"
-		android:layout_toLeftOf="@id/tv_skip"
+		android:layout_alignTop="@id/num"
+		android:layout_toLeftOf="@id/skip"
 		android:layout_marginBottom="8dp"
 		android:src="@drawable/enter"/>
 		
-	<ImageButton android:id="@+id/tv_info"
+	<ImageButton android:id="@+id/info"
 		style="@style/MDButton72"
-		android:layout_alignTop="@id/tv_guide"
+		android:layout_alignTop="@id/guide"
 		android:layout_alignParentRight="true"
 		android:src="@drawable/info"/>
 		
-	<TextView android:id="@+id/tv_title"
+	<TextView android:id="@+id/title"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     	android:layout_alignParentTop="true"
-    	android:layout_toRightOf="@id/tv_back"
+    	android:layout_toRightOf="@id/back"
     	android:layout_marginTop="8dp"
     	android:layout_marginLeft="4dp"
     	android:layout_marginRight="54dp"
@@ -79,10 +79,10 @@
     	android:textStyle="bold"
     	android:textColor="@color/light_grey_text"/>
     	
-	<ImageView android:id="@+id/tv_gesture"
+	<ImageView android:id="@+id/gesture"
 		android:layout_width="200dp"
 		android:layout_height="fill_parent"
-		android:layout_below="@id/tv_progress"
+		android:layout_below="@id/progress"
 		android:layout_margin="16dp"
 		android:scaleType="fitCenter"
 		android:layout_centerHorizontal="true"

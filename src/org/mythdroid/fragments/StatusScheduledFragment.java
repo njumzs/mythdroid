@@ -74,7 +74,7 @@ public class StatusScheduledFragment extends ListFragment {
         }
         
         ((TextView)view.findViewById(R.id.emptyMsg))
-            .setText(R.string.no_scheduled);
+            .setText(R.string.noScheduled);
        
         setListAdapter(
             new ProgramAdapter(

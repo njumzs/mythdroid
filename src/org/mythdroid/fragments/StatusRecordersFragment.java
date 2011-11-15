@@ -24,7 +24,6 @@ import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.Program;
-import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.activities.RecordingDetail;
 import org.mythdroid.activities.Status;
 import org.mythdroid.resource.Messages;
@@ -53,14 +52,11 @@ import android.widget.TextView;
 public class StatusRecordersFragment extends ListFragment {
 
     final private static int REFRESH_NEEDED = Activity.RESULT_FIRST_USER;
-    final private static int DIALOG_LOAD    = 0;
-
-    private MDFragmentActivity activity = null;
-
-    private Document doc = null;
-    private ArrayList<Encoder> encoders = new ArrayList<Encoder>();
-
-    final private Handler handler = new Handler();
+    final private Handler handler           = new Handler();
+    
+    private Status activity                 = null;
+    private Document doc                    = null;
+    private ArrayList<Encoder> encoders     = new ArrayList<Encoder>();
 
     final private Runnable refreshEncoders = new Runnable() {
         @Override
@@ -81,9 +77,7 @@ public class StatusRecordersFragment extends ListFragment {
             for (int i = 0; i < encoderItems.getLength(); i++)
                 encoders.add(new Encoder(encoderItems.item(i)));
 
-            try {
-                activity.dismissDialog(DIALOG_LOAD);
-            } catch (IllegalArgumentException e) {}
+            activity.dismissLoadingDialog();
           
             setListAdapter(
                 new EncoderAdapter(
@@ -99,11 +93,9 @@ public class StatusRecordersFragment extends ListFragment {
         public void run() {
             
             if (!Status.getStatus(activity) && Status.statusDoc == null) {
-                try {
-                    activity.dismissDialog(DIALOG_LOAD);
-                } catch (IllegalArgumentException e) {}
+                activity.dismissLoadingDialog();
                 ErrUtil.postErr(
-                    activity, Messages.getString("StatusRecorders.3")  //$NON-NLS-1$
+                    activity, Messages.getString("StatusRecorders.3") //$NON-NLS-1$
                 );
                 activity.finish();
                 return;
@@ -190,14 +182,11 @@ public class StatusRecordersFragment extends ListFragment {
                     R.layout.encoder_list_item, null
                 );
                 vHolder = new ViewHolder();
-                vHolder.encoder =
-                    (TextView)old.findViewById(R.id.enclist_encoder);
-                vHolder.state = (TextView)old.findViewById(R.id.enclist_state);
-                vHolder.program =
-                    (TextView)old.findViewById(R.id.enclist_program);
-                vHolder.endTime =
-                    (TextView)old.findViewById(R.id.enclist_endTime);
-                vHolder.rec = (ProgressBar)old.findViewById(R.id.enclist_rec);
+                vHolder.encoder = (TextView)old.findViewById(R.id.encoder);
+                vHolder.state   = (TextView)old.findViewById(R.id.state);
+                vHolder.program = (TextView)old.findViewById(R.id.program);
+                vHolder.endTime = (TextView)old.findViewById(R.id.endTime);
+                vHolder.rec = (ProgressBar)old.findViewById(R.id.progress);
                 old.setTag(vHolder);
             }
             else
@@ -243,11 +232,11 @@ public class StatusRecordersFragment extends ListFragment {
         LayoutInflater inflater, ViewGroup container, Bundle icicle
     ) {
         if (container == null) return null;
-        activity = (MDFragmentActivity)getActivity();
+        activity  = (Status)getActivity();
         View view = inflater.inflate(R.layout.status_recorders, null, false);
         ((TextView)view.findViewById(R.id.emptyMsg))
-            .setText(R.string.no_recorders);
-        if (((Status)activity).embed)
+            .setText(R.string.noEncoders);
+        if (activity.embed)
             handler.post(refreshEncoders);
         else
             refresh();
@@ -288,7 +277,7 @@ public class StatusRecordersFragment extends ListFragment {
 
     private void refresh() {
         Globals.getWorker().removeCallbacks(getStatusTask);
-        activity.showDialog(DIALOG_LOAD);
+        activity.showLoadingDialog();
         Globals.getWorker().post(getStatusTask);
     }
 

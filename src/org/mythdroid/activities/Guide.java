@@ -82,10 +82,10 @@ public class Guide extends MDActivity {
      * Change numHours to configure how many hours are displayed at a time 
      * This value is doubled for devices with one screen dimension > 1000 pixels 
      */
-    private static int numHours = 2, numTimes;
-    final private static int colMins = 5, hdrSpan = 6;
+    private static int       numHours = 2, numTimes;
+    final private static int colMins  = 5, hdrSpan = 6;
 
-    private static Date now = null, later = null;
+    private static Date      now = null,   later = null;
 
     /** ArrayList of channel objects, capacity ensured during XML parsing */
     final private ArrayList<Channel> channels = new ArrayList<Channel>();
@@ -93,26 +93,25 @@ public class Guide extends MDActivity {
     final private SimpleDateFormat
         date = new SimpleDateFormat("d MMM yy"), //$NON-NLS-1$
         time = new SimpleDateFormat("HH:mm"); //$NON-NLS-1$
-
-    final private Handler handler   = new Handler();
-
-    private long[]   times    = null;
-    private String[] hdrTimes = null;
-
+    
     final private LayoutParams
-        rowLayout     = new LayoutParams(), chanLayout    = new LayoutParams(),
-        hdrDateLayout = new LayoutParams(), hdrTimeLayout = new LayoutParams(),
-        spacerLayout  = new LayoutParams();
+    	rowLayout     = new LayoutParams(), chanLayout    = new LayoutParams(),
+    	hdrDateLayout = new LayoutParams(), hdrTimeLayout = new LayoutParams(),
+    	spacerLayout  = new LayoutParams();
 
-    private Drawable
-        recordedIcon = null, willRecordIcon = null, failedIcon = null,
-        conflictIcon = null, otherIcon = null;
+    final private Handler handler = new Handler();
 
-    private String      hdrDate = null;
-    private TableLayout tbl     = null;
-
+    private long[]      times     = null;
+    private String[]    hdrTimes  = null;
+    private String      hdrDate   = null;
+    private TableLayout tbl       = null;
     /** Scale factor for pixel values for different display densities */
-    private float       scale   = 1;
+    private float       scale     = 1;
+    
+    private Drawable
+    	recordedIcon = null, willRecordIcon = null, failedIcon = null,
+    	conflictIcon = null, otherIcon = null;
+
     /**
     * Tweak colWidth to alter the visible width of the columns
     * Tweak rowHeight to alter the visible height of rows
@@ -130,9 +129,7 @@ public class Guide extends MDActivity {
                     @Override
                     public void run() {
 
-                        try {
-                            dismissDialog(DIALOG_LOAD);
-                        } catch (IllegalArgumentException e) {}
+                        dismissLoadingDialog();
 
                         tbl.addView(getHeader());
                         // this is necessary to get proper layout
@@ -254,7 +251,7 @@ public class Guide extends MDActivity {
         rowHeight = (int)(60  * scale + 0.5f);
         chanWidth = (int)(100 * scale + 0.5f);
 
-        tbl = (TableLayout)findViewById(R.id.guide_table);
+        tbl = (TableLayout)findViewById(R.id.table);
 
         rowLayout.topMargin = rowLayout.bottomMargin = chanLayout.topMargin =
             chanLayout.bottomMargin = chanLayout.leftMargin =
@@ -297,9 +294,9 @@ public class Guide extends MDActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_DATE, Menu.NONE, R.string.ch_start_date)
+        menu.add(Menu.NONE, MENU_DATE, Menu.NONE, R.string.chStartDate)
             .setIcon(drawable.ic_menu_today);
-        menu.add(Menu.NONE, MENU_TIME, Menu.NONE, R.string.ch_start_time)
+        menu.add(Menu.NONE, MENU_TIME, Menu.NONE, R.string.chStartTime)
             .setIcon(drawable.ic_menu_recent_history);
         return true;
     }
