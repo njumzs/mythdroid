@@ -2,43 +2,43 @@
 <resources>
     <string name="appName">MythDroid</string>
     <string name="settings">Einstellungen</string>
-    <string name="setCurFe">Setze Current Frontend</string>
+    <string name="setCurFe">Setze Derzeitiges Frontend</string>
     <string name="setDefFe">Setze standard frontend</string>
-    <string name="curFe">Current frontend: </string>
-    <string name="curSetTo">Currently set to: </string>
+    <string name="curFe">Derzeitiges Frontend: </string>
+    <string name="curSetTo">Derzeitiger Wert: </string>
     <string name="noBe">Keine Backends gefunden</string>
-    <string name="noBeDetail">Einen manuell in den Einstellungen konfigurieren?</string>
-    <string name="editFes">Edit frontends</string>
+    <string name="noBeDetail">Manuell in den Einstellungen konfigurieren?</string>
+    <string name="editFes">Bearbeite Frontends</string>
     <string name="addFe">Ein Frontend hinzufügen</string>
     <string name="clickAddFe">Hier klicken um ein neues Frontend hinzufügen</string>
     <string name="name">Name:</string>
-    <string name="addr">Address:</string>
-    <string name="macAddr">MAC Address:</string>
+    <string name="addr">Addresse:</string>
+    <string name="macAddr">MAC Addresse:</string>
     <string name="noFes">Kein Frontend eingestellt!</string>
     <string name="chFe">Wähle ein Frontend</string>
     <string name="noEncoders">Keine Encoder</string>
     <string name="noScheduled">Keine geplanten Aufnahmen</string>
-    <string name="noJobs">Keine Jobs</string>
-    <string name="recGroup">Recording group:</string>
-    <string name="storGroup">Storage group:</string>
-    <string name="matchDups">Match duplicates using:</string>
-    <string name="lookDups">Look for duplicates in:</string>
-    <string name="epiFilter">Episode filter:</string>
-    <string name="recType">Recording type:</string>
-    <string name="recPrio">Recording priority:</string>
-    <string name="schedOpt">Scheduling Options</string>
-    <string name="groupOpt">Group Options</string>
-    <string name="storage">Storage</string>
-    <string name="load">Load</string>
-    <string name="guideData">Guide Data</string>
-    <string name="scheduled">Scheduled</string>
-    <string name="encoders">Encoders</string>
-    <string name="jobs">Jobs</string>
-    <string name="plot">Plot:</string>
+    <string name="noJobs">Keine Aufgaben</string>
+    <string name="recGroup">Aufnahmegruppe:</string>
+    <string name="storGroup">Speichergruppe:</string>
+    <string name="matchDups">Duplikate finden mit:</string>
+    <string name="lookDups">Duplikate finden:</string>
+    <string name="epiFilter">Episodenfilter:</string>
+    <string name="recType">Aufnahmetyp:</string>
+    <string name="recPrio">Aufnahmepriorität:</string>
+    <string name="schedOpt">Steuerungsoptionen</string>
+    <string name="groupOpt">Gruppeneinstellungen</string>
+    <string name="storage">Speicher</string>
+    <string name="load">Lade</string>
+    <string name="guideData">Programmdaten</string>
+    <string name="scheduled">Vorgemerkt</string>
+    <string name="encoders">Encoder</string>
+    <string name="jobs">Aufgaben</string>
+    <string name="plot">Handlung:</string>
     <string name="videos">Videos</string>
-    <string name="play">Play</string>
+    <string name="play">Wiedergabe</string>
     <string name="stopRec">Stop Rec</string> <!-- needs to be short to fit in a button -->
-    <string name="schedule">Schedule</string>   
+    <string name="schedule">Aufnehmen</string>
     <string name="ok">OK</string>
     <string name="error">Fehler</string>
     <string name="yes">Ja</string>
@@ -56,32 +56,32 @@
     <string name="plEdit">Wiedergabeliste Editor</string>
     <string name="osdMenu">OSD Menü</string>
     <string name="leaveRemote">Lasse Fernbedienung</string>
-    <string name="haltPlayback">Halt playback?</string>
+    <string name="haltPlayback">Wiedergabe beenden?</string>
     <string name="dispGuide">Zeige Fernsehprogramm</string>
     <string name="remote">Fernbedienung</string>
-    <string name="btnIface">Button Interface</string>
-    <string name="gestIface">Gesten Interface</string>
-    <string name="delRec">Lüsche Aufnahme</string>
+    <string name="btnIface">Fernbedienung mit Knöpfen</string>
+    <string name="gestIface">Fernbediehnung mit Gesten</string>
+    <string name="delRec">Lösche Aufnahme</string>
     <string name="stopRecording">Stoppe Aufnahme</string>
     <string name="sure">Sind Sie sicher?</string>
     <string name="filterRec">Filtere Aufnahmen</string>
-    <string name="noRecs">No recordings!</string>
+    <string name="noRecs">Keine Aufnahmen!</string>
     <string name="refresh">Aktualisieren</string>
     <string name="filter">Filter</string>
     <string name="resetFilter">Filter zurücksetzen</string>
     <string name="wakeFe">Frontend Aufwecken</string>
-    <string name="mddCmd">Befehl auf MDD ausfÃ¼hren</string>
+    <string name="mddCmd">Befehl auf MDD ausführen</string>
     <string name="mddCmds">MDD Befehle</string>
     <string name="noMddCmds">Keine MDD Befehle definiert</string>
-    <string name="streamQuality">Select stream quality</string>
-    <string name="crash_notif_ticker_text">MythDroid has crashed, please send a report...</string>
-    <string name="crash_notif_title">MythDroid has crashed...</string>
-    <string name="crash_notif_text">Please click here to help fix the issue.</string>
-    <string name="crash_dialog_title">MythDroid has crashed</string>
-    <string name="crash_dialog_text">An unexpected error occurred forcing the
-        application to stop. Please help us fix this by sending us error data,
-        all you have to do is click \'OK\'.</string>
-    <string name="mcrash_dialog_text">An unexpected error occurred. You were running
-	an unofficial copy of MythDroid with unknown modifications. Find the original,
-	open source project at http://mythdroid.googlecode.com</string>
+    <string name="streamQuality">Wähle Übertragungsqualität</string>
+    <string name="crash_notif_ticker_text">MythDroid ist abgestürzt, bitte Bericht einsenden...</string>
+    <string name="crash_notif_title">MythDroid ist abgestürzt...</string>
+    <string name="crash_notif_text">Bitte hier drücken und beim Beheben des Fehlers helfen.</string>
+    <string name="crash_dialog_title">MythDroid ist abgestürzt</string>
+    <string name="crash_dialog_text">Ein unerwarteter Fehler ist aufgetreten.
+	Bitte helfen Sie uns, den Fehler zu finden, indem Sie einen Bericht einsenden.
+	Drücken Sie dazu einfach \'OK\'.</string>
+    <string name="mcrash_dialog_text">Ein unerwarteter Fehler ist aufgetreten.
+	Sie verwenden eine inoffizielle Version von Mythdroid.
+	Die offizielle Version des quelloffenen Programms erhalten sie kostenlos auf http://mythdroid.googlecode.com</string>
 </resources>
