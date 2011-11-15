@@ -86,7 +86,7 @@ sub install_init {
     if (-e '/usr/sbin/service' && -d "$confdir/init") {
         print "Installing upstart script\n";
         copy('init/upstart', $uinit);
-        $self->do_system('service mdd ' . $running ? 'restart' : 'start');
+        $self->do_system('service mdd ' . ($running ? 'restart' : 'start'));
         return;
     }
     
@@ -114,7 +114,7 @@ sub install_init {
             map { symlink $init, "$confdir/rc$_.d/K01mdd" } (qw(0 1 6));
             map { symlink $init, "$confdir/rc$_.d/S98mdd" } (qw(2 3 4 5));
         }
-        $self->do_system($init . ' ' . $running ? 'restart' : 'start');
+        $self->do_system($init . ' ' . ($running ? 'restart' : 'start'));
         return;
     }
 

@@ -32,11 +32,15 @@ import org.mythdroid.util.ErrUtil;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * Displays a list of recordings
@@ -63,7 +67,12 @@ public class RecListFragment extends ListFragment
         lv.setOnItemLongClickListener(this);
         lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         
-        setEmptyText(Messages.getString("RecListFragment.0")); //$NON-NLS-1$
+        TextView emptyView = new TextView(activity);
+        emptyView.setText(Messages.getString("RecListFragment.0")); //$NON-NLS-1$
+        emptyView.setTextSize(20);
+        emptyView.setGravity(Gravity.CENTER);
+        ((ViewGroup)lv.getParent()).addView(emptyView);
+        lv.setEmptyView(emptyView);
         
         View detailsFrame = getActivity().findViewById(R.id.recdetails);
         dualPane = detailsFrame != null && 
@@ -95,7 +104,7 @@ public class RecListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView list, View v, int pos, long id) {
         Globals.curProg = (Program)list.getItemAtPosition(pos);
-        activity.index = pos;
+        activity.index  = pos;
         showDetails();
     }
 
@@ -104,7 +113,7 @@ public class RecListFragment extends ListFragment
         AdapterView<?> adapter, View item, int pos, long itemid
     ) {
         Globals.curProg = (Program)adapter.getItemAtPosition(pos);
-        activity.index = pos;
+        activity.index  = pos;
         activity.nextActivity = TVRemote.class;
         activity.showDialog(Recordings.FRONTEND_CHOOSER);
         return true;
@@ -115,6 +124,7 @@ public class RecListFragment extends ListFragment
      * @param recordings ArrayList of Programs
      */
     public void setAdapter(ArrayList<Program> recordings) {
+        
         if (recordings.isEmpty()) {
             setListAdapter(null);
             return;
@@ -126,26 +136,35 @@ public class RecListFragment extends ListFragment
                 recordings
             )
         );
+        
         updateSelection();
+        
     }
     
     /**
      * Update which recording is selected
      */
     public void updateSelection() {
-        if (activity.index > lv.getCount() - 1)
-            activity.index = lv.getCount() - 1;
-        Globals.curProg = (Program)lv.getItemAtPosition(activity.index);
-        lv.setItemChecked(activity.index, true);
-        lv.setSelection(activity.index);
+        
+        activity.index = Math.min(activity.index, lv.getCount() - 1);
+        int idx        = activity.index;
+        
+        if ((Globals.curProg = (Program)lv.getItemAtPosition(idx)) == null)
+            return;
+        
+        lv.setItemChecked(idx, true);
+        lv.setSelection(idx);
         if (dualPane || detailsFragClass != null) 
             showDetails();
+        
     }
     
     private void showDetails() {
         
-        Fragment rdf = null;
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment rdf           = null;
+        FragmentManager fm     = getFragmentManager();
+        if (fm == null) return;
+        FragmentTransaction ft = fm.beginTransaction();
         
         rdf = RecDetailFragment.newInstance(false, false);
         
@@ -157,7 +176,7 @@ public class RecListFragment extends ListFragment
         }
         
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.commit();
+        ft.commitAllowingStateLoss();
         
         if (detailsFragClass == null) return;
         
@@ -181,7 +200,7 @@ public class RecListFragment extends ListFragment
         ft.replace(dualPane ? R.id.recdetails : R.id.reclistframe, rdf);
         ft.addToBackStack(null);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.commit();
+        ft.commitAllowingStateLoss();
         detailsFragClass = null;
         
     }

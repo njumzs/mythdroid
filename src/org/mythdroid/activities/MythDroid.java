@@ -25,7 +25,7 @@ import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.frontend.FrontendDB;
-import org.mythdroid.frontend.FrontendManager;
+import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.frontend.WakeOnLan;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.receivers.ConnectivityReceiver;
@@ -119,6 +119,9 @@ public class MythDroid extends MDListActivity implements
         );
 
         getPreferences();
+        
+        // Try to grab locations from the frontend in the background
+        Globals.getWorker().post(FrontendLocation.getLocations);
 
         crecv = new ConnectivityReceiver(Globals.appContext);
 
@@ -139,19 +142,16 @@ public class MythDroid extends MDListActivity implements
         getListView().setOnItemLongClickListener(this);
 
         try {
-            if (Globals.getBackend() == null) {
-                ((TextView)findViewById(R.id.emptyMsg))
-                    .setText(R.string.no_be);
-                ((TextView)findViewById(R.id.emptyDetail))
-                    .setText(R.string.no_be_detail);
-                setListAdapter(null);
-            }
-            else
-                setListAdapter(menuAdapter);
+            Globals.getBackend();
         } catch (IOException e) {
-            ErrUtil.err(this, e);
+            ((TextView)findViewById(R.id.emptyMsg))
+                .setText(R.string.no_be);
+            ((TextView)findViewById(R.id.emptyDetail))
+                .setText(R.string.no_be_detail);
+            setListAdapter(null);
+            return;
         }
-
+        setListAdapter(menuAdapter);
     }
 
     @Override
@@ -434,6 +434,7 @@ public class MythDroid extends MDListActivity implements
 
         if (ca.getCount() < 1) {
             ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
+            removeDialog(WAKE_FRONTEND);
             return;
         }
 
@@ -475,18 +476,15 @@ public class MythDroid extends MDListActivity implements
         ArrayList<String> cmds = null;
 
         try {
-            FrontendManager femgr = Globals.getFrontend(this);
-            if (femgr == null) {
-                ErrUtil.errDialog(ctx, dialog, R.string.no_fes);
-                return;
-            }
-            cmds = MDDManager.getCommands(femgr.addr);
+            cmds = MDDManager.getCommands(Globals.getFrontend(this).addr);
         } catch(IOException e) {
-            ErrUtil.err(ctx, e);
+            ErrUtil.errDialog(ctx, dialog, e.getMessage());
+            return;
         }
 
         if (cmds == null || cmds.isEmpty()) {
             ErrUtil.errDialog(ctx, dialog, R.string.no_mddCmds);
+            removeDialog(MDD_COMMAND);
             return;
         }
 

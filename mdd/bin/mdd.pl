@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end comment
 =cut
 
-$VERSION = 0.5.0;
+$VERSION = 0.5.2;
 
 use strict;
 use warnings;
@@ -35,6 +35,7 @@ use MDD::LCD;
 use MDD::MythDB;
 use MDD::Log;
 use MDD::CMux;
+use MDD::HTTPServer;
 eval "use MDD::XOSD";
 
 sub usage();
@@ -52,6 +53,7 @@ sub streamFile($);
 sub stopStreaming();
 sub getStorGroups();
 sub getRecGroups();
+sub getCutList($$);
 sub killKids();
 
 my $lcdServerPort = 6545;
@@ -138,6 +140,10 @@ my @clientMsgs = (
         regex => qr/^NEWREC (\d+) (\d+) (.*)$/,
         proc  => sub { sendMsg($mythdb->newRec($1, $2, $3)) }
     },
+    {
+        regex => qr/^CUTLIST (\d+) (.*)$/,
+        proc  => sub { getCutList($1, $2) }
+    },
 ); 
 
 # Get rid of old log files in case root owns them
@@ -193,6 +199,8 @@ if (exists $config{cmux}) {
 }
 else { MDD::CMux->new($log) }
 
+my $httpServer = MDD::HTTPServer->new($log);
+
 # Forking is done.. install our signal handlers
 
 # Kill off the real mythlcdserver when we are killed
@@ -202,7 +210,7 @@ $SIG{HUP} = \&readConfig;
 $SIG{CHLD} = 'IGNORE';
 sub END { killKids() }
 
-$mythdb = MDD::MythDB->new($log);;
+$mythdb = MDD::MythDB->new($log, $httpServer);;
 
 $log->dbg("Listen on port $listenPort/tcp");
 
@@ -476,16 +484,15 @@ sub videoListSG($) {
     my $videos = $mythdb->getVideos("^$subdir");
 
     foreach my $vid (@$videos) {
-        my $file = ($vid =~ /\|\|([^\|]+)$/)[0];
+        my $file = (split /\|\|/, $vid)[9];
         map { $file =~ s/^$_\/?// } @{ $storageGroups{Videos} };
-        $file =~ s/^$subdir// unless $subdir eq '.';
-        if ($file =~ /(.+?)\//) {
+        next if ($file =~ /^\//);
+        $file =~ s/^$subdir\/?// unless $subdir eq '.';
+        if ($file =~ /^(.+?)\//) {
             push @dirs, $1 unless grep { $1 eq $_ } @dirs;
             next;
         }
-        else {
-            push @vids, $vid;
-        }
+        push @vids, $vid;
     }
 
     @dirs = sort @dirs;
@@ -506,7 +513,10 @@ sub videoList($) {
     %storageGroups = %{ $mythdb->getStorGroups() } 
         unless (scalar %storageGroups);
 
-    return videoListSG($subdir) if (exists $storageGroups{Videos});
+    if (exists $storageGroups{Videos}) {
+        $log->dbg("Videos SG exists");
+        return videoListSG($subdir);
+    }
 
     $videoDir = $mythdb->setting('VideoStartupDir', hostname)
         unless $videoDir;
@@ -596,12 +606,15 @@ sub streamFile($) {
 
     $log->dbg("Will use $cpus threads for transcode");
 
-    if ($file =~ /^myth:\/\//) {
+    if ($file =~ s/^myth:\/\///) {
 
         %storageGroups = %{ $mythdb->getStorGroups() } 
             unless (scalar %storageGroups);
     
-        $file =~ s/.*\//\//;
+        if ($file =~ /^(.+)@/) {
+            $sg = $1;
+        }
+        $file =~ s/.*?\///;
         my $filename = $file;
 
         if (exists $storageGroups{$sg}) {
@@ -618,10 +631,9 @@ sub streamFile($) {
         }
 
     }
-    else {
-        $file =~ s/ /\\ /g;
-        $file =~ s/'/\\'/g;
-    }
+
+    $file =~ s/ /\\ /g;
+    $file =~ s/'/\\'/g;
 
     $log->dbg("Streaming - resolved path is $file");
     
@@ -691,6 +703,11 @@ sub getRecGroups() {
     map { sendMsg($_) } (@{$mythdb->getRecGroups()});
     sendMsg("RECGROUPS DONE");
 
+}
+
+sub getCutList($$) {
+    map { sendMsg($_) } (@{$mythdb->getCutList(shift, shift)});
+    sendMsg("CUTLIST DONE");
 }
 
 # Kill the original mythlcdserver

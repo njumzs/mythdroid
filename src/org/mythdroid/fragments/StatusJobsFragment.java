@@ -256,8 +256,10 @@ public class StatusJobsFragment extends ListFragment {
         ((TextView)view.findViewById(R.id.emptyMsg))
             .setText(R.string.no_jobs);
        
-        if (Status.statusDoc == null && !Status.getStatus(activity))
+        if (Status.statusDoc == null && !Status.getStatus(activity)) {
             activity.finish();
+            return view;
+        }
 
         Document doc = Status.statusDoc;
         NodeList jobNodes = doc.getElementsByTagName("Job"); //$NON-NLS-1$

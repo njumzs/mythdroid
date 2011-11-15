@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import org.mythdroid.ConnMgr;
 import org.mythdroid.Globals;
-import org.mythdroid.resource.Messages;
 
 /**
  * Manage a connection to VLC's remote control interface
@@ -39,14 +38,7 @@ public class VLCRemote {
      * @param host - hostname or IP address of host running VLC
      */
     public VLCRemote(String host) throws IOException {
-
         cmgr = ConnMgr.connect(host, port, null, Globals.muxConns);
-
-        if (cmgr == null)
-            throw new 
-                IOException(
-                    Messages.getString("VLCRemote.0") + host + ":" + port //$NON-NLS-1$ //$NON-NLS-2$
-                );
     }
     
     /**

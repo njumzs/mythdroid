@@ -23,7 +23,7 @@ import org.mythdroid.fragments.RecDetailFragment;
 import android.os.Bundle;
 
 /**
- * MDFragementActivity that houses a RecDetailFragment 
+ * MDFragmentActivity that houses a RecDetailFragment 
  */
 public class RecordingDetail extends MDFragmentActivity {
     
@@ -34,7 +34,7 @@ public class RecordingDetail extends MDFragmentActivity {
         RecDetailFragment rdf = new RecDetailFragment();
         rdf.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction()
-            .replace(android.R.id.content, rdf).commit();
+            .replace(android.R.id.content, rdf).commitAllowingStateLoss();
     }
     
 }

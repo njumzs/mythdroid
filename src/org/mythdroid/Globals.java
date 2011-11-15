@@ -91,7 +91,7 @@ public class Globals {
 
         // Are we already connected to the desired frontend?
         if (feMgr != null && feMgr.isConnected()) {
-            if (name.equals(feMgr.name))
+            if (name != null && name.equals(feMgr.name))
                 return feMgr;
             // Wrong frontend, disconnect
             feMgr.disconnect();
@@ -100,8 +100,7 @@ public class Globals {
 
         // If unspecified, connect to the first defined frontend
         if (name == null) {
-            name = FrontendDB.getFirstFrontendName(ctx);
-            if (name == null)
+            if ((name = FrontendDB.getFirstFrontendName(ctx)) == null)
                 throw new IOException(Messages.getString("MythDroid.26")); //$NON-NLS-1$
             feMgr = 
                 new FrontendManager(name, FrontendDB.getFirstFrontendAddr(ctx));
@@ -115,11 +114,8 @@ public class Globals {
             feMgr = new FrontendManager(
                 name, FrontendDB.getFrontendAddr(ctx, name)
             );
-        
-        // Set the current frontend to the newly connected frontend
-        if (feMgr != null)
-            currentFrontend = feMgr.name;
 
+        currentFrontend = feMgr.name;
         return feMgr;
 
     }
@@ -129,9 +125,8 @@ public class Globals {
      *
      * Connect to a specific backend if so configured or locate one otherwise
      * returns quickly if a backend is already connected
-     * @return A BackendManager connected to a backend or null if there's a
-     * problem
-     * @throws IOException
+     * @return A BackendManager connected to a backend
+     * @throws IOException if we can't find or connect to a backend
      */
     public static BackendManager getBackend() throws IOException {
 

@@ -28,7 +28,6 @@ import org.mythdroid.activities.Guide;
 import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.activities.Recordings;
 import org.mythdroid.activities.VideoPlayer;
-import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
@@ -58,12 +57,12 @@ import android.widget.TextView;
 public class RecDetailFragment extends Fragment {
     
     private MDFragmentActivity activity = null;
-    private BackendManager beMgr        = null;
     private Program prog                = null;
     private Button stop                 = null;
     private View view                   = null;
     private int containerId;
-    private boolean livetv = false, guide = false, embedded = false;
+    private boolean livetv   = false, guide    = false,
+                    embedded = false, dualPane = false;
     
     private OnClickListener no = new OnClickListener() {
         @Override
@@ -103,6 +102,9 @@ public class RecDetailFragment extends Fragment {
             guide  = args.getBoolean(Extras.GUIDE.toString());
         }
         
+        View detailsFrame = getActivity().findViewById(R.id.recdetails);
+        dualPane = detailsFrame != null && 
+                   detailsFrame.getVisibility() == View.VISIBLE;
         embedded = 
             activity.getClass().getName().endsWith("Recordings"); //$NON-NLS-1$
         if (!embedded)
@@ -123,13 +125,9 @@ public class RecDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        try {
-            beMgr = Globals.getBackend();
-        } catch (Exception e) { ErrUtil.err(activity, e); }
-        prog = Globals.curProg;
-        if (prog == null) {
-            if (embedded) getFragmentManager().popBackStackImmediate(); 
-            else activity.finish();
+        if ((prog = Globals.curProg) == null) {
+            if (!dualPane) getFragmentManager().popBackStack(); 
+            if (!embedded) activity.finish();
             return;
         }
         setViews();
@@ -178,7 +176,7 @@ public class RecDetailFragment extends Fragment {
                     ft.replace(containerId, new RecEditFragment());
                     ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                     ft.addToBackStack(null);
-                    ft.commit();
+                    ft.commitAllowingStateLoss();
                 }
             }
         );
@@ -274,13 +272,19 @@ public class RecDetailFragment extends Fragment {
                             public void onClick(
                                 DialogInterface dialog, int which) {
                                 try {
-                                    beMgr.deleteRecording(prog);
-                                } catch (Exception e) {
+                                    Globals.getBackend().deleteRecording(prog);
+                                } catch (IOException e) {
                                     ErrUtil.err(activity, e);
+                                    dialog.dismiss();
+                                    return;
                                 }
                                 dialog.dismiss();
-                                if (embedded)
+                                if (embedded) {
                                     ((Recordings)activity).deleteRecording();
+                                    if (!dualPane)
+                                        getFragmentManager()
+                                            .popBackStack();
+                                }
                                 else
                                     activity.finish();
                             }
@@ -306,7 +310,7 @@ public class RecDetailFragment extends Fragment {
                                 DialogInterface dialog, int which
                             ) {
                                 try {
-                                    beMgr.stopRecording(prog);
+                                    Globals.getBackend().stopRecording(prog);
                                 } catch (IOException e) {
                                     ErrUtil.err(getActivity(), e);
                                     dialog.dismiss();

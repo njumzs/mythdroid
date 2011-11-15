@@ -18,6 +18,8 @@
 
 package org.mythdroid.fragments;
 
+import java.io.IOException;
+
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 
@@ -90,7 +92,7 @@ public class RecEditGroupsFragment extends Fragment {
             storGroups = MDDManager.getStorageGroups(
                 Globals.getBackend().addr
             );
-        } catch (Exception e) {
+        } catch (IOException e) {
             ErrUtil.err(activity, e);
             done();
         }
@@ -203,7 +205,7 @@ public class RecEditGroupsFragment extends Fragment {
     }
     
     private void done() {
-        if (embedded) getFragmentManager().popBackStackImmediate();
+        if (embedded) getFragmentManager().popBackStack();
         else activity.finish();
     }
     

@@ -55,8 +55,10 @@ public class StatusScheduledFragment extends ListFragment {
         activity = (MDFragmentActivity)getActivity();
         View view = inflater.inflate(R.layout.status_scheduled, null, false);
         
-        if (Status.statusDoc == null && !Status.getStatus(activity))
+        if (Status.statusDoc == null && !Status.getStatus(activity)) {
             activity.finish();
+            return view;
+        }
 
         Document doc = Status.statusDoc;
 

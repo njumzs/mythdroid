@@ -4,13 +4,17 @@ use strict;
 use warnings;
 use MDD::ConfigData;
 
-use Test::More tests => MDD::ConfigData->feature('backend') ? 6 : 11;
+use Test::More tests => MDD::ConfigData->feature('backend') ? 10 : 15;
 
 BEGIN {
     use_ok('MythTV');
     use_ok('MDD::Log');
     use_ok('MDD::MythDB'); 
     use_ok('Sys::Hostname');
+    use_ok('HTTP::Daemon');
+    use_ok('URI::Escape');
+    use_ok('Image::Imlib2');
+    use_ok('threads');
 }
 
 my $mtv = new_ok(MythTV => [\{'connect' => 0}], 'MythTV');

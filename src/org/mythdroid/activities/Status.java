@@ -88,6 +88,7 @@ public class Status extends MDFragmentActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Globals.getWorker().removeCallbacks(getStatusTask);
         statusDoc = null;
     }
 
@@ -137,7 +138,6 @@ public class Status extends MDFragmentActivity {
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.commitAllowingStateLoss();
         }
-
     }
     
     @Override
