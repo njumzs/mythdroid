@@ -80,9 +80,7 @@ public class Recordings extends MDFragmentActivity {
                 recordings = Globals.getBackend().getRecordings();
             } catch (IOException e) {
                 ErrUtil.postErr(ctx, Messages.getString("Recordings.0")); //$NON-NLS-1$
-                try {
-                    dismissDialog(DIALOG_LOAD);
-                } catch (IllegalArgumentException e1) {}
+                dismissLoadingDialog();
                 finish();
             }
 
@@ -105,9 +103,7 @@ public class Recordings extends MDFragmentActivity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        try {
-                            dismissDialog(DIALOG_LOAD);
-                        } catch (IllegalArgumentException e) {}
+                        dismissLoadingDialog();
                         listFragment.setAdapter(recordings);
                     }
                 }

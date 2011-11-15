@@ -242,6 +242,18 @@ public abstract class MDActivity extends Activity {
         );
 
     }
+    
+    /** Show the loading dialog */
+    protected void showLoadingDialog() {
+        showDialog(DIALOG_LOAD);
+    }
+
+    /** Dismiss the loading dialog */
+    protected void dismissLoadingDialog() {
+        try {
+            dismissDialog(DIALOG_LOAD);
+        } catch (IllegalArgumentException e) {}
+    }
 
     /**
      * Add "Here" to the frontend chooser and start the provided

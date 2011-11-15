@@ -243,6 +243,18 @@ public abstract class MDListActivity extends ListActivity {
 
     }
     
+    /** Show the loading dialog */
+    protected void showLoadingDialog() {
+        showDialog(DIALOG_LOAD);
+    }
+
+    /** Dismiss the loading dialog */
+    protected void dismissLoadingDialog() {
+        try {
+            dismissDialog(DIALOG_LOAD);
+        } catch (IllegalArgumentException e) {}
+    }
+    
     /**
      * Add "Here" to the frontend chooser and start the provided
      * activity if it's selected
@@ -285,7 +297,7 @@ public abstract class MDListActivity extends ListActivity {
      * Add a frontend chooser to the options menu (or action bar on >= 3.0)
      * @param menu menu to add to
      */
-protected void addFrontendChooser(Menu menu) {
+    protected void addFrontendChooser(Menu menu) {
         
         MenuItem item = menu.add(
             Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.setCurFe

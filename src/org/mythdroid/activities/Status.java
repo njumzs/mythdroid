@@ -134,17 +134,5 @@ public class Status extends MDFragmentActivity {
         else
             super.resetContentView();
     }
-    
-    /** Show the loading dialog */
-    public void showLoadingDialog() {
-        showDialog(DIALOG_LOAD);
-    }
-
-    /** Dismiss the loading dialog */
-    public void dismissLoadingDialog() {
-        try {
-            dismissDialog(DIALOG_LOAD);
-        } catch (IllegalArgumentException e) {}
-    }
-
+  
 }
