@@ -110,8 +110,6 @@ public class ConnMgr {
     private byte[]                  lastSent         = null;
     /** The timeOut modifier for the next read */
     private timeOut                 timeOutModifier  = timeOut.DEFAULT;
-    /** An exception with a message that we've been unexpectedly disconnected */
-    private IOException             disconnected     = null;
     /** List of onConnect callbacks */
     private ArrayList<onConnectListener> oCLs = 
         new ArrayList<onConnectListener>();
@@ -207,8 +205,6 @@ public class ConnMgr {
         
         hostname = host;
         addr = host + ":" + port; //$NON-NLS-1$
-
-        disconnected = new IOException(Messages.getString("ConnMgr.0") + addr); //$NON-NLS-1$
 
         if (ocl != null)
             oCLs.add(ocl);
@@ -362,11 +358,6 @@ public class ConnMgr {
 
             r = read(buf, 0, rbufSize);
 
-            if (r == -1) {
-                doDisconnect();
-                throw disconnected;
-            }
-
             String extra = new String(buf, 0 , r);
             line += extra;
 
@@ -414,23 +405,11 @@ public class ConnMgr {
 
         final byte[] bytes = new byte[len];
         int read = read(bytes, 0, len);
-
-        if (read == -1) {
-            doDisconnect();
-            throw disconnected;
-        }
-
-        int got = 0;
+        int got  = 0;
 
         while (read < len) {
-
-            if ((got = read(bytes, read, len - read)) == -1) {
-                doDisconnect();
-                throw disconnected;
-            }
-
+            read(bytes, read, len - read);
             read += got;
-
         }
 
         LogUtil.debug("readBytes read " + read + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -446,12 +425,7 @@ public class ConnMgr {
 
         // First 8 bytes are the length
         byte[] bytes = new byte[8];
-        if (read(bytes, 0, 8) == -1) {
-            LogUtil.debug("readStringList from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$
-            doDisconnect();
-            throw disconnected;
-        }
-
+        read(bytes, 0, 8);
         int len = Integer.parseInt(new String(bytes).trim());
 
         bytes = readBytes(len);
@@ -723,8 +697,9 @@ public class ConnMgr {
         }
 
         if (ret == -1) {
+            LogUtil.warn("read from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$
             dispose();
-            LogUtil.debug("read from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new IOException(Messages.getString("ConnMgr.0") + addr); //$NON-NLS-1$
         }
         
         if (localtimeout != timeout && sock != null) {
