@@ -212,7 +212,8 @@ public abstract class MDListActivity extends ListActivity {
                     onHere = false;
                     String fe = (String)av.getAdapter().getItem(pos);
                     Globals.currentFrontend = fe;
-                    if (frontendIndicator != null) frontendIndicator.setText(fe);
+                    if (frontendIndicator != null)
+                        frontendIndicator.setText(fe);
                     if (fe.equals(Messages.getString("MDActivity.0"))) // Here //$NON-NLS-1$
                         onHere = true;
                     d.dismiss();

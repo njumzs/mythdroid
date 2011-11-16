@@ -92,7 +92,8 @@ public class FrontendManager {
      * @param loc a FrontendLocation to jump to
      * @return true if we jumped ok, false otherwise
      */
-    public synchronized boolean jumpTo(FrontendLocation loc) throws IOException {
+    public synchronized boolean jumpTo(FrontendLocation loc) throws IOException
+    {
         if (!isConnected()) throw connectionGone;
         if (loc == null || loc.location == null) throw invalidParam;
         cmgr.writeLine("jump " + loc.location.toLowerCase()); //$NON-NLS-1$

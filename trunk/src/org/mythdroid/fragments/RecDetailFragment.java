@@ -153,11 +153,11 @@ public class RecDetailFragment extends Fragment {
         ((TextView)view.findViewById(R.id.start)).setText(prog.startString());
         ((TextView)view.findViewById(R.id.category))
             .setText(
-                Messages.getString("RecordingDetail.0") + prog.Category // type: //$NON-NLS-1$
+                Messages.getString("RecordingDetail.0") + prog.Category //$NON-NLS-1$
             ); 
         ((TextView)view.findViewById(R.id.status))
             .setText(
-                Messages.getString("RecordingDetail.1") + prog.Status.msg() // status: //$NON-NLS-1$
+                Messages.getString("RecordingDetail.1") + prog.Status.msg() //$NON-NLS-1$
             ); 
         ((TextView)view.findViewById(R.id.desc)).setText(prog.Description);
         

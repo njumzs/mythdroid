@@ -211,7 +211,9 @@ public abstract class Remote extends Activity implements View.OnClickListener {
 
         }
 
-        private void resetScroll(MotionEvent start, float dX, float dY, int lock) {
+        private void resetScroll(
+            MotionEvent start, float dX, float dY, int lock
+        ) {
             if (start != null) {
                 lastStartX = start.getRawX();
                 lastStartY = start.getRawY();

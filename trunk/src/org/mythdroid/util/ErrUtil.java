@@ -184,7 +184,9 @@ final public class ErrUtil {
                     @Override
                     public void onClick(View v) {
                         ((Activity)c).removeDialog(id);
-                        c.startActivity(new Intent().setClass(c, FrontendList.class));
+                        c.startActivity(
+                            new Intent().setClass(c, FrontendList.class)
+                        );
                     }
                 }
             );
