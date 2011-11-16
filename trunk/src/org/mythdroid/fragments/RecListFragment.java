@@ -82,16 +82,16 @@ public class RecListFragment extends ListFragment
     
     @Override
     public void onResume() {
-    	super.onResume();
-    	lv.setSelection(activity.visibleIndex);
+        super.onResume();
+        lv.setSelection(activity.visibleIndex);
     }
     
     @Override
     public void onPause() {
-    	super.onPause();
-    	int vIdx = lv.getFirstVisiblePosition();
-    	if (vIdx != ListView.INVALID_POSITION && vIdx != 0)
-    		activity.visibleIndex = vIdx;
+        super.onPause();
+        int vIdx = lv.getFirstVisiblePosition();
+        if (vIdx != ListView.INVALID_POSITION && vIdx != 0)
+            activity.visibleIndex = vIdx;
     }
     
     @Override
@@ -176,15 +176,15 @@ public class RecListFragment extends ListFragment
         Fragment df = getFragmentManager().findFragmentById(R.id.recdetails);
         
         if (
-        	df == null || !df.getClass().equals(RecDetailFragment.class) ||
-        	!df.isVisible()
+            df == null || !df.getClass().equals(RecDetailFragment.class) ||
+            !df.isVisible()
         ) {
-        	showDetails();
-        	return;
+            showDetails();
+            return;
         }
         Program prog = ((RecDetailFragment)df).getProg();
         if (prog == null || !prog.equals(Globals.curProg))
-        	showDetails();	
+            showDetails();    
         
     }
     

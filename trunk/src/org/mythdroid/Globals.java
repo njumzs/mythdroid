@@ -141,9 +141,9 @@ public class Globals {
         if (
             backend != null &&
             (
-            	backend.equals("127.0.0.1") || backend.equals("localhost") || //$NON-NLS-1$ //$NON-NLS-2$
-            	ConnectivityReceiver.networkType() ==
-            		ConnectivityManager.TYPE_MOBILE
+                backend.equals("127.0.0.1") || backend.equals("localhost") || //$NON-NLS-1$ //$NON-NLS-2$
+                ConnectivityReceiver.networkType() ==
+                    ConnectivityManager.TYPE_MOBILE
             ) && 
             testMuxConn()
         )

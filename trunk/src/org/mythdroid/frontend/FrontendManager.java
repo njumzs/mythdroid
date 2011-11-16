@@ -32,17 +32,17 @@ import org.mythdroid.resource.Messages;
 public class FrontendManager {
 
     /** String containing the name of the frontend */
-	public  String  name = null;
-	/** String containing the hostname or IP address of the frontend */
-	public  String  addr = null;
-	
-	final private IOException connectionGone = 
+    public  String  name = null;
+    /** String containing the hostname or IP address of the frontend */
+    public  String  addr = null;
+    
+    final private IOException connectionGone = 
         new IOException(Messages.getString("FrontendManager.0")); //$NON-NLS-1$
-	
-	final private IllegalArgumentException invalidParam =
-	    new IllegalArgumentException(Messages.getString("FrontendManager.2")); //$NON-NLS-1$
-	
-	private ConnMgr cmgr = null;
+    
+    final private IllegalArgumentException invalidParam =
+        new IllegalArgumentException(Messages.getString("FrontendManager.2")); //$NON-NLS-1$
+    
+    private ConnMgr cmgr = null;
     
     /**
      * Constructor

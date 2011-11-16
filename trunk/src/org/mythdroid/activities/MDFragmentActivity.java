@@ -172,8 +172,8 @@ public abstract class MDFragmentActivity extends FragmentActivity {
     
     @Override
     public void onCreate(Bundle icicle) {
-    	super.onCreate(icicle);
-    	Reflection.setThreadPolicy();
+        super.onCreate(icicle);
+        Reflection.setThreadPolicy();
     }
     
     @Override

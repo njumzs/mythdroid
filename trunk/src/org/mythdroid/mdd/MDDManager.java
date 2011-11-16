@@ -384,8 +384,8 @@ public class MDDManager {
     /** Disconnect from MDD and clean up internal resources */
     public void shutdown() {
         try {
-			cmgr.dispose();
-		} catch (IOException e) {}
+            cmgr.dispose();
+        } catch (IOException e) {}
     }
 
     private static ConnMgr sendMsg(String addr, String msg) throws IOException {

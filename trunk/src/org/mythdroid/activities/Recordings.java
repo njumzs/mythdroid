@@ -171,11 +171,11 @@ public class Recordings extends MDFragmentActivity {
                 final ArrayList<String> titles = new ArrayList<String>();
 
                 if (recordings == null)
-                	return new AlertDialog.Builder(this)
-                		.setTitle(R.string.filterRec)
-                		.setMessage(R.string.noRecs)
-                		.setPositiveButton(R.string.ok, no)
-                		.create();
+                    return new AlertDialog.Builder(this)
+                        .setTitle(R.string.filterRec)
+                        .setMessage(R.string.noRecs)
+                        .setPositiveButton(R.string.ok, no)
+                        .create();
                 
                 RECORDINGSLOOP: for (Program prog : recordings) {
                     for (String title : titles)
@@ -309,12 +309,12 @@ public class Recordings extends MDFragmentActivity {
            At this stage dualPane reflects the old configuration */        
         int backStackSize = fm.getBackStackEntryCount();
         for (int i = 0; i < backStackSize; i++) {
-        	Fragment lf = fm.findFragmentById(R.id.reclistframe);
+            Fragment lf = fm.findFragmentById(R.id.reclistframe);
             Fragment df = fm.findFragmentById(R.id.recdetails);
             backStackFrags.add(
                 0, (!dualPane || df == null ? lf : df).getClass().getName()
             );
-        	fm.popBackStackImmediate();
+            fm.popBackStackImmediate();
         }
         
         setContentView(R.layout.recordings);                
@@ -332,23 +332,23 @@ public class Recordings extends MDFragmentActivity {
         
         // Restore the backstack
         for (String frag : backStackFrags) {
-        	// RecListFragment will handle this..
-        	if (dualPane && frag.endsWith("RecDetailFragment")) //$NON-NLS-1$
-        		continue;
-        	try {
-        		FragmentTransaction ft = fm.beginTransaction();
-        		ft.replace(
-        				(dualPane ? R.id.recdetails : R.id.reclistframe), 
-						(Fragment)Class.forName(frag).newInstance()
-				);
-				ft.addToBackStack(null);
-				ft.commitAllowingStateLoss();
-			} catch (Exception e) {
-				ErrUtil.err(this, e);
-				return;
-			}
+            // RecListFragment will handle this..
+            if (dualPane && frag.endsWith("RecDetailFragment")) //$NON-NLS-1$
+                continue;
+            try {
+                FragmentTransaction ft = fm.beginTransaction();
+                ft.replace(
+                        (dualPane ? R.id.recdetails : R.id.reclistframe), 
+                        (Fragment)Class.forName(frag).newInstance()
+                );
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+            } catch (Exception e) {
+                ErrUtil.err(this, e);
+                return;
+            }
         }
-        	
+            
         fm.executePendingTransactions();
 
     }
