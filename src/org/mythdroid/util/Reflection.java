@@ -53,12 +53,12 @@ public class Reflection {
      * Has no effect on pre-Honeycomb devices
      */
     public static void setThreadPolicy() {
-    	/* Allow network activity on UI thread */
-    	if (Integer.parseInt(Build.VERSION.SDK) >= 11)
-    		try {
-    			rStrictMode.checkAvailable();
-    			rStrictMode.setThreadPolicy();
-    		} catch (Exception e) {}
+        /* Allow network activity on UI thread */
+        if (Integer.parseInt(Build.VERSION.SDK) >= 11)
+            try {
+                rStrictMode.checkAvailable();
+                rStrictMode.setThreadPolicy();
+            } catch (Exception e) {}
     }
     
     /**

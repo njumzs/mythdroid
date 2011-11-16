@@ -108,7 +108,7 @@ public class Status extends MDFragmentActivity {
     private void installFragments() {
         if (!embed) {
             FragmentTransaction ft = 
-            	getSupportFragmentManager().beginTransaction();
+                getSupportFragmentManager().beginTransaction();
             ft.replace(android.R.id.content, new StatusFragment());
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.commitAllowingStateLoss();
@@ -128,8 +128,8 @@ public class Status extends MDFragmentActivity {
     @Override
     protected void resetContentView() {
         if (embed) {
-        	setContentView(R.layout.status);
-        	installFragments();
+            setContentView(R.layout.status);
+            installFragments();
         }
         else
             super.resetContentView();

@@ -107,7 +107,7 @@ public class StatusRecordersFragment extends ListFragment {
 
     static final private class Encoder {
 
-    	// From enum TVState defined in libmythtv/tv.h
+        // From enum TVState defined in libmythtv/tv.h
         private final static String[] states = {
             Messages.getString("StatusRecorders.1"),  // Idle //$NON-NLS-1$
             Messages.getString("StatusRecorders.2"),  // Live TV //$NON-NLS-1$
@@ -133,9 +133,9 @@ public class StatusRecordersFragment extends ListFragment {
             int s = Integer.parseInt(attr.getNamedItem("state").getNodeValue());  //$NON-NLS-1$
             
             if (s < 0) 
-            	state = Messages.getString("StatusRecorders.6"); //$NON-NLS-1$
+                state = Messages.getString("StatusRecorders.6"); //$NON-NLS-1$
             else
-            	state = states[s];
+                state = states[s];
 
             if (!item.hasChildNodes()) return;
 

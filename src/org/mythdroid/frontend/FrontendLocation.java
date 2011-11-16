@@ -123,8 +123,8 @@ public class FrontendLocation {
         
         synchronized(locationsLock) {
         
-	        if (hasLocations)
-    	        return false;
+            if (hasLocations)
+                return false;
         
             try {
                 locations = feMgr.getLocs();

@@ -256,7 +256,7 @@ public class RecDetailFragment extends Fragment {
      * @return Program being displayed
      */
     public Program getProg() {
-    	return prog;
+        return prog;
     }
     
     private class deleteDialog extends DialogFragment {

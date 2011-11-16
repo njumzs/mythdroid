@@ -181,7 +181,7 @@ public class ConnMgr {
             throw new IOException(Messages.getString("ConnMgr.9") + port); //$NON-NLS-1$
         
         if (mux)
-        	// Add a callback that sets up the muxed connection
+            // Add a callback that sets up the muxed connection
             oCLs.add(
                 new onConnectListener() {
                     @Override
@@ -214,8 +214,8 @@ public class ConnMgr {
             oCLs.add(ocl);
         
         boolean wifi = 
-        		ConnectivityReceiver.networkType() == 
-        			ConnectivityManager.TYPE_WIFI;
+                ConnectivityReceiver.networkType() == 
+                    ConnectivityManager.TYPE_WIFI;
 
         // Increase default socket timeout if we're on a slow link
         if (wifi) {
@@ -229,7 +229,7 @@ public class ConnMgr {
         doConnect(timeout);
         
         if (wifi) { 
-        	wifiLock = ((WifiManager)Globals.appContext
+            wifiLock = ((WifiManager)Globals.appContext
                 .getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock("MythDroid"); //$NON-NLS-1$
             wifiLock.acquire();
@@ -491,7 +491,7 @@ public class ConnMgr {
          * Local array of connections to dispose of once we've finished
          * iterating over conns (and dropped the lock on it)
          */
-    	ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
+        ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
         
         synchronized(conns) {
 
