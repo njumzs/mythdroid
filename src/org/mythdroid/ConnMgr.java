@@ -110,7 +110,7 @@ public class ConnMgr {
     private byte[]                  lastSent         = null;
     /** The timeOut modifier for the next read */
     private timeOut                 timeOutModifier  = timeOut.DEFAULT;
-    /** An IOException with a message that we've been unexpectedly disconnected */
+    /** An exception with a message that we've been unexpectedly disconnected */
     private IOException             disconnected     = null;
     /** List of onConnect callbacks */
     private ArrayList<onConnectListener> oCLs = 
@@ -678,7 +678,8 @@ public class ConnMgr {
         sock = null;
     }
 
-    private synchronized int read(byte[] buf, int off, int len) throws IOException {
+    private synchronized int read(byte[] buf, int off, int len)
+        throws IOException {
 
         int ret = -1;
         
@@ -726,7 +727,7 @@ public class ConnMgr {
             LogUtil.debug("read from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         
-        if (localtimeout != timeout) {
+        if (localtimeout != timeout && sock != null) {
             sock.setSoTimeout(timeout);
             timeOutModifier = timeOut.DEFAULT;
         }
