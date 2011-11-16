@@ -192,7 +192,7 @@ public class MusicRemote extends Remote {
                             ShuffleMode s = ShuffleMode.get(value);
                             if (shuffle != null && shuffle != s)
                                 Toast.makeText(
-                                    ctx, Messages.getString("MusicRemote.2") + // Shuffle mode is //$NON-NLS-1$
+                                    ctx, Messages.getString("MusicRemote.2") + //$NON-NLS-1$
                                     s,
                                     Toast.LENGTH_SHORT
                                 ).show();
@@ -203,7 +203,7 @@ public class MusicRemote extends Remote {
                             RepeatMode r = RepeatMode.get(value);
                             if (repeat != null && repeat != r)
                                 Toast.makeText(
-                                    ctx, Messages.getString("MusicRemote.4") + // Repeat mode is //$NON-NLS-1$
+                                    ctx, Messages.getString("MusicRemote.4") + //$NON-NLS-1$
                                     r,
                                     Toast.LENGTH_SHORT
                                 ).show();

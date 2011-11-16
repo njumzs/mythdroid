@@ -44,7 +44,8 @@ public class Video {
     YEAR = 6, USERRATING = 7, LENGTH = 8, FILENAME = 9, COVER = 10;
     
     @SuppressWarnings("all")
-    public String title, subtitle, director, plot, homepage, filename, coverfile;
+    public String 
+        title, subtitle, director, plot, homepage, filename, coverfile;
     @SuppressWarnings("all")
     public float rating;
     @SuppressWarnings("all")

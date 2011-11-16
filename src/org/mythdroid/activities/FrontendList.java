@@ -48,7 +48,8 @@ import java.util.ArrayList;
 public class FrontendList extends ListActivity implements
     DialogInterface.OnClickListener {
 
-    final static private int ADD_DIALOG  = 0, DEFAULT_DIALOG = 1, EDIT_DIALOG = 2;
+    final static private int
+        ADD_DIALOG  = 0, DEFAULT_DIALOG = 1, EDIT_DIALOG = 2;
 
     final private Context ctx             = this;
 
@@ -168,7 +169,8 @@ public class FrontendList extends ListActivity implements
     }
 
     @Override
-    public void onListItemClick(ListView list, View item, int pos, long itemid) {
+    public void onListItemClick(ListView list, View item, int pos, long itemid)
+    {
         clickedPosition = pos;
         clickedView = item;
         switch (pos) {

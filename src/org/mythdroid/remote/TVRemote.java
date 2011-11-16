@@ -703,7 +703,9 @@ public class TVRemote extends Remote {
         
     }
     
-    private void setupProgressBar(int max, int progress, Program prog, float fps) {
+    private void setupProgressBar(
+        int max, int progress, Program prog, float fps
+    ) {
         
         pBar.setMax(max);
         pBar.setProgress(progress);

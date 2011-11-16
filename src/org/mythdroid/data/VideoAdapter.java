@@ -114,7 +114,9 @@ public class VideoAdapter extends ArrayAdapter<Object> {
             RelativeLayout.LayoutParams params =
                 (RelativeLayout.LayoutParams)vHolder.title.getLayoutParams();
             params.addRule(RelativeLayout.CENTER_VERTICAL, 0);
-            params.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+            params.addRule(
+                RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE
+            );
             vHolder.title.setLayoutParams(params);
             if (video.poster == null)
                 vHolder.poster.setImageDrawable(videoDrawable);

@@ -311,7 +311,9 @@ public class Recordings extends MDFragmentActivity {
         for (int i = 0; i < backStackSize; i++) {
         	Fragment lf = fm.findFragmentById(R.id.reclistframe);
             Fragment df = fm.findFragmentById(R.id.recdetails);
-            backStackFrags.add(0, (!dualPane || df == null ? lf : df).getClass().getName());
+            backStackFrags.add(
+                0, (!dualPane || df == null ? lf : df).getClass().getName()
+            );
         	fm.popBackStackImmediate();
         }
         

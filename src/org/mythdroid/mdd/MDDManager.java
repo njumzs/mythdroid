@@ -89,7 +89,8 @@ public class MDDManager {
      * @param addr String containing address of MDD
      * @return ArrayList<String> containing names of MDD commands
      */
-    public static ArrayList<String> getCommands(String addr) throws IOException {
+    public static ArrayList<String> getCommands(String addr) throws IOException
+    {
         
         final ConnMgr cmgr = sendMsgNoMux(addr, "COMMANDS"); //$NON-NLS-1$
         final ArrayList<String> cmds = new ArrayList<String>();
@@ -118,8 +119,9 @@ public class MDDManager {
     /**
      * Static method, retrieves a list of Videos
      * @param addr String containing address of MDD
-     * @param viddir which video dir to look in (could be a : separated list in mythtv config)
-     * @param subdir String containing directory to enumerate, pass "ROOT" for the root video directory
+     * @param viddir which video dir(s) to look in (could be a : separated list)
+     * @param subdir String containing directory to enumerate, 
+     * pass "ROOT" for the root video directory
      * @return ArrayList of Videos
      * @throws IOException
      */
@@ -231,7 +233,8 @@ public class MDDManager {
      * @param recid int representing RecID of recording
      * @return String contaning recording's storage group
      */
-    public static String getStorageGroup(String addr, int recid) throws IOException {
+    public static String getStorageGroup(String addr, int recid)
+        throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "STORGROUP " + recid); //$NON-NLS-1$
         String sg = cmgr.readLine();
         cmgr.disconnect();

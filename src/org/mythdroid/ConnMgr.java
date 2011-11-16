@@ -749,7 +749,8 @@ public class ConnMgr {
      * Wait for a connection to be established
      * @param timeout - maximum wait time in milliseconds
      */
-    private synchronized void waitForConnection(int timeout) throws IOException {
+    private synchronized void waitForConnection(int timeout) throws IOException
+    {
 
         if (!reconnectPending) {
             doConnect(timeout);

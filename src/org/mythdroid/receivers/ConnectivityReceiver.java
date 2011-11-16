@@ -182,7 +182,9 @@ public class ConnectivityReceiver extends BroadcastReceiver {
 
             }
 
-            while (netType != ConnectivityManager.TYPE_WIFI || connected == false) {
+            while (
+                netType != ConnectivityManager.TYPE_WIFI || connected == false
+            ) {
 
                 LogUtil.debug("Waiting for WiFi connection"); //$NON-NLS-1$
 

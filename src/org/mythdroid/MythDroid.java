@@ -23,7 +23,10 @@ public class MythDroid extends CrashReportingApplication {
         result.putInt(RES_NOTIF_TITLE, R.string.crash_notif_title);
         result.putInt(RES_NOTIF_TEXT, R.string.crash_notif_text);
         result.putInt(RES_NOTIF_ICON, android.R.drawable.stat_notify_error);
-        result.putInt(RES_DIALOG_TEXT, m ? R.string.crash_dialog_text : R.string.mcrash_dialog_text);
+        result.putInt(
+            RES_DIALOG_TEXT,
+            m ? R.string.crash_dialog_text : R.string.mcrash_dialog_text
+        );
         result.putInt(RES_DIALOG_ICON, android.R.drawable.ic_dialog_info);
         return result;
     }

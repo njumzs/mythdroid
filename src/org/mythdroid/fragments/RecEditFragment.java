@@ -311,7 +311,9 @@ public class RecEditFragment extends Fragment {
                         FragmentTransaction ft = 
                             getFragmentManager().beginTransaction();
                         ft.replace(containerId, new RecEditSchedFragment());
-                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                        ft.setTransition(
+                            FragmentTransaction.TRANSIT_FRAGMENT_FADE
+                        );
                         ft.addToBackStack(null);
                         ft.commitAllowingStateLoss();
                     }
@@ -327,7 +329,9 @@ public class RecEditFragment extends Fragment {
                         FragmentTransaction ft = 
                             getFragmentManager().beginTransaction();
                         ft.replace(containerId, new RecEditGroupsFragment());
-                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                        ft.setTransition(
+                            FragmentTransaction.TRANSIT_FRAGMENT_FADE
+                        );
                         ft.addToBackStack(null);
                         ft.commitAllowingStateLoss();
                     }

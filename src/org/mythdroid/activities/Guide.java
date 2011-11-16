@@ -178,7 +178,7 @@ public class Guide extends MDActivity {
                                 j = 0;
                             }
 
-                            // This became necessary in either android 2.2 or MythTV 0.24
+                            // This became necessary in MythTV 0.24
                             Collections.sort(current.programs);
 
                             tbl.addView(getRowFromChannel(current));
