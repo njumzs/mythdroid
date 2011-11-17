@@ -55,6 +55,8 @@ public class ConnMgr {
         LONG,
         /** 10x the default read timeout */
         EXTRALONG,
+        /** never timeout */
+        INFINITE
     }
     
     /** 
@@ -249,6 +251,7 @@ public class ConnMgr {
      * Set the read timeout to infinity for all reads
      */
     public void setIndefiniteReads() {
+        timeOutModifier = timeOut.INFINITE;
         try {
             sock.setSoTimeout(0);
         } catch (SocketException e) {}
@@ -350,6 +353,8 @@ public class ConnMgr {
             LogUtil.debug("readLine: " + line); //$NON-NLS-1$
             return line.trim();
         }
+        
+        setReadTimeout();
 
         // We don't have a whole line buffered, read until we get one
         while (true) {
@@ -367,6 +372,7 @@ public class ConnMgr {
                 line.charAt(0) == '#' && line.charAt(1) == ' '
             ) {
                 LogUtil.debug("readLine: #"); //$NON-NLS-1$
+                restoreReadTimeout();
                 return "#"; //$NON-NLS-1$
             }
 
@@ -375,6 +381,8 @@ public class ConnMgr {
                 break;
 
         }
+        
+        restoreReadTimeout();
 
         // We've got a whole line
         int tot = line.length() - 1;
@@ -403,17 +411,18 @@ public class ConnMgr {
      */
     public synchronized byte[] readBytes(int len) throws IOException {
 
+        setReadTimeout();
         final byte[] bytes = new byte[len];
         int read = read(bytes, 0, len);
         int got  = 0;
 
         while (read < len) {
-            read(bytes, read, len - read);
+            got = read(bytes, read, len - read);
             read += got;
         }
 
         LogUtil.debug("readBytes read " + read + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$
-
+        restoreReadTimeout();
         return bytes;
     }
 
@@ -423,13 +432,14 @@ public class ConnMgr {
      */
     public synchronized String[] readStringList() throws IOException {
 
+        setReadTimeout();
         // First 8 bytes are the length
         byte[] bytes = new byte[8];
         read(bytes, 0, 8);
         int len = Integer.parseInt(new String(bytes).trim());
-
         bytes = readBytes(len);
         return new String(bytes).split("\\[\\]:\\[\\]"); //$NON-NLS-1$
+        
     }
 
     /**
@@ -657,25 +667,6 @@ public class ConnMgr {
 
         int ret = -1;
         
-        int localtimeout = timeout;
-        
-        /* 
-         * See if a longer read timeout has been requested
-         * but don't increase it too much if we already have a long timeout due 
-         * to the use of a slow link
-         */
-        switch (timeOutModifier) {            
-            case LONG:
-                localtimeout *= (localtimeout > 5000 ? 2 : 5);
-                break;
-            case EXTRALONG:
-                localtimeout *= (localtimeout > 5000 ? 3 : 10);
-                break;
-        }
-        
-        if (localtimeout != timeout)
-            sock.setSoTimeout(localtimeout);
-
         try {
             ret = is.read(buf, off, len);
         } catch (SocketTimeoutException e) {
@@ -701,12 +692,7 @@ public class ConnMgr {
             dispose();
             throw new IOException(Messages.getString("ConnMgr.0") + addr); //$NON-NLS-1$
         }
-        
-        if (localtimeout != timeout && sock != null) {
-            sock.setSoTimeout(timeout);
-            timeOutModifier = timeOut.DEFAULT;
-        }
-
+       
         return ret;
 
     }
@@ -759,6 +745,39 @@ public class ConnMgr {
             }
         
         timer.cancel();
+        
+    }
+    
+    private void setReadTimeout() throws SocketException {
+        
+        int localtimeout = timeout;
+        
+        /* 
+         * See if a longer read timeout has been requested
+         * but don't increase it too much if we already have a long timeout due 
+         * to the use of a slow link
+         */
+        switch (timeOutModifier) {            
+            case LONG:
+                localtimeout *= (localtimeout > 5000 ? 2 : 5);
+                break;
+            case EXTRALONG:
+                localtimeout *= (localtimeout > 5000 ? 3 : 10);
+                break;
+            default:
+                return;
+        }
+        
+        sock.setSoTimeout(localtimeout);
+
+    }
+    
+    private void restoreReadTimeout() throws SocketException { 
+        
+        if (sock == null || timeOutModifier == timeOut.INFINITE) return;
+        
+        sock.setSoTimeout(timeout);
+        timeOutModifier = timeOut.DEFAULT;
         
     }
 
