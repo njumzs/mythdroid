@@ -10,5 +10,6 @@ lib/MDD/LCD.pm
 lib/MDD/Log.pm
 lib/MDD/MythDB.pm
 lib/MDD/XOSD.pm
+lib/MDD/HTTPServer.pm
 MANIFEST			This list of files
 t/mdd.t

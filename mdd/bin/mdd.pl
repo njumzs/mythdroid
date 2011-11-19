@@ -510,8 +510,7 @@ sub videoList($) {
     my $subdir = shift;
     my $regex;
     
-    %storageGroups = %{ $mythdb->getStorGroups() } 
-        unless (scalar %storageGroups);
+    %storageGroups = %{ $mythdb->getStorGroups() }; 
 
     if (exists $storageGroups{Videos}) {
         $log->dbg("Videos SG exists");
@@ -608,8 +607,7 @@ sub streamFile($) {
 
     if ($file =~ s/^myth:\/\///) {
 
-        %storageGroups = %{ $mythdb->getStorGroups() } 
-            unless (scalar %storageGroups);
+        %storageGroups = %{ $mythdb->getStorGroups() }; 
     
         if ($file =~ /^(.+)@/) {
             $sg = $1;
@@ -688,8 +686,7 @@ sub stopStreaming() {
 # Get a list of storage groups
 sub getStorGroups() {
 
-    %storageGroups = %{ $mythdb->getStorGroups() } 
-        unless (scalar %storageGroups);
+    %storageGroups = %{ $mythdb->getStorGroups() };
 
     map { sendMsg($_) } (keys %storageGroups);
 
