@@ -366,27 +366,26 @@ sub readConfig() {
         next if /^#/;
         s/#.*$//;
         next unless length;
-        my ($name, $value) = /(.*?)=(.*)/;
+        my ($name, $value) = /^\s*(.*?)\s*=\s*(.*?)\s*$/;
         unless ($name && $value) {
             print STDERR "MDD: Error parsing line $line of $f, ignoring\n";
             next;
         }
-        $name =~ s/\s+$//;
-        $value =~ s/^\s+//;
-
+        
         while ($value =~ s/\\$//) { 
             chomp $value;
             $value .= readline F;
         }
 
         if ($name =~ /command/i) {
-            my ($cm, $cv) = $value =~ /(.*)=>(.*)/;
+            my ($cm, $cv) = $value =~ /^\s*(.*?)\s*=>\s*(.*?)\s*$/;
             unless ($cm && $cv) {
                 print STDERR "MDD: Error parsing command on line $line of " .
                              "$f, ignoring\n";
                 next;
             }
             $commands{$cm} = $cv;
+            next;
         }
 
         $config{$name} = $value;
