@@ -176,7 +176,9 @@ sub getVideos($) {
     while (my $aref = $videoSth->fetchrow_arrayref) {
         splice @$aref, 2, 0, '' if ($self->{VidDBVer} < 1024);
         if ($aref->[10]) {
-            if ($posterSG && ($aref->[10] !~ m#^/#)) {
+            if (
+                $posterSG && $aref->[10] !~ m#^/# && $aref->[10] ne 'No Cover'
+            ) {
                 $aref->[10] = findPosterInSG($posterSG, $aref->[10]);
             }
             $self->{httpserver}->addFile($aref->[10]) if $self->{httpserver};
