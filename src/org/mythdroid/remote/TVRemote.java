@@ -762,7 +762,8 @@ public class TVRemote extends Remote {
               catch (IllegalArgumentException e) { ErrUtil.postErr(this, e); }
         }
         jump = false;
-        finish();
+        if (!isFinishing())
+            finish();
     }
 
     @Override
