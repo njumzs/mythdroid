@@ -40,9 +40,7 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 
-/**
- * A TCP connection manager
- */
+/** A TCP connection manager */
 public class ConnMgr {
 
     /**
@@ -87,6 +85,8 @@ public class ConnMgr {
     private WeakReference<ConnMgr>  weakThis         = null;
     /** Our socket */
     private Socket                  sock             = null;
+    /** A lock for operations that modify sock, inUse or reconnectPending */
+    private Object                  sockLock         = new Object();
     /** The sockaddr of the remote host */
     private InetSocketAddress       sockAddr         = null;
     /** Our outputstream */
@@ -115,7 +115,6 @@ public class ConnMgr {
     /** List of onConnect callbacks */
     private ArrayList<onConnectListener> oCLs = 
         new ArrayList<onConnectListener>();
-
     
     /**
      * Make a connection, reuse an existing connection if possible
@@ -187,14 +186,16 @@ public class ConnMgr {
                     @Override
                     public void onConnect(ConnMgr cmgr) throws IOException {
                         byte[] buf = new byte[512];
-                        // Tell CMux which port we want to connect to
-                        cmgr.write(String.valueOf(port).getBytes());
-                        // Get the response
-                        cmgr.read(buf, 0, 2);
-                        if (buf[0] == 'O' && buf[1] == 'K')
-                            return;
-                        // There was a problem, read the rest of the error msg
-                        cmgr.read(buf, 2, 510);
+                        synchronized (cmgr.is) {
+                            // Tell CMux which port we want to connect to
+                            cmgr.write(String.valueOf(port).getBytes());
+                            // Get the response
+                            cmgr.read(buf, 0, 2);
+                            if (buf[0] == 'O' && buf[1] == 'K')
+                                return;
+                            // There was a problem, read the rest of the err msg
+                            cmgr.read(buf, 2, 510);
+                        }
                         throw new IOException(new String(buf));
                     }
                 }
@@ -307,7 +308,7 @@ public class ConnMgr {
      * Read a line from the socket (buffered)
      * @return A string containing the line we read
      */
-    public synchronized String readLine() throws IOException {
+    public String readLine() throws IOException {
 
         String line = ""; //$NON-NLS-1$
         int r = -1;
@@ -354,35 +355,37 @@ public class ConnMgr {
             return line.trim();
         }
         
-        setReadTimeout();
+        synchronized (is) {
+            setReadTimeout();
 
-        // We don't have a whole line buffered, read until we get one
-        while (true) {
-
-            final byte[] buf = new byte[rbufSize];
-
-            r = read(buf, 0, rbufSize);
-
-            String extra = new String(buf, 0 , r);
-            line += extra;
-
-            // If the buffer was empty and we got 2 bytes, check for a prompt
-            if (
-                line.length() == 2 &&
-                line.charAt(0) == '#' && line.charAt(1) == ' '
-            ) {
-                LogUtil.debug("readLine: #"); //$NON-NLS-1$
-                restoreReadTimeout();
-                return "#"; //$NON-NLS-1$
+            // We don't have a whole line buffered, read until we get one
+            while (true) {
+    
+                final byte[] buf = new byte[rbufSize];
+    
+                r = read(buf, 0, rbufSize);
+    
+                String extra = new String(buf, 0 , r);
+                line += extra;
+    
+                // If the buffer was empty and we got 2 bytes, check for a #
+                if (
+                    line.length() == 2 &&
+                    line.charAt(0) == '#' && line.charAt(1) == ' '
+                ) {
+                    LogUtil.debug("readLine: #"); //$NON-NLS-1$
+                    restoreReadTimeout();
+                    return "#"; //$NON-NLS-1$
+                }
+    
+                // Got a whole line yet?
+                if (extra.indexOf('\n') != -1)
+                    break;
+    
             }
-
-            // Got a whole line yet?
-            if (extra.indexOf('\n') != -1)
-                break;
-
+            
+            restoreReadTimeout();
         }
-        
-        restoreReadTimeout();
 
         // We've got a whole line
         int tot = line.length() - 1;
@@ -409,20 +412,23 @@ public class ConnMgr {
      * @param len number of bytes to read
      * @return a byte array of len bytes
      */
-    public synchronized byte[] readBytes(int len) throws IOException {
+    public byte[] readBytes(int len) throws IOException {
 
-        setReadTimeout();
         final byte[] bytes = new byte[len];
-        int read = read(bytes, 0, len);
-        int got  = 0;
+        synchronized (is) {
+            setReadTimeout();
+            
+            int read = read(bytes, 0, len);
+            int got  = 0;
 
-        while (read < len) {
-            got = read(bytes, read, len - read);
-            read += got;
+            while (read < len) {
+                got = read(bytes, read, len - read);
+                read += got;
+            }
+
+            LogUtil.debug("readBytes read " + read + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$
+            restoreReadTimeout();
         }
-
-        LogUtil.debug("readBytes read " + read + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$
-        restoreReadTimeout();
         return bytes;
     }
 
@@ -430,16 +436,17 @@ public class ConnMgr {
      * Read a MythTV style stringlist from the socket (unbuffered)
      * @return List of strings
      */
-    public synchronized String[] readStringList() throws IOException {
-
-        setReadTimeout();
-        // First 8 bytes are the length
+    public String[] readStringList() throws IOException {
+        
         byte[] bytes = new byte[8];
-        read(bytes, 0, 8);
+        synchronized (is) {
+            setReadTimeout();
+            // First 8 bytes are the length
+            read(bytes, 0, 8);
+        }
         int len = Integer.parseInt(new String(bytes).trim());
         bytes = readBytes(len);
         return new String(bytes).split("\\[\\]:\\[\\]"); //$NON-NLS-1$
-        
     }
 
     /**
@@ -447,7 +454,9 @@ public class ConnMgr {
      * @return true if socket is connected, false otherwise
      */
     public boolean isConnected() {
-        return sock != null && sock.isConnected() && inUse;
+        synchronized (sockLock) {
+            return sock != null && sock.isConnected() && inUse;
+        }
     }
     
     /**
@@ -455,8 +464,10 @@ public class ConnMgr {
      * socket since the ConnMgr will be cached in case it can be reused
      */
     public void disconnect() {
-        inUse = false;
-        lastUsed = System.currentTimeMillis();
+        synchronized (sockLock) {
+            inUse = false;
+            lastUsed = System.currentTimeMillis();
+        }
         if (wifiLock != null && wifiLock.isHeld())
             wifiLock.release();
     }
@@ -469,7 +480,7 @@ public class ConnMgr {
     }
 
     /** Disconnect all currently connected connections */
-    static public synchronized void disconnectAll() throws IOException {
+    static public void disconnectAll() throws IOException {
 
         /* 
          * Local array of connections to dispose of once we've finished
@@ -479,13 +490,18 @@ public class ConnMgr {
         
         synchronized(conns) {
 
+            boolean iU = false;
+            
             for (WeakReference<ConnMgr> r : conns) {
 
                 if (r == null) continue;
                 ConnMgr c = r.get();
                 if (c == null) continue;
-                c.reconnectPending = true;
-                if (c.inUse)
+                synchronized (c.sockLock) {
+                    c.reconnectPending = true;
+                    iU = c.inUse;
+                }
+                if (iU)
                     c.doDisconnect();
                 else
                     dispose.add(c);
@@ -503,7 +519,7 @@ public class ConnMgr {
     }
 
     /** Reconnect all disconnected connections */
-    static public synchronized void reconnectAll() throws IOException {
+    static public void reconnectAll() throws IOException {
 
         synchronized(conns) {
 
@@ -540,8 +556,10 @@ public class ConnMgr {
                 if (r == null) continue;
                 ConnMgr c = r.get();
                 if (c == null) continue;
-                if (c.inUse == false && c.lastUsed + maxAge < now)
-                    dispose.add(c);
+                synchronized (c.sockLock) {
+                    if (c.inUse == false && c.lastUsed + maxAge < now)
+                        dispose.add(c);
+                }
                     
             }
             
@@ -569,19 +587,22 @@ public class ConnMgr {
                 if (r == null) continue;
                 ConnMgr c = r.get();
                 if (c == null) continue;
-                if (
-                     c.addr.equals(host + ":" + port) && //$NON-NLS-1$
-                     c.sock != null                   &&
-                     c.sock.isConnected()             &&
-                     c.inUse == false
-                ) {
-                    c.inUse = true;
-                    if (c.wifiLock != null)
-                        c.wifiLock.acquire();
-                    LogUtil.debug(
-                        "Reusing an existing connection to " + host + ":" + port //$NON-NLS-1$ //$NON-NLS-2$
-                    );
-                    return c;
+                synchronized (c.sockLock) {
+                    if (
+                        c.sock != null                   &&
+                        c.addr.equals(host + ":" + port) && //$NON-NLS-1$
+                        c.sock.isConnected()             &&
+                        c.inUse == false
+                    ) {
+                        c.inUse = true;
+                        if (c.wifiLock != null)
+                            c.wifiLock.acquire();
+                        LogUtil.debug(
+                            "Reusing an existing connection to " + //$NON-NLS-1$
+                            host + ":" + port //$NON-NLS-1$
+                        );
+                        return c;
+                    }
                 }
                     
             }
@@ -595,7 +616,7 @@ public class ConnMgr {
      * Connect to the remote host
      * @param timeout connect timeout in milliseconds
      */
-    private synchronized void doConnect(int timeout) throws IOException {
+    private void doConnect(int timeout) throws IOException {
 
         // Wait for a maximum of 5s if a WiFi link is being established
         ConnectivityReceiver.waitForWifi(Globals.appContext, 5000);
@@ -604,46 +625,47 @@ public class ConnMgr {
             LogUtil.debug(addr + " is already connected"); //$NON-NLS-1$
             return;
         }
-
-        sock = new Socket();
-        sock.setTcpNoDelay(true);
-        sock.setSoTimeout(timeout);
-
-        for (int i = 0; i < 3; i++) {
-            LogUtil.debug("Connecting to " + addr); //$NON-NLS-1$
-            try {
-                sock.connect(sockAddr, timeout / 2);
-            } catch (UnknownHostException e) {
-                throw new IOException(
-                    Messages.getString("ConnMgr.1") + hostname //$NON-NLS-1$
-                );
-            } catch (SocketTimeoutException e) {
-                if (i < 3)
-                    continue;
-                throw
-                    new IOException(
-                        Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
-                            Messages.getString("ConnMgr.4") //$NON-NLS-1$
-                    );
-            } catch (IOException e) {
-                throw
-                    new IOException(
-                        Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
-                            Messages.getString("ConnMgr.7") //$NON-NLS-1$
-                    );
-            }
-            if (sock.isConnected())
-                break;
-        }
         
-        reconnectPending = false;
+        synchronized (sockLock) {
 
-        os = sock.getOutputStream();
-        is = sock.getInputStream();
-
-        LogUtil.debug("Connection to " + addr + " successful"); //$NON-NLS-1$ //$NON-NLS-2$
-
-        inUse = true;
+            sock = new Socket();
+            sock.setTcpNoDelay(true);
+            sock.setSoTimeout(timeout);
+                
+            for (int i = 0; i < 3; i++) {
+                LogUtil.debug("Connecting to " + addr); //$NON-NLS-1$
+                try {
+                    sock.connect(sockAddr, timeout / 2);
+                } catch (UnknownHostException e) {
+                    throw 
+                        new IOException(
+                            Messages.getString("ConnMgr.1") + hostname //$NON-NLS-1$
+                        );
+                } catch (SocketTimeoutException e) {
+                    if (i < 3)
+                        continue;
+                    throw
+                        new IOException(
+                            Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
+                                Messages.getString("ConnMgr.4") //$NON-NLS-1$
+                        );
+                } catch (IOException e) {
+                    throw
+                        new IOException(
+                            Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
+                                Messages.getString("ConnMgr.7") //$NON-NLS-1$
+                        );
+                }
+                if (sock.isConnected())
+                    break;
+            }
+            
+            reconnectPending = false;
+            os = sock.getOutputStream();
+            is = sock.getInputStream();
+            LogUtil.debug("Connection to " + addr + " successful"); //$NON-NLS-1$ //$NON-NLS-2$
+            inUse = true;
+        }
 
         // Execute onConnectListeners
         for (onConnectListener oCL : oCLs)
@@ -651,19 +673,18 @@ public class ConnMgr {
 
     }
 
-    /**
-     * Actually disconnect the socket
-     */
+    /** Actually disconnect the socket */
     private void doDisconnect() throws IOException {
         if (sock == null) return;
-        LogUtil.debug("Disconnecting from " + addr); //$NON-NLS-1$
-        if (!sock.isClosed())
-            sock.close();
-        sock = null;
+        synchronized (sockLock) {
+            LogUtil.debug("Disconnecting from " + addr); //$NON-NLS-1$
+            if (!sock.isClosed())
+                sock.close();
+            sock = null;
+        }
     }
 
-    private synchronized int read(byte[] buf, int off, int len)
-        throws IOException {
+    private int read(byte[] buf, int off, int len) throws IOException {
 
         int ret = -1;
         
@@ -677,6 +698,9 @@ public class ConnMgr {
             LogUtil.debug(msg);
 
             if (!isConnected()) {
+                LogUtil.warn(
+                    "Disconnected from " + addr + ", wait for reconnect"  //$NON-NLS-1$ //$NON-NLS-2$
+                );
                 waitForConnection(timeout * 4);
                 write(lastSent);
                 return read(buf, off, len);
@@ -688,7 +712,7 @@ public class ConnMgr {
         }
 
         if (ret == -1) {
-            LogUtil.warn("read from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$
+            LogUtil.warn("Read from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$
             dispose();
             throw new IOException(Messages.getString("ConnMgr.0") + addr); //$NON-NLS-1$
         }
@@ -711,7 +735,7 @@ public class ConnMgr {
      * Wait for a connection to be established
      * @param timeout - maximum wait time in milliseconds
      */
-    private synchronized void waitForConnection(int timeout) throws IOException
+    private void waitForConnection(int timeout) throws IOException
     {
 
         if (!reconnectPending) {
@@ -739,7 +763,7 @@ public class ConnMgr {
             } catch (InterruptedException e) {
                 String msg = Messages.getString("ConnMgr.3") + addr; //$NON-NLS-1$
                 LogUtil.debug(msg);
-                inUse = false;
+                synchronized (sockLock) { inUse = false; }
                 timer.cancel();
                 throw new IOException(msg);
             }
