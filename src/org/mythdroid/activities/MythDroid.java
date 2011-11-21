@@ -113,8 +113,6 @@ public class MythDroid extends MDListActivity implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Globals.destroyBackend();
-        Globals.destroyFrontend();
         FrontendDB.close();
     }
 
