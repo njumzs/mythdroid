@@ -153,16 +153,14 @@ public class RecListFragment extends ListFragment
      */
     public void updateSelection() {
         
-        if (activity.checkedIndex < 0)
-            activity.checkedIndex = 0;
-        
         int maxIndex = lv.getCount() - 1;
         
         if (maxIndex >= 0) 
             activity.checkedIndex = Math.min(activity.checkedIndex, maxIndex);
-        int cIdx = activity.checkedIndex;
         
-        Program p = (Program)lv.getItemAtPosition(cIdx);
+        if (activity.checkedIndex > maxIndex) return;
+        
+        Program p = (Program)lv.getItemAtPosition(activity.checkedIndex);
         if (p == null) return;
         Globals.curProg = p;
 
@@ -170,7 +168,7 @@ public class RecListFragment extends ListFragment
         
         if (!dualPane) return;
         
-        lv.setItemChecked(cIdx, true);
+        lv.setItemChecked(activity.checkedIndex, true);
         
         // Do we need to add / replace the fragment in the details view slot?
         Fragment df = getFragmentManager().findFragmentById(R.id.recdetails);
