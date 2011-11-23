@@ -491,7 +491,12 @@ public class MythDroid extends MDListActivity implements
     private void getPreferences() {
         Globals.backend =
             PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("backendAddr", ""); //$NON-NLS-1$ //$NON-NLS-2$
+                .getString("backendAddr", "").trim(); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        if (!Globals.backend.contains(" ")) return;//$NON-NLS-1$
+        
+        ErrUtil.err(ctx, Messages.getString("Prefs.1")); //$NON-NLS-1$
+        Globals.backend = "";	 //$NON-NLS-1$
     }
 
 }
