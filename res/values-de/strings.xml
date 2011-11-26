@@ -2,10 +2,10 @@
 <resources>
     <string name="appName">MythDroid</string>
     <string name="settings">Einstellungen</string>
+    <string name="defFe">Standard frontend</string>
     <string name="setCurFe">Setze Derzeitiges Frontend</string>
-    <string name="setDefFe">Setze standard frontend</string>
-    <string name="curFe">Derzeitiges Frontend: </string>
-    <string name="curSetTo">Derzeitiger Wert: </string>
+    <string name="curFe">Frontend: </string>
+    <string name="none">Keiner</string>
     <string name="noBe">Keine Backends gefunden</string>
     <string name="noBeDetail">Manuell in den Einstellungen konfigurieren?</string>
     <string name="editFes">Bearbeite Frontends</string>
