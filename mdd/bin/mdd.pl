@@ -628,9 +628,9 @@ sub streamFile($) {
         }
 
     }
-
-    $file =~ s/ /\\ /g;
-    $file =~ s/'/\\'/g;
+    
+    # Escape shell metacharacters
+    $file =~ s/([ &'`\\"\|\*!?~<>\^\(\)\[\]\{\}\$])/\\$1/g;
 
     $log->dbg("Streaming - resolved path is $file");
     
