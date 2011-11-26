@@ -153,7 +153,7 @@ public class Globals {
         if (backend != null && backend.length() > 0)
             try {
                 beMgr = new BackendManager(backend);
-            } catch(IOException e) {}
+            } catch (IOException e) {}
             
         if (beMgr == null) {
             // See if we can locate a backend via UPnP
