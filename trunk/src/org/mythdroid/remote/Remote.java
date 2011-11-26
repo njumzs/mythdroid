@@ -71,9 +71,9 @@ public abstract class Remote extends Activity implements View.OnClickListener {
 
     private boolean alt = false, shift = false, moveWake = true;
 
-    private GestureDetector gDetector;
-    private ServiceConnection wakeConnection = null;
-    private Messenger wakeMessenger = null;
+    private GestureDetector     gDetector      = null;
+    private ServiceConnection   wakeConnection = null;
+    private Messenger           wakeMessenger  = null;
 
     private class RemoteGestureListener extends SimpleOnGestureListener {
 
@@ -264,10 +264,12 @@ public abstract class Remote extends Activity implements View.OnClickListener {
 
     @Override
     public void onResume() {
+        
         super.onResume();
         
         if (Globals.appContext == null)
             Globals.appContext = getApplicationContext();
+        
         if (wakeMessenger != null && wakeConnection != null) 
             try {
                 Message msg = new Message();

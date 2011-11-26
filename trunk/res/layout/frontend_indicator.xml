@@ -10,8 +10,8 @@
         android:id="@+id/label"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_marginLeft="12sp"
-        android:textSize="20sp"
+        android:layout_marginLeft="10sp"
+        android:textSize="18sp"
         android:textColor="#FFFFFF"
         android:text="@string/curFe"/>
 
@@ -20,8 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_marginLeft="8sp"
-        android:layout_marginRight="12sp"
-        android:textSize="20sp"
+        android:layout_marginRight="10sp"
+        android:textSize="18sp"
         android:textColor="#FFFFFF"/>
 
 </LinearLayout>

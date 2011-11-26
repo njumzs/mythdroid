@@ -48,7 +48,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 import android.view.View.OnClickListener;
 import android.view.LayoutInflater;
-import android.widget.LinearLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -168,9 +167,7 @@ public abstract class MDActivity extends Activity {
     public void onResume() {
         super.onResume();
         
-        // Reset Frontend Indicator
-        if (frontendIndicator != null)
-            frontendIndicator.setText(Globals.currentFrontend);
+        updateFrontendIndicator();
         
         if (Globals.appContext == null)
             Globals.appContext = getApplicationContext();
@@ -212,8 +209,7 @@ public abstract class MDActivity extends Activity {
                     onHere = false;
                     String fe = (String)av.getAdapter().getItem(pos);
                     Globals.currentFrontend = fe;
-                    if (frontendIndicator != null)
-                        frontendIndicator.setText(fe);
+                    updateFrontendIndicator();
                     if (fe.equals(Messages.getString("MDActivity.0")))  // Here //$NON-NLS-1$
                         onHere = true;
                     d.dismiss();
@@ -314,16 +310,12 @@ public abstract class MDActivity extends Activity {
             View vi = LayoutInflater.from(this).inflate(
                 R.layout.frontend_indicator, null
             );
-
-            frontendIndicator = (TextView)vi.findViewById(R.id.text);
-            frontendIndicator.setText(Globals.currentFrontend);
-            
-            LinearLayout l = (LinearLayout)vi.findViewById(R.id.layout);
-            l.setFocusable(true);
-            l.setBackgroundResource(
+                  
+            vi.setFocusable(true);
+            vi.setBackgroundResource(
                 android.R.drawable.list_selector_background
             );
-            l.setOnClickListener(
+            vi.setOnClickListener(
                 new OnClickListener() {
                     @Override
                     public void onClick( View v ) {
@@ -332,6 +324,9 @@ public abstract class MDActivity extends Activity {
                     }
                 }
             );
+            
+            frontendIndicator = (TextView)vi.findViewById(R.id.text);
+            updateFrontendIndicator();
 
             MenuItem.class.getMethod(
                 "setActionView", View.class //$NON-NLS-1$
@@ -341,6 +336,14 @@ public abstract class MDActivity extends Activity {
           catch (IllegalAccessException e)    {}
           catch (InvocationTargetException e) {}
           
+    }
+    
+    private void updateFrontendIndicator() {
+        if (frontendIndicator == null) return;
+        if (Globals.currentFrontend != null)
+            frontendIndicator.setText(Globals.currentFrontend);
+        else
+            frontendIndicator.setText(R.string.none);
     }
     
 }
