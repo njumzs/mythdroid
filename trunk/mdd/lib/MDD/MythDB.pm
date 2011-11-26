@@ -185,7 +185,7 @@ sub getVideos($) {
         }
         my $id = $aref->[0];
         my $msg = "VIDEO $id";
-        map { $msg .= '||' . $_ } @{$aref}[1 .. $#$aref];
+        map { $msg .= '||' . ($_ ? $_ : '') } @{$aref}[1 .. $#$aref];
         push @vids, $msg;
     }
 
