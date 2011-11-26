@@ -180,6 +180,7 @@ public class RecListFragment extends ListFragment
             showDetails();
             return;
         }
+
         Program prog = ((RecDetailFragment)df).getProg();
         if (prog == null || !prog.equals(Globals.curProg))
             showDetails();    
