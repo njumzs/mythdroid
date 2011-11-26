@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end comment
 =cut
 
-$VERSION = 0.5.2;
+$VERSION = 0.5.3;
 
 use strict;
 use warnings;
