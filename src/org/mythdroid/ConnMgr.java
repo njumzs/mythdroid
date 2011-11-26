@@ -79,14 +79,19 @@ public class ConnMgr {
     /** Receive buffer size */
     final private static int        rbufSize         = 128;
     /** Maximum age of unused connections in milliseconds */
-    final private static int        maxAge           = 60000; 
+    final private static int        maxAge           = 60000;
+    
+    /** List of onConnect callbacks */
+    final private ArrayList<onConnectListener> oCLs = 
+        new ArrayList<onConnectListener>();
+        
+    /** A lock for operations that modify sock, inUse or reconnectPending */
+    final private Object            sockLock         = new Object();
     
     /** A weak reference to ourself */
     private WeakReference<ConnMgr>  weakThis         = null;
     /** Our socket */
     private Socket                  sock             = null;
-    /** A lock for operations that modify sock, inUse or reconnectPending */
-    private Object                  sockLock         = new Object();
     /** The sockaddr of the remote host */
     private InetSocketAddress       sockAddr         = null;
     /** Our outputstream */
@@ -98,7 +103,7 @@ public class ConnMgr {
     /** Our receive buffer */
     private byte[]                  rbuf             = null;
     /** Default socket timeout for connect and read */
-    private int                     timeout          = 1000;
+    private int                     timeout          = 2000;
     /** Hostname of the remote host */
     private String                  hostname         = null;
     private WifiLock                wifiLock         = null;
@@ -112,9 +117,6 @@ public class ConnMgr {
     private byte[]                  lastSent         = null;
     /** The timeOut modifier for the next read */
     private timeOut                 timeOutModifier  = timeOut.DEFAULT;
-    /** List of onConnect callbacks */
-    private ArrayList<onConnectListener> oCLs = 
-        new ArrayList<onConnectListener>();
     
     /**
      * Make a connection, reuse an existing connection if possible
@@ -220,10 +222,10 @@ public class ConnMgr {
         if (wifi) {
             if (sockAddr.getAddress().isLoopbackAddress())
                 // SSH port forward we guess
-                timeout *= 10;
+                timeout *= 5;
         }
         else
-            timeout *= 10;
+            timeout *= 5;
 
         doConnect(timeout);
         
@@ -244,7 +246,7 @@ public class ConnMgr {
      * Set the read timeout for the next read
      * @param time a ConnMgr.timeOut value
      */
-    public void setTimeout(timeOut time) {
+    public void setTimeout(final timeOut time) {
         timeOutModifier = time;
     }
     
@@ -293,7 +295,7 @@ public class ConnMgr {
      * Separate and write a stringlist to the socket
      * @param list Array of strings to write
      */
-    public void sendStringList(String[] list) throws IOException {
+    public void sendStringList(final String[] list) throws IOException {
 
         String str = list[0];
 
@@ -412,7 +414,7 @@ public class ConnMgr {
      * @param len number of bytes to read
      * @return a byte array of len bytes
      */
-    public byte[] readBytes(int len) throws IOException {
+    public byte[] readBytes(final int len) throws IOException {
 
         final byte[] bytes = new byte[len];
         synchronized (is) {
@@ -486,7 +488,7 @@ public class ConnMgr {
          * Local array of connections to dispose of once we've finished
          * iterating over conns (and dropped the lock on it)
          */
-        ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
+        final ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
         
         synchronized(conns) {
 
@@ -547,7 +549,7 @@ public class ConnMgr {
          * Local array of connections to dispose of once we've finished
          * iterating over conns (and dropped the lock on it)
          */
-        ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
+        final ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
         
         synchronized (conns) {
             
@@ -579,7 +581,7 @@ public class ConnMgr {
      * @param port desired port number
      * @return existing ConnMgr or null if none was found
      */
-    static private ConnMgr findExisting(String host, int port) {
+    static private ConnMgr findExisting(final String host, final int port) {
         
         synchronized (conns) {
             for (WeakReference<ConnMgr> r : conns) {
@@ -684,7 +686,8 @@ public class ConnMgr {
         }
     }
 
-    private int read(byte[] buf, int off, int len) throws IOException {
+    private int read(byte[] buf, final int off, final int len) 
+    	throws IOException {
 
         int ret = -1;
         
@@ -701,9 +704,7 @@ public class ConnMgr {
                 LogUtil.warn(
                     "Disconnected from " + addr + ", wait for reconnect"  //$NON-NLS-1$ //$NON-NLS-2$
                 );
-                waitForConnection(timeout * 4);
-                write(lastSent);
-                return read(buf, off, len);
+                retryRead(buf, off, len);
             }
             
             dispose();
@@ -712,16 +713,15 @@ public class ConnMgr {
         }
 
         if (ret == -1) {
-            LogUtil.warn("Read from " + addr + " failed"); //$NON-NLS-1$ //$NON-NLS-2$
-            dispose();
-            throw new IOException(Messages.getString("ConnMgr.0") + addr); //$NON-NLS-1$
+            LogUtil.warn("Read from " + addr + " failed, wait for reconnect"); //$NON-NLS-1$ //$NON-NLS-2$
+            retryRead(buf, off, len);
         }
        
         return ret;
 
     }
 
-    private void write(byte[] buf) throws IOException {
+    private void write(final byte[] buf) throws IOException {
 
         if (!isConnected())
             waitForConnection(timeout * 4);
@@ -769,6 +769,15 @@ public class ConnMgr {
             }
         
         timer.cancel();
+        
+    }
+    
+    private int retryRead(byte[] buf, final int off, final int len)
+    	throws IOException {
+    	
+    	waitForConnection(timeout * 4);
+        if (lastSent != null) write(lastSent);
+        return read(buf, off, len);
         
     }
     
