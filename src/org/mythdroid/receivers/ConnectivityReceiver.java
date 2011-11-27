@@ -98,9 +98,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
         netType = type;
         connected = true;
 
-        try {
-            ConnMgr.reconnectAll();
-        } catch (IOException e) {}
+        ConnMgr.reconnectAll();
 
     }
 

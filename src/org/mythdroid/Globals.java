@@ -155,7 +155,7 @@ public class Globals {
                 beMgr = new BackendManager(backend);
             } catch (IOException e) {}
             
-        if (beMgr == null) {
+        if (beMgr == null || !beMgr.isConnected()) {
             // See if we can locate a backend via UPnP
             beMgr = BackendManager.locate();
             muxConns = false;
