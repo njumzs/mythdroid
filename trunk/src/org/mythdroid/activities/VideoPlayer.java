@@ -30,6 +30,7 @@ import org.mythdroid.data.Program;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.LogUtil;
 import org.mythdroid.views.MDVideoView;
 import org.mythdroid.views.MDVideoView.OnSeekListener;
 import org.mythdroid.vlc.VLCRemote;
@@ -44,6 +45,7 @@ import android.content.DialogInterface.OnDismissListener;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
@@ -59,15 +61,15 @@ import android.widget.AdapterView.OnItemClickListener;
 /** MDActivity that displays streamed Video */
 public class VideoPlayer extends MDActivity {
     
-    final private Context ctx = this;
+    final private Context ctx        = this;
     final private int DIALOG_QUALITY = 1;
     
-    private int vb = 0, ab = 0, vwidth = 0, vheight = 0;
-    private MDVideoView videoView = null;
-    private BackendManager beMgr = null;
-    private VLCRemote vlc = null;
-    private MediaPlayer mplayer = null;
-    private Uri url = null;
+    private int            vb = 0, ab = 0, vwidth = 0, vheight = 0, retries = 0;
+    private MDVideoView    videoView   = null;
+    private BackendManager beMgr       = null;
+    private VLCRemote      vlc         = null;
+    private MediaPlayer    mplayer     = null;
+    private Uri            url         = null;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -266,14 +268,25 @@ public class VideoPlayer extends MDActivity {
            sdpAddr = sdpPublicAddr;
 
         url = Uri.parse("rtsp://" + sdpAddr + ":5554/stream"); //$NON-NLS-1$ //$NON-NLS-2$
-
-        videoView.setVideoURI(url);
         
         videoView.setOnCompletionListener(
             new OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     finish();
+                }
+            }
+        );
+        
+        videoView.setOnErrorListener(
+            new OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    LogUtil.warn("MediaPlayer err " + what + " extra " + extra); //$NON-NLS-1$ //$NON-NLS-2$
+                    if (retries > 2) return false;
+                    retries++;
+                    playVideo();
+                    return true;
                 }
             }
         );
@@ -322,6 +335,8 @@ public class VideoPlayer extends MDActivity {
                 }
             }
         );
+
+        videoView.setVideoURI(url);
         
     }
 
