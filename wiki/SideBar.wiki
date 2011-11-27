@@ -13,4 +13,5 @@
    * [SettingsGuide Settings Guide]
    * [RemoteGuide Remotes Guide]
    * [StreamingGuide Streaming Guide]
+  * [GettingInvolved Getting Involved]
   
