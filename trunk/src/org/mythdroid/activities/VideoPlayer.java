@@ -226,7 +226,7 @@ public class VideoPlayer extends MDActivity {
         
         int attempts = 0;
         
-        while (attempts < 6 && vlc == null)
+        while (attempts < 8 && vlc == null)
             try {
                 vlc = new VLCRemote(beMgr.addr);
             } catch (IOException e) { 
@@ -284,6 +284,7 @@ public class VideoPlayer extends MDActivity {
                 public boolean onError(MediaPlayer mp, int what, int extra) {
                     LogUtil.warn("MediaPlayer err " + what + " extra " + extra); //$NON-NLS-1$ //$NON-NLS-2$
                     if (retries > 2) return false;
+                    mplayer.reset();
                     retries++;
                     playVideo();
                     return true;
