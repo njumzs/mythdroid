@@ -18,8 +18,8 @@ Check out the resources below and then get in touch (via the development mailing
 
 == Resources ==
 
+ * The [http://code.google.com/p/mythdroid/issues/list issues list]
  * The [http://groups.google.com/group/mythdroid-dev development mailing list]
  * The #mythdroid IRC channel on freenode
  * [http://mythdroid.googlecode.com/svn/docs/index.html MythDroid's javadocs]
  * The [http://code.google.com/p/mythdroid/source/browse/ source]
-
