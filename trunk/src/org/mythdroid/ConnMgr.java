@@ -521,8 +521,10 @@ public class ConnMgr {
     }
 
     /** Reconnect all disconnected connections */
-    static public void reconnectAll() throws IOException {
+    static public void reconnectAll() {
 
+        final ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
+        
         synchronized(conns) {
 
             for (WeakReference<ConnMgr> r : conns) {
@@ -530,9 +532,19 @@ public class ConnMgr {
                 if (r == null) continue;
                 ConnMgr c = r.get();
                 if (c == null) continue;
-                c.doConnect(c.timeout);
+                try {
+                    c.doConnect(c.timeout);
+                } catch (IOException e) {
+                    LogUtil.warn("Failed to reconnect to " + c.addr); //$NON-NLS-1$
+                    dispose.add(c);
+                }
 
             }
+            
+            for (ConnMgr r : dispose)
+                try {
+                    r.dispose();
+                } catch (IOException e) {}
 
         }
 
