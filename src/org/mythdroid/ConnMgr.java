@@ -726,6 +726,7 @@ public class ConnMgr {
 
         if (ret == -1) {
             LogUtil.warn("Read from " + addr + " failed, wait for reconnect"); //$NON-NLS-1$ //$NON-NLS-2$
+            doDisconnect();
             retryRead(buf, off, len);
         }
        
