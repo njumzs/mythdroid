@@ -39,7 +39,9 @@ public class FrontendManager {
     final private IllegalArgumentException invalidParam =
         new IllegalArgumentException(Messages.getString("FrontendManager.2")); //$NON-NLS-1$
     
-    private ConnMgr cmgr = null;
+    final private Object cmgrLock = new Object(); 
+    
+    private ConnMgr cmgr          = null;
     
     /**
      * Constructor
@@ -48,15 +50,17 @@ public class FrontendManager {
      */
     public FrontendManager(String name, String host) throws IOException {
 
-        cmgr = ConnMgr.connect(
-            host, 6546,
-            new onConnectListener() {
-                @Override
-                public void onConnect(ConnMgr cmgr) throws IOException {
-                    readToPrompt(cmgr);
+        synchronized (cmgrLock) {
+            cmgr = ConnMgr.connect(
+                host, 6546,
+                new onConnectListener() {
+                    @Override
+                    public void onConnect(ConnMgr cmgr) throws IOException {
+                        readToPrompt(cmgr);
+                    }
                 }
-            }
-        );
+            );
+        }
 
         this.name = name;
         addr = host;
@@ -68,8 +72,9 @@ public class FrontendManager {
      * @return true if we are connected, false otherwise
      */
     public boolean isConnected() {
-        if (cmgr == null) return false;
-        synchronized (cmgr){ return cmgr.isConnected(); }
+        synchronized (cmgrLock) {
+            return (cmgr != null && cmgr.isConnected());
+        }
     }
 
     /**
@@ -201,7 +206,7 @@ public class FrontendManager {
     /** Disconnect from the frontend */
     public void disconnect() {
         if (!isConnected()) return;
-        synchronized (cmgr) {
+        synchronized (cmgrLock) {
             cmgr.disconnect();
             cmgr = null;
         }
@@ -230,7 +235,7 @@ public class FrontendManager {
         checkConnection();
         final ArrayList<String> resp = new ArrayList<String>(64);
         String msg = ""; //$NON-NLS-1$
-        synchronized (cmgr) {
+        synchronized (cmgrLock) {
             cmgr.writeLine(cmd);
             cmgr.setTimeout(time);
             while (cmgr != null) {
@@ -246,7 +251,7 @@ public class FrontendManager {
 
     /** Read until we see a prompt */
     private void readToPrompt(ConnMgr cmgr) throws IOException {
-        synchronized (cmgr) {
+        synchronized (cmgrLock) {
             while (cmgr != null)
                 if (cmgr.readLine().equals("#")) break; //$NON-NLS-1$
         }
@@ -254,7 +259,7 @@ public class FrontendManager {
 
     private String getSingleLineResponse(String cmd) throws IOException {
         checkConnection();
-        synchronized (cmgr) {
+        synchronized (cmgrLock) {
             cmgr.writeLine(cmd);
             final String line = cmgr.readLine();
             while (cmgr != null)
@@ -267,7 +272,7 @@ public class FrontendManager {
         throws IOException {
         
         checkConnection();
-        synchronized (cmgr) {
+        synchronized (cmgrLock) {
             cmgr.writeLine(cmd);
             cmgr.setTimeout(time);
             final String line = cmgr.readLine();
@@ -280,18 +285,23 @@ public class FrontendManager {
     
     private void checkConnection() throws IOException {
         
-        if (cmgr != null && cmgr.isConnected()) return;
-        if (cmgr != null) cmgr.dispose();
-
-        cmgr = ConnMgr.connect(
-            addr, 6546, 
-            new onConnectListener() {
-                @Override
-                public void onConnect(ConnMgr cmgr) throws IOException {
-                    readToPrompt(cmgr);
+        if (cmgr.isConnected()) return;
+        
+        synchronized (cmgrLock) {
+            
+            if (cmgr != null) cmgr.dispose();
+            
+            cmgr = ConnMgr.connect(
+                addr, 6546, 
+                new onConnectListener() {
+                    @Override
+                    public void onConnect(ConnMgr cmgr) throws IOException {
+                        readToPrompt(cmgr);
+                    }
                 }
-            }
-        );
+            );
+            
+        }
         
     }
 
