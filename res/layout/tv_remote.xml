@@ -150,6 +150,6 @@
     	android:textColor="#ff333333"
     	android:text="123"
     	android:textSize="13sp"
-    	android:gravity="center"/>"
+    	android:gravity="center"/>
    
 </RelativeLayout>
