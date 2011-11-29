@@ -87,7 +87,7 @@
     	style="@style/MDButton58"
     	android:layout_toRightOf="@id/back"
     	android:layout_below="@id/back"
-    	android:layout_marginTop="12dp"
+    	android:layout_marginTop="16dp"
     	android:layout_marginLeft="16dp"
     	android:src="@drawable/left"/>
     	
@@ -147,10 +147,11 @@
     <SeekBar android:id="@+id/progress"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
-    	android:layout_toRightOf="@id/right"
+    	android:layout_alignLeft="@id/title"
  		android:layout_alignParentRight="true"
     	android:layout_below="@id/title"
     	android:layout_marginTop="4dp"
+    	android:layout_marginLeft="24dp"
     	android:layout_marginBottom="8dp"
     	android:gravity="center"
     	style="?android:attr/progressBarStyleHorizontal"/>	
