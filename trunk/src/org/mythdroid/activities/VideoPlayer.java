@@ -285,7 +285,7 @@ public class VideoPlayer extends MDActivity {
                     LogUtil.warn("MediaPlayer err " + what + " extra " + extra); //$NON-NLS-1$ //$NON-NLS-2$
                     dismissLoadingDialog();
                     if (retries > 2) return false;
-                    mplayer.reset();
+                    if (mp != null)  mp.reset();
                     retries++;
                     showLoadingDialog();
                     playVideo();
