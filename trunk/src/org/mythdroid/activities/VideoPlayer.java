@@ -46,6 +46,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
+import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
@@ -331,16 +332,7 @@ public class VideoPlayer extends MDActivity {
                     vwidth = mp.getVideoWidth();
                     vheight = mp.getVideoHeight();
                     videoView.setVideoSize(vwidth, vheight);
-                    mp.setOnVideoSizeChangedListener(
-                        new OnVideoSizeChangedListener() {
-                            @Override
-                            public void onVideoSizeChanged(
-                                MediaPlayer mp, int width, int height
-                            ) {
-                               videoView.setVideoSize(width, height);
-                            }
-                        }
-                    );
+                    setupMediaPlayer(mp);
                     mplayer = mp;
                     videoView.start();
                 }
@@ -350,5 +342,33 @@ public class VideoPlayer extends MDActivity {
         videoView.setVideoURI(url);
         
     }
-
+    
+    private void setupMediaPlayer(final MediaPlayer mp) {
+        
+        mp.setOnVideoSizeChangedListener(
+            new OnVideoSizeChangedListener() {
+                @Override
+                public void onVideoSizeChanged(
+                    MediaPlayer mp, int width, int height
+                ) {
+                   videoView.setVideoSize(width, height);
+                }
+            }
+        );
+        
+        mp.setOnInfoListener(
+            new OnInfoListener() {
+                @Override
+                public boolean onInfo(
+                    MediaPlayer mp, int what, int extra
+                ) {
+                    if (what == MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING)
+                        LogUtil.warn("Video decode is too slow"); //$NON-NLS-1$
+                    return false;
+                }
+            }
+        );
+        
+    }
+    
 }
