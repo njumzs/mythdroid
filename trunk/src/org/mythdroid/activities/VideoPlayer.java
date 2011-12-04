@@ -288,7 +288,15 @@ public class VideoPlayer extends MDActivity {
                     if (mp != null)  mp.reset();
                     retries++;
                     showLoadingDialog();
-                    playVideo();
+                    new Handler().postDelayed(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                playVideo();
+                            }
+                            
+                        }, 2000
+                    );
                     return true;
                 }
             }
