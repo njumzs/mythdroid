@@ -540,13 +540,13 @@ public class ConnMgr {
                 }
 
             }
-            
-            for (ConnMgr r : dispose)
-                try {
-                    r.dispose();
-                } catch (IOException e) {}
 
         }
+        
+        for (ConnMgr r : dispose)
+            try {
+                r.dispose();
+            } catch (IOException e) {}
 
     }
     
