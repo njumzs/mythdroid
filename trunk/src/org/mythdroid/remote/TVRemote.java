@@ -139,13 +139,14 @@ public class TVRemote extends Remote {
             
             synchronized (feLock) {
                 if (feMgr == null || !feMgr.isConnected()) return;
-                try {
-                    loc = feMgr.getLoc();
-                } catch (IOException e) {
-                    ErrUtil.postErr(ctx, e);
-                    done();
-                    return;
-                }
+            }
+            
+            try {
+                synchronized (feLock) { loc = feMgr.getLoc(); }
+            } catch (IOException e) {
+                ErrUtil.postErr(ctx, e);
+                done();
+                return;
             }
             
             if (!loc.video) {
@@ -204,44 +205,50 @@ public class TVRemote extends Remote {
         @Override
         public void run() {
 
-            synchronized (feLock) {
-                
-                if (feMgr == null) return;
+            synchronized (feLock) { if (feMgr == null) return; }
             
-                try {
-                    if (livetv) {
-                        if (!feMgr.getLoc().livetv)
+            try {
+                
+                if (livetv) {
+                    
+                    FrontendLocation loc = null;
+                    synchronized (feLock) { 
+                        if (!(loc = feMgr.getLoc()).livetv)
                             feMgr.jumpTo("livetv"); //$NON-NLS-1$
-    
-                        if (!feMgr.getLoc().livetv) {
-                            ErrUtil.postErr(
-                                ctx, Messages.getString("TVRemote.1") //$NON-NLS-1$
-                            );
-                            done();
-                            return;
-                        }
-                        if (jumpChan >= 0) {
+                    }
+                    
+                    synchronized (feLock) { loc = feMgr.getLoc(); }
+                    if (!loc.livetv) {
+                        ErrUtil.postErr(ctx, Messages.getString("TVRemote.1")); //$NON-NLS-1$
+                        done();
+                        return;
+                    }
+                    
+                    if (jumpChan >= 0)
+                        synchronized (feLock) {
                             while(feMgr.getLoc().position < 1)
                                 Thread.sleep(500);
                             feMgr.playChan(jumpChan);
                         }
-                    }
-                    else if (filename != null)
-                        feMgr.playFile(filename);
-                    else
-                        feMgr.playRec(Globals.curProg);
-                } catch (IOException e) {
-                    ErrUtil.postErr(ctx, e);
-                    done();
-                    return;
-                } catch (InterruptedException e) {}
-                  catch (IllegalArgumentException e) { 
-                      ErrUtil.postErr(ctx, e);
-                      done();
-                      return;
-                  }
+                    
+                }
                 
-            }
+                else if (filename != null)
+                    synchronized (feLock) { feMgr.playFile(filename); }
+                else
+                    synchronized (feLock) { feMgr.playRec(Globals.curProg); }
+                
+            } catch (IOException e) {
+                ErrUtil.postErr(ctx, e);
+                done();
+                return;
+            } catch (InterruptedException e) {}
+              catch (IllegalArgumentException e) { 
+                  ErrUtil.postErr(ctx, e);
+                  done();
+                  return;
+              }
+            
             
             handler.post(ready);
 
