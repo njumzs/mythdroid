@@ -108,7 +108,7 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                 }
             }
             
-            LogUtil.debug("SMS from " + m); //$NON-NLS-1$
+            LogUtil.debug("SMS from " + from); //$NON-NLS-1$
             
             if (altOSD)
                 OSDMessage.XOSD(ctx, m);
