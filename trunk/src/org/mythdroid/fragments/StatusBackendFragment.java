@@ -65,8 +65,8 @@ public class StatusBackendFragment extends Fragment {
         int numNodes = nodes.getLength();
         String name = null;
         String stotal = Messages.getString("StatusBackend.1"), //$NON-NLS-1$
-                sused = Messages.getString("StatusBackend.2"), //$NON-NLS-1$
-                sfree = Messages.getString("StatusBackend.3"); //$NON-NLS-1$
+                sused = Messages.getString("StatusBackend.1"), //$NON-NLS-1$
+                sfree = Messages.getString("StatusBackend.1"); //$NON-NLS-1$
         NamedNodeMap attr = null;
 
         for (int i = 0; i < numNodes; i++) {

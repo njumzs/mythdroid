@@ -252,9 +252,9 @@ public class Program implements Comparable<Program> {
     @SuppressWarnings("all")
     public int          ChanID, RecID = -1, RecPrio = 0;
 
-    private String[] list                        = null;
+    private String[] list                     = null;
     private ArrayList<Commercial> commercials = new ArrayList<Commercial>();
-    private boolean fetchedCutList              = false;
+    private boolean fetchedCutList            = false;
     
     /**
      * Construct a Program from a stringlist
