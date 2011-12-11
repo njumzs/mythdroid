@@ -166,7 +166,7 @@ public class WakeService extends Service implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        if (event.values[2] == 0) return;
+        if (!isStarted || event.values[2] == 0) return;
 
         if (last0 != 0 || last1 != 0 || last2 != 0)
             if (
@@ -187,11 +187,11 @@ public class WakeService extends Service implements SensorEventListener {
 
     private void wakeUp() {
 
-        LogUtil.debug("Waking up"); //$NON-NLS-1$
-        
         // Ignore wake ups that are so soon after going to sleep
         if (System.currentTimeMillis() < startTime + 500)
             return;
+        
+        LogUtil.debug("Waking up"); //$NON-NLS-1$
         
         pm.newWakeLock(
             PowerManager.SCREEN_BRIGHT_WAKE_LOCK |
