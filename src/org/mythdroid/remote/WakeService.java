@@ -187,6 +187,8 @@ public class WakeService extends Service implements SensorEventListener {
 
     private void wakeUp() {
 
+        LogUtil.debug("Waking up"); //$NON-NLS-1$
+        
         // Ignore wake ups that are so soon after going to sleep
         if (System.currentTimeMillis() < startTime + 500)
             return;
