@@ -324,14 +324,12 @@ public class TVRemote extends Remote {
     @Override
     public void onResume() {
         super.onResume();
-        synchronized (feLock) {
-            try {
-                feMgr = Globals.getFrontend(this);
-            } catch (IOException e) {
-                ErrUtil.err(this, e);
-                finish();
-                return;
-            }
+        try {
+            synchronized (feLock) { feMgr = Globals.getFrontend(this); }
+        } catch (IOException e) {
+            ErrUtil.err(this, e);
+            finish();
+            return;
         }
 
         if (mddMgr == null)
