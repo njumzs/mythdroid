@@ -34,7 +34,7 @@ public class LogUtil {
         
         String method = ste.getMethodName();
         Log.e(
-            "Error ",  //$NON-NLS-1$
+            "MythDroid",  //$NON-NLS-1$
             msg + " in " + method + " at line " + ste.getLineNumber() + //$NON-NLS-1$ //$NON-NLS-2$
               " of " + ste.getFileName() //$NON-NLS-1$
         );
@@ -49,7 +49,7 @@ public class LogUtil {
         
         String method = ste.getMethodName();
         Log.w(
-            "Warning ",  //$NON-NLS-1$
+            "MythDroid",  //$NON-NLS-1$
             msg + " in " + method + " at line " + ste.getLineNumber() + //$NON-NLS-1$ //$NON-NLS-2$
               " of " + ste.getFileName() //$NON-NLS-1$
         );
