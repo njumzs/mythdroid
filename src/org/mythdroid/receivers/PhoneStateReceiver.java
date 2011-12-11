@@ -20,6 +20,7 @@ package org.mythdroid.receivers;
 
 import org.mythdroid.frontend.OSDMessage;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.LogUtil;
 import org.mythdroid.util.PhoneUtil;
 
 import android.content.BroadcastReceiver;
@@ -61,6 +62,8 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             number = intent.getStringExtra(
                 android.telephony.TelephonyManager.EXTRA_INCOMING_NUMBER
             );
+            
+            LogUtil.debug("Incoming call from " + number); //$NON-NLS-1$
 
             if (number != null) {
                 name = PhoneUtil.nameFromNumber(ctx, number);
@@ -101,6 +104,8 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                     m += msg.getDisplayMessageBody();
                 }
             }
+            
+            LogUtil.debug("SMS from " + m); //$NON-NLS-1$
             
             if (altOSD)
                 OSDMessage.XOSD(ctx, m);
