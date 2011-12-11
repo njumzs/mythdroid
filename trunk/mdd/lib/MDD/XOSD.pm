@@ -24,7 +24,7 @@ use strict;
 use warnings;
 use X::Osd;
 
-my $font = '-b&h-luxi sans-bold-*-normal-*-*-300-*-*-*-*-*-*';
+my $font = '-b&h-lucida-bold-*-normal-*-*-240-*-*-*-*-*-*';
 
 sub new {
 
@@ -39,6 +39,8 @@ sub new {
     $self->{outline}  = 5;
     $self->{timeout}  = 8;
     $self->{shadow}   = 0;
+
+    $ENV{LANG} = 'foo';
 
     return bless $self, $class;
 
