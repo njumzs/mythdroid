@@ -63,22 +63,25 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                 android.telephony.TelephonyManager.EXTRA_INCOMING_NUMBER
             );
             
+            if (number == null) {
+                number = Messages.getString("PhoneStateReceiver.1"); //$NON-NLS-1$
+                name   = Messages.getString("StatusBackend.1"); //$NON-NLS-1$
+            }
+            else
+                name = PhoneUtil.nameFromNumber(ctx, number);
+            
             LogUtil.debug("Incoming call from " + number); //$NON-NLS-1$
 
-            if (number != null) {
-                name = PhoneUtil.nameFromNumber(ctx, number);
-
-                if (altOSD)
-                    OSDMessage.XOSD(
-                        ctx, 
-                        Messages.getString("PhoneStateReceiver.0") +  //$NON-NLS-1$
-                            name + " (" + number + ")"   //$NON-NLS-1$//$NON-NLS-2$
-                    );
-                else
-                    try {
-                        OSDMessage.Caller(name, number);
-                    } catch (Exception e) {}
-            }
+            if (altOSD)
+                OSDMessage.XOSD(
+                    ctx, 
+                    Messages.getString("PhoneStateReceiver.0") +  //$NON-NLS-1$
+                        name + " (" + number + ")"   //$NON-NLS-1$//$NON-NLS-2$
+                );
+            else
+                try {
+                    OSDMessage.Caller(name, number);
+                } catch (Exception e) {}
 
         }
 
