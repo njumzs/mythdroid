@@ -268,6 +268,7 @@ sub getStorGroups() {
         $getStorGroupsSth = execute($getStorGroupsSth, \$getStorGroupsSQL);
 
         while (my $aref = $getStorGroupsSth->fetchrow_arrayref) {
+            $aref[1] .= '/' unless $aref[1] =~ /\/$/;
             push @{ $storageGroups{$aref->[0]} }, $aref->[1];
         }
     
