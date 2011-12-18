@@ -125,6 +125,7 @@ public class RecDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (activity == null) activity = (MDFragmentActivity)getActivity();
         if ((prog = Globals.curProg) == null) {
             if (!dualPane) getFragmentManager().popBackStack(); 
             if (!embedded) activity.finish();
