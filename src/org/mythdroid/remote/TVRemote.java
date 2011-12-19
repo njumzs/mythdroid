@@ -578,9 +578,7 @@ public class TVRemote extends Remote {
                     synchronized (feLock) {
                         if (feMgr != null) feMgr.sendKey(Key.MENU);
                     }
-                } catch (IOException e) {
-                    ErrUtil.err(this, e);
-                }
+                } catch (IOException e) { ErrUtil.err(this, e); }
                 return true;
             case MENU_GESTURE:
                 gesture = true;
@@ -644,7 +642,7 @@ public class TVRemote extends Remote {
             }
         }
         
-        final View v = findViewById(R.id.guide);
+        View v = findViewById(R.id.guide);
 
         if (!livetv)
             v.setVisibility(View.INVISIBLE);
@@ -658,6 +656,22 @@ public class TVRemote extends Remote {
                     }
                 }
             );
+        
+        v = findViewById(R.id.skip);
+        v.setOnLongClickListener(
+            new OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    try {
+                        synchronized (feLock) {
+                            if (feMgr != null)
+                                feMgr.sendKey(Key.SKIP_PREV_COMMERCIAL);
+                        }
+                    } catch (IOException e) { ErrUtil.err(ctx, e); }
+                    return true;
+                }
+            }
+        );
 
         removeDialog(DIALOG_NUMPAD);
         
