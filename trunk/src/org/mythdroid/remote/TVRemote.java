@@ -617,7 +617,7 @@ public class TVRemote extends Remote {
             setContentView(R.layout.tv_gesture_remote);
             for (
                 int id : new int[] { 
-                    R.id.back,  R.id.num,  R.id.volMute,
+                    R.id.back,  R.id.num,  R.id.volMute, R.id.guide,
                     R.id.enter, R.id.info, R.id.skip
                 }
            ) {
@@ -636,34 +636,31 @@ public class TVRemote extends Remote {
 
                 final View v = findViewById(id);
                 Key key = ctrls.get(id);
-
-                if (key == Key.GUIDE) {
-
-                    if (!livetv) {
-                        v.setVisibility(View.INVISIBLE);
-                        continue;
-                    }
-                    
-                    v.setOnLongClickListener(
-                        new OnLongClickListener() {
-                            @Override
-                            public boolean onLongClick(View v) {
-                                showDialog(DIALOG_GUIDE);
-                                return true;
-                            }
-                        }
-                    );
-
-                }
-
+                
                 v.setOnClickListener(this);
                 v.setFocusable(false);
                 v.setTag(key);
 
             }
         }
+        
+        final View v = findViewById(R.id.guide);
+
+        if (!livetv)
+            v.setVisibility(View.INVISIBLE);
+        else
+            v.setOnLongClickListener(
+                new OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        showDialog(DIALOG_GUIDE);
+                        return true;
+                    }
+                }
+            );
 
         removeDialog(DIALOG_NUMPAD);
+        
     }
 
     /** Setup the status widgets (progress bar, program title) */
