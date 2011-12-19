@@ -54,6 +54,7 @@
     <string name="visualiser">Visualisierung An-/Ausschalten</string>
     <string name="chVisual">Ändere Visualisierung</string>
     <string name="plEdit">Wiedergabeliste Editor</string>
+    <string name="menu">Menü</string>
     <string name="osdMenu">OSD Menü</string>
     <string name="leaveRemote">Lasse Fernbedienung</string>
     <string name="haltPlayback">Wiedergabe beenden?</string>
