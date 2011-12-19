@@ -54,6 +54,7 @@
     <string name="visualiser">Toggle Visualiser</string>
     <string name="chVisual">Change Visualiser</string>
     <string name="plEdit">Playlist Editor</string>
+    <string name="menu">Menu</string>
     <string name="osdMenu">OSD Menu</string>
     <string name="leaveRemote">Leave Remote</string>
     <string name="haltPlayback">Halt playback?</string>
