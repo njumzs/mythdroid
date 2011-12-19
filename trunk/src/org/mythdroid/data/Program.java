@@ -262,6 +262,9 @@ public class Program implements Comparable<Program> {
      */
     public Program(String[] list, int off) {
 
+        if (list.length < off + STORGROUP + 1)
+            throw new IllegalArgumentException("Program: not enough elements"); //$NON-NLS-1$
+        
         int dupInTemp;
 
         try {
