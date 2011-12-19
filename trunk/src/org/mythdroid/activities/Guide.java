@@ -382,6 +382,9 @@ public class Guide extends MDActivity {
                     now.getHours(), now.getMinutes()
                 );
                 break;
+                
+            default:
+                super.onPrepareDialog(id, dialog);
 
         }
 
