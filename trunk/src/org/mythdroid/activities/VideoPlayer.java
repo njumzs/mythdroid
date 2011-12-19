@@ -87,9 +87,10 @@ public class VideoPlayer extends MDActivity {
         try {
             videoView.stopPlayback();
         } catch (IllegalArgumentException e) {}
-        try {
-            MDDManager.stopStream(beMgr.addr);
-        } catch (IOException e) { ErrUtil.err(ctx, e); }
+        if (beMgr != null)
+            try {
+                MDDManager.stopStream(beMgr.addr);
+            } catch (IOException e) { ErrUtil.err(ctx, e); }
         if (vlc != null)
             try {
                 vlc.disconnect();
