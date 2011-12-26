@@ -17,8 +17,10 @@ sub create_account {
 
 sub get_install_dir() {
     
+    $ENV{PATH} .= ':/usr/local/bin' unless $ENV{PATH} =~ m#/usr/local/bin#;
     my $dir = (`which mythlcdserver`)[0];
-    croak "Couldn't locate mythlcdserver. Aborted\n" if ($dir =~ /^which:/);
+    croak "Couldn't locate mythlcdserver. Aborted\n"
+        unless ($dir && $dir !~ /^which:/);
     $dir =~ s/\/mythlcdserver$//;
     chomp $dir;
     return $dir;
@@ -196,6 +198,7 @@ sub ACTION_uninstall {
 
         map { $self->do_system("killall -9 $_ 2>/dev/null") } 
             (qw(mythfrontend mythfrontend.real mythlcdserver mythlcd));
+
 
         my $dir  = get_install_dir();
         my $dst  = "$dir/mythlcd"; 
