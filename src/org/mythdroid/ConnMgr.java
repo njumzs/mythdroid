@@ -716,7 +716,7 @@ public class ConnMgr {
                 LogUtil.warn(
                     "Disconnected from " + addr + ", wait for reconnect"  //$NON-NLS-1$ //$NON-NLS-2$
                 );
-                retryRead(buf, off, len);
+                return retryRead(buf, off, len);
             }
             
             dispose();
