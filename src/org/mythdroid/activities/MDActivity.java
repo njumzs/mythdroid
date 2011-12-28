@@ -210,7 +210,7 @@ public abstract class MDActivity extends Activity {
                     String fe = (String)av.getAdapter().getItem(pos);
                     Globals.currentFrontend = fe;
                     updateFrontendIndicator();
-                    if (fe.equals(Messages.getString("MDActivity.0")))  // Here //$NON-NLS-1$
+                    if (fe.equals(Messages.getString("MDActivity.0"))) // Here //$NON-NLS-1$
                         onHere = true;
                     d.dismiss();
                 }
