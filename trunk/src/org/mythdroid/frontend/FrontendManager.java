@@ -285,7 +285,7 @@ public class FrontendManager {
     
     private void checkConnection() throws IOException {
         
-        if (cmgr.isConnected()) return;
+        if (cmgr != null && cmgr.isConnected()) return;
         
         synchronized (cmgrLock) {
             
