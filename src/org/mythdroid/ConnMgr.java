@@ -484,70 +484,56 @@ public class ConnMgr {
     /** Disconnect all currently connected connections */
     static public void disconnectAll() throws IOException {
 
-        /* 
-         * Local array of connections to dispose of once we've finished
-         * iterating over conns (and dropped the lock on it)
-         */
-        final ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
+        Object con[] = null;
         
-        synchronized(conns) {
+        synchronized (conns) { con = conns.toArray(); }
+        
+        boolean iU = false;
+        
+        for (int i = 0; i < con.length; i++) {
 
-            boolean iU = false;
-            
-            for (WeakReference<ConnMgr> r : conns) {
+            @SuppressWarnings("unchecked")
+            WeakReference<ConnMgr> r = (WeakReference<ConnMgr>)con[i];  
 
-                if (r == null) continue;
-                ConnMgr c = r.get();
-                if (c == null) continue;
-                synchronized (c.sockLock) {
-                    c.reconnectPending = true;
-                    iU = c.inUse;
-                }
-                if (iU)
-                    c.doDisconnect();
-                else
-                    dispose.add(c);
-
+            if (r == null) continue;
+            ConnMgr c = r.get();
+            if (c == null) continue;
+            synchronized (c.sockLock) {
+                c.reconnectPending = true;
+                iU = c.inUse;
             }
+            if (iU)
+                c.doDisconnect();
+            else
+                try { c.dispose(); } catch (IOException e1) {}
 
         }
-        
-        // Dispose of the cached conns that weren't in use
-        for (ConnMgr r : dispose)
-            try {
-                r.dispose();
-            } catch (IOException e) {}
 
     }
 
     /** Reconnect all disconnected connections */
     static public void reconnectAll() {
 
-        final ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
+        Object con[] = null;
         
-        synchronized(conns) {
+        synchronized (conns) { con = conns.toArray(); }
+        
+        for (int i = 0; i < con.length; i++) {
 
-            for (WeakReference<ConnMgr> r : conns) {
-
-                if (r == null) continue;
-                ConnMgr c = r.get();
-                if (c == null) continue;
-                try {
-                    c.doConnect(c.timeout);
-                } catch (IOException e) {
-                    LogUtil.warn("Failed to reconnect to " + c.addr); //$NON-NLS-1$
-                    dispose.add(c);
-                }
-
+            @SuppressWarnings("unchecked")
+            WeakReference<ConnMgr> r = (WeakReference<ConnMgr>)con[i];    
+            
+            if (r == null) continue;
+            ConnMgr c = r.get();
+            if (c == null) continue;
+            try {
+                c.doConnect(c.timeout);
+            } catch (IOException e) {
+                LogUtil.warn("Failed to reconnect to " + c.addr); //$NON-NLS-1$
             }
 
         }
         
-        for (ConnMgr r : dispose)
-            try {
-                r.dispose();
-            } catch (IOException e) {}
-
     }
     
     /** Dispose of cached connections that haven't been used recently */
@@ -557,33 +543,24 @@ public class ConnMgr {
         
         long now = System.currentTimeMillis();
         
-        /* 
-         * Local array of connections to dispose of once we've finished
-         * iterating over conns (and dropped the lock on it)
-         */
-        final ArrayList<ConnMgr> dispose = new ArrayList<ConnMgr>();
+        Object con[] = null;
         
-        synchronized (conns) {
-            
-            for (WeakReference<ConnMgr> r : conns) {
+        synchronized (conns) { con = conns.toArray(); }
+        
+        for (int i = 0; i < con.length; i++) {
 
-                if (r == null) continue;
-                ConnMgr c = r.get();
-                if (c == null) continue;
-                synchronized (c.sockLock) {
-                    if (c.inUse == false && c.lastUsed + maxAge < now)
-                        dispose.add(c);
-                }
-                    
+            @SuppressWarnings("unchecked")
+            WeakReference<ConnMgr> r = (WeakReference<ConnMgr>)con[i];    
+
+            if (r == null) continue;
+            ConnMgr c = r.get();
+            if (c == null) continue;
+            synchronized (c.sockLock) {
+                if (c.inUse == false && c.lastUsed + maxAge < now)
+                    try { c.dispose(); } catch (IOException e1) {}
             }
             
         }
-        
-        // Dispose of conns that hadn't been used during the last maxAge ms
-        for (ConnMgr r : dispose)
-            try {
-                r.dispose();
-            } catch (IOException e) {}
         
     }
     
