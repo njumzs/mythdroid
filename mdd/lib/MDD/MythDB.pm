@@ -161,8 +161,10 @@ sub findPosterInSG($$) {
 
 sub getVideos($) {
 
-    my $self  = shift;
-    my $regex = shift;
+    my $self   = shift;
+    my $regex  = shift;
+    my $fregex = $regex . '/[^/]*$';
+    my $cregex = qr/$fregex/;
 
     my %videos;
     my @vids;
@@ -175,7 +177,7 @@ sub getVideos($) {
 
     while (my $aref = $videoSth->fetchrow_arrayref) {
         splice @$aref, 2, 0, '' if ($self->{VidDBVer} < 1024);
-        if ($aref->[10]) {
+        if ($aref->[10] && $aref->[9] =~ /$cregex/) {
             if (
                 $posterSG && $aref->[10] !~ m#^/# && $aref->[10] ne 'No Cover'
             ) {
