@@ -148,22 +148,10 @@ public class VideoPlayer extends MDActivity {
                 ) {
 
                     switch (pos) {
-                        case 0:
-                            vb = 1024;
-                            ab = 128;
-                            break;
-                        case 1:
-                            vb = 448;
-                            ab = 128;
-                            break;
-                        case 2:
-                            vb = 320;
-                            ab = 96;
-                            break;
-                        case 3:
-                            vb = 192;
-                            ab = 64;
-                            break;
+                        case 0: vb = 1024; ab = 160; break;
+                        case 1: vb = 512;  ab = 128; break;
+                        case 2: vb = 384;  ab = 96;  break;
+                        case 3: vb = 192;  ab = 64;  break;
                     }
                     d.dismiss();
                 }
@@ -200,10 +188,15 @@ public class VideoPlayer extends MDActivity {
                 else
                     sg = MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
             }
+            
+            int enc = Integer.valueOf(
+                PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("streamComplexity", "0") //$NON-NLS-1$ //$NON-NLS-2$
+            );
 
             MDDManager.streamFile(
                 beMgr.addr, path, sg,
-                dm.widthPixels, dm.heightPixels, vb, ab
+                dm.widthPixels, dm.heightPixels, enc, vb, ab
             );
         } catch (IOException e) {
             ErrUtil.err(this, e);
@@ -250,6 +243,11 @@ public class VideoPlayer extends MDActivity {
         return vlc;
     }
     
+    @Override
+    public void onActivityResult(int a, int b, Intent data) {
+        finish();
+    }
+    
     private void playVideo() {
             
         String sdpAddr = beMgr.addr;
@@ -270,6 +268,14 @@ public class VideoPlayer extends MDActivity {
            sdpAddr = sdpPublicAddr;
 
         url = Uri.parse("rtsp://" + sdpAddr + ":5554/stream"); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        if (
+            PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("streamExternalPlayer", false) //$NON-NLS-1$
+        ) {
+            startActivityForResult(new Intent(Intent.ACTION_VIEW, url), 0);
+            return;
+        }
         
         videoView.setOnCompletionListener(
             new OnCompletionListener() {

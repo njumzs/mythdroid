@@ -162,12 +162,13 @@ public class MDDManager {
      * @param ab int representing desired bitrate of audio in kb/s
      */
     public static void streamFile(
-            String addr, String file, String sg, int w, int h, int vb, int ab
+            String addr, String file, String sg, int w, int h, int enc,
+            int vb, int ab
     ) throws IOException {
         sendMsg(
             addr,
-            "STREAM " + w + "x" + h + " VB " + vb + " AB " + ab + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-            " SG " + sg + " FILE " + file  //$NON-NLS-1$ //$NON-NLS-2$
+            "STREAM " + w + "x" + h + " ENC " + enc + " VB " + vb + " AB " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ 
+            ab + " SG " + sg + " FILE " + file  //$NON-NLS-1$ //$NON-NLS-2$
         ).disconnect();
     }
 
