@@ -164,7 +164,10 @@ public class RecListFragment extends ListFragment
         if (p == null) return;
         Globals.curProg = p;
 
-        lv.setSelection(activity.visibleIndex);
+        lv.setSelection(
+            activity.checkedIndex >= 0 ? 
+                activity.checkedIndex : activity.visibleIndex
+        );
         
         if (!dualPane) return;
         
