@@ -84,8 +84,10 @@ public class Recordings extends MDFragmentActivity {
                 finish();
             }
 
-            if (recordings == null)
+            if (recordings == null) {
+                dismissLoadingDialog();
                 return;
+            }
 
             // Filter the recordings?
             if (filter != null) {
