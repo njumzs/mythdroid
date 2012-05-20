@@ -158,6 +158,7 @@ public class MDDManager {
      * @param file String containing path to the file
      * @param w int representing desired width of video in pixels
      * @param h int representing desired height of video in pixels
+     * @param enc int representing the desired encoding complexity (0-2)
      * @param vb int representing desired bitrate of video in kb/s
      * @param ab int representing desired bitrate of audio in kb/s
      */
