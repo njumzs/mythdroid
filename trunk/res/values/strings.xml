@@ -27,6 +27,7 @@
     <string name="recType">Recording type:</string>
     <string name="recPrio">Recording priority:</string>
     <string name="schedOpt">Scheduling Options</string>
+    <string name="backend">Backend</string>
     <string name="storage">Storage</string>
     <string name="groupOpt">Group Options</string>
     <string name="load">Load</string>
@@ -40,7 +41,6 @@
     <string name="stopRec">Stop Rec</string> <!-- needs to be short to fit in a button -->
     <string name="schedule">Schedule</string>
     <string name="ok">OK</string>
-    <string name="error">Error</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="save">Save</string>
@@ -78,11 +78,7 @@
     <string name="crash_notif_ticker_text">MythDroid has crashed, please send a report...</string>
     <string name="crash_notif_title">MythDroid has crashed...</string>
     <string name="crash_notif_text">Please click here to help fix the issue.</string>
-    <string name="crash_dialog_title">MythDroid has crashed</string>
     <string name="crash_dialog_text">An unexpected error occurred forcing the
         application to stop. Please help us fix this by sending us error data,
         all you have to do is click \'OK\'.</string>
-    <string name="mcrash_dialog_text">An unexpected error occurred. You were running
-        an unofficial copy of MythDroid with unknown modifications. Find the original,
-        open source project at http://mythdroid.googlecode.com</string>   
 </resources>
