@@ -1,5 +1,6 @@
 package org.mythdroid.util;
 
+import android.annotation.TargetApi;
 import android.net.Uri;
 import android.os.Build;
 import android.os.StrictMode;
@@ -16,7 +17,8 @@ public class Reflection {
     /**
      * Wrapped StrictMode
      */
-    public static class rStrictMode {
+    @TargetApi(9)
+	public static class rStrictMode {
         
         static {
             try {
@@ -64,7 +66,8 @@ public class Reflection {
     /**
      * Wrapped ContactsContract
      */
-    public static class rContactsContract {
+    @TargetApi(5)
+	public static class rContactsContract {
         
         static {
             try {
