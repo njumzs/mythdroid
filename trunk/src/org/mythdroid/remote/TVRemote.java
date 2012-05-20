@@ -20,7 +20,6 @@ package org.mythdroid.remote;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -52,6 +51,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -76,9 +76,9 @@ public class TVRemote extends Remote {
     final private static int
         DIALOG_LOAD  = 0, DIALOG_NUMPAD = 1, DIALOG_GUIDE = 2, DIALOG_QUIT = 3;
 
-    private static HashMap<Integer, Key>
-        ctrls = new HashMap<Integer, Key>(20),
-        nums = new HashMap<Integer, Key>(12);
+    private static SparseArray<Key>
+        ctrls = new SparseArray<Key>(20),
+        nums  = new SparseArray<Key>(12);
 
     static {
         nums.put(R.id.one,          Key.ONE);
@@ -437,7 +437,9 @@ public class TVRemote extends Remote {
                 pad.setContentView(R.layout.numpad);
                 pad.findViewById(android.R.id.title).setVisibility(View.GONE);
                 View button;
-                for (int viewId : nums.keySet()) {
+                int size = nums.size();
+                for (int i = 0; i < size; i++) {
+                    int viewId = nums.keyAt(i);
                     button = pad.findViewById(viewId);
                     button.setTag(nums.get(viewId));
                     button.setOnClickListener(this);
@@ -630,11 +632,13 @@ public class TVRemote extends Remote {
         else {
             setContentView(R.layout.tv_remote);
 
-            for (int id : ctrls.keySet()) {
-
+            int size = ctrls.size();
+            
+            for (int i = 0; i < size; i++) {
+                
+                int id = ctrls.keyAt(i);
                 final View v = findViewById(id);
                 Key key = ctrls.get(id);
-                
                 v.setOnClickListener(this);
                 v.setFocusable(false);
                 v.setTag(key);
