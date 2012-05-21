@@ -116,6 +116,12 @@
         	android:summaryOff="Error reporting is enabled"
         	android:defaultValue="false"/>
     	
+    	<CheckBoxPreference android:key="disableUpdateNotif"
+            android:title="Disable update notifications"
+            android:summaryOn="Update notifications are disabled"
+            android:summaryOff="Update notifications are enabled"
+            android:defaultValue="false"/>
+    	
     </PreferenceCategory>
     
 </PreferenceScreen>
