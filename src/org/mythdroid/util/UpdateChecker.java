@@ -48,7 +48,7 @@ public class UpdateChecker {
         public int major, minor, inc;
         public Uri url;
         
-        public Version(String ver, String url) {
+        public Version(String ver, String url) throws NumberFormatException {
         
             int first = ver.indexOf('.');
             major = Integer.valueOf(ver.substring(0, first));
@@ -149,14 +149,24 @@ public class UpdateChecker {
             if ((start = entry.title.indexOf("MythDroid")) != -1) { //$NON-NLS-1$
                 start += 10;
                 int end = entry.title.indexOf(".apk"); //$NON-NLS-1$
+                if (end == -1) continue;
                 version = entry.title.substring(start, end);
-                MDVer = new Version(version, entry.url);
+                try {
+                    MDVer = new Version(version, entry.url);
+                } catch (NumberFormatException e) {
+                    MDVer = null;
+                }
             }
             else if ((start = entry.title.indexOf("mdd")) != -1) { //$NON-NLS-1$
                 start += 4;
                 int end = entry.title.indexOf(".tgz"); //$NON-NLS-1$
+                if (end == -1) continue;
                 version = entry.title.substring(start, end);
-                MDDVer = new Version(version, entry.url);
+                try {
+                    MDDVer = new Version(version, entry.url);
+                } catch (NumberFormatException e) {
+                    MDDVer = null;
+                }
             }
             else
                 ErrUtil.logErr(
