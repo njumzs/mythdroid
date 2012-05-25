@@ -28,12 +28,15 @@ import org.mythdroid.data.Program;
 import org.mythdroid.data.Video;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.UpdateService;
+
+import android.content.Intent;
 
 /** Manage a connection to MDD */
 public class MDDManager {
 
     private ConnMgr cmgr = null;
-    private Thread recvThread = null;
+    private Thread  recvThread = null;
     
     final private ArrayList<MDDMenuListener> menuListeners
         = new ArrayList<MDDMenuListener>();
@@ -109,11 +112,48 @@ public class MDDManager {
 
     /**
      * Send a MDD command to mdd
-     * @param addr String containing address of frontend
+     * @param addr String containing address of MDD
      * @param cmd String containing the name of the MDD command
      */
     public static void mddCommand(String addr, String cmd) throws IOException {
-        sendMsgNoMux(addr, "COMMAND " + cmd).disconnect(); //$NON-NLS-1$
+        sendMsg(addr, "COMMAND " + cmd).disconnect(); //$NON-NLS-1$
+    }
+    
+    /**
+     * Get a version string from MDD
+     * @param addr String containing address of MDD
+     * @return String containing the version of MDD
+     * @throws IOException
+     */
+    public static String getVersion(String addr) throws IOException {
+        final ConnMgr cmgr = sendMsg(addr, "VERSION"); //$NON-NLS-1$
+        String ver = cmgr.readLine();
+        cmgr.disconnect();
+        return ver;
+    }
+    
+    /**
+     * Tell MDD to download an new version of itself and blocks whilst MDD does 
+     * it
+     * @param addr String containing address of MDD
+     * @param ver String containing new version
+     * @param url String containing url of new tarball
+     * @return String containing the filename of the downloaded file or 'FAILED'
+     * if the download failed
+     * @throws IOException
+     */
+    public static String downloadUpdate(String addr, String ver, String url)
+        throws IOException {
+        
+        final ConnMgr cmgr = sendMsg(addr, "UPDATE " + ver + " " + url); //$NON-NLS-1$ //$NON-NLS-2$
+        String line = cmgr.readLine();
+        while (line != null && !line.startsWith("UPDATE")) //$NON-NLS-1$
+            line = cmgr.readLine();
+        cmgr.disconnect();
+        
+        if (line == null) return "FAILED"; //$NON-NLS-1$
+        return line.substring(7);
+        
     }
 
     /**
@@ -329,6 +369,15 @@ public class MDDManager {
      * @param addr String containing address of host running MDD
      */
     public MDDManager(String addr) throws IOException {
+        
+        if (!Globals.checkedForUpdate(addr)) {
+            Intent intent = new Intent();
+            intent.setClass(Globals.appContext, UpdateService.class);
+            intent.putExtra(UpdateService.ACTION, UpdateService.CHECKMDD);
+            intent.putExtra(UpdateService.ADDR, addr);
+            Globals.appContext.startService(intent);
+        }
+        
         /* 
          * Don't use persistent connections for 'listening' mdd connections
          * We'll end up with an immortal recvThread since we can't interrupt
@@ -347,6 +396,15 @@ public class MDDManager {
      * @param mux mux MDD connection via MDD if true
      */
     public MDDManager(String addr, boolean mux) throws IOException {
+        
+        if (!Globals.checkedForUpdate(addr)) {
+            Intent intent = new Intent();
+            intent.setClass(Globals.appContext, UpdateService.class);
+            intent.putExtra(UpdateService.ACTION, UpdateService.CHECKMDD);
+            intent.putExtra(UpdateService.ADDR, addr);
+            Globals.appContext.startService(intent);
+        }
+        
         /* 
          * Don't use persistent connections for 'listening' mdd connections
          * We'll end up with an immortal recvThread since we can't interrupt
@@ -357,6 +415,7 @@ public class MDDManager {
         cmgr.setIndefiniteReads();
         recvThread = new Thread(recvTask, "MDDListener"); //$NON-NLS-1$
         recvThread.start();
+        
     }
 
 

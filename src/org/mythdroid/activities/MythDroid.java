@@ -34,7 +34,7 @@ import org.mythdroid.remote.NavRemote;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
-import org.mythdroid.util.UpdateChecker;
+import org.mythdroid.util.UpdateService;
 
 import android.R.drawable;
 import android.R.id;
@@ -109,18 +109,13 @@ public class MythDroid extends MDListActivity implements
 
         crecv = new ConnectivityReceiver(Globals.appContext);
         
-        if (
-            !PreferenceManager.getDefaultSharedPreferences(this)
-                .getBoolean("disableUpdateNotif", false) //$NON-NLS-1$
-        )
-            Globals.getWorker().post(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        new UpdateChecker().check(Globals.appContext);
-                    }
-                }
-            );
+        Intent intent = new Intent();
+        intent.setClass(this, UpdateService.class);
+        
+        if (!Globals.checkedForUpdate("local")) { //$NON-NLS-1$
+            intent.putExtra(UpdateService.ACTION, UpdateService.CHECKMD);
+            startService(intent);
+        }
         
     }
 
