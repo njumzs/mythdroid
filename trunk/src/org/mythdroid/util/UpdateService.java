@@ -417,6 +417,13 @@ public class UpdateService extends Service {
             currentVer.toString() + ")" //$NON-NLS-1$
         );
         
+        if (MDVer != null && MDVer.compareTo(MDDVer) != 0) {
+            LogUtil.warn(
+                "Version mismatch:" + " MythDroid is " + MDVer.toString() + //$NON-NLS-1$ //$NON-NLS-2$
+                ", MDD on " + addr + " is " + MDDVer.toString() //$NON-NLS-1$ //$NON-NLS-2$ 
+            );
+        }
+        
         NotificationManager nm = (NotificationManager)getSystemService(
             Context.NOTIFICATION_SERVICE
         );
