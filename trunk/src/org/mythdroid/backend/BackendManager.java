@@ -19,14 +19,10 @@
 package org.mythdroid.backend;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -37,14 +33,21 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.mythdroid.ConnMgr;
 import org.mythdroid.Globals;
 import org.mythdroid.data.Program;
-import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.services.MythService;
+import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
+import org.mythdroid.util.UPnPSearch;
+import org.mythdroid.util.UpdateService;
 import org.mythdroid.ConnMgr.onConnectListener;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 /**
  * A BackendManager locates and manages a master backend, providing
@@ -55,17 +58,7 @@ public class BackendManager {
     /** Hostname or IP address of the backend */
     public String addr = null;
 
-    static final private String BACKEND_UPNP_ID =
-        "ST: urn:schemas-mythtv-org:device:MasterMediaServer:1\r\n"; //$NON-NLS-1$
-
-    static final private String UPNP_SEARCH     =
-        "M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\n" + //$NON-NLS-1$
-        "MAN: \"ssdp:discover\"\r\n" + //$NON-NLS-1$
-        "MX: 2\r\n" + //$NON-NLS-1$
-        BACKEND_UPNP_ID + "\r\n"; //$NON-NLS-1$
-
-    static final private String UPNP_LOCATION   = "LOCATION: http://"; //$NON-NLS-1$
-    static final private String myAddr          = "android"; //$NON-NLS-1$
+    static final private String myAddr = "android"; //$NON-NLS-1$
 
     private String  statusURL = null;
     private ConnMgr cmgr      = null;
@@ -78,8 +71,13 @@ public class BackendManager {
 
         statusURL = "http://" + host + ":6544"; //$NON-NLS-1$ //$NON-NLS-2$
 
-        Globals.protoVersion = getVersion(statusURL);
-
+        try {
+            Globals.protoVersion = getVersion(statusURL);
+        } catch (IOException e) {
+            MythService myth = new MythService(host);
+            Globals.protoVersion = myth.getVersion();
+        }
+        
         // Cope with odd protoVer resulting from mythtv r25366
         if (Globals.protoVersion > 1000) {
             Globals.beVersion = Globals.protoVersion / 1000;
@@ -101,8 +99,16 @@ public class BackendManager {
                 }
             }, Globals.muxConns
         );
-
+        
         addr = host;
+
+        if (!Globals.checkedForUpdate(addr)) {
+            Intent intent = new Intent();
+            intent.setClass(Globals.appContext, UpdateService.class);
+            intent.putExtra(UpdateService.ACTION, UpdateService.CHECKMDD);
+            intent.putExtra(UpdateService.ADDR, addr);
+            Globals.appContext.startService(intent);
+        }
 
     }
 
@@ -111,54 +117,7 @@ public class BackendManager {
      * @return An initialised BackendManager or null if we couldn't find one
      */
     static public BackendManager locate() throws IOException {
-
-        final InetSocketAddress isa = new InetSocketAddress(1900);
-        final DatagramSocket sock = new DatagramSocket(null);
-        InetAddress addr = null;
-
-        try {
-            addr = InetAddress.getByName("239.255.255.250"); //$NON-NLS-1$
-        } catch (UnknownHostException e) {}
-
-        final DatagramPacket pkt = new DatagramPacket(
-            UPNP_SEARCH.getBytes(), UPNP_SEARCH.length(), addr, 1900
-        );
-
-        final DatagramPacket rpkt = new DatagramPacket(new byte[1024], 1024);
-
-        ConnectivityReceiver.waitForWifi(Globals.appContext, 5000);
-
-        LogUtil.debug("Sending UPNP M-SEARCH to 239.255.255.250:1900"); //$NON-NLS-1$
-
-        sock.setReuseAddress(true);
-        sock.bind(isa);
-        sock.setBroadcast(true);
-        sock.setSoTimeout(800);
-        sock.send(pkt);
-
-        try {
-            sock.receive(rpkt);
-        } catch (SocketTimeoutException e) {
-            sock.close();
-            LogUtil.debug("Timeout waiting for UPNP response"); //$NON-NLS-1$
-            throw new IOException(Messages.getString("BackendManager.2")); //$NON-NLS-1$
-        }
-
-        sock.close();
-
-        final String msg = new String(rpkt.getData(), 0, rpkt.getLength());
-        LogUtil.debug("UPNP Response received: " + msg); //$NON-NLS-1$
-
-        if (!msg.contains(BACKEND_UPNP_ID)) 
-            throw new IOException(Messages.getString("BackendManager.2")); //$NON-NLS-1$
-
-        int locIdx = msg.indexOf(UPNP_LOCATION);
-        int portIdx = msg.indexOf(":", locIdx + UPNP_LOCATION.length()); //$NON-NLS-1$
-
-        return new BackendManager(
-            msg.substring(locIdx + UPNP_LOCATION.length(), portIdx)
-        );
-
+        return new BackendManager(UPnPSearch.findMasterBackend());
     }
 
     /**
@@ -174,7 +133,6 @@ public class BackendManager {
      * @return String containing the URL
      */
     public String getStatusURL() {
-        LogUtil.debug("statusURL is " + statusURL); //$NON-NLS-1$
         return statusURL;
     }
 
@@ -215,7 +173,10 @@ public class BackendManager {
         // QUERY_RECORDINGS can take a few seconds..
         cmgr.setTimeout(ConnMgr.timeOut.LONG);
         
-        cmgr.sendString("QUERY_RECORDINGS Play"); //$NON-NLS-1$
+        String type = "Ascending"; //$NON-NLS-1$
+        if (Globals.protoVersion < 65) 
+            type = "Play"; //$NON-NLS-1$
+        cmgr.sendString("QUERY_RECORDINGS " + type); //$NON-NLS-1$
         final String[] resp = cmgr.readStringList();
 
         int respSize = resp.length;
@@ -270,8 +231,50 @@ public class BackendManager {
      * @param recid integer recording id
      */
     public void reschedule(int recid) throws IOException {
-        cmgr.sendString("RESCHEDULE_RECORDINGS " + recid); //$NON-NLS-1$
+        if (Globals.protoVersion >= 73)
+            cmgr.sendString(
+                "RESCHEDULE_RECORDINGS MATCH " + recid + " 0 0 - MythDroid" //$NON-NLS-1$ //$NON-NLS-2$
+            );
+        else
+            cmgr.sendString("RESCHEDULE_RECORDINGS " + recid); //$NON-NLS-1$
         cmgr.readStringList();
+    }
+    
+    /**
+     * Fetch an image file from the backend
+     * @param path URL path for file
+     * @return a Bitmap or null if there's a problem
+     */
+    public Bitmap getImage(String path) {
+        
+        URL url = null;
+        try {
+            url = new URL(statusURL + path);
+        } catch (Exception e) { 
+            ErrUtil.logWarn(e);
+            return null; 
+        }
+        
+        if (Globals.muxConns) 
+            try {
+                url = new URL(
+                    url.getProtocol() + "://" + url.getHost() + ":16550" + //$NON-NLS-1$ //$NON-NLS-2$
+                    url.getFile()
+                );
+            } catch (MalformedURLException e) {
+                ErrUtil.logWarn(e);
+                return null;
+            }
+        
+        LogUtil.debug("Fetching image from " + url.toString()); //$NON-NLS-1$
+
+        try {
+            return BitmapFactory.decodeStream(url.openStream());
+        } catch (IOException e) {
+            ErrUtil.logWarn(e);
+            return null;
+        }
+        
     }
 
     /** Disconnect from the backend */
@@ -294,7 +297,9 @@ public class BackendManager {
             url = new URL(
                 url.getProtocol() + "://" + url.getHost() +  ":16550/xml"  //$NON-NLS-1$ //$NON-NLS-2$
             );
-       
+        
+        LogUtil.debug("Fetching XML from " + url.toString()); //$NON-NLS-1$
+        
         URLConnection urlConn = url.openConnection();
         urlConn.setConnectTimeout(3000);
         urlConn.setReadTimeout(4000);
@@ -314,7 +319,6 @@ public class BackendManager {
         return Integer.parseInt(attr.getNamedItem("protoVer").getNodeValue()); //$NON-NLS-1$
 
     }
-
 
     /**
      * Announce ourselves to the backend
