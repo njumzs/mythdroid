@@ -37,6 +37,7 @@ import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
 import org.xml.sax.SAXException;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -47,12 +48,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.sax.EndTextElementListener;
 import android.util.Xml;
 
 /** An update checker for MythDroid and MDD */
+@TargetApi(8)
 public class UpdateService extends Service {
     
     /** ACTION intent extra value to check for MythDroid updates */
@@ -333,9 +336,12 @@ public class UpdateService extends Service {
         }
         
         final File storage = Environment.getExternalStorageDirectory();
+        String download = 
+            Integer.parseInt(Build.VERSION.SDK) >= 8 ?
+                Environment.DIRECTORY_DOWNLOADS : "Download"; //$NON-NLS-1$
         
         final File outputFile = new File(
-            storage.getAbsolutePath() + '/' + Environment.DIRECTORY_DOWNLOADS,
+            storage.getAbsolutePath() + '/' + download,
             "MythDroid-" + ver + ".apk" //$NON-NLS-1$ //$NON-NLS-2$
         );
         
