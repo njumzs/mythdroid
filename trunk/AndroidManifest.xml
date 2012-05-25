@@ -27,6 +27,7 @@
         </receiver>
         
         <service android:name=".remote.WakeService"/>
+        <service android:name=".util.UpdateService"/>
         
         <activity android:name="org.acra.CrashReportDialog"
         	android:theme="@android:style/Theme.Dialog"
