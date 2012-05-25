@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end comment
 =cut
 
-$VERSION = 0.5.3;
+our $VERSION = '0.6.0';
 
 use strict;
 use warnings;
@@ -31,6 +31,7 @@ use IO::Socket::INET;
 use IO::Select;
 use POSIX qw(setsid);
 use Sys::Hostname;
+use LWP::Simple;
 use Config;
 use MDD::ConfigData;
 use MDD::LCD;
@@ -49,6 +50,7 @@ sub sendMsg($);
 sub sendMsgs($);
 sub listCommands();
 sub runCommand($);
+sub sendVersion();
 sub osdMsg($);
 sub videoList($);
 sub streamFile($);
@@ -56,6 +58,7 @@ sub stopStreaming();
 sub getStorGroups();
 sub getRecGroups();
 sub getCutList($$);
+sub downloadUpdate($$);
 sub killKids();
 
 my $lcdServerPort = 6545;
@@ -123,6 +126,7 @@ my $stream_cmd = $config{stream} ||
 # and refs to subroutines that will handle them
 my @clientMsgs = (
     { regex => qr/^COMMANDS$/,       proc => \&listCommands              },
+    { regex => qr/^VERSION$/,        proc => \&sendVersion               },
     { regex => qr/^STOPSTREAM$/,     proc => \&stopStreaming             },
     { regex => qr/^STORGROUPS$/,     proc => \&getStorGroups             },
     { regex => qr/^RECGROUPS$/,      proc => \&getRecGroups              },
@@ -151,6 +155,10 @@ my @clientMsgs = (
         regex => qr/^CUTLIST (\d+) (.*)$/,
         proc  => sub { getCutList($1, $2) }
     },
+    {   
+        regex => qr/UPDATE (\S+) (.*)$/,
+        proc  => sub { downloadUpdate($1, $2) }
+    }
 ); 
 
 # Get rid of old log files in case root owns them
@@ -472,6 +480,10 @@ sub runCommand($) {
 
 }
 
+sub sendVersion() {
+    sendMsg($VERSION);
+}
+    
 sub osdMsg($) {
 
     unless (MDD::ConfigData->feature('xosd_support')) {
@@ -752,6 +764,32 @@ sub getRecGroups() {
 sub getCutList($$) {
     map { sendMsg($_) } (@{$mythdb->getCutList(shift, shift)});
     sendMsg("CUTLIST DONE");
+}
+
+sub downloadUpdate($$) {
+
+    my $version = shift;
+    my $url     = shift;
+    my $file    = "/tmp/mdd-$version.tgz";
+    
+    $log->dbg("New version $version is available");
+    $log->dbg("Downloading $url to $file");
+
+    if (opendir my($dh), '/tmp/') {
+        foreach my $f (readdir($dh)) {
+            next unless $f =~ /mdd-(\S+)\.tgz$/;
+            $log->dbg("Removing old version /tmp/$f");
+            unlink "/tmp/$f";
+        }
+    }
+
+    if (getstore($url, $file) == 200) {
+        sendMsg("UPDATE $file");
+        return;
+    }
+    
+    sendMsg("UPDATE FAILED");
+
 }
 
 # Kill the original mythlcdserver
