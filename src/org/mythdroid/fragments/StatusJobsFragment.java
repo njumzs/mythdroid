@@ -21,8 +21,6 @@ package org.mythdroid.fragments;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.mythdroid.Globals;
 import org.mythdroid.R;
@@ -41,6 +39,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,8 +63,8 @@ public class StatusJobsFragment extends ListFragment {
 
         private int value;
 
-        static final private Map<Integer, JobStatus> revMap =
-            new HashMap<Integer, JobStatus>(14);
+        static final private SparseArray<JobStatus> revMap =
+            new SparseArray<JobStatus>(14);
 
         static {
             for (JobStatus j : EnumSet.allOf(JobStatus.class))
@@ -105,8 +104,8 @@ public class StatusJobsFragment extends ListFragment {
         private int     value;
         private String  msg;
 
-        static final private Map<Integer, JobType> revMap =
-            new HashMap<Integer, JobType>(10);
+        static final private SparseArray<JobType> revMap =
+            new SparseArray<JobType>(10);
 
         static {
             for (JobType j : EnumSet.allOf(JobType.class))
