@@ -2,6 +2,7 @@ package org.mythdroid;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.TimeZone;
 
 import org.mythdroid.backend.BackendManager;
@@ -18,6 +19,7 @@ import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
+import android.preference.PreferenceManager;
 
 /** Global static variables and methods */
 public class Globals {
@@ -68,6 +70,8 @@ public class Globals {
     private static FrontendManager feMgr  = null;
     /** A handler for the worker thread */
     private static Handler wHandler = null;
+    /** A list of addresses that have been checked for updates */
+    private static ArrayList<String> updateChecked = new ArrayList<String>(4);
 
     /**
      * Is the currentFrontend set to 'Here'? 
@@ -220,6 +224,25 @@ public class Globals {
         if (wHandler != null)
             wHandler.getLooper().quit();
         wHandler = null;
+    }
+    
+    /**
+     * Check whether the supplied address has already been checked for updates
+     * mark it so if not
+     * @param addr address to check
+     * @return true if already checked, false otherwise
+     */
+    public static boolean checkedForUpdate(String addr) {
+        
+        if (
+            PreferenceManager.getDefaultSharedPreferences(appContext)
+                .getBoolean("disableUpdateNotif", false) //$NON-NLS-1$
+        )
+            return true;
+        
+        if (updateChecked.contains(addr)) return true;
+        updateChecked.add(addr);
+        return false;
     }
     
     /** Test muxed conns, return true if they're available, false otherwise */
