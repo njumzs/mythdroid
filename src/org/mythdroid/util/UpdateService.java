@@ -27,11 +27,8 @@ import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.XMLHandler;
@@ -218,8 +215,8 @@ public class UpdateService extends Service {
         registerReceiver(receiver, filter);
         
         handler = new XMLHandler("feed"); //$NON-NLS-1$
-        Element root = handler.rootElement();
-        Element entry = root.getChild("entry"); //$NON-NLS-1$
+        final Element root  = handler.rootElement();
+        final Element entry = root.getChild("entry"); //$NON-NLS-1$
 
         entry.getChild("content").setTextElementListener( //$NON-NLS-1$
             new EndTextElementListener() {
@@ -283,11 +280,11 @@ public class UpdateService extends Service {
             " is available (current version is " + runningVer.toString() + ")" //$NON-NLS-1$ //$NON-NLS-2$
         );
         
-        NotificationManager nm = (NotificationManager)getSystemService(
+        final NotificationManager nm = (NotificationManager)getSystemService(
             Context.NOTIFICATION_SERVICE
         );
 
-        Notification notification = new Notification(
+        final Notification notification = new Notification(
             R.drawable.logo, 
             Messages.getString("UpdateService.0") + "MythDroid" + //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("UpdateService.1"),  //$NON-NLS-1$
@@ -296,7 +293,7 @@ public class UpdateService extends Service {
         
         notification.flags = Notification.FLAG_AUTO_CANCEL;
         
-        Intent intent = new Intent(MDACTION);
+        final Intent intent = new Intent(MDACTION);
         intent.putExtra(VER, MDVer.toString());
         intent.putExtra(URL, MDVer.url.toString());
 
@@ -314,13 +311,11 @@ public class UpdateService extends Service {
     
     private void updateMythDroid(String ver, String url) {
         
-        HttpClient client = new DefaultHttpClient();
-        HttpResponse response = null;
-        
         LogUtil.debug("Fetching APK from " + url); //$NON-NLS-1$
         
+        HttpFetcher fetcher = null;
         try {
-            response = client.execute(new HttpGet(url));
+            fetcher = new HttpFetcher(url);
         } catch (ClientProtocolException e) {
             ErrUtil.logErr(e);
             notify(
@@ -337,17 +332,9 @@ public class UpdateService extends Service {
             return;
         }
         
-        int status = response.getStatusLine().getStatusCode(); 
-
-        if (!(status == 200))
-            notify(
-                "MythDroid" + Messages.getString("UpdateService.2"), //$NON-NLS-1$ //$NON-NLS-2$
-                Messages.getString("UpdateService.4") + status //$NON-NLS-1$
-            );
+        final File storage = Environment.getExternalStorageDirectory();
         
-        File storage = Environment.getExternalStorageDirectory();
-        
-        File outputFile = new File(
+        final File outputFile = new File(
             storage.getAbsolutePath() + '/' + Environment.DIRECTORY_DOWNLOADS,
             "MythDroid-" + ver + ".apk" //$NON-NLS-1$ //$NON-NLS-2$
         );
@@ -367,7 +354,7 @@ public class UpdateService extends Service {
         }
 
         try {
-            response.getEntity().writeTo(outputStream);
+            fetcher.writeTo(outputStream);
         } catch (IOException e) {
             ErrUtil.logErr(e);
             notify(
@@ -379,7 +366,7 @@ public class UpdateService extends Service {
         
         LogUtil.debug("Download successful, installing..."); //$NON-NLS-1$
         
-        Intent installIntent = new Intent(Intent.ACTION_VIEW);
+        final Intent installIntent = new Intent(Intent.ACTION_VIEW);
         installIntent.setDataAndType(
             Uri.fromFile(outputFile), "application/vnd.android.package-archive" //$NON-NLS-1$
         );
@@ -424,11 +411,11 @@ public class UpdateService extends Service {
             );
         }
         
-        NotificationManager nm = (NotificationManager)getSystemService(
+        final NotificationManager nm = (NotificationManager)getSystemService(
             Context.NOTIFICATION_SERVICE
         );
 
-        Notification notification = new Notification(
+        final Notification notification = new Notification(
             R.drawable.logo, 
             Messages.getString("UpdateService.0") + "MDD" + //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("UpdateService.1"),  //$NON-NLS-1$
@@ -437,7 +424,7 @@ public class UpdateService extends Service {
         
         notification.flags = Notification.FLAG_AUTO_CANCEL;
         
-        Intent intent = new Intent(MDDACTION);
+        final Intent intent = new Intent(MDDACTION);
         intent.putExtra(ADDR, addr);
         intent.putExtra(VER, MDDVer.toString());
         intent.putExtra(URL, MDDVer.url.toString());
@@ -503,7 +490,7 @@ public class UpdateService extends Service {
     
     private void getAvailableVersions() {
         
-        URL url;
+        final URL url;
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
@@ -528,7 +515,7 @@ public class UpdateService extends Service {
         for (int i = 0; i < 2; i++) {
             
             String version;
-            DownloadEntry entry = entries.get(i);
+            final DownloadEntry entry = entries.get(i);
             int start = -1;
             if ((start = entry.title.indexOf("MythDroid")) != -1) { //$NON-NLS-1$
                 start += 10;
