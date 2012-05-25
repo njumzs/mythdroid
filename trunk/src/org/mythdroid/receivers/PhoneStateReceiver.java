@@ -95,8 +95,9 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             SmsMessage msg = SmsMessage.createFromPdu((byte[]) pdus[0]);
             final String from = msg.getDisplayOriginatingAddress();
 
-            String m = Messages.getString("BCastReceiver.5") + from + ": " + //$NON-NLS-1$ //$NON-NLS-2$
-                       msg.getDisplayMessageBody();
+            StringBuilder m = new StringBuilder(
+                Messages.getString("BCastReceiver.5") //$NON-NLS-1$
+            ).append(from).append(": ").append(msg.getDisplayMessageBody()); //$NON-NLS-1$
         
             if (pdus.length > 1) {
                 for (int i = 1; i < pdus.length; i++){
@@ -104,20 +105,20 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                     String f = msg.getDisplayOriginatingAddress();
                     if (f == null || !f.equals(from))
                         break;
-                    m += msg.getDisplayMessageBody();
+                    m.append(msg.getDisplayMessageBody());
                 }
             }
             
             LogUtil.debug("SMS from " + from); //$NON-NLS-1$
             
             if (altOSD)
-                OSDMessage.XOSD(ctx, m);
+                OSDMessage.XOSD(ctx, m.toString());
             else
                 try {
                     if (scrollSMS)
-                        OSDMessage.Scroller(m, m.length() / 9 + 8);
+                        OSDMessage.Scroller(m.toString(), m.length() / 9 + 8);
                     else
-                        OSDMessage.Alert(m);
+                        OSDMessage.Alert(m.toString());
                 } catch (Exception e){}
         }
 
