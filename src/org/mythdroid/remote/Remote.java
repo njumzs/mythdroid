@@ -57,9 +57,6 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     final private static KeyCharacterMap keyMap =
         KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
 
-    final private static String wakeService =
-        "org.mythdroid.remote.WakeService"; //$NON-NLS-1$
-
     /** Result codes for when a remote is startActivityForResult()'d */
     final protected int REMOTE_RESULT_FINISH = RESULT_FIRST_USER;
     
@@ -255,7 +252,7 @@ public abstract class Remote extends Activity implements View.OnClickListener {
                 
             };
             bindService(
-                new Intent().setClassName(this, wakeService),
+                new Intent().setClass(this, WakeService.class),
                 wakeConnection, BIND_AUTO_CREATE
             );
         }
