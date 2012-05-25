@@ -26,6 +26,7 @@ import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.frontend.FrontendLocation;
+import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.frontend.WakeOnLan;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.receivers.ConnectivityReceiver;
@@ -104,15 +105,19 @@ public class MythDroid extends MDListActivity implements
 
         getPreferences();
         
+        // Search for new frontends via UPnP
+        Globals.getWorker().post(FrontendManager.findFrontends);
+        
         // Try to grab locations from the frontend in the background
         Globals.getWorker().post(FrontendLocation.getLocations);
 
         crecv = new ConnectivityReceiver(Globals.appContext);
         
+        // Check for MythDroid updates
         Intent intent = new Intent();
         intent.setClass(this, UpdateService.class);
         
-        if (!Globals.checkedForUpdate("local")) { //$NON-NLS-1$
+        if (!Globals.checkedForUpdate("MythDroid")) { //$NON-NLS-1$
             intent.putExtra(UpdateService.ACTION, UpdateService.CHECKMD);
             startService(intent);
         }

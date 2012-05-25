@@ -187,6 +187,23 @@ public class FrontendDB {
         }
         return null;
     }
+    
+    /**
+     * Determine whether a frontend with a given address is defined
+     * @param ctx Context
+     * @param addr address to search for
+     * @return true if a frontend with the given address exists, false otherwise
+     */
+    public static boolean hasFrontendWithAddr(Context ctx, String addr) {
+        if (db == null || cached == null || cached.isClosed()) initDB(ctx);
+        cached.moveToFirst();
+        while (!cached.isAfterLast()) {
+            if (cached.getString(ADDR).equals(addr))
+                return true;
+            cached.moveToNext();
+        }
+        return false;
+    }
 
     /**
      * Insert a new frontend
