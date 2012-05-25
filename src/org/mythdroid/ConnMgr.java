@@ -297,13 +297,13 @@ public class ConnMgr {
      */
     public void sendStringList(final String[] list) throws IOException {
 
-        String str = list[0];
+        StringBuilder sb = new StringBuilder(list[0]);
 
-        for (int i = 1; i < list.length; i++) {
-            str += "[]:[]" + list[i]; //$NON-NLS-1$
-        }
+        for (int i = 1; i < list.length; i++)
+            sb.append("[]:[]").append(list[i]); //$NON-NLS-1$
 
-        sendString(str);
+        sendString(sb.toString());
+        
     }
 
     /**
@@ -312,12 +312,12 @@ public class ConnMgr {
      */
     public String readLine() throws IOException {
 
-        String line = ""; //$NON-NLS-1$
+        StringBuilder line = new StringBuilder(16);
         int r = -1;
 
         // Have left over buffered data?
         if (rbufIdx > -1 && rbuf.length >= rbufIdx + 1)
-            line = new String(rbuf, 0, rbufIdx + 1);
+            line.append(new String(rbuf, 0, rbufIdx + 1));
 
         rbufIdx = line.length() - 1;
 
@@ -339,7 +339,7 @@ public class ConnMgr {
         }
 
         // Is there a whole line in the buffer?
-        r = line.indexOf('\n');
+        r = line.indexOf("\n"); //$NON-NLS-1$
 
         if (r != -1) {
             // Yup, did we consume the whole buffer?
@@ -354,7 +354,7 @@ public class ConnMgr {
             rbuf = null;
             rbufIdx = -1;
             LogUtil.debug("readLine: " + line); //$NON-NLS-1$
-            return line.trim();
+            return line.toString().trim();
         }
         
         synchronized (is) {
@@ -368,7 +368,7 @@ public class ConnMgr {
                 r = read(buf, 0, rbufSize);
     
                 String extra = new String(buf, 0 , r);
-                line += extra;
+                line.append(extra);
     
                 // If the buffer was empty and we got 2 bytes, check for a #
                 if (
@@ -391,7 +391,7 @@ public class ConnMgr {
 
         // We've got a whole line
         int tot = line.length() - 1;
-        r = line.indexOf('\n');
+        r = line.indexOf("\n"); //$NON-NLS-1$
 
         // Are we gonna consume the whole string?
         if (r < tot) {
@@ -405,7 +405,7 @@ public class ConnMgr {
         rbuf = null;
         rbufIdx = -1;
         LogUtil.debug("readLine: " + line); //$NON-NLS-1$
-        return line.trim();
+        return line.toString().trim();
 
     }
 
