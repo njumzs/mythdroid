@@ -27,6 +27,7 @@ import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.fragments.RecEditFragment;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.services.MythService;
 import org.mythdroid.util.ErrUtil;
 
 import android.app.Activity;
@@ -86,17 +87,25 @@ public class RecEditGroupsFragment extends Fragment {
         }
         
         try {
-            recGroups  = MDDManager.getRecGroups(
-                Globals.getBackend().addr
-            );
-            storGroups = MDDManager.getStorageGroups(
-                Globals.getBackend().addr
-            );
+            if (!Globals.haveServices()) {
+                recGroups  = MDDManager.getRecGroups(
+                    Globals.getBackend().addr
+                );
+                storGroups = MDDManager.getStorageGroups(
+                    Globals.getBackend().addr
+                );
+            }
+            else {
+                MythService myth = new MythService(Globals.getBackend().addr);
+                recGroups = new String[1];
+                recGroups[0] = Messages.getString("RecEditGroupsFragment.0"); //$NON-NLS-1$
+                storGroups = myth.getStorageGroups();
+            }
         } catch (IOException e) {
             ErrUtil.err(activity, e);
             done();
         }
-
+       
         if (recGroups == null || storGroups == null) {
             ErrUtil.err(activity, Messages.getString("RecordingEditGroups.0")); //$NON-NLS-1$
             done();
