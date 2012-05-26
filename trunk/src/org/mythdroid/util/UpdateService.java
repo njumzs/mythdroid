@@ -48,7 +48,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.sax.EndTextElementListener;
@@ -336,12 +335,8 @@ public class UpdateService extends Service {
         }
         
         final File storage = Environment.getExternalStorageDirectory();
-        String download = 
-            Integer.parseInt(Build.VERSION.SDK) >= 8 ?
-                Environment.DIRECTORY_DOWNLOADS : "Download"; //$NON-NLS-1$
-        
         final File outputFile = new File(
-            storage.getAbsolutePath() + '/' + download,
+            storage.getAbsolutePath() + '/' + "Download", //$NON-NLS-1$
             "MythDroid-" + ver + ".apk" //$NON-NLS-1$ //$NON-NLS-2$
         );
         
