@@ -27,8 +27,10 @@ import org.mythdroid.R.id;
 import org.mythdroid.R.layout;
 import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
+import org.mythdroid.data.StreamInfo;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.services.ContentService;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
 import org.mythdroid.views.MDVideoView;
@@ -71,6 +73,8 @@ public class VideoPlayer extends MDActivity {
     private VLCRemote      vlc         = null;
     private MediaPlayer    mplayer     = null;
     private Uri            url         = null;
+    private ContentService contentService = null;
+    private StreamInfo     streamInfo  = null;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -79,6 +83,12 @@ public class VideoPlayer extends MDActivity {
         videoView = (MDVideoView)findViewById(id.videoview);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         showDialog(DIALOG_QUALITY);
+        if (Globals.haveServices()) 
+            try {
+                contentService = new ContentService(Globals.getBackend().addr);
+            } catch (IOException e) {
+                ErrUtil.err(this, e);
+            }
     }
 
     @Override
@@ -95,6 +105,8 @@ public class VideoPlayer extends MDActivity {
             try {
                 vlc.disconnect();
             } catch (IOException e) { ErrUtil.err(ctx, e); }
+        if (streamInfo != null)
+            contentService.RemoveStream(streamInfo.id);
     }
 
     @Override
@@ -161,48 +173,81 @@ public class VideoPlayer extends MDActivity {
         return d;
     }
 
+    @SuppressWarnings("unused")
     private void startStream() {
 
         showDialog(DIALOG_LOAD);
 
         DisplayMetrics dm = getResources().getDisplayMetrics();
+        
+        int h = (dm.heightPixels + 15) & ~0xf;
+        int w = (dm.widthPixels + 15) & ~0xf;
 
         try {
             Intent intent = getIntent();
             String path = null, sg = null;
+            int id = -1;
+            
+            /** MythTV HLS is really low bitrate and seeking isn't supported */
+            if (false && Globals.haveServices() && contentService != null) {
 
-            if (intent.hasExtra(Extras.FILENAME.toString())) {
-                path = getIntent().getStringExtra(Extras.FILENAME.toString());
-                sg = "Default"; //$NON-NLS-1$
+                if (intent.hasExtra(Extras.VIDEOID.toString())) {
+                    id = intent.getIntExtra(Extras.VIDEOID.toString(), -1);
+                    streamInfo = contentService.StreamFile(
+                        id, w, h, vb * 1000, ab * 1000
+                    );
+                }
+                else {
+                    Program prog = Globals.curProg;
+                    if (prog == null) {
+                        ErrUtil.err(this, Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
+                        finish();
+                        return;
+                    }
+                    streamInfo = contentService.StreamFile(
+                        prog.ChanID, Globals.utcFmt.format(prog.StartTime), 
+                        w, h, vb * 1000, ab * 1000
+                    );
+                }
+
             }
             else {
-                Program prog = Globals.curProg;
-                if (prog == null) {
-                    ErrUtil.err(this, Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
-                    finish();
-                    return;
-                }
-                path = prog.Path;
-                if (prog.StorGroup != null)
-                    sg = prog.StorGroup;
-                else
-                    sg = MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
-            }
             
-            int enc = Integer.valueOf(
-                PreferenceManager.getDefaultSharedPreferences(this)
-                    .getString("streamComplexity", "0") //$NON-NLS-1$ //$NON-NLS-2$
-            );
+                if (intent.hasExtra(Extras.FILENAME.toString())) {
+                    path = intent.getStringExtra(Extras.FILENAME.toString());
+                    sg = "Default"; //$NON-NLS-1$
+                }
+                else {
+                    Program prog = Globals.curProg;
+                    if (prog == null) {
+                        ErrUtil.err(this, Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
+                        finish();
+                        return;
+                    }
+                    path = prog.Path;
+                    if (prog.StorGroup != null)
+                        sg = prog.StorGroup;
+                    else
+                        sg = MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
+                }
+            
+                int enc = Integer.valueOf(
+                    PreferenceManager.getDefaultSharedPreferences(this)
+                        .getString("streamComplexity", "0") //$NON-NLS-1$ //$NON-NLS-2$
+                    );
 
-            MDDManager.streamFile(
-                beMgr.addr, path, sg,
-                dm.widthPixels, dm.heightPixels, enc, vb, ab
-            );
+                MDDManager.streamFile(
+                    beMgr.addr, path, sg,
+                    dm.widthPixels, dm.heightPixels, enc, vb, ab
+                );
+                
+            }
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();
             return;
         }
+            
         
         // Give MDD a chance to exec vlc and vlc a chance to start streaming
         new Handler().postDelayed(
@@ -250,30 +295,37 @@ public class VideoPlayer extends MDActivity {
     
     private void playVideo() {
             
-        String sdpAddr = beMgr.addr;
+        if (streamInfo != null)
+            url = Uri.parse(streamInfo.url);
+        else {
+            String sdpAddr = beMgr.addr;
 
-        /* If the backend address is localhost, assume SSH port forwarding
-           We must connect to the RTSP server directly otherwise the RTP
-           goes astray, so use the public address for the backend if it's
-           configured. This requires that port 5554/tcp is forwarded to the 
-           backend */
-        String sdpPublicAddr =
-            PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("backendPublicAddr", null);  //$NON-NLS-1$
-
-        if (
-               (sdpAddr.equals("127.0.0.1") || sdpAddr.equals("localhost")) && //$NON-NLS-1$ //$NON-NLS-2$
-                sdpPublicAddr != null
-           )
-           sdpAddr = sdpPublicAddr;
-
-        url = Uri.parse("rtsp://" + sdpAddr + ":5554/stream"); //$NON-NLS-1$ //$NON-NLS-2$
+            /* If the backend address is localhost, assume SSH port forwarding
+               We must connect to the RTSP server directly otherwise the RTP
+               goes astray, so use the public address for the backend if it's
+               configured. This requires that port 5554/tcp is forwarded to the 
+               backend */
+            String sdpPublicAddr =
+                PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("backendPublicAddr", null);  //$NON-NLS-1$
+    
+            if (
+                   (sdpAddr.equals("127.0.0.1") || sdpAddr.equals("localhost")) //$NON-NLS-1$ //$NON-NLS-2$
+                   && sdpPublicAddr != null
+               )
+               sdpAddr = sdpPublicAddr;
+    
+            url = Uri.parse("rtsp://" + sdpAddr + ":5554/stream"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
         
         if (
             PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("streamExternalPlayer", false) //$NON-NLS-1$
         ) {
-            startActivityForResult(new Intent(Intent.ACTION_VIEW, url), 0);
+            Intent intent = new Intent(Intent.ACTION_VIEW, url);
+            if (streamInfo != null)
+                intent.setDataAndType(url, "video/x-mpegurl"); //$NON-NLS-1$
+            startActivityForResult(intent, 0);
             return;
         }
         
@@ -310,26 +362,28 @@ public class VideoPlayer extends MDActivity {
             }
         );
         
-        videoView.setVLC(getVLC());
+        if (streamInfo == null)
+            videoView.setVLC(getVLC());
         videoView.setMediaController(new MediaController(ctx, false));
-        videoView.setOnSeekListener(
-            new OnSeekListener() {
-                @Override
-                public void onSeek() {
-                    showDialog(DIALOG_LOAD);
-                    mplayer.pause();
-                    // Dump the buffer, no better way of doing it :(
-                    mplayer.reset();
-                    try {
-                        mplayer.setDataSource(ctx, url);
-                        mplayer.prepareAsync();
-                    } catch (Exception e) {
-                        ErrUtil.err(ctx, e);
-                        finish();
+        if (streamInfo == null)
+            videoView.setOnSeekListener(
+                new OnSeekListener() {
+                    @Override
+                    public void onSeek() {
+                        showDialog(DIALOG_LOAD);
+                        mplayer.pause();
+                        // Dump the buffer, no better way of doing it :(
+                        mplayer.reset();
+                        try {
+                            mplayer.setDataSource(ctx, url);
+                            mplayer.prepareAsync();
+                        } catch (Exception e) {
+                            ErrUtil.err(ctx, e);
+                            finish();
+                        }
                     }
                 }
-            }
-        );
+            );
   
         videoView.setOnPreparedListener(
             new OnPreparedListener() {
@@ -345,6 +399,9 @@ public class VideoPlayer extends MDActivity {
                 }
             }
         );
+        
+        if (streamInfo != null)
+            contentService.WaitForStream(streamInfo.id);
 
         videoView.setVideoURI(url);
         
