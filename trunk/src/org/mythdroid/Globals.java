@@ -59,9 +59,13 @@ public class Globals {
     /** SimpleDateFormat of HH:mm, EEE d MMM yy */
     final public static SimpleDateFormat dispFmt =
         new SimpleDateFormat("HH:mm, EEE d MMM yy"); //$NON-NLS-1$
+    /** SimpleDataFormat like dateFmt but in UTC */
+    final public static SimpleDateFormat utcFmt = 
+        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$;
     static {
         dispFmt.setTimeZone(TimeZone.getDefault());
         dateFmt.setTimeZone(TimeZone.getDefault());
+        utcFmt.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
     }
 
     /** A BackendManager representing a connected backend */
@@ -167,6 +171,14 @@ public class Globals {
 
         return beMgr;
 
+    }
+    
+    /**
+     * Returns true if the backend supports the Services API
+     * @return true if the backend supports the Services API, false otherwise
+     */
+    public static boolean haveServices() {
+        return protoVersion >= 72;
     }
 
     /**
