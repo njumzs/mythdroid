@@ -42,34 +42,38 @@ public class Enums {
         /** Don't jumpTo() (All remotes) */
         DONTJUMP,
         /** jumpTo() the program guide (NavRemote) */
-        GUIDE;
+        GUIDE,
+        /** Video ID to stream (VideoPlayer) */
+        VIDEOID;
     }
 
     /** Recording statuses, with reverse lookup by code */
     public enum RecStatus {
-        FAILED      (-9,    Messages.getString("Program.0")),  //$NON-NLS-1$
-        TUNERBUSY   (-8,    Messages.getString("Program.13")), //$NON-NLS-1$
-        LOWSPACE    (-7,    Messages.getString("Program.14")), //$NON-NLS-1$
-        CANCELLED   (-6,    Messages.getString("Program.15")), //$NON-NLS-1$
-        MISSED      (-5,    Messages.getString("Program.16")), //$NON-NLS-1$
-        ABORTED     (-4,    Messages.getString("Program.17")), //$NON-NLS-1$
-        RECORDED    (-3,    Messages.getString("Program.18")), //$NON-NLS-1$
-        RECORDING   (-2,    Messages.getString("Program.19")), //$NON-NLS-1$
-        WILLRECORD  (-1,    Messages.getString("Program.20")), //$NON-NLS-1$
-        UNKNOWN     (0,     Messages.getString("Program.21")), //$NON-NLS-1$
-        DONTRECORD  (1,     Messages.getString("Program.22")), //$NON-NLS-1$
-        PREVIOUS    (2,     Messages.getString("Program.23")), //$NON-NLS-1$
-        CURRENT     (3,     Messages.getString("Program.24")), //$NON-NLS-1$
-        EARLIER     (4,     Messages.getString("Program.25")), //$NON-NLS-1$
-        TOOMANY     (5,     Messages.getString("Program.26")), //$NON-NLS-1$
-        NOTLISTED   (6,     Messages.getString("Program.27")), //$NON-NLS-1$
-        CONFLICT    (7,     Messages.getString("Program.28")), //$NON-NLS-1$
-        LATER       (8,     Messages.getString("Program.29")), //$NON-NLS-1$
-        REPEAT      (9,     Messages.getString("Program.30")), //$NON-NLS-1$
-        INACTIVE    (10,    Messages.getString("Program.31")), //$NON-NLS-1$
-        NEVERRECORD (11,    Messages.getString("Program.32")), //$NON-NLS-1$
-        OFFLINE     (12,    Messages.getString("Program.33")), //$NON-NLS-1$
-        OTHER       (13,    Messages.getString("Program.34")); //$NON-NLS-1$
+        MISSEDFUTURE (-11,   Messages.getString("Program.48")), //$NON-NLS-1$
+        TUNER        (-10,   Messages.getString("Program.49")), //$NON-NLS-1$
+        FAILED       (-9,    Messages.getString("Program.0")),  //$NON-NLS-1$
+        TUNERBUSY    (-8,    Messages.getString("Program.13")), //$NON-NLS-1$
+        LOWSPACE     (-7,    Messages.getString("Program.14")), //$NON-NLS-1$
+        CANCELLED    (-6,    Messages.getString("Program.15")), //$NON-NLS-1$
+        MISSED       (-5,    Messages.getString("Program.16")), //$NON-NLS-1$
+        ABORTED      (-4,    Messages.getString("Program.17")), //$NON-NLS-1$
+        RECORDED     (-3,    Messages.getString("Program.18")), //$NON-NLS-1$
+        RECORDING    (-2,    Messages.getString("Program.19")), //$NON-NLS-1$
+        WILLRECORD   (-1,    Messages.getString("Program.20")), //$NON-NLS-1$
+        UNKNOWN      (0,     Messages.getString("Program.21")), //$NON-NLS-1$
+        DONTRECORD   (1,     Messages.getString("Program.22")), //$NON-NLS-1$
+        PREVIOUS     (2,     Messages.getString("Program.23")), //$NON-NLS-1$
+        CURRENT      (3,     Messages.getString("Program.24")), //$NON-NLS-1$
+        EARLIER      (4,     Messages.getString("Program.25")), //$NON-NLS-1$
+        TOOMANY      (5,     Messages.getString("Program.26")), //$NON-NLS-1$
+        NOTLISTED    (6,     Messages.getString("Program.27")), //$NON-NLS-1$
+        CONFLICT     (7,     Messages.getString("Program.28")), //$NON-NLS-1$
+        LATER        (8,     Messages.getString("Program.29")), //$NON-NLS-1$
+        REPEAT       (9,     Messages.getString("Program.30")), //$NON-NLS-1$
+        INACTIVE     (10,    Messages.getString("Program.31")), //$NON-NLS-1$
+        NEVERRECORD  (11,    Messages.getString("Program.32")), //$NON-NLS-1$
+        OFFLINE      (12,    Messages.getString("Program.33")), //$NON-NLS-1$
+        OTHER        (13,    Messages.getString("Program.34")); //$NON-NLS-1$
 
         private int     code;
         private String  msg;
@@ -113,31 +117,37 @@ public class Enums {
 
     /** Recording types, with reverse lookup by code */
     public enum RecType {
-        NOT         (0,     Messages.getString("Program.35")), //$NON-NLS-1$
-        SINGLE      (1,     Messages.getString("Program.1")), //$NON-NLS-1$
-        CHANNEL     (3,     Messages.getString("Program.2")), //$NON-NLS-1$
-        ALL         (4,     Messages.getString("Program.3")), //$NON-NLS-1$
-        TIMESLOT    (2,     Messages.getString("Program.4")), //$NON-NLS-1$
-        WEEKSLOT    (5,     Messages.getString("Program.5")), //$NON-NLS-1$
-        FINDONE     (6,     Messages.getString("Program.6")), //$NON-NLS-1$
-        FINDDAILY   (9,     Messages.getString("Program.7")), //$NON-NLS-1$
-        FINDWEEKLY  (10,    Messages.getString("Program.8")), //$NON-NLS-1$
-        OVERRIDE    (7,     Messages.getString("Program.9")), //$NON-NLS-1$
-        DONT        (8,     Messages.getString("Program.10")); //$NON-NLS-1$
+        NOT        (0,  Messages.getString("Program.35"), "Not Recording"),      //$NON-NLS-1$ //$NON-NLS-2$
+        SINGLE     (1,  Messages.getString("Program.1"),  "Single Record"),      //$NON-NLS-1$ //$NON-NLS-2$
+        CHANNEL    (3,  Messages.getString("Program.2"),  "Channel Record"),     //$NON-NLS-1$ //$NON-NLS-2$
+        ALL        (4,  Messages.getString("Program.3"),  "Record All"),         //$NON-NLS-1$ //$NON-NLS-2$
+        TIMESLOT   (2,  Messages.getString("Program.4"),  "Record Daily"),       //$NON-NLS-1$ //$NON-NLS-2$
+        WEEKSLOT   (5,  Messages.getString("Program.5"),  "Record Weekly"),      //$NON-NLS-1$ //$NON-NLS-2$
+        FINDONE    (6,  Messages.getString("Program.6"),  "Find One"),           //$NON-NLS-1$ //$NON-NLS-2$
+        FINDDAILY  (9,  Messages.getString("Program.7"),  "Find Daily"),         //$NON-NLS-1$ //$NON-NLS-2$
+        FINDWEEKLY (10, Messages.getString("Program.8"),  "Find Weekly"),        //$NON-NLS-1$ //$NON-NLS-2$
+        OVERRIDE   (7,  Messages.getString("Program.9"),  "Override Recording"), //$NON-NLS-1$ //$NON-NLS-2$
+        DONT       (8,  Messages.getString("Program.10"), "Don't Record");       //$NON-NLS-1$ //$NON-NLS-2$
 
         private int     code;
-        private String  msg;
+        private String  msg, json;
+        
         static final private Map<Integer, RecType> revMap =
             new HashMap<Integer, RecType>(11);
+        static final private Map<String, RecType>  JSONMap = 
+            new HashMap<String, RecType>(11);
 
         static {
-            for (RecType s : EnumSet.allOf(RecType.class))
-                revMap.put(s.value(), s);
+            for (RecType s : EnumSet.allOf(RecType.class)) {
+                revMap.put(s.code, s);
+                JSONMap.put(s.json, s);
+            }
         }
 
-        private RecType(int code, String str) {
+        private RecType(int code, String str, String JSON) {
             this.code = code;
-            this.msg = str;
+            this.msg  = str;
+            this.json = JSON;
         }
 
         /**
@@ -146,6 +156,14 @@ public class Enums {
          */
         public String msg() {
             return msg;
+        }
+        
+        /**
+         * Get a description suitable for use with the services api
+         * @return String suitable for use with the services api
+         */
+        public String json() {
+            return json;
         }
 
         /**
@@ -158,32 +176,51 @@ public class Enums {
 
         /**
          * Reverse lookup by integer code
-         * @return RecStatus corresponding to code
+         * @param value integer value to lookup
+         * @return RecType corresponding to code
          */
         public static RecType get(int value) {
             return revMap.get(value);
         }
+        
+        /**
+         * Reverse lookup by description as received in JSON
+         * @param jdesc description to lookup
+         * @return RecType corresponding to description
+         */
+        public static RecType get(String jdesc) {
+            return JSONMap.get(jdesc);
+        }
+        
     }
 
     /** Recording duplicate search types, with reverse lookup by code */
     public enum RecDupIn {
-        RECORDED    (0x01,     Messages.getString("Program.11")), //$NON-NLS-1$
-        OLDRECORDED (0x02,     Messages.getString("Program.12")), //$NON-NLS-1$
-        ALL         (0x0f,     Messages.getString("Program.36")); //$NON-NLS-1$
+        RECORDED    
+        (0x01, Messages.getString("Program.11"), "Current Recordings"), //$NON-NLS-1$
+        OLDRECORDED 
+        (0x02, Messages.getString("Program.12"), "Previous Recordings"), //$NON-NLS-1$
+        ALL         
+        (0x0f, Messages.getString("Program.36"), "All Recordings"); //$NON-NLS-1$
 
         private int     code;
-        private String  msg;
+        private String  msg, json;
         static final private Map<Integer, RecDupIn> revMap =
             new HashMap<Integer, RecDupIn>(3);
+        static final private Map<String, RecDupIn>  JSONMap = 
+            new HashMap<String, RecDupIn>(3);
 
         static {
-            for (RecDupIn s : EnumSet.allOf(RecDupIn.class))
+            for (RecDupIn s : EnumSet.allOf(RecDupIn.class)) {
                 revMap.put(s.value(), s);
+                JSONMap.put(s.json, s);
+            }
         }
 
-        private RecDupIn(int code, String str) {
+        private RecDupIn(int code, String str, String JSON) {
             this.code = code;
-            this.msg = str;
+            this.msg  = str;
+            this.json = JSON;
         }
 
         /**
@@ -192,6 +229,14 @@ public class Enums {
          */
         public String msg() {
             return msg;
+        }
+        
+        /**
+         * Get a description suitable for use with the services api
+         * @return String suitable for use with the services api
+         */
+        public String json() {
+            return json;
         }
 
         /**
@@ -208,6 +253,15 @@ public class Enums {
          */
         public static RecDupIn get(int value) {
             return revMap.get(value);
+        }
+        
+        /**
+         * Reverse lookup by description as received in JSON
+         * @param jdesc description to lookup
+         * @return RecType corresponding to description
+         */
+        public static RecDupIn get(String jdesc) {
+            return JSONMap.get(jdesc);
         }
     }
 
@@ -261,25 +315,35 @@ public class Enums {
 
     /** Recording duplicate matching methods, with reverse lookup by code */
     public enum RecDupMethod {
-        NONE        (1,     Messages.getString("Program.42")), //$NON-NLS-1$
-        SUB         (2,     Messages.getString("Program.43")), //$NON-NLS-1$
-        DESC        (4,     Messages.getString("Program.44")), //$NON-NLS-1$
-        SUBANDDESC  (6,     Messages.getString("Program.45")), //$NON-NLS-1$
-        SUBTHENDESC (8,     Messages.getString("Program.46")); //$NON-NLS-1$
+        NONE        
+        (1, Messages.getString("Program.42"), "None"), //$NON-NLS-1$
+        SUB         
+        (2, Messages.getString("Program.43"), "Subtitle"), //$NON-NLS-1$
+        DESC        
+        (4, Messages.getString("Program.44"), "Description"), //$NON-NLS-1$
+        SUBANDDESC  
+        (6, Messages.getString("Program.45"), "Subtitle and Description"), //$NON-NLS-1$
+        SUBTHENDESC 
+        (8, Messages.getString("Program.46"), "Subtitle then Description"); //$NON-NLS-1$
 
         private int     code;
-        private String  msg;
+        private String  msg, json;
         static final private Map<Integer, RecDupMethod> revMap =
             new HashMap<Integer, RecDupMethod>(5);
+        static final private Map<String, RecDupMethod>  JSONMap = 
+            new HashMap<String, RecDupMethod>(3);
 
         static {
-            for (RecDupMethod s : EnumSet.allOf(RecDupMethod.class))
+            for (RecDupMethod s : EnumSet.allOf(RecDupMethod.class)) {
                 revMap.put(s.value(), s);
+                JSONMap.put(s.json, s);
+            }
         }
 
-        private RecDupMethod(int code, String str) {
+        private RecDupMethod(int code, String str, String JSON) {
             this.code = code;
-            this.msg = str;
+            this.msg  = str;
+            this.json = JSON;
         }
 
         /**
@@ -288,6 +352,14 @@ public class Enums {
          */
         public String msg() {
             return msg;
+        }
+        
+        /**
+         * Get a description suitable for use with the services api
+         * @return String suitable for use with the services api
+         */
+        public String json() {
+            return json;
         }
 
         /**
@@ -304,6 +376,15 @@ public class Enums {
          */
         public static RecDupMethod get(int value) {
             return revMap.get(value);
+        }
+        
+        /**
+         * Reverse lookup by description as received in JSON
+         * @param jdesc description to lookup
+         * @return RecType corresponding to description
+         */
+        public static RecDupMethod get(String jdesc) {
+            return JSONMap.get(jdesc);
         }
     }
 
