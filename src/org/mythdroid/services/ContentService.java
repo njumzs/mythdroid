@@ -1,0 +1,159 @@
+/*
+    MythDroid: Android MythTV Remote
+    Copyright (C) 2009-2010 foobum@gmail.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+package org.mythdroid.services;
+
+import java.io.IOException;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.mythdroid.data.StreamInfo;
+import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.LogUtil;
+
+/** An implementation of the Guide service */
+public class ContentService {
+    
+    private JSONClient jc = null;
+    
+    /**
+     * Construct a client for the Guide service
+     * @param addr IP address or hostname of server
+     */
+    public ContentService(String addr) {
+        jc = new JSONClient(addr, "Content"); //$NON-NLS-1$
+    }
+    
+    /**
+     * Add a HTTP Live Stream
+     * @param chanid channel id
+     * @param startTime startTime in UTC ISO format
+     * @param width desired width
+     * @param height desired height
+     * @param vb desired video bitrate
+     * @param ab desired audio bitrate
+     * @return a StreamInfo or null if there's a problem
+     * @throws IOException
+     */
+    public StreamInfo StreamFile(
+        int chanid, String startTime, int width, int height, int vb, int ab
+    ) throws IOException {
+        
+        Params params = new Params();
+        params.put("ChanId", chanid); //$NON-NLS-1$
+        params.put("StartTime", startTime); //$NON-NLS-1$
+        params.put("Width", width); //$NON-NLS-1$
+        params.put("Height", height); //$NON-NLS-1$
+        params.put("Bitrate", vb); //$NON-NLS-1$
+        params.put("AudioBitrate", ab); //$NON-NLS-1$
+        
+        final JSONObject jo = jc.Get("AddRecordingLiveStream", params); //$NON-NLS-1$
+        
+        try {
+            return new StreamInfo(jo.getJSONObject("LiveStreamInfo")); //$NON-NLS-1$
+        } catch (JSONException e) {
+            ErrUtil.logErr(e);
+            return null;
+        } 
+   
+    }
+    
+    /**
+     * Add a HTTP Video Live Stream
+     * @param id video id
+     * @param width desired width
+     * @param height desired height
+     * @param vb desired video bitrate
+     * @param ab desired audio bitrate
+     * @return a StreamInfo or null if there's a problem
+     * @throws IOException
+     */
+    public StreamInfo StreamFile(
+        int id, int width, int height, int vb, int ab
+    ) throws IOException {
+        
+        final Params params = new Params();
+        params.put("Id", id); //$NON-NLS-1$
+        params.put("Width", width); //$NON-NLS-1$
+        params.put("Height", height); //$NON-NLS-1$
+        params.put("Bitrate", vb); //$NON-NLS-1$
+        params.put("AudioBitrate", ab); //$NON-NLS-1$
+        
+        JSONObject jo = jc.Get("AddVideoLiveStream", params); //$NON-NLS-1$
+        
+        try {
+            return new StreamInfo(jo.getJSONObject("LiveStreamInfo")); //$NON-NLS-1$
+        } catch (JSONException e) {
+            ErrUtil.logErr(e);
+            return null;
+        } 
+   
+    }
+    
+    /**
+     * Remove a live stream
+     * @param id stream id
+     * @return true if successful, false otherwise
+     */
+    public boolean RemoveStream(int id) {
+        Params params = new Params("Id", String.valueOf(id)); //$NON-NLS-1$
+        try {
+            JSONObject jo = jc.Get("RemoveLiveStream", params); //$NON-NLS-1$
+            return jo.getBoolean("bool"); //$NON-NLS-1$
+        } catch (IOException e) {
+            ErrUtil.logErr(e);
+            return false;
+        } catch (JSONException e) {
+            ErrUtil.logErr(e);
+            return false;
+        }
+    }
+    
+    /**
+     * Poll the stream status, return when it's started
+     * @param id stream id
+     */
+    public void WaitForStream(int id) {
+        
+        int segments = 0;
+        Params params = new Params("Id", String.valueOf(id)); //$NON-NLS-1$
+        
+        while (segments < 2) {
+            try {
+                JSONObject jo = jc.Get("GetLiveStream", params); //$NON-NLS-1$
+                jo = jo.getJSONObject("LiveStreamInfo"); //$NON-NLS-1$
+                segments = jo.getInt("SegmentCount"); //$NON-NLS-1$
+                LogUtil.debug("Live stream segments: " + segments); //$NON-NLS-1$
+            } catch (IOException e) {
+                ErrUtil.logErr(e);
+                break;
+            } catch (JSONException e) {
+                ErrUtil.logErr(e);
+                break;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                continue;
+            }
+        }
+        
+    }
+    
+}
+    
