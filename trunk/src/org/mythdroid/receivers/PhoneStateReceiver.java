@@ -22,6 +22,7 @@ import org.mythdroid.frontend.OSDMessage;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.LogUtil;
 import org.mythdroid.util.PhoneUtil;
+import org.mythdroid.util.Reflection;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -49,6 +50,7 @@ public class PhoneStateReceiver extends BroadcastReceiver {
         final String action     = intent.getAction();
         String number, name     = null;
 
+        Reflection.setThreadPolicy();
 
         if (
             showCalls &&
