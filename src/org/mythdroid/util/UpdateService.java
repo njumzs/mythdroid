@@ -149,9 +149,69 @@ public class UpdateService extends Service {
             
         }
     };
+    
+    @Override
+    public void onStart(Intent intent, int startId) {
+        handleCommand(intent);
+    }
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
+        
+        handleCommand(intent);
+        return Service.START_NOT_STICKY;
+
+    }
+    
+    @Override
+    public void onCreate() {
+        
+        registerReceiver(receiver, filter);
+        
+        handler = new XMLHandler("feed"); //$NON-NLS-1$
+        final Element root  = handler.rootElement();
+        final Element entry = root.getChild("entry"); //$NON-NLS-1$
+
+        entry.getChild("content").setTextElementListener( //$NON-NLS-1$
+            new EndTextElementListener() {
+                @Override
+                public void end(String text) {
+                    int start = text.indexOf("http:"); //$NON-NLS-1$
+                    int end = text.indexOf("\">", start); //$NON-NLS-1$
+                    download.url = text.substring(start, end);
+                    entries.add(download);
+                }
+            }
+        );
+        
+        entry.getChild("title").setTextElementListener( //$NON-NLS-1$
+            new EndTextElementListener() {
+                @Override
+                public void end(String text) {
+                    download = new DownloadEntry();
+                    download.title = text;
+                    
+                }
+            }
+        );
+        
+        Globals.getWorker().post(
+            new Runnable() {
+                @Override
+                public void run() {
+                    getAvailableVersions();
+                }
+            }
+        );
+        
+    }
+    
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(receiver);
+    }
+    
+    private void handleCommand(final Intent intent) {
         
         switch (intent.getIntExtra(ACTION, CHECKMD)) {
             
@@ -207,56 +267,6 @@ public class UpdateService extends Service {
                 break;
         }
         
-        return Service.START_NOT_STICKY;
-
-    }
-    
-    @Override
-    public void onCreate() {
-        
-        registerReceiver(receiver, filter);
-        
-        handler = new XMLHandler("feed"); //$NON-NLS-1$
-        final Element root  = handler.rootElement();
-        final Element entry = root.getChild("entry"); //$NON-NLS-1$
-
-        entry.getChild("content").setTextElementListener( //$NON-NLS-1$
-            new EndTextElementListener() {
-                @Override
-                public void end(String text) {
-                    int start = text.indexOf("http:"); //$NON-NLS-1$
-                    int end = text.indexOf("\">", start); //$NON-NLS-1$
-                    download.url = text.substring(start, end);
-                    entries.add(download);
-                }
-            }
-        );
-        
-        entry.getChild("title").setTextElementListener( //$NON-NLS-1$
-            new EndTextElementListener() {
-                @Override
-                public void end(String text) {
-                    download = new DownloadEntry();
-                    download.title = text;
-                    
-                }
-            }
-        );
-        
-        Globals.getWorker().post(
-            new Runnable() {
-                @Override
-                public void run() {
-                    getAvailableVersions();
-                }
-            }
-        );
-        
-    }
-    
-    @Override
-    public void onDestroy() {
-        unregisterReceiver(receiver);
     }
     
     private void checkMythDroid() {
@@ -346,10 +356,10 @@ public class UpdateService extends Service {
         try {
             outputStream = new FileOutputStream(outputFile);
         } catch (FileNotFoundException e) {
-            ErrUtil.logErr(e);
+            ErrUtil.logErr("SDCard is unavailable"); //$NON-NLS-1$
             notify(
                 "MythDroid" + Messages.getString("UpdateService.2"), //$NON-NLS-1$ //$NON-NLS-2$
-                e.getMessage()
+                Messages.getString("UpdateService.4") //$NON-NLS-1$
             );
             return;
         }
@@ -483,7 +493,8 @@ public class UpdateService extends Service {
         notification.flags = Notification.FLAG_AUTO_CANCEL;
         
         notification.setLatestEventInfo(
-            getApplicationContext(), title,  message, null
+            getApplicationContext(), title,  message,
+            PendingIntent.getBroadcast(Globals.appContext, 0, null, 0)
         );
 
         nm.notify(-1, notification);
