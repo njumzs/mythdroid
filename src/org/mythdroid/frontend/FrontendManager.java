@@ -121,6 +121,7 @@ public class FrontendManager {
             " is new, adding to the FrontendDB" //$NON-NLS-1$
         );
         
+        name.setCharAt(0, Character.toUpperCase(name.charAt(0)));
         FrontendDB.insert(Globals.appContext, name.toString(), addr, null);
         
     }
