@@ -19,7 +19,9 @@
 package org.mythdroid.fragments;
 
 import java.io.IOException;
+import java.text.ParseException;
 
+import org.json.JSONException;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.RecDupIn;
@@ -30,8 +32,10 @@ import org.mythdroid.activities.Guide;
 import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
+import org.mythdroid.data.RecordingRule;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.services.DvrService;
 import org.mythdroid.util.ErrUtil;
 
 import android.os.Bundle;
@@ -80,7 +84,10 @@ public class RecEditFragment extends Fragment {
     
     private int containerId;
     
-    private String  updates = ""; //$NON-NLS-1$
+    private DvrService dvr = null;
+    private RecordingRule rule = null;
+    
+    private StringBuilder updates = new StringBuilder(16);
     
     @Override
     public void onCreate(Bundle icicle) {
@@ -100,26 +107,47 @@ public class RecEditFragment extends Fragment {
             initError(null);
             return;
         }
+        
+        type        = prog.Type;
+        prio        = prog.RecPrio;
+        dupMethod   = prog.DupMethod;
+        dupIn       = prog.DupIn;
+        epiFilter   = prog.EpiFilter;
+        recGroup    = prog.RecGroup;
+        storGroup   = prog.StorGroup;
 
-        type = prog.Type;
-        prio = prog.RecPrio;
-
-        dupMethod = prog.DupMethod;
-        dupIn = prog.DupIn;
-        epiFilter = prog.EpiFilter;
-        recGroup = prog.RecGroup;
-        storGroup = prog.StorGroup;
-
-        if (prog.RecID != -1)
+        if (!Globals.haveServices()) {
+            if (prog.RecID != -1)
+                try {
+                    type = prog.Type =
+                        MDDManager.getRecType(beMgr.addr, prog.RecID);
+                    if (storGroup == null) {
+                        storGroup = prog.StorGroup =
+                            MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
+                    }
+                } catch (IOException e) { initError(e); }
+            rule = new RecordingRule();
+        }
+        else {
+            dvr = new DvrService(beMgr.addr);
             try {
-                type = prog.Type =
-                    MDDManager.getRecType(beMgr.addr, prog.RecID);
-
-                if (storGroup == null) {
-                    storGroup = prog.StorGroup =
-                        MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
-                }
-            } catch (IOException e) { initError(e); }
+                rule = dvr.getRecRule(prog.RecID);
+            } catch (JSONException e) {
+                initError(e);
+            } catch (ParseException e) {
+                initError(e);
+            }
+            if (rule == null)
+                rule = new RecordingRule(prog);
+            else {
+                type        = prog.Type      = rule.type;
+                prio        = prog.RecPrio   = rule.recpriority;
+                dupMethod   = prog.DupMethod = rule.dupMethod;
+                dupIn       = prog.DupIn     = rule.dupIn;
+                recGroup    = prog.RecGroup  = rule.recGroup;
+                storGroup   = prog.StorGroup = rule.storGroup;
+            }
+        }
         
     }
 
@@ -171,16 +199,17 @@ public class RecEditFragment extends Fragment {
             return;
         }
 
-        try {
-            MDDManager mdd = new MDDManager(beMgr.addr, Globals.muxConns);
-            mdd.shutdown();
-        } catch (IOException e) {
-            initError(
-                new IOException(
-                    Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
-                )
-            );
-        }
+        if (!Globals.haveServices())
+            try {
+                MDDManager mdd = new MDDManager(beMgr.addr, Globals.muxConns);
+                mdd.shutdown();
+            } catch (IOException e) {
+                initError(
+                    new IOException(
+                        Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
+                        )
+                    );
+            }
         
     }
 
@@ -367,20 +396,29 @@ public class RecEditFragment extends Fragment {
 
         if (modified) {
             if (prio != prog.RecPrio) {
-                addUpdate("recpriority = " + prio); //$NON-NLS-1$
-                prog.RecPrio = prio;
+                addUpdate("RecPriority", prio); //$NON-NLS-1$
+                prog.RecPrio = rule.recpriority = prio;
             }
             if (type != prog.Type) {
 
-                addUpdate("type = " + type.value()); //$NON-NLS-1$
-                prog.Type = type;
+                addUpdate("Type", type.value()); //$NON-NLS-1$
+                prog.Type = rule.type = type;
 
                 if (type == RecType.NOT && prog.RecID != -1) {
-                    try {
-                        MDDManager.deleteRecording(beMgr.addr, prog.RecID);
-                        beMgr.reschedule(prog.RecID);
-                    } catch (IOException e) {
-                        ErrUtil.err(activity, e);
+                    
+                    if (!Globals.haveServices())
+                        try {
+                            MDDManager.deleteRecording(beMgr.addr, prog.RecID);
+                            beMgr.reschedule(prog.RecID);
+                        } catch (IOException e) {
+                            ErrUtil.err(activity, e);
+                        }
+                    else {
+                        try {
+                            dvr.deleteRecording(prog.RecID);
+                        } catch (IOException e) {
+                            ErrUtil.err(activity, e);
+                        }
                     }
                     prog.RecID = -1;
                     activity.setResult(Guide.REFRESH_NEEDED);
@@ -388,37 +426,37 @@ public class RecEditFragment extends Fragment {
                     return;
                 }
 
-                addUpdate("findday = " + prog.StartTime.getDay()); //$NON-NLS-1$
-                addUpdate(
-                    "findtime = '" +  //$NON-NLS-1$
-                        prog.StartTime.getHours() + ":" + //$NON-NLS-1$
+                addUpdate("FindDay", prog.StartTime.getDay()); //$NON-NLS-1$
+                rule.day = prog.StartTime.getDay();
+                String time = 
+                    prog.StartTime.getHours() + ":" + //$NON-NLS-1$
                         prog.StartTime.getMinutes() + ":" + //$NON-NLS-1$
-                        prog.StartTime.getSeconds() + "'" //$NON-NLS-1$
-                );
-                addUpdate(
-                    "findid = " +  //$NON-NLS-1$
-                        ((prog.StartTime.getTime() / (1000*60*60*24)) + 719528)
-                );
+                            prog.StartTime.getSeconds(); 
+                addUpdate("FindTime", time);//$NON-NLS-1$
+                rule.time = time;
+                long id = (prog.StartTime.getTime() / (1000*60*60*24)) + 719528;
+                addUpdate("FindId", id); //$NON-NLS-1$
+                rule.findid = id;
 
             }
         }
 
         if (childrenModified) {
             if (dupMethod != prog.DupMethod) {
-                addUpdate("dupmethod = " + dupMethod.value()); //$NON-NLS-1$
-                prog.DupMethod = dupMethod;
+                addUpdate("DupMethod", dupMethod.value()); //$NON-NLS-1$
+                prog.DupMethod = rule.dupMethod = dupMethod;
             }
             if (dupIn != prog.DupIn || epiFilter != prog.EpiFilter) {
-                addUpdate("dupin = " + (dupIn.value() | epiFilter.value())); //$NON-NLS-1$
-                prog.DupIn = dupIn;
+                addUpdate("DupIn", (dupIn.value() | epiFilter.value())); //$NON-NLS-1$
+                prog.DupIn = rule.dupIn = dupIn;
             }
             if (recGroup != prog.RecGroup) {
-                addUpdate("recgroup = '" + recGroup + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-                prog.RecGroup = recGroup;
+                addUpdate("RecGroup", recGroup); //$NON-NLS-1$
+                prog.RecGroup = rule.recGroup = recGroup;
             }
             if (storGroup != prog.StorGroup) {
-                addUpdate("storagegroup = '" + storGroup + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-                prog.StorGroup = storGroup;
+                addUpdate("StorageGroup", storGroup); //$NON-NLS-1$
+                prog.StorGroup = rule.storGroup = storGroup;
             }
         }
 
@@ -428,11 +466,20 @@ public class RecEditFragment extends Fragment {
         }
 
         // Send the schedule updates to MDD, get back the (new) recid
-        try {
-            recid = MDDManager.updateRecording(beMgr.addr, prog, updates);
-        } catch (IOException e) {
-            ErrUtil.err(activity, e);
-        }
+        if (!Globals.haveServices())
+            try {
+                recid = MDDManager.updateRecording(
+                    beMgr.addr, prog, updates.toString()
+                );
+            } catch (IOException e) {
+                ErrUtil.err(activity, e);
+            }
+        else
+            try {
+                recid = dvr.updateRecording(rule);
+            } catch (IOException e) {
+                ErrUtil.err(activity, e);
+            }
 
         prog.RecID = recid;
 
@@ -458,10 +505,20 @@ public class RecEditFragment extends Fragment {
      * Add to the list of schedule updates to send to MDD 
      * @param update new schedule update
      */
-    private void addUpdate(String update) {
+    private void addUpdate(String update, long value) {
         if (updates.length() > 0)
-            updates += ", "; //$NON-NLS-1$
-        updates += update;
+            updates.append(", "); //$NON-NLS-1$
+        updates.append(update).append(" = ").append(value); //$NON-NLS-1$
+    }
+    
+    /**
+     * Add to the list of schedule updates to send to MDD 
+     * @param update new schedule update
+     */
+    private void addUpdate(String update, String value) {
+        if (updates.length() > 0)
+            updates.append(", "); //$NON-NLS-1$
+        updates.append(update).append(" = '").append(value).append("'"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     
     private void initError(Exception e) {
