@@ -18,8 +18,12 @@
 
 package org.mythdroid.data;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.mythdroid.data.Program.ProgramListener;
 import org.mythdroid.data.Program.ProgramXMLParser;
 import org.mythdroid.Enums.RecStatus;
@@ -118,6 +122,25 @@ public class Channel implements Comparable<Channel> {
 
     /** Construct an empty Channel */
     public Channel() {}
+    
+    /** Construct a Channel from a "Channel" JSONObject
+     * @param jo Channel JSONObject 
+     * @throws JSONException 
+     * @throws ParseException */
+    public Channel(JSONObject jo) throws JSONException, ParseException {
+        callSign = jo.getString("CallSign"); //$NON-NLS-1$
+        num = jo.getString("ChanNum"); //$NON-NLS-1$
+        ID = jo.getInt("ChanId"); //$NON-NLS-1$
+        JSONArray ja = jo.getJSONArray("Programs"); //$NON-NLS-1$
+        int numProgs = ja.length();
+        for (int i = 0; i < numProgs; i++) {
+            Program prog = new Program(ja.getJSONObject(i));
+            prog.ChanID = ID;
+            prog.Channel = callSign;
+            programs.add(prog);
+        }
+        
+    }
 
     @Override
     public int compareTo(Channel other) {
