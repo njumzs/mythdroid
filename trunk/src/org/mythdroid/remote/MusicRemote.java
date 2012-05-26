@@ -19,11 +19,7 @@
 package org.mythdroid.remote;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
@@ -44,10 +40,10 @@ import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -67,8 +63,8 @@ public class MusicRemote extends Remote {
 
     final private static int DIALOG_QUIT = 0;
 
-    final private static HashMap<Integer, Key>
-        ctrls = new HashMap<Integer, Key>(20);
+    final private static SparseArray<Key>
+        ctrls = new SparseArray<Key>(20);
 
     static {
         ctrls.put(R.id.seekBack,    Key.MUSIC_REWIND);
@@ -101,8 +97,8 @@ public class MusicRemote extends Remote {
 
         private int value;
 
-        static final private Map<Integer, RepeatMode> revMap =
-            new HashMap<Integer, RepeatMode>(3);
+        static final private SparseArray<RepeatMode> revMap =
+            new SparseArray<RepeatMode>(3);
 
         static {
             for (RepeatMode m : EnumSet.allOf(RepeatMode.class))
@@ -132,8 +128,8 @@ public class MusicRemote extends Remote {
 
         private int value;
 
-        static final private Map<Integer, ShuffleMode> revMap =
-            new HashMap<Integer, ShuffleMode>(5);
+        static final private SparseArray<ShuffleMode> revMap =
+            new SparseArray<ShuffleMode>(5);
 
         static {
             for (ShuffleMode m : EnumSet.allOf(ShuffleMode.class))
@@ -445,7 +441,10 @@ public class MusicRemote extends Remote {
 
         setContentView(R.layout.music_remote);
 
-        for (int id : ctrls.keySet()) {
+        int size = ctrls.size();
+        
+        for (int i = 0; i < size; i++) {
+            int id = ctrls.keyAt(i);
             final View v = findViewById(id);
             Key key = ctrls.get(id);
             v.setOnClickListener(this);
@@ -486,38 +485,22 @@ public class MusicRemote extends Remote {
         if (bm != null)
             return bm;
 
-        URL url = null;
         try {
-            url = new URL(
-                Globals.getBackend().getStatusURL() +
-                "/Myth/GetAlbumArt?" +  //$NON-NLS-1$
-                "Id=" + artid + //$NON-NLS-1$
+            bm = Globals.getBackend().getImage(
+                (Globals.haveServices() ? "/Content/" : "/Myth/") + //$NON-NLS-1$ //$NON-NLS-2$
+                "GetAlbumArt?" + "Id=" + artid + //$NON-NLS-1$ //$NON-NLS-2$
                 "&Width=" + artView.getWidth() + //$NON-NLS-1$
                 "&Height=" + artView.getHeight() //$NON-NLS-1$
             );
-        } catch (Exception e) { 
-            ErrUtil.logWarn(e);
-            return null; 
-        }
-        
-        if (Globals.muxConns) try {
-            url = new URL(
-                url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
-                ":16550" + url.getFile()  //$NON-NLS-1$
-            );
-        } catch (MalformedURLException e) {
-            ErrUtil.logWarn(e);
-            return null;
-        }
-
-        try {
-            bm = BitmapFactory.decodeStream(url.openStream());
-            artCache.put(artid, bm);
-            return bm;
         } catch (IOException e) {
-            ErrUtil.err(this, e);
+            ErrUtil.logWarn(e);
             return null;
         }
+    
+        if (bm != null)
+            artCache.put(artid, bm);
+        
+        return bm;
 
     }
 
