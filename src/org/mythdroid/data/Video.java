@@ -19,21 +19,19 @@
 package org.mythdroid.data;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.mythdroid.Globals;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.HttpFetcher;
+import org.mythdroid.util.LogUtil;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 
 /** Represents a video or directory containing videos */
@@ -104,6 +102,28 @@ public class Video {
     }
     
     /**
+     * Constructor
+     * @param jo VideoMetadataInfo JSONObject
+     * @throws JSONException 
+     * @throws ParseException 
+     */
+    public Video(JSONObject jo) throws ParseException, JSONException {
+        id       = jo.getInt("Id"); //$NON-NLS-1$
+        title    = jo.getString("Title"); //$NON-NLS-1$
+        subtitle = jo.getString("SubTitle"); //$NON-NLS-1$
+        director = jo.getString("Director"); //$NON-NLS-1$
+        plot     = jo.getString("Description"); //$NON-NLS-1$
+        homepage = jo.getString("HomePage"); //$NON-NLS-1$
+        rating   = jo.getInt("UserRating"); //$NON-NLS-1$
+        length   = jo.getInt("Length"); //$NON-NLS-1$
+        filename = jo.getString("FileName"); //$NON-NLS-1$
+        coverfile = jo.getString("Coverart"); //$NON-NLS-1$
+        String release = jo.getString("ReleaseDate"); //$NON-NLS-1$
+        if (release.length() > 0)
+            year = Globals.dateFmt.parse(release).getYear();
+    }
+    
+    /**
      * Get a full path to the video (a myth:// URL if it's in a storage group)
      * @return String containing path to the video
      */
@@ -131,8 +151,13 @@ public class Video {
         URI uri = null;
         try {
             uri = new URI(
-                "http", null, Globals.getBackend().addr, 16551, coverfile, //$NON-NLS-1$
-                "width=" + w + "&height=" + h, null //$NON-NLS-1$ //$NON-NLS-2$
+                "http", null, Globals.getBackend().addr,  //$NON-NLS-1$
+                (Globals.haveServices() ? 6544 : 16551), 
+                (Globals.haveServices() ? 
+                    "/Content/GetVideoArtWork" : coverfile  //$NON-NLS-1$
+                ),
+                (Globals.haveServices() ? "Id=" + id + "&Type=coverart&" : "") + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                "Width=" + w + "&Height=" + h, null //$NON-NLS-1$ //$NON-NLS-2$
             ); 
         } catch (URISyntaxException e)  { ErrUtil.logWarn(e); return; } 
           catch (IOException e)         { ErrUtil.logWarn(e); return; }
@@ -141,26 +166,25 @@ public class Video {
           try {
               uri = new URI(
                   "http", null, uri.getHost(), 16550, //$NON-NLS-1$
-                  "/MDDHTTP" + uri.getPath(), uri.getQuery(), null //$NON-NLS-1$
+                  (Globals.haveServices() ? "" : "/MDDHTTP") + uri.getPath(), //$NON-NLS-1$ //$NON-NLS-2$
+                  uri.getQuery(), null
               );
           } catch (URISyntaxException e) { ErrUtil.logWarn(e); return; }
+       
+       LogUtil.debug("Fetching image from " + uri.toString()); //$NON-NLS-1$
 
         Bitmap bm = null;
 
         try {
-            HttpClient client = new DefaultHttpClient();
-            HttpResponse resp = client.execute(new HttpGet(uri));
-            if (resp.getStatusLine().getStatusCode() == 404)
-                return;
-            InputStream is = new BufferedHttpEntity(resp.getEntity())
-                .getContent();
-            bm = BitmapFactory.decodeStream(is);
-            is.close();
-        } catch (Exception e)        { ErrUtil.logWarn(e); return; }
-          catch (OutOfMemoryError e) { 
-              ErrUtil.logWarn(e.getMessage());
-              return; 
-          }
+            HttpFetcher fetcher = new HttpFetcher(uri);
+            bm = fetcher.getImage();
+        } catch (IOException e) { 
+            ErrUtil.logWarn(e);
+            return; 
+        } catch (OutOfMemoryError e) { 
+            ErrUtil.logWarn(e.getMessage());
+            return;
+        }
 
         if (bm == null) return;
 
