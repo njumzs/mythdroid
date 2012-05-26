@@ -153,7 +153,7 @@ public class RecListFragment extends ListFragment
      */
     public void updateSelection() {
         
-        int maxIndex = lv.getCount() - 1;
+        int maxIndex = lv.getAdapter().getCount() - 1;
         
         if (maxIndex >= 0) 
             activity.checkedIndex = Math.min(activity.checkedIndex, maxIndex);
