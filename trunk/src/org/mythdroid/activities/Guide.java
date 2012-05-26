@@ -18,6 +18,7 @@
 
 package org.mythdroid.activities;
 
+import java.io.IOException;
 import java.net.SocketException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -26,6 +27,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.json.JSONException;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Extras;
@@ -38,6 +40,7 @@ import org.mythdroid.data.Channel.ChannelXMLParser;
 import org.mythdroid.data.XMLHandler.Element;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.services.GuideService;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
 import org.xml.sax.SAXException;
@@ -88,7 +91,7 @@ public class Guide extends MDActivity {
     private static Date      now = null,   later = null;
 
     /** ArrayList of channel objects, capacity ensured during XML parsing */
-    final private ArrayList<Channel> channels = new ArrayList<Channel>();
+    private ArrayList<Channel> channels = new ArrayList<Channel>();
 
     final private SimpleDateFormat
         date = new SimpleDateFormat("d MMM yy"), //$NON-NLS-1$
@@ -117,6 +120,8 @@ public class Guide extends MDActivity {
     * Tweak rowHeight to alter the visible height of rows
     */
     private int         colWidth, rowHeight, chanWidth;
+    
+    private GuideService guideService;
 
     /** Get and sort the list of channels, add them to table in UI thread */
     final private Runnable getData = new Runnable() {
@@ -136,7 +141,7 @@ public class Guide extends MDActivity {
                         tbl.addView(getSpacer());
 
                         int j = 0;
-                        int maxChan = channels.size() - 1;
+                        int maxChan = channels.size();
 
                         for (int i = 0; i < maxChan; i++) {
 
@@ -280,6 +285,14 @@ public class Guide extends MDActivity {
 
         date.setTimeZone(TimeZone.getDefault());
         time.setTimeZone(TimeZone.getDefault());
+        
+        if (Globals.haveServices())
+            try {
+                guideService = new GuideService(Globals.getBackend().addr);
+            } catch (IOException e) {
+                ErrUtil.err(this, e);
+                return;
+            }
 
         displayGuide(new Date());
 
@@ -440,6 +453,19 @@ public class Guide extends MDActivity {
      * @param end Date that guide should end at
      */
     private void getGuideData(Date start, Date end) {
+        
+        if (Globals.haveServices()) {
+            try {
+                channels = guideService.GetProgramGuide(start, end);
+            } catch (IOException e) {
+                ErrUtil.err(this, e);
+                return;
+            } catch (JSONException e) {
+                ErrUtil.err(this, e);
+                return;
+            }
+            return;
+        }
 
         XMLHandler handler = new XMLHandler("GetProgramGuideResponse"); //$NON-NLS-1$
         Element root = handler.rootElement();
@@ -478,13 +504,13 @@ public class Guide extends MDActivity {
                 "&StartChanId=0" + "&NumOfChannels=-1" + "&Details=1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             );
 
-            LogUtil.debug("Fetching XML from " + url.toExternalForm()); //$NON-NLS-1$
-            
             if (Globals.muxConns)
                 url = new URL(
                     url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
                     ":16550" + url.getFile()  //$NON-NLS-1$
                 );
+            
+            LogUtil.debug("Fetching XML from " + url.toExternalForm()); //$NON-NLS-1$
             
             try {
                 Xml.parse(url.openStream(), Xml.Encoding.UTF_8, handler);
@@ -509,6 +535,8 @@ public class Guide extends MDActivity {
     private void setStatusDrawable(TextView tv, Program prog) {
 
         Drawable icon = null;
+        
+        if (prog.Status == null) return; 
 
         switch (prog.Status) {
             case RECORDED:
