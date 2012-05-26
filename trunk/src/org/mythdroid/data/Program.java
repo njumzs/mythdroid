@@ -19,12 +19,13 @@
 package org.mythdroid.data;
 
 import java.io.IOException;
-import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.mythdroid.data.XMLHandler.Element;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
@@ -42,7 +43,6 @@ import org.xml.sax.Attributes;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.sax.EndElementListener;
 import android.sax.EndTextElementListener;
 import android.sax.StartElementListener;
@@ -212,25 +212,34 @@ public class Program implements Comparable<Program> {
     
     @SuppressWarnings("all")
     static final public int
-        TITLE     = 0,  SUBTITLE  = 1,  DESC     = 2,   CATEGORY  = 3,
-        CHANID    = 4,  CHANNEL   = 6,  PATH     = 8,
+        TITLE     = 0,  SUBTITLE  = 1,  DESC     = 2,
+        CATEGORY, CHANID, CHANNEL, PATH,
         START, END, FINDID, RECPRIO, STATUS, RECID, RECTYPE, RECDUPIN,
         DUPMETHOD, RECSTART, RECEND, RECGROUP, SERIESID, PROGID, STORGROUP,
         TOTAL;
 
     static {
         if (Globals.protoVersion < 57) {
+            CATEGORY  =  3; CHANID    =  4; CHANNEL   =  6; PATH      =  8;
             START     = 11; END       = 12; FINDID    = 15; RECPRIO   = 20;
             STATUS    = 21; RECID     = 22; RECTYPE   = 23; RECDUPIN  = 24;
             DUPMETHOD = 25; RECSTART  = 26; RECEND    = 27; RECGROUP  = 30;
             SERIESID  = 33; PROGID    = 34; STORGROUP = 42;
             TOTAL     = Globals.protoVersion < 50 ? 46 : 47;
         }
-        else {
+        else if (Globals.protoVersion < 67){
+            CATEGORY  =  3; CHANID    =  4; CHANNEL   =  6; PATH      =  8;
             START     = 10; END       = 11; FINDID    = 12; RECPRIO   = 17;
             STATUS    = 18; RECID     = 19; RECTYPE   = 20; RECDUPIN  = 21;
             DUPMETHOD = 22; RECSTART  = 23; RECEND    = 24; RECGROUP  = 26;
             SERIESID  = 28; PROGID    = 29; STORGROUP = 36; TOTAL     = 41;
+        }
+        else {
+            CATEGORY  =  5; CHANID    =  6; CHANNEL   =  8; PATH      = 10;
+            START     = 12; END       = 13; FINDID    = 14; RECPRIO   = 19;
+            STATUS    = 20; RECID     = 21; RECTYPE   = 22; RECDUPIN  = 23;
+            DUPMETHOD = 24; RECSTART  = 25; RECEND    = 26; RECGROUP  = 28;
+            SERIESID  = 30; PROGID    = 31; STORGROUP = 39; TOTAL     = 44;
         }
     }
     
@@ -379,6 +388,40 @@ public class Program implements Comparable<Program> {
 
         }
     }
+    
+    /**
+     * Construct a Program from a JSONObject
+     * @param jo Program JSONObject
+     */
+    public Program(JSONObject jo) throws JSONException, ParseException {
+        
+        JSONObject RecordInfo  = jo.getJSONObject("Recording"); //$NON-NLS-1$
+        
+        Title = jo.getString("Title"); //$NON-NLS-1$
+        SubTitle = jo.getString("SubTitle"); //$NON-NLS-1$
+        Description = jo.getString("Description"); //$NON-NLS-1$
+        Category = jo.getString("Category"); //$NON-NLS-1$
+        Path = jo.getString("FileName"); //$NON-NLS-1$
+        
+        StartTime = Globals.utcFmt.parse(jo.getString("StartTime")); //$NON-NLS-1$
+        EndTime = Globals.utcFmt.parse(jo.getString("EndTime")); //$NON-NLS-1$
+        RecPrio = RecordInfo.getInt("Priority"); //$NON-NLS-1$
+        Status = RecStatus.get(RecordInfo.getInt("Status")); //$NON-NLS-1$
+        RecID = RecordInfo.getInt("RecordId"); //$NON-NLS-1$
+        Type = RecType.get(RecordInfo.getInt("RecType")); //$NON-NLS-1$
+        DupIn = RecDupIn.get(RecordInfo.getInt("DupInType")); //$NON-NLS-1$
+        DupMethod = RecDupMethod.get(RecordInfo.getInt("DupMethod")); //$NON-NLS-1$
+        String rstart = RecordInfo.getString("StartTs"); //$NON-NLS-1$
+        if (rstart.length() > 0)
+            RecStartTime = Globals.utcFmt.parse(rstart);
+        String rend = RecordInfo.getString("EndTs"); //$NON-NLS-1$
+        if (rend.length() > 0)
+            RecEndTime = Globals.utcFmt.parse(rend);
+        RecGroup = RecordInfo.getString("RecGroup"); //$NON-NLS-1$
+        StorGroup = RecordInfo.getString("StorageGroup"); //$NON-NLS-1$
+        EpiFilter = RecEpiFilter.NONE;
+        
+    }
 
     /** Construct an empty Program */
     public Program() {}
@@ -405,19 +448,16 @@ public class Program implements Comparable<Program> {
         ) return null;
 
         try {
-            URL url =
-                new URL(
-                    Globals.getBackend().getStatusURL() +
-                    "/Myth/GetPreviewImage?ChanId=" + ChanID + //$NON-NLS-1$
-                    "&StartTime=" + Globals.dateFmt.format(RecStartTime) //$NON-NLS-1$
-                );
-            if (Globals.muxConns)
-                url = new URL(
-                    url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
-                    ":16550" + url.getFile()  //$NON-NLS-1$
-                );
-            return BitmapFactory.decodeStream(url.openStream());
-        } catch (Exception e) { 
+            return Globals.getBackend().getImage(
+                (Globals.haveServices() ? "/Content/" : "/Myth/") +  //$NON-NLS-1$//$NON-NLS-2$
+                "GetPreviewImage?ChanId=" + ChanID + //$NON-NLS-1$
+                "&StartTime=" + //$NON-NLS-1$
+                (Globals.haveServices() ? 
+                    Globals.utcFmt.format(RecStartTime) :
+                    Globals.dateFmt.format(RecStartTime)
+                )
+            );
+        } catch (IOException e) { 
             ErrUtil.logWarn(e); 
             return null; 
         }
