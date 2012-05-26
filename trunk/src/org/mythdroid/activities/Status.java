@@ -31,6 +31,7 @@ import org.mythdroid.fragments.StatusRecordersFragment;
 import org.mythdroid.fragments.StatusScheduledFragment;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.LogUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -92,10 +93,19 @@ public class Status extends MDFragmentActivity {
     public static boolean getStatus(Context ctx) {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        URL url = null;
         try {
-            URL url = new URL(Globals.getBackend().getStatusURL() + "/xml"); //$NON-NLS-1$
+            if (Globals.haveServices()) 
+                url = new URL(
+                    Globals.getBackend().getStatusURL() + "/Status/GetStatus" //$NON-NLS-1$
+                );
+            else
+                url = new URL(Globals.getBackend().getStatusURL() + "/xml"); //$NON-NLS-1$
             if (Globals.muxConns)
-                url = new URL("http://" + url.getHost() + ":16550/xml");  //$NON-NLS-1$ //$NON-NLS-2$
+                url = new URL(
+                    "http://" + url.getHost() + ":16550" + url.getFile() //$NON-NLS-1$ //$NON-NLS-2$
+                );
+            LogUtil.debug("Fetching XML from " + url.toString()); //$NON-NLS-1$
             statusDoc = dbf.newDocumentBuilder().parse(url.openStream());
         } catch (SAXException e) {
             ErrUtil.postErr(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
