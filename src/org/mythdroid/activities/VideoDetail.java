@@ -143,6 +143,7 @@ public class VideoDetail extends MDActivity {
                             .setClass(ctx, nextClass)
                             .putExtra(Extras.FILENAME.toString(), filename) 
                             .putExtra(Extras.TITLE.toString(), video.title)
+                            .putExtra(Extras.VIDEOID.toString(), video.id)
                     );
                     
                 }
@@ -160,6 +161,7 @@ public class VideoDetail extends MDActivity {
                         return true;
                     }
                     setExtra(Extras.TITLE.toString(), video.title);
+                    setExtra(Extras.VIDEOID.toString(), video.id);
                     nextActivity = TVRemote.class;
                     showDialog(FRONTEND_CHOOSER);
                     return true;

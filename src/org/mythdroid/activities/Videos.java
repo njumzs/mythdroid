@@ -20,7 +20,6 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
@@ -30,6 +29,7 @@ import org.mythdroid.data.VideoAdapter;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.services.VideoService;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.ImageCache;
 
@@ -38,6 +38,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -51,8 +52,8 @@ public class Videos extends MDActivity implements
     final private ImageCache artCache =
         new ImageCache("videos", 20, 200, 1024*1024*10); //$NON-NLS-1$
     
-    final private HashMap<Integer,String> viddirs = 
-        new HashMap<Integer, String>();
+    final private SparseArray<String> viddirs = 
+        new SparseArray<String>();
 
     final private Handler handler   = new Handler();
     private Thread artThread        = null;
@@ -64,7 +65,9 @@ public class Videos extends MDActivity implements
     private boolean fetchingArt     = false;
     private boolean largeScreen     = false;
     /** Scale factor for pixel values for different display densities */
-    private float scale              = 1;
+    private float scale             = 1;
+    
+    private VideoService videoService = null;
 
     /**
      * Fetch a list of videos from MDD and then start a Thread to fetch
@@ -74,27 +77,35 @@ public class Videos extends MDActivity implements
         @Override
         public void run() {
 
-            String addr = null;
-            
-            try {
-                addr = Globals.getBackend().addr;
-            } catch (IOException e) {
-                ErrUtil.postErr(ctx, e);
-                finish();
-                return;
-            }
-            
             /* We use an empty string to denote the root of a 
                top-level directory */
             String tmppath = path.length() > 0 ? path : "ROOT"; //$NON-NLS-1$
 
-            try {
-                videos = MDDManager.getVideos(addr, viddir, tmppath);
-            } catch (IOException e) {
-                ErrUtil.postErr(ctx, e);
-                finish();
-                return;
+            if (!Globals.haveServices()) {
+                String addr = null;
+                try {
+                    addr = Globals.getBackend().addr;
+                } catch (IOException e) {
+                    ErrUtil.postErr(ctx, e);
+                    finish();
+                    return;
+                }
+                try {
+                    videos = MDDManager.getVideos(addr, viddir, tmppath);
+                } catch (IOException e) {
+                    ErrUtil.postErr(ctx, e);
+                    finish();
+                    return;
+                }
             }
+            else
+                try {
+                    videos = videoService.getVideos(tmppath);
+                } catch (IOException e) {
+                    ErrUtil.postErr(ctx, e);
+                    finish();
+                    return;
+                }
 
             handler.post(gotVideos);
                 
@@ -174,6 +185,14 @@ public class Videos extends MDActivity implements
         scale = getResources().getDisplayMetrics().density;
         largeScreen = getResources().getDisplayMetrics().widthPixels > 1000;
         
+        if (Globals.haveServices()) 
+            try {
+                videoService = new VideoService(Globals.getBackend().addr);
+            } catch (IOException e) {
+                ErrUtil.err(this, e.getMessage());
+                finish();
+            }
+        
         refresh();
         
     }
@@ -239,6 +258,7 @@ public class Videos extends MDActivity implements
             return true;
         }
         setExtra(Extras.TITLE.toString(), video.title);
+        setExtra(Extras.VIDEOID.toString(), video.id);
         nextActivity = TVRemote.class;
         showDialog(FRONTEND_CHOOSER);
         return true;
