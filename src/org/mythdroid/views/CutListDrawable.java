@@ -51,7 +51,7 @@ public class CutListDrawable extends Drawable {
         int bottom = rect.bottom;
         
         // Hacky? Honeycomb has a itty bitty progress bar
-        if (Integer.parseInt(Build.VERSION.SDK) >= 11) {
+        if (Build.VERSION.SDK_INT >= 11) {
             top = 12;
             bottom = 20;
         }

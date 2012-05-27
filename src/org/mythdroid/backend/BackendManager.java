@@ -241,7 +241,7 @@ public class BackendManager {
         URL url = null;
         try {
             url = new URL(statusURL + path);
-        } catch (Exception e) { 
+        } catch (MalformedURLException e) { 
             ErrUtil.logWarn(e);
             return null; 
         }
