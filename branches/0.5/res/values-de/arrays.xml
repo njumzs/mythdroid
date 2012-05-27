@@ -18,4 +18,14 @@
         <item>Video  320   Audio  96    (416 kb/s)</item>
         <item>Video  192   Audio  64    (256 kb/s)</item>
     </string-array>
+    <string-array name="streamStrings">
+        <item>Baseline - low</item>
+        <item>Baseline - medium</item>
+        <item>Main     - high</item>
+    </string-array>
+    <string-array name="streamValues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

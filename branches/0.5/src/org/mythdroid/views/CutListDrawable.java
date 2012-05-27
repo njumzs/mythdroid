@@ -34,7 +34,7 @@ public class CutListDrawable extends Drawable {
      * @param cuts
      */
     public CutListDrawable(
-    		ArrayList<Commercial> cuts, float fps, int end, Rect rect
+            ArrayList<Commercial> cuts, float fps, int end, Rect rect
     ) {
         this.cuts = cuts;
         this.fps  = fps;

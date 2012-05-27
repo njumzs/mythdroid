@@ -31,6 +31,7 @@ import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 
 
+import android.R.drawable;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -46,7 +47,7 @@ import android.widget.TextView;
 /** Remote for menu / guide navigation */
 public class NavRemote extends Remote {
 
-    final private static int MENU_GESTURE = 0, MENU_BUTTON = 1;
+    final private static int MENU_GESTURE = 0, MENU_BUTTON = 1, MENU_MENU = 2;
 
     final private Handler    handler = new Handler();
 
@@ -233,6 +234,8 @@ public class NavRemote extends Remote {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(Menu.NONE, MENU_MENU, Menu.NONE, R.string.menu)
+            .setIcon(drawable.ic_menu_more);
         menu.add(Menu.NONE, MENU_BUTTON, Menu.NONE, R.string.btnIface)
             .setIcon(android.R.drawable.ic_menu_add);
         menu.add(Menu.NONE, MENU_GESTURE, Menu.NONE, R.string.gestIface)
@@ -257,6 +260,11 @@ public class NavRemote extends Remote {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+            case MENU_MENU:
+                try {
+                    if (feMgr != null) feMgr.sendKey(Key.MENU);
+                } catch (IOException e) { ErrUtil.err(this, e); }
+                return true;
             case MENU_GESTURE:
                 gesture = true;
                 break;

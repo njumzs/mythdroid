@@ -149,6 +149,7 @@
     	android:textStyle="bold"
     	android:textColor="#ff333333"
     	android:text="123"
-    	android:gravity="center"/>    	
+    	android:textSize="13sp"
+    	android:gravity="center"/>
    
 </RelativeLayout>

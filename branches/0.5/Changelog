@@ -1,0 +1,136 @@
+Faster streaming encode
+
+------------------------------------------------------------------------
+r630 | foobum | 2011-12-28 01:43:48 +0000 (Wed, 28 Dec 2011) | 1 line
+
+MDD: An expect fork/daemon stanza causes issues in the upstart script
+------------------------------------------------------------------------
+r629 | foobum | 2011-12-26 14:15:46 +0000 (Mon, 26 Dec 2011) | 4 lines
+
+MDD: Append /usr/local/bin to PATH before searching for mythlcdserver
+Abort if we don't find mythlcdserver during frontend install
+Fixes issue 84
+
+------------------------------------------------------------------------
+r628 | foobum | 2011-12-19 23:39:21 +0000 (Mon, 19 Dec 2011) | 1 line
+
+Fix the frontend chooser in Guide
+------------------------------------------------------------------------
+r627 | foobum | 2011-12-19 23:26:21 +0000 (Mon, 19 Dec 2011) | 2 lines
+
+Long press on the skip commercial button to skip back to the previous marker
+Fixes issue 36
+------------------------------------------------------------------------
+r625 | foobum | 2011-12-19 22:34:55 +0000 (Mon, 19 Dec 2011) | 1 line
+
+Add a menu option to NavRemote's OptionsMenu so that we can send a 'menu' keypress
+------------------------------------------------------------------------
+r624 | foobum | 2011-12-19 22:19:17 +0000 (Mon, 19 Dec 2011) | 1 line
+
+Enable the guide button in TVRemote's gesture mode
+------------------------------------------------------------------------
+r619 | foobum | 2011-12-17 20:39:08 +0000 (Sat, 17 Dec 2011) | 1 line
+
+MDD: Ensure that storage group paths have trailing slashes
+------------------------------------------------------------------------
+r618 | foobum | 2011-12-17 13:07:31 +0000 (Sat, 17 Dec 2011) | 1 line
+
+MDD: Limit stream video size to requested dimensions
+------------------------------------------------------------------------
+r614 | foobum | 2011-12-11 20:27:57 +0000 (Sun, 11 Dec 2011) | 1 line
+
+Show calls from withheld (null) numbers on the OSD
+------------------------------------------------------------------------
+r613 | foobum | 2011-12-11 18:58:53 +0000 (Sun, 11 Dec 2011) | 3 lines
+
+Update to a modified version of ACRA trunk (4.3.0-snapshot)
+ACRA was modified to fix a bug that caused it to crash if we didn't prompt for a comment
+Fixes issue 79
+------------------------------------------------------------------------
+r605 | foobum | 2011-12-04 11:33:10 +0000 (Sun, 04 Dec 2011) | 1 line
+
+Pause between retries in VideoPlayer
+------------------------------------------------------------------------
+r600 | foobum | 2011-11-29 01:06:02 +0000 (Tue, 29 Nov 2011) | 1 line
+
+Fix num button in TvRemote on phone screens
+------------------------------------------------------------------------
+r599 | foobum | 2011-11-29 00:56:24 +0000 (Tue, 29 Nov 2011) | 1 line
+
+Don't show the action bar in remote screens on phones (running ICS) 
+------------------------------------------------------------------------
+r597 | foobum | 2011-11-29 00:28:33 +0000 (Tue, 29 Nov 2011) | 2 lines
+
+Layout fixes for itty bitty screens plus some minor layout tidy ups
+Fixes issue 81
+------------------------------------------------------------------------
+r596 | foobum | 2011-11-28 23:10:15 +0000 (Mon, 28 Nov 2011) | 1 line
+
+MDD: The upstart script expect statement was wrong causing hangs on start / stop
+------------------------------------------------------------------------
+r592 | foobum | 2011-11-27 23:28:51 +0000 (Sun, 27 Nov 2011) | 1 line
+
+Reset the mediaplayer before retrying in VideoPlayer
+------------------------------------------------------------------------
+r591 | foobum | 2011-11-27 21:02:50 +0000 (Sun, 27 Nov 2011) | 1 line
+
+Fix squashed recording detail buttons on ICS running on a phone sized screen
+------------------------------------------------------------------------
+r590 | foobum | 2011-11-27 15:22:12 +0000 (Sun, 27 Nov 2011) | 3 lines
+
+Catch MediaPlayer errors and retry a few times before giving up.
+Try to get a VLC rc connection before attempting to open the stream.
+Updates issue 71
+------------------------------------------------------------------------
+r586 | foobum | 2011-11-27 00:35:13 +0000 (Sun, 27 Nov 2011) | 1 line
+
+ConnMgr: After a failed read, disconnect and then attempt to wait for a connection
+------------------------------------------------------------------------
+r585 | foobum | 2011-11-27 00:22:19 +0000 (Sun, 27 Nov 2011) | 1 line
+
+Improve reliability of reconnections post connectivity restore
+------------------------------------------------------------------------
+r584 | foobum | 2011-11-26 23:45:44 +0000 (Sat, 26 Nov 2011) | 4 lines
+
+ConnMgr: Retry failed reads, waiting for connections to be reestablished if necessary.
+Bump default timeout to 2000ms
+Add final attribute to method arguments where appropriate
+
+------------------------------------------------------------------------
+r580 | foobum | 2011-11-26 23:37:12 +0000 (Sat, 26 Nov 2011) | 1 line
+
+MDD: Kill warning for missing video fields. Updates issue 71.
+------------------------------------------------------------------------
+r579 | foobum | 2011-11-26 23:20:02 +0000 (Sat, 26 Nov 2011) | 1 line
+
+MDD: Escape (more) shell meta-characters in video filenames. Update issue 71.
+------------------------------------------------------------------------
+r575 | foobum | 2011-11-23 01:15:33 +0000 (Wed, 23 Nov 2011) | 2 lines
+
+Due to a bug in Honeycomb it was possible to cause a crash on startup if you configured a backend address containing a space. This was obviously difficult for a user to recover from!
+Fix by verifying that the backend address doesn't contain spaces when the preference is changed, being more permissive wrt leading or trailing whitespace and by avoiding the bug in case we've already stored a value with a space using a version that is younger than this commit
+------------------------------------------------------------------------
+r565 | foobum | 2011-11-19 00:45:30 +0000 (Sat, 19 Nov 2011) | 3 lines
+
+Don't bother looking for 'No Cover' in Coverart SG
+Updates issue 69
+
+------------------------------------------------------------------------
+r564 | foobum | 2011-11-19 00:43:38 +0000 (Sat, 19 Nov 2011) | 3 lines
+
+Fix serving of posters stored in SGs
+Fixes issue 69
+
+------------------------------------------------------------------------
+r561 | foobum | 2011-11-16 20:40:46 +0000 (Wed, 16 Nov 2011) | 1 line
+
+Don't try to set socket options on a socket that got closed
+------------------------------------------------------------------------
+r557 | foobum | 2011-11-15 23:41:19 +0000 (Tue, 15 Nov 2011) | 1 line
+
+Create little utility methods in MD*Activity for showing / dismissing the loading dialog
+------------------------------------------------------------------------
+r556 | foobum | 2011-11-15 23:31:14 +0000 (Tue, 15 Nov 2011) | 1 line
+
+Fix loading dialog usage in StatusRecordersFragment
+------------------------------------------------------------------------

@@ -376,6 +376,7 @@ public class Enums {
         INFO                ("i"), //$NON-NLS-1$
         MENU                ("m"), //$NON-NLS-1$
         SKIP_COMMERCIAL     ("z"), //$NON-NLS-1$
+        SKIP_PREV_COMMERCIAL("q"),
         BACKSPACE           ("backspace"), //$NON-NLS-1$
         SPACE               ("space"), //$NON-NLS-1$
         TAB                 ("tab"), //$NON-NLS-1$

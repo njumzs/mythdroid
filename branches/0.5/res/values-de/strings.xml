@@ -2,10 +2,10 @@
 <resources>
     <string name="appName">MythDroid</string>
     <string name="settings">Einstellungen</string>
+    <string name="defFe">Standard frontend</string>
     <string name="setCurFe">Setze Derzeitiges Frontend</string>
-    <string name="setDefFe">Setze standard frontend</string>
-    <string name="curFe">Derzeitiges Frontend: </string>
-    <string name="curSetTo">Derzeitiger Wert: </string>
+    <string name="curFe">Frontend: </string>
+    <string name="none">Keiner</string>
     <string name="noBe">Keine Backends gefunden</string>
     <string name="noBeDetail">Manuell in den Einstellungen konfigurieren?</string>
     <string name="editFes">Bearbeite Frontends</string>
@@ -28,6 +28,7 @@
     <string name="recPrio">Aufnahmepriorität:</string>
     <string name="schedOpt">Steuerungsoptionen</string>
     <string name="groupOpt">Gruppeneinstellungen</string>
+    <string name="backend">Backend</string>
     <string name="storage">Speicher</string>
     <string name="load">Lade</string>
     <string name="guideData">Programmdaten</string>
@@ -40,7 +41,6 @@
     <string name="stopRec">Stop Rec</string> <!-- needs to be short to fit in a button -->
     <string name="schedule">Aufnehmen</string>
     <string name="ok">OK</string>
-    <string name="error">Fehler</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="save">Speichern</string>
@@ -54,6 +54,7 @@
     <string name="visualiser">Visualisierung An-/Ausschalten</string>
     <string name="chVisual">Ändere Visualisierung</string>
     <string name="plEdit">Wiedergabeliste Editor</string>
+    <string name="menu">Menü</string>
     <string name="osdMenu">OSD Menü</string>
     <string name="leaveRemote">Lasse Fernbedienung</string>
     <string name="haltPlayback">Wiedergabe beenden?</string>

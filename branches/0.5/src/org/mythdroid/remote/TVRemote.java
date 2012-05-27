@@ -20,7 +20,6 @@ package org.mythdroid.remote;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -52,6 +51,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -76,9 +76,9 @@ public class TVRemote extends Remote {
     final private static int
         DIALOG_LOAD  = 0, DIALOG_NUMPAD = 1, DIALOG_GUIDE = 2, DIALOG_QUIT = 3;
 
-    private static HashMap<Integer, Key>
-        ctrls = new HashMap<Integer, Key>(20),
-        nums = new HashMap<Integer, Key>(12);
+    private static SparseArray<Key>
+        ctrls = new SparseArray<Key>(20),
+        nums  = new SparseArray<Key>(12);
 
     static {
         nums.put(R.id.one,          Key.ONE);
@@ -113,6 +113,7 @@ public class TVRemote extends Remote {
     }
 
     final private Handler    handler      = new Handler();
+    final private Object     feLock       = new Object();
     final private Context    ctx          = this;
     private TextView         titleView    = null;
     private SeekBar          pBar         = null;
@@ -134,45 +135,46 @@ public class TVRemote extends Remote {
         @Override
         public void run() {
 
-            if (feMgr == null || !feMgr.isConnected())
-                return;
-
+            FrontendLocation loc = null;
+            
+            synchronized (feLock) {
+                if (feMgr == null || !feMgr.isConnected()) return;
+            }
+            
             try {
-
-                final FrontendLocation loc = feMgr.getLoc();
-
-                if (!loc.video) {
-                    done();
-                    return;
-                }
-
-                final String name = loc.filename;
-
-                if (livetv && !name.equals(lastFilename))
-                    handler.post(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Program prog =
-                                        Globals.getBackend().getRecording(name);
-                                    titleView.setText(prog.Title);
-                                } catch (IOException e) {
-                                    ErrUtil.postErr(ctx, e);
-                                    return;
-                                }
-                            }
-                        }
-                    );
-
-                else if (!livetv) {
-                    pBar.setProgress(loc.position);
-                }
-
+                synchronized (feLock) { loc = feMgr.getLoc(); }
             } catch (IOException e) {
                 ErrUtil.postErr(ctx, e);
                 done();
                 return;
+            }
+            
+            if (!loc.video) {
+                done();
+                return;
+            }
+            
+            final String name = loc.filename;
+
+            if (livetv && !name.equals(lastFilename))
+                handler.post(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Program prog =
+                                    Globals.getBackend().getRecording(name);
+                                titleView.setText(prog.Title);
+                            } catch (IOException e) {
+                                ErrUtil.postErr(ctx, e);
+                                return;
+                            }
+                        }
+                    }
+                );
+
+            else if (!livetv) {
+                pBar.setProgress(loc.position);
             }
 
         }
@@ -185,16 +187,17 @@ public class TVRemote extends Remote {
                 try {
                     dismissDialog(DIALOG_LOAD);
                 } catch (IllegalArgumentException e) {}
-            if (feMgr != null) {
-                setupStatus();
-                if (mddMgr == null) {
-                    updateStatus = new UpdateStatusTask();
-                    if (timer == null) timer = new Timer();
-                    timer.scheduleAtFixedRate(updateStatus, 8000, 8000);
-                }
-                else
-                    mddMgr.setChannelListener(new mddListener());
+            
+            synchronized (feLock) { if (feMgr == null) return; }
+            
+            setupStatus();
+            if (mddMgr == null) {
+                updateStatus = new UpdateStatusTask();
+                if (timer == null) timer = new Timer();
+                timer.scheduleAtFixedRate(updateStatus, 8000, 8000);
             }
+            else
+                mddMgr.setChannelListener(new mddListener());
         }
     };
 
@@ -202,33 +205,39 @@ public class TVRemote extends Remote {
         @Override
         public void run() {
 
-            if (feMgr == null)
-                return;
+            synchronized (feLock) { if (feMgr == null) return; }
             
             try {
-                synchronized (feMgr) {
-                    if (livetv) {
-                        if (!feMgr.getLoc().livetv)
+                
+                if (livetv) {
+                    
+                    FrontendLocation loc = null;
+                    synchronized (feLock) { 
+                        if (!(loc = feMgr.getLoc()).livetv)
                             feMgr.jumpTo("livetv"); //$NON-NLS-1$
-    
-                        if (!feMgr.getLoc().livetv) {
-                            ErrUtil.postErr(
-                                ctx, Messages.getString("TVRemote.1") //$NON-NLS-1$
-                            );
-                            done();
-                            return;
-                        }
-                        if (jumpChan >= 0) {
+                    }
+                    
+                    synchronized (feLock) { loc = feMgr.getLoc(); }
+                    if (!loc.livetv) {
+                        ErrUtil.postErr(ctx, Messages.getString("TVRemote.1")); //$NON-NLS-1$
+                        done();
+                        return;
+                    }
+                    
+                    if (jumpChan >= 0)
+                        synchronized (feLock) {
                             while(feMgr.getLoc().position < 1)
                                 Thread.sleep(500);
                             feMgr.playChan(jumpChan);
                         }
-                    }
-                    else if (filename != null)
-                        feMgr.playFile(filename);
-                    else
-                        feMgr.playRec(Globals.curProg);
+                    
                 }
+                
+                else if (filename != null)
+                    synchronized (feLock) { feMgr.playFile(filename); }
+                else
+                    synchronized (feLock) { feMgr.playRec(Globals.curProg); }
+                
             } catch (IOException e) {
                 ErrUtil.postErr(ctx, e);
                 done();
@@ -239,6 +248,8 @@ public class TVRemote extends Remote {
                   done();
                   return;
               }
+            
+            
             handler.post(ready);
 
         }
@@ -314,7 +325,7 @@ public class TVRemote extends Remote {
     public void onResume() {
         super.onResume();
         try {
-            feMgr = Globals.getFrontend(this);
+            synchronized (feLock) { feMgr = Globals.getFrontend(this); }
         } catch (IOException e) {
             ErrUtil.err(this, e);
             finish();
@@ -339,11 +350,11 @@ public class TVRemote extends Remote {
 
     private void cleanup() {
 
-        if (feMgr != null)
-            synchronized (feMgr) {
+        synchronized (feLock) {
+            if (feMgr != null) 
                 feMgr.disconnect();
-                feMgr = null;
-            }
+            feMgr = null;
+        }
 
         if (timer != null) {
             timer.cancel();
@@ -372,8 +383,7 @@ public class TVRemote extends Remote {
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
         setupViews(gesture);
-        if (feMgr == null)
-            onResume();
+        if (feMgr == null) onResume();
         setupStatus();
     }
 
@@ -399,12 +409,14 @@ public class TVRemote extends Remote {
             showDialog(DIALOG_NUMPAD);
             return;
         }
-
-        if (feMgr != null)
-            try {
-                feMgr.sendKey(key);
-            } catch (IOException e) { ErrUtil.err(this, e); }
-              catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+        
+        synchronized (feLock) {
+            if (feMgr != null)
+                try {
+                    feMgr.sendKey(key);
+                } catch (IOException e) { ErrUtil.err(this, e); }
+                  catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+        }
               
         if (key == Key.GUIDE)
             startActivityForResult(
@@ -425,7 +437,9 @@ public class TVRemote extends Remote {
                 pad.setContentView(R.layout.numpad);
                 pad.findViewById(android.R.id.title).setVisibility(View.GONE);
                 View button;
-                for (int viewId : nums.keySet()) {
+                int size = nums.size();
+                for (int i = 0; i < size; i++) {
+                    int viewId = nums.keyAt(i);
                     button = pad.findViewById(viewId);
                     button.setTag(nums.get(viewId));
                     button.setOnClickListener(this);
@@ -514,7 +528,9 @@ public class TVRemote extends Remote {
 
                         case 1:
                             try {
-                                feMgr.sendKey(Key.GUIDE);
+                                synchronized (feLock) { 
+                                    if (feMgr != null) feMgr.sendKey(Key.GUIDE);
+                                }
                             } catch (IOException e) {
                                 ErrUtil.err(ctx, e.getMessage());
                                 return;
@@ -561,11 +577,10 @@ public class TVRemote extends Remote {
         switch (item.getItemId()) {
             case MENU_OSDMENU:
                 try {
-                    if (feMgr != null)
-                        feMgr.sendKey(Key.MENU);
-                } catch (IOException e) {
-                    ErrUtil.err(this, e);
-                }
+                    synchronized (feLock) {
+                        if (feMgr != null) feMgr.sendKey(Key.MENU);
+                    }
+                } catch (IOException e) { ErrUtil.err(this, e); }
                 return true;
             case MENU_GESTURE:
                 gesture = true;
@@ -602,7 +617,7 @@ public class TVRemote extends Remote {
             setContentView(R.layout.tv_gesture_remote);
             for (
                 int id : new int[] { 
-                    R.id.back,  R.id.num,  R.id.volMute,
+                    R.id.back,  R.id.num,  R.id.volMute, R.id.guide,
                     R.id.enter, R.id.info, R.id.skip
                 }
            ) {
@@ -617,38 +632,53 @@ public class TVRemote extends Remote {
         else {
             setContentView(R.layout.tv_remote);
 
-            for (int id : ctrls.keySet()) {
-
+            int size = ctrls.size();
+            
+            for (int i = 0; i < size; i++) {
+                
+                int id = ctrls.keyAt(i);
                 final View v = findViewById(id);
                 Key key = ctrls.get(id);
-
-                if (key == Key.GUIDE) {
-
-                    if (!livetv) {
-                        v.setVisibility(View.INVISIBLE);
-                        continue;
-                    }
-                    
-                    v.setOnLongClickListener(
-                        new OnLongClickListener() {
-                            @Override
-                            public boolean onLongClick(View v) {
-                                showDialog(DIALOG_GUIDE);
-                                return true;
-                            }
-                        }
-                    );
-
-                }
-
                 v.setOnClickListener(this);
                 v.setFocusable(false);
                 v.setTag(key);
 
             }
         }
+        
+        View v = findViewById(R.id.guide);
+
+        if (!livetv)
+            v.setVisibility(View.INVISIBLE);
+        else
+            v.setOnLongClickListener(
+                new OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        showDialog(DIALOG_GUIDE);
+                        return true;
+                    }
+                }
+            );
+        
+        v = findViewById(R.id.skip);
+        v.setOnLongClickListener(
+            new OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    try {
+                        synchronized (feLock) {
+                            if (feMgr != null)
+                                feMgr.sendKey(Key.SKIP_PREV_COMMERCIAL);
+                        }
+                    } catch (IOException e) { ErrUtil.err(ctx, e); }
+                    return true;
+                }
+            }
+        );
 
         removeDialog(DIALOG_NUMPAD);
+        
     }
 
     /** Setup the status widgets (progress bar, program title) */
@@ -671,7 +701,7 @@ public class TVRemote extends Remote {
         FrontendLocation loc = null;
 
         try {
-            loc = feMgr.getLoc();
+            synchronized (feLock) { loc = feMgr.getLoc(); }
             if (!loc.video) {
                 done();
                 return;
@@ -703,7 +733,9 @@ public class TVRemote extends Remote {
         
     }
     
-    private void setupProgressBar(int max, int progress, Program prog, float fps) {
+    private void setupProgressBar(
+        int max, int progress, Program prog, float fps
+    ) {
         
         pBar.setMax(max);
         pBar.setProgress(progress);
@@ -718,13 +750,13 @@ public class TVRemote extends Remote {
                     if (mddMgr != null) {
                         FrontendLocation loc = null;
                         try {
-                            loc = feMgr.getLoc();
+                            synchronized (feLock) { loc = feMgr.getLoc(); }
                         } catch (IOException e) { return; }
                         if (loc.end <= 0) return;
                         progress = (loc.end * progress) / 1000;
                     }
                     try {
-                        feMgr.seekTo(progress);
+                        synchronized (feLock) { feMgr.seekTo(progress); }
                     } catch (IOException e) {}
                 }
 
@@ -753,60 +785,72 @@ public class TVRemote extends Remote {
 
     /** Call finish() but jump to lastLocation first, if possible */
     private synchronized void done() {
-        if (feMgr != null && feMgr.isConnected() && jump) {
-            try {
-                feMgr.jumpTo(Globals.lastLocation);
-            } catch (IOException e) { ErrUtil.postErr(this, e); }
-              catch (IllegalArgumentException e) { ErrUtil.postErr(this, e); }
+        synchronized (feLock) {
+            if (feMgr != null && feMgr.isConnected() && jump) {
+                try {
+                    feMgr.jumpTo(Globals.lastLocation);
+                } catch (IOException e) { ErrUtil.postErr(this, e); }
+                catch (IllegalArgumentException e) { ErrUtil.postErr(this, e); }
+            }
         }
         jump = false;
-        finish();
+        if (!isFinishing()) finish();
     }
 
     @Override
     protected void onScrollDown() {
-        if (feMgr == null) return;
-        try {
-            feMgr.sendKey(Key.VOL_DOWN);
-            feMgr.sendKey(Key.VOL_DOWN);
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        synchronized (feLock) {
+            if (feMgr == null) return;
+            try {
+                feMgr.sendKey(Key.VOL_DOWN);
+                feMgr.sendKey(Key.VOL_DOWN);
+            } catch (IOException e) { ErrUtil.err(this, e); }
+        }
         onAction();
     }
 
     @Override
     protected void onScrollLeft() {
-        if (feMgr == null) return;
-        try {
-            feMgr.sendKey(Key.SEEK_BACK);
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        synchronized (feLock) {
+            if (feMgr == null) return;
+            try {
+                feMgr.sendKey(Key.SEEK_BACK);
+            } catch (IOException e) { ErrUtil.err(this, e); }
+        }
         onAction();
     }
 
     @Override
     protected void onScrollRight() {
-        if (feMgr == null) return;
-        try {
-            feMgr.sendKey(Key.SEEK_FORWARD);
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        synchronized (feLock) {
+            if (feMgr == null) return;
+            try {
+                feMgr.sendKey(Key.SEEK_FORWARD);
+            } catch (IOException e) { ErrUtil.err(this, e); }
+        }
         onAction();
     }
 
     @Override
     protected void onScrollUp() {
-        if (feMgr == null) return;
-        try {
-            feMgr.sendKey(Key.VOL_UP);
-            feMgr.sendKey(Key.VOL_UP);
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        synchronized (feLock) {
+            if (feMgr == null) return;
+            try {
+                feMgr.sendKey(Key.VOL_UP);
+                feMgr.sendKey(Key.VOL_UP);
+            } catch (IOException e) { ErrUtil.err(this, e); }
+        }
         onAction();
     }
 
     @Override
     protected void onTap() {
-        if (feMgr == null) return;
-        try {
-            feMgr.sendKey(Key.PAUSE);
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        synchronized (feLock) {
+            if (feMgr == null) return;
+            try {
+                feMgr.sendKey(Key.PAUSE);
+            } catch (IOException e) { ErrUtil.err(this, e); }
+        }
         onAction();
     }
 

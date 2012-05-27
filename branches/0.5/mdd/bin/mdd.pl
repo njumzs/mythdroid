@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end comment
 =cut
 
-$VERSION = 0.5.2;
+$VERSION = 0.5.3;
 
 use strict;
 use warnings;
@@ -104,13 +104,16 @@ my @clients;
 my (%commands, %videos, %storageGroups);
 
 my $stream_cmd = $config{stream} ||
-    '/usr/bin/vlc -vvv -I oldrc --rc-host 0.0.0.0:16547 --rc-fake-tty ' .
-    '--file-caching=2000 %FILE% ' . 
-    '--sout=\'#transcode{vcodec=h264,venc=x264{no-cabac,level=30,keyint=50,' .
-    'ref=4,bframes=0,bpyramid=none,profile=baseline,no-weightb,weightp=0,' .
-    'no-8x8dct,trellis=0},vb=%VB%,threads=%THR%,deinterlace,acodec=mp4a,' . 
-    'samplerate=48000,ab=%AB%,channels=2,audio-sync}' .
+    '/usr/bin/vlc -vvv -I oldrc --rc-host 0.0.0.0:16547 --rc-fake-tty '      .
+    '--file-caching=2000 %FILE% '                                            . 
+    '--sout=\'#transcode{vcodec=h264,venc=x264{no-cabac,keyint=50,ref=1,'    .
+    'level=31,bframes=0,bpyramid=none,profile=baseline,no-weightb,weightp=0,'.
+    'no-8x8dct,trellis=0,me=dia,subme=1,no-mbtree,partitions=none,'          .
+    'no-mixed-refs,intra-refresh=1},'                                        .
+    'vb=%VB%,threads=%THR%,deinterlace,maxwidth=%WIDTH%,maxheight=%HEIGHT%,' .
+    'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2,audio-sync}'            .
     ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' 2>&1';
+
 
 # List of regex to match messages we might get from MythDroid
 # and refs to subroutines that will handle them
@@ -288,19 +291,10 @@ MDD - MythDroid Daemon
 Usage:
 
     --help    [-h]      - Show this message
-    --backend [-b]      - Backend-only mode
     --debug   [-d]      - Debug mode
 
-Backend-only mode should be used on systems that serve only as a backend. 
-MDD will detach from the terminal and run as a daemon in backend mode.
-
-Debug mode will result in debug information being output to the logfile 
-(/tmp/mdd.log). It will also cause MDD to run in the foreground even
-in backend-only mode.
-
-MDD will install itself if run from a non-installed location - i.e. from a
-location that is not /usr/bin/ for backend-only mode or 
-\$PREFIX/bin/mythlcdserver otherwise.
+If debug mode is enabled MDD will run in the foreground regardless of 
+installation mode and debug information will be written to /tmp/mdd.log 
 
 EOF
 
@@ -366,27 +360,26 @@ sub readConfig() {
         next if /^#/;
         s/#.*$//;
         next unless length;
-        my ($name, $value) = /(.*?)=(.*)/;
+        my ($name, $value) = /^\s*(.*?)\s*=\s*(.*?)\s*$/;
         unless ($name && $value) {
             print STDERR "MDD: Error parsing line $line of $f, ignoring\n";
             next;
         }
-        $name =~ s/\s+$//;
-        $value =~ s/^\s+//;
-
+        
         while ($value =~ s/\\$//) { 
             chomp $value;
             $value .= readline F;
         }
 
         if ($name =~ /command/i) {
-            my ($cm, $cv) = $value =~ /(.*)=>(.*)/;
+            my ($cm, $cv) = $value =~ /^\s*(.*?)\s*=>\s*(.*?)\s*$/;
             unless ($cm && $cv) {
                 print STDERR "MDD: Error parsing command on line $line of " .
                              "$f, ignoring\n";
                 next;
             }
             $commands{$cm} = $cv;
+            next;
         }
 
         $config{$name} = $value;
@@ -510,8 +503,7 @@ sub videoList($) {
     my $subdir = shift;
     my $regex;
     
-    %storageGroups = %{ $mythdb->getStorGroups() } 
-        unless (scalar %storageGroups);
+    %storageGroups = %{ $mythdb->getStorGroups() }; 
 
     if (exists $storageGroups{Videos}) {
         $log->dbg("Videos SG exists");
@@ -587,12 +579,14 @@ sub streamFile($) {
     
     my $file = shift;
     my $dir;
-    my $pat = qr/(\d+)x(\d+)\s+VB\s+(\d+)\s+AB\s+(\d+)\s+SG\s+(.+)\s+FILE\s+/;
+    my $pat = qr/(\d+)x(\d+)\s+(?:ENC\s+(\d+)\s+)?VB\s+(\d+)\s+AB\s+(\d+)\s+SG\s+(.+)\s+FILE\s+/;
 
     $log->dbg("Streaming $file");
 
-    my ($width, $height, $vb, $ab, $sg) = $file =~ /$pat/;
+    my ($width, $height, $enc, $vb, $ab, $sg) = $file =~ /$pat/;
     $file =~ s/$pat//;
+
+    $enc = 0 unless $enc;
 
     unless (defined $cpus) {
         my $buf;
@@ -608,8 +602,7 @@ sub streamFile($) {
 
     if ($file =~ s/^myth:\/\///) {
 
-        %storageGroups = %{ $mythdb->getStorGroups() } 
-            unless (scalar %storageGroups);
+        %storageGroups = %{ $mythdb->getStorGroups() }; 
     
         if ($file =~ /^(.+)@/) {
             $sg = $1;
@@ -631,12 +624,12 @@ sub streamFile($) {
         }
 
     }
-
-    $file =~ s/ /\\ /g;
-    $file =~ s/'/\\'/g;
+    
+    # Escape shell metacharacters
+    $file =~ s/([ &'`\\"\|\*!?~<>\^\(\)\[\]\{\}\$])/\\$1/g;
 
     $log->dbg("Streaming - resolved path is $file");
-    
+
     my $cmd = $stream_cmd;
 
     # The default demuxer doesn't support get_length et al in ts
@@ -645,6 +638,26 @@ sub streamFile($) {
         $file =~ /\.ts$/ || $file =~ /\.m2ts$/
     ) {
         $cmd =~ s/vlc /vlc --demux avformat /;
+    }
+
+    # Limit maximum resolution
+    $width  = 1024 if $width  > 1024;
+    $height = 576  if $height > 576;
+
+    # Modify stream_cmd for different encoding profiles
+    unless ($config{stream}) {
+        if ($enc == 1) {
+            $cmd =~ s/me=dia,subme=1,no-mbtree,partitions=none
+                     /me=hex,subme=3/x;
+        }
+        elsif ($enc == 2) {
+            $cmd =~ s/no-cabac,//;
+            $cmd =~ s/level=31,bframes=0,bpyramid=none,profile=baseline,
+                      no-weightb,weightp=0
+                     /level=4,bframes=0,profile=main,no-weightb/x;
+            $cmd =~ s/me=dia,subme=1,no-mbtree,partitions=none
+                     /me=hex,subme=3/x;
+        }
     }
 
     $cmd =~ s/%FILE%/$file/;
@@ -688,8 +701,7 @@ sub stopStreaming() {
 # Get a list of storage groups
 sub getStorGroups() {
 
-    %storageGroups = %{ $mythdb->getStorGroups() } 
-        unless (scalar %storageGroups);
+    %storageGroups = %{ $mythdb->getStorGroups() };
 
     map { sendMsg($_) } (keys %storageGroups);
 

@@ -83,6 +83,8 @@ my (
     $settingNoHostSth
 );
 
+my %storageGroups;
+
 sub new {
 
     my $class = shift;
@@ -144,22 +146,48 @@ sub dosql {
 
 }
 
+sub findPosterInSG($$) {
+
+    my $sgd  = shift;
+    my $file = shift;
+
+    foreach my $d (@$sgd) {
+        return "$d$file" if (-e "$d$file");
+    }
+
+    return 'No Cover';
+
+}
+
 sub getVideos($) {
 
-    my $self  = shift;
-    my $regex = shift;
+    my $self   = shift;
+    my $regex  = shift;
+    my $fregex = $regex . '/[^/]*$';
+    my $cregex = qr/$fregex/;
 
     my %videos;
     my @vids;
+
+    %storageGroups = %{ $self->getStorGroups() };
+
+    my $posterSG = $storageGroups{Coverart};
 
     $videoSth = execute($videoSth, \$videoSQL, $regex);
 
     while (my $aref = $videoSth->fetchrow_arrayref) {
         splice @$aref, 2, 0, '' if ($self->{VidDBVer} < 1024);
-        $self->{httpserver}->addFile($aref->[10]) if $self->{httpserver};
+        if ($aref->[10] && $aref->[9] =~ /$cregex/) {
+            if (
+                $posterSG && $aref->[10] !~ m#^/# && $aref->[10] ne 'No Cover'
+            ) {
+                $aref->[10] = findPosterInSG($posterSG, $aref->[10]);
+            }
+            $self->{httpserver}->addFile($aref->[10]) if $self->{httpserver};
+        }
         my $id = $aref->[0];
         my $msg = "VIDEO $id";
-        map { $msg .= '||' . $_ } @{$aref}[1 .. $#$aref];
+        map { $msg .= '||' . ($_ ? $_ : '') } @{$aref}[1 .. $#$aref];
         push @vids, $msg;
     }
 
@@ -237,17 +265,22 @@ sub getStorGroup($) {
 # Populate the global storageGroups hash
 sub getStorGroups() {
 
-    my %storGroups;
+    unless (scalar %storageGroups) {
 
-    $getStorGroupsSth = execute($getStorGroupsSth, \$getStorGroupsSQL);
+        $getStorGroupsSth = execute($getStorGroupsSth, \$getStorGroupsSQL);
 
-    while (my $aref = $getStorGroupsSth->fetchrow_arrayref) {
-        push @{ $storGroups{$aref->[0]} }, $aref->[1];
-    }
+        while (my $aref = $getStorGroupsSth->fetchrow_arrayref) {
+            $aref->[1] .= '/' unless $aref->[1] =~ /\/$/;
+            push @{ $storageGroups{$aref->[0]} }, $aref->[1];
+        }
     
-    $log->dbg("getStorGroups() found " . scalar(keys %storGroups) . " groups");
+        $log->dbg(
+            "getStorGroups() found " . scalar(keys %storageGroups) . " groups"
+        );
 
-    return \%storGroups;
+    }
+
+    return \%storageGroups;
 }
 
 # get a list of recording groups

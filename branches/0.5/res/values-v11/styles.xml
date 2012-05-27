@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<style name="MDNoTitle" parent="android:Theme.Holo">
-  		<item name="android:windowActionBar">true</item>
-  	</style>
+	<style name="MDNoTitle" parent="android:Theme.Holo.NoActionBar"/>
   	<style name="MDButton">
     	<item name="android:scaleType">fitCenter</item>
     	<item name="android:focusable">false</item>

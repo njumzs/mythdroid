@@ -2,20 +2,30 @@
 <resources>
     <string-array name="mainMenuItems">
         <item>Watch TV</item>
-	<item>Recordings</item>
-	<item>Videos</item>
-	<item>Music</item>
-	<item>Guide</item>
-	<item>Status</item>
+	   <item>Recordings</item>
+	   <item>Videos</item>
+	   <item>Music</item>
+	   <item>Guide</item>
+	   <item>Status</item>
     </string-array>
     <string-array name="remoteStyles">
-	<item>Button</item>
-	<item>Gesture</item>
+	   <item>Button</item>
+	   <item>Gesture</item>
     </string-array>
     <string-array name="streamingRates">
-	<item>Video 1024   Audio 128   (1152 kb/s)</item>
-	<item>Video  448   Audio 128    (576 kb/s)</item>
-	<item>Video  320   Audio  96    (416 kb/s)</item>
-	<item>Video  192   Audio  64    (256 kb/s)</item>
+	   <item>Video 1024   Audio 160   (1184 kb/s)</item>
+	   <item>Video  512   Audio 128    (640 kb/s)</item>
+	   <item>Video  384   Audio  96    (480 kb/s)</item>
+	   <item>Video  192   Audio  64    (256 kb/s)</item>
+    </string-array>
+    <string-array name="streamStrings">
+        <item>Baseline - low</item>
+        <item>Baseline - medium</item>
+        <item>Main     - high</item>
+    </string-array>
+    <string-array name="streamValues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
 </resources>

@@ -30,6 +30,7 @@ import org.mythdroid.data.Program;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.LogUtil;
 import org.mythdroid.views.MDVideoView;
 import org.mythdroid.views.MDVideoView.OnSeekListener;
 import org.mythdroid.vlc.VLCRemote;
@@ -44,6 +45,8 @@ import android.content.DialogInterface.OnDismissListener;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnErrorListener;
+import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
@@ -59,15 +62,15 @@ import android.widget.AdapterView.OnItemClickListener;
 /** MDActivity that displays streamed Video */
 public class VideoPlayer extends MDActivity {
     
-    final private Context ctx = this;
+    final private Context ctx        = this;
     final private int DIALOG_QUALITY = 1;
     
-    private int vb = 0, ab = 0, vwidth = 0, vheight = 0;
-    private MDVideoView videoView = null;
-    private BackendManager beMgr = null;
-    private VLCRemote vlc = null;
-    private MediaPlayer mplayer = null;
-    private Uri url = null;
+    private int            vb = 0, ab = 0, vwidth = 0, vheight = 0, retries = 0;
+    private MDVideoView    videoView   = null;
+    private BackendManager beMgr       = null;
+    private VLCRemote      vlc         = null;
+    private MediaPlayer    mplayer     = null;
+    private Uri            url         = null;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -84,9 +87,10 @@ public class VideoPlayer extends MDActivity {
         try {
             videoView.stopPlayback();
         } catch (IllegalArgumentException e) {}
-        try {
-            MDDManager.stopStream(beMgr.addr);
-        } catch (IOException e) { ErrUtil.err(ctx, e); }
+        if (beMgr != null)
+            try {
+                MDDManager.stopStream(beMgr.addr);
+            } catch (IOException e) { ErrUtil.err(ctx, e); }
         if (vlc != null)
             try {
                 vlc.disconnect();
@@ -144,22 +148,10 @@ public class VideoPlayer extends MDActivity {
                 ) {
 
                     switch (pos) {
-                        case 0:
-                            vb = 1024;
-                            ab = 128;
-                            break;
-                        case 1:
-                            vb = 448;
-                            ab = 128;
-                            break;
-                        case 2:
-                            vb = 320;
-                            ab = 96;
-                            break;
-                        case 3:
-                            vb = 192;
-                            ab = 64;
-                            break;
+                        case 0: vb = 1024; ab = 160; break;
+                        case 1: vb = 512;  ab = 128; break;
+                        case 2: vb = 384;  ab = 96;  break;
+                        case 3: vb = 192;  ab = 64;  break;
                     }
                     d.dismiss();
                 }
@@ -196,10 +188,15 @@ public class VideoPlayer extends MDActivity {
                 else
                     sg = MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
             }
+            
+            int enc = Integer.valueOf(
+                PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("streamComplexity", "0") //$NON-NLS-1$ //$NON-NLS-2$
+            );
 
             MDDManager.streamFile(
                 beMgr.addr, path, sg,
-                dm.widthPixels, dm.heightPixels, vb, ab
+                dm.widthPixels, dm.heightPixels, enc, vb, ab
             );
         } catch (IOException e) {
             ErrUtil.err(this, e);
@@ -224,7 +221,7 @@ public class VideoPlayer extends MDActivity {
         
         int attempts = 0;
         
-        while (attempts < 6 && vlc == null)
+        while (attempts < 8 && vlc == null)
             try {
                 vlc = new VLCRemote(beMgr.addr);
             } catch (IOException e) { 
@@ -244,6 +241,11 @@ public class VideoPlayer extends MDActivity {
         }
         
         return vlc;
+    }
+    
+    @Override
+    public void onActivityResult(int a, int b, Intent data) {
+        finish();
     }
     
     private void playVideo() {
@@ -266,14 +268,44 @@ public class VideoPlayer extends MDActivity {
            sdpAddr = sdpPublicAddr;
 
         url = Uri.parse("rtsp://" + sdpAddr + ":5554/stream"); //$NON-NLS-1$ //$NON-NLS-2$
-
-        videoView.setVideoURI(url);
+        
+        if (
+            PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("streamExternalPlayer", false) //$NON-NLS-1$
+        ) {
+            startActivityForResult(new Intent(Intent.ACTION_VIEW, url), 0);
+            return;
+        }
         
         videoView.setOnCompletionListener(
             new OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     finish();
+                }
+            }
+        );
+        
+        videoView.setOnErrorListener(
+            new OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    LogUtil.warn("MediaPlayer err " + what + " extra " + extra); //$NON-NLS-1$ //$NON-NLS-2$
+                    dismissLoadingDialog();
+                    if (retries > 2) return false;
+                    if (mp != null)  mp.reset();
+                    retries++;
+                    showLoadingDialog();
+                    new Handler().postDelayed(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                playVideo();
+                            }
+                            
+                        }, 2000
+                    );
+                    return true;
                 }
             }
         );
@@ -307,22 +339,43 @@ public class VideoPlayer extends MDActivity {
                     vwidth = mp.getVideoWidth();
                     vheight = mp.getVideoHeight();
                     videoView.setVideoSize(vwidth, vheight);
-                    mp.setOnVideoSizeChangedListener(
-                        new OnVideoSizeChangedListener() {
-                            @Override
-                            public void onVideoSizeChanged(
-                                MediaPlayer mp, int width, int height
-                            ) {
-                               videoView.setVideoSize(width, height);
-                            }
-                        }
-                    );
+                    setupMediaPlayer(mp);
                     mplayer = mp;
                     videoView.start();
                 }
             }
         );
+
+        videoView.setVideoURI(url);
         
     }
-
+    
+    private void setupMediaPlayer(final MediaPlayer mp) {
+        
+        mp.setOnVideoSizeChangedListener(
+            new OnVideoSizeChangedListener() {
+                @Override
+                public void onVideoSizeChanged(
+                    MediaPlayer mp, int width, int height
+                ) {
+                   videoView.setVideoSize(width, height);
+                }
+            }
+        );
+        
+        mp.setOnInfoListener(
+            new OnInfoListener() {
+                @Override
+                public boolean onInfo(
+                    MediaPlayer mp, int what, int extra
+                ) {
+                    if (what == MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING)
+                        LogUtil.warn("Video decode is too slow"); //$NON-NLS-1$
+                    return false;
+                }
+            }
+        );
+        
+    }
+    
 }

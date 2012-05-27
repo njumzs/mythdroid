@@ -5,6 +5,7 @@
   	android:orientation="vertical">
     
     <LinearLayout
+        android:baselineAligned="false"
   		android:layout_weight="1"
   		android:layout_width="fill_parent"
   		android:layout_height="0px"
@@ -12,7 +13,6 @@
 
    		<FrameLayout
   			android:id="@+id/recorderframe"
-  			android:layout_weight="1"
     		android:layout_width="0px"
     		android:layout_height="fill_parent"
     		android:layout_marginRight="2dp"
@@ -20,7 +20,6 @@
 
     	<FrameLayout
   			android:id="@+id/backendframe"
-  			android:layout_weight="1"
     		android:layout_width="0px"
     		android:layout_height="fill_parent"
     		android:background="@drawable/fragmentbackground"/>
@@ -28,6 +27,7 @@
     </LinearLayout>
 
 	<LinearLayout
+	    android:baselineAligned="false"
   		android:layout_weight="1.5"
   		android:layout_width="fill_parent"
   		android:layout_height="0px"
@@ -36,7 +36,6 @@
 
 		<FrameLayout
   			android:id="@+id/scheduledframe"
-  			android:layout_weight="1"
     		android:layout_width="0px"
     		android:layout_height="fill_parent"
     		android:layout_marginRight="2dp"
@@ -44,7 +43,6 @@
 
     	<FrameLayout
   			android:id="@+id/jobframe"
-  			android:layout_weight="1"
     		android:layout_width="0px"
     		android:layout_height="fill_parent"
             android:background="@drawable/fragmentbackground"/>

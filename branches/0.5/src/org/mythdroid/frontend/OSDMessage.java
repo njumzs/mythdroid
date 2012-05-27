@@ -114,7 +114,8 @@ final public class OSDMessage {
 
     private static void send(String message) throws IOException {
         byte[] buf = message.getBytes("utf8"); //$NON-NLS-1$
-        DatagramPacket dgram = new DatagramPacket(buf, buf.length, address, 6948);
+        DatagramPacket dgram =
+            new DatagramPacket(buf, buf.length, address, 6948);
         DatagramSocket sock = new DatagramSocket();
         sock.setBroadcast(true);
         sock.send(dgram);

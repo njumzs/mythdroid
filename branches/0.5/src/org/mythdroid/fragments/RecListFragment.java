@@ -82,16 +82,16 @@ public class RecListFragment extends ListFragment
     
     @Override
     public void onResume() {
-    	super.onResume();
-    	lv.setSelection(activity.visibleIndex);
+        super.onResume();
+        lv.setSelection(activity.visibleIndex);
     }
     
     @Override
     public void onPause() {
-    	super.onPause();
-    	int vIdx = lv.getFirstVisiblePosition();
-    	if (vIdx != ListView.INVALID_POSITION && vIdx != 0)
-    		activity.visibleIndex = vIdx;
+        super.onPause();
+        int vIdx = lv.getFirstVisiblePosition();
+        if (vIdx != ListView.INVALID_POSITION && vIdx != 0)
+            activity.visibleIndex = vIdx;
     }
     
     @Override
@@ -153,38 +153,40 @@ public class RecListFragment extends ListFragment
      */
     public void updateSelection() {
         
-        if (activity.checkedIndex < 0)
-            activity.checkedIndex = 0;
-        
         int maxIndex = lv.getCount() - 1;
         
         if (maxIndex >= 0) 
             activity.checkedIndex = Math.min(activity.checkedIndex, maxIndex);
-        int cIdx = activity.checkedIndex;
         
-        Program p = (Program)lv.getItemAtPosition(cIdx);
+        if (activity.checkedIndex > maxIndex) return;
+        
+        Program p = (Program)lv.getItemAtPosition(activity.checkedIndex);
         if (p == null) return;
         Globals.curProg = p;
 
-        lv.setSelection(activity.visibleIndex);
+        lv.setSelection(
+            activity.checkedIndex >= 0 ? 
+                activity.checkedIndex : activity.visibleIndex
+        );
         
         if (!dualPane) return;
         
-        lv.setItemChecked(cIdx, true);
+        lv.setItemChecked(activity.checkedIndex, true);
         
         // Do we need to add / replace the fragment in the details view slot?
         Fragment df = getFragmentManager().findFragmentById(R.id.recdetails);
         
         if (
-        	df == null || !df.getClass().equals(RecDetailFragment.class) ||
-        	!df.isVisible()
+            df == null || !df.getClass().equals(RecDetailFragment.class) ||
+            !df.isVisible()
         ) {
-        	showDetails();
-        	return;
+            showDetails();
+            return;
         }
+
         Program prog = ((RecDetailFragment)df).getProg();
         if (prog == null || !prog.equals(Globals.curProg))
-        	showDetails();	
+            showDetails();    
         
     }
     

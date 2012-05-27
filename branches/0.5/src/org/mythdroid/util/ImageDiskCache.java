@@ -42,7 +42,8 @@ public class ImageDiskCache {
     static final private int STORAGE_READABLE = 1;
     static final private int STORAGE_WRITABLE = 2;
     
-    static final private String cachePath = "/Android/data/org.mythdroid/cache/"; //$NON-NLS-1$
+    static final private String cachePath =
+        "/Android/data/org.mythdroid/cache/"; //$NON-NLS-1$
     
     private long sizeOnDisk = 0, maxSizeOnDisk = 0;
     private File cacheDir = null;

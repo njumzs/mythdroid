@@ -1,5 +1,6 @@
 package org.mythdroid.util;
 
+import android.annotation.TargetApi;
 import android.net.Uri;
 import android.os.Build;
 import android.os.StrictMode;
@@ -16,7 +17,8 @@ public class Reflection {
     /**
      * Wrapped StrictMode
      */
-    public static class rStrictMode {
+    @TargetApi(9)
+	public static class rStrictMode {
         
         static {
             try {
@@ -53,18 +55,19 @@ public class Reflection {
      * Has no effect on pre-Honeycomb devices
      */
     public static void setThreadPolicy() {
-    	/* Allow network activity on UI thread */
-    	if (Integer.parseInt(Build.VERSION.SDK) >= 11)
-    		try {
-    			rStrictMode.checkAvailable();
-    			rStrictMode.setThreadPolicy();
-    		} catch (Exception e) {}
+        /* Allow network activity on UI thread */
+        if (Integer.parseInt(Build.VERSION.SDK) >= 11)
+            try {
+                rStrictMode.checkAvailable();
+                rStrictMode.setThreadPolicy();
+            } catch (Exception e) {}
     }
     
     /**
      * Wrapped ContactsContract
      */
-    public static class rContactsContract {
+    @TargetApi(5)
+	public static class rContactsContract {
         
         static {
             try {

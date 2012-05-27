@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
-	android:background="@drawable/metal">
+	android:background="@drawable/metal"
+	android:padding="4dp">
 	
 	<ImageButton android:id="@+id/back"
 		style="@style/MDButton72"
@@ -32,7 +33,6 @@
 		style="@style/MDButton72"
 		android:layout_alignParentLeft="true"
 		android:layout_alignParentBottom="true"
-		android:layout_marginBottom="8dp"
 		android:gravity="center"
 		android:textSize="16sp"
 		android:textStyle="bold"
@@ -43,21 +43,18 @@
 		style="@style/MDButton72"
 		android:layout_alignTop="@id/num"
 		android:layout_toRightOf="@id/num"
-		android:layout_marginBottom="8dp"
 		android:src="@drawable/vol_mute"/>
 		
 	<ImageButton android:id="@+id/skip"
 		style="@style/MDButton72"
 		android:layout_alignTop="@id/num"
 		android:layout_alignParentRight="true"
-		android:layout_marginBottom="8dp"
 		android:src="@drawable/skip"/>
 				
 	<ImageButton android:id="@+id/enter"
 		style="@style/MDButton72"
 		android:layout_alignTop="@id/num"
 		android:layout_toLeftOf="@id/skip"
-		android:layout_marginBottom="8dp"
 		android:src="@drawable/enter"/>
 		
 	<ImageButton android:id="@+id/info"

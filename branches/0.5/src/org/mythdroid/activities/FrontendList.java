@@ -48,7 +48,8 @@ import java.util.ArrayList;
 public class FrontendList extends ListActivity implements
     DialogInterface.OnClickListener {
 
-    final static private int ADD_DIALOG  = 0, DEFAULT_DIALOG = 1, EDIT_DIALOG = 2;
+    final static private int
+        ADD_DIALOG  = 0, DEFAULT_DIALOG = 1, EDIT_DIALOG = 2;
 
     final private Context ctx             = this;
 
@@ -75,13 +76,13 @@ public class FrontendList extends ListActivity implements
             R.layout.frontend_list_item, null
         );
 
-        ((TextView)(ftr.findViewById(R.id.name))).setText(R.string.setDefFe);
+        ((TextView)(ftr.findViewById(R.id.name))).setText(R.string.defFe);
 
-        ((TextView)(ftr.findViewById(R.id.addr)))
-            .setText(
-                getResources().getString(R.string.curSetTo) +
-                FrontendDB.getDefault(this)
-             );
+        String defFE = FrontendDB.getDefault(this);
+        
+        if (defFE != null)
+            ((TextView)(ftr.findViewById(R.id.addr)))
+                .setText(FrontendDB.getDefault(this));
         
         getListView().addHeaderView(ftr);
 
@@ -168,7 +169,8 @@ public class FrontendList extends ListActivity implements
     }
 
     @Override
-    public void onListItemClick(ListView list, View item, int pos, long itemid) {
+    public void onListItemClick(ListView list, View item, int pos, long itemid)
+    {
         clickedPosition = pos;
         clickedView = item;
         switch (pos) {
@@ -277,11 +279,7 @@ public class FrontendList extends ListActivity implements
     private void setDefaultFrontend(String name) {
         FrontendDB.updateDefault(ctx, name);
         Globals.currentFrontend = name;
-        ((TextView)(ftr.findViewById(R.id.addr)))
-            .setText(
-                getResources().getString(R.string.curSetTo) +
-                FrontendDB.getDefault(ctx)
-            );
+        ((TextView)(ftr.findViewById(R.id.addr))).setText(name);
     }
 
 }

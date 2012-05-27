@@ -141,9 +141,9 @@ public class Globals {
         if (
             backend != null &&
             (
-            	backend.equals("127.0.0.1") || backend.equals("localhost") || //$NON-NLS-1$ //$NON-NLS-2$
-            	ConnectivityReceiver.networkType() ==
-            		ConnectivityManager.TYPE_MOBILE
+                backend.equals("127.0.0.1") || backend.equals("localhost") || //$NON-NLS-1$ //$NON-NLS-2$
+                ConnectivityReceiver.networkType() ==
+                    ConnectivityManager.TYPE_MOBILE
             ) && 
             testMuxConn()
         )
@@ -153,9 +153,9 @@ public class Globals {
         if (backend != null && backend.length() > 0)
             try {
                 beMgr = new BackendManager(backend);
-            } catch(IOException e) {}
+            } catch (IOException e) {}
             
-        if (beMgr == null) {
+        if (beMgr == null || !beMgr.isConnected()) {
             // See if we can locate a backend via UPnP
             beMgr = BackendManager.locate();
             muxConns = false;

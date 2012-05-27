@@ -98,9 +98,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
         netType = type;
         connected = true;
 
-        try {
-            ConnMgr.reconnectAll();
-        } catch (IOException e) {}
+        ConnMgr.reconnectAll();
 
     }
 
@@ -182,7 +180,9 @@ public class ConnectivityReceiver extends BroadcastReceiver {
 
             }
 
-            while (netType != ConnectivityManager.TYPE_WIFI || connected == false) {
+            while (
+                netType != ConnectivityManager.TYPE_WIFI || connected == false
+            ) {
 
                 LogUtil.debug("Waiting for WiFi connection"); //$NON-NLS-1$
 
