@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/actionbaritem"
     android:layout_width="wrap_content"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp">
 
     <TextView
         android:id="@+id/label"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_marginLeft="10sp"
+        android:layout_marginLeft="5dp"
         android:textSize="18sp"
         android:textColor="#FFFFFF"
         android:text="@string/curFe"/>
@@ -19,8 +21,8 @@
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_marginLeft="8sp"
-        android:layout_marginRight="10sp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:textSize="18sp"
         android:textColor="#FFFFFF"/>
 

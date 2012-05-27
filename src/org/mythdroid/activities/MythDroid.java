@@ -307,7 +307,7 @@ public class MythDroid extends MDListActivity implements
                 startActivity(new Intent().setClass(this, NavRemote.class));
                 return true;
             default:
-                return false;
+                return super.onOptionsItemSelected(item);
         }
 
     }

@@ -193,7 +193,7 @@ public class VideoDetail extends MDActivity {
                 return true;
         }
 
-        return false;
+        return super.onOptionsItemSelected(item);
 
     }
 

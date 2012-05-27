@@ -249,7 +249,7 @@ public class Recordings extends MDFragmentActivity {
                 return true;
         }
 
-        return false;
+        return super.onOptionsItemSelected(item);
 
     }
     
