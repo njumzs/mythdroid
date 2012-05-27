@@ -95,9 +95,9 @@ public class Guide extends MDActivity {
         time = new SimpleDateFormat("HH:mm"); //$NON-NLS-1$
     
     final private LayoutParams
-    	rowLayout     = new LayoutParams(), chanLayout    = new LayoutParams(),
-    	hdrDateLayout = new LayoutParams(), hdrTimeLayout = new LayoutParams(),
-    	spacerLayout  = new LayoutParams();
+        rowLayout     = new LayoutParams(), chanLayout    = new LayoutParams(),
+        hdrDateLayout = new LayoutParams(), hdrTimeLayout = new LayoutParams(),
+        spacerLayout  = new LayoutParams();
 
     final private Handler handler = new Handler();
 
@@ -109,8 +109,8 @@ public class Guide extends MDActivity {
     private float       scale     = 1;
     
     private Drawable
-    	recordedIcon = null, willRecordIcon = null, failedIcon = null,
-    	conflictIcon = null, otherIcon = null;
+        recordedIcon = null, willRecordIcon = null, failedIcon = null,
+        conflictIcon = null, otherIcon = null;
 
     /**
     * Tweak colWidth to alter the visible width of the columns
@@ -178,7 +178,7 @@ public class Guide extends MDActivity {
                                 j = 0;
                             }
 
-                            // This became necessary in either android 2.2 or MythTV 0.24
+                            // This became necessary in MythTV 0.24
                             Collections.sort(current.programs);
 
                             tbl.addView(getRowFromChannel(current));
@@ -382,6 +382,9 @@ public class Guide extends MDActivity {
                     now.getHours(), now.getMinutes()
                 );
                 break;
+                
+            default:
+                super.onPrepareDialog(id, dialog);
 
         }
 

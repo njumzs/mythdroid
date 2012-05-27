@@ -55,7 +55,8 @@ public class WakeOnLan {
         sock.close();
     }
 
-    private static byte[] parseAddr(String addr) throws IllegalArgumentException {
+    private static byte[] parseAddr(String addr)
+        throws IllegalArgumentException {
         byte[] bytes = new byte[6];
         String[] hex = addr.split(":"); //$NON-NLS-1$
         if (hex.length != 6)

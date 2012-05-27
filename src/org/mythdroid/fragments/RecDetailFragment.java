@@ -125,6 +125,7 @@ public class RecDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (activity == null) activity = (MDFragmentActivity)getActivity();
         if ((prog = Globals.curProg) == null) {
             if (!dualPane) getFragmentManager().popBackStack(); 
             if (!embedded) activity.finish();
@@ -153,11 +154,11 @@ public class RecDetailFragment extends Fragment {
         ((TextView)view.findViewById(R.id.start)).setText(prog.startString());
         ((TextView)view.findViewById(R.id.category))
             .setText(
-                Messages.getString("RecordingDetail.0") + prog.Category // type: //$NON-NLS-1$
+                Messages.getString("RecordingDetail.0") + prog.Category //$NON-NLS-1$
             ); 
         ((TextView)view.findViewById(R.id.status))
             .setText(
-                Messages.getString("RecordingDetail.1") + prog.Status.msg() // status: //$NON-NLS-1$
+                Messages.getString("RecordingDetail.1") + prog.Status.msg() //$NON-NLS-1$
             ); 
         ((TextView)view.findViewById(R.id.desc)).setText(prog.Description);
         
@@ -256,7 +257,7 @@ public class RecDetailFragment extends Fragment {
      * @return Program being displayed
      */
     public Program getProg() {
-    	return prog;
+        return prog;
     }
     
     private class deleteDialog extends DialogFragment {

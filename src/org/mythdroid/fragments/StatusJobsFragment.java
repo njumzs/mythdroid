@@ -204,7 +204,9 @@ public class StatusJobsFragment extends ListFragment {
             ViewHolder vHolder = null;
 
             if (old == null) {
-                old = activity.getLayoutInflater().inflate(R.layout.job_list_item, null);
+                old = activity.getLayoutInflater().inflate(
+                    R.layout.job_list_item, null
+                );
                 vHolder          = new ViewHolder();
                 vHolder.title    = (TextView)old.findViewById(R.id.title);
                 vHolder.type     = (TextView)old.findViewById(R.id.type);
@@ -264,7 +266,9 @@ public class StatusJobsFragment extends ListFragment {
         for (int i = 0; i < jobNodes.getLength(); i++)
             jobs.add(new Job(jobNodes.item(i)));
 
-        setListAdapter(new JobAdapter(activity, layout.simple_list_item_1, jobs));
+        setListAdapter(
+            new JobAdapter(activity, layout.simple_list_item_1, jobs)
+        );
         
         return view;
 

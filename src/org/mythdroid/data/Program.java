@@ -180,34 +180,34 @@ public class Program implements Comparable<Program> {
     
     /** Represents a commercial break or 'cut' */
     static public class Commercial {
-    	/** Frame number of commercial start */
-    	public int start;
-    	/** Frame number of commercial end */
-    	public int end;
-    	
-    	/**
-    	 * Constructor
-    	 * @param start frame number of commercial start
-    	 * @param end frame number of commercial end
-    	 */
-    	public Commercial(int start, int end) {
-    		this.start = start;
-    		this.end   = end;
-    	}
-    	
-    	/**
-    	 * Constructor
-    	 * @param cut 2 element array, 1st is start frame, 2nd is end frame
-    	 */
-    	public Commercial(int[] cut) {
-    		if (cut.length != 2)
-    			throw new IllegalArgumentException(
-    				Messages.getString("Program.47") //$NON-NLS-1$
-    			);
-    		start = cut[0];
-    		end   = cut[1];
-    	}
-    			
+        /** Frame number of commercial start */
+        public int start;
+        /** Frame number of commercial end */
+        public int end;
+        
+        /**
+         * Constructor
+         * @param start frame number of commercial start
+         * @param end frame number of commercial end
+         */
+        public Commercial(int start, int end) {
+            this.start = start;
+            this.end   = end;
+        }
+        
+        /**
+         * Constructor
+         * @param cut 2 element array, 1st is start frame, 2nd is end frame
+         */
+        public Commercial(int[] cut) {
+            if (cut.length != 2)
+                throw new IllegalArgumentException(
+                    Messages.getString("Program.47") //$NON-NLS-1$
+                );
+            start = cut[0];
+            end   = cut[1];
+        }
+                
     }
     
     @SuppressWarnings("all")
@@ -252,9 +252,9 @@ public class Program implements Comparable<Program> {
     @SuppressWarnings("all")
     public int          ChanID, RecID = -1, RecPrio = 0;
 
-    private String[] list  					  = null;
+    private String[] list                     = null;
     private ArrayList<Commercial> commercials = new ArrayList<Commercial>();
-    private boolean fetchedCutList			  = false;
+    private boolean fetchedCutList            = false;
     
     /**
      * Construct a Program from a stringlist
@@ -262,6 +262,9 @@ public class Program implements Comparable<Program> {
      */
     public Program(String[] list, int off) {
 
+        if (list.length < off + STORGROUP + 1)
+            throw new IllegalArgumentException("Program: not enough elements"); //$NON-NLS-1$
+        
         int dupInTemp;
 
         try {
@@ -443,17 +446,17 @@ public class Program implements Comparable<Program> {
      * @return a list of Commercials, which might be empty
      */
     public ArrayList<Commercial> getCutList(String addr) {
-    	if (fetchedCutList)
-    		return commercials;
-    	try {
-			for (int[] cut : MDDManager.getCutList(addr, this)) {
-				try {
-					commercials.add(new Commercial(cut));
-				} catch (IllegalArgumentException e1) { continue; }
-			}
-		} catch (IOException e) { return commercials; }
-    	  finally { fetchedCutList = true; }
-    	return commercials;
+        if (fetchedCutList)
+            return commercials;
+        try {
+            for (int[] cut : MDDManager.getCutList(addr, this)) {
+                try {
+                    commercials.add(new Commercial(cut));
+                } catch (IllegalArgumentException e1) { continue; }
+            }
+        } catch (IOException e) { return commercials; }
+          finally { fetchedCutList = true; }
+        return commercials;
     }
 
     /**

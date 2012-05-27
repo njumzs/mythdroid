@@ -8,7 +8,6 @@ description     "MythDroid Daemon"
 start on started mythtv-backend
 stop on stopping mythtv-backend
 
-expect fork
 respawn
 
 exec mdd.pl

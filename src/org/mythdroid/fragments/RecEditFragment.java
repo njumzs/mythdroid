@@ -92,12 +92,12 @@ public class RecEditFragment extends Fragment {
         try {
             beMgr = Globals.getBackend();
         } catch (IOException e) {
-        	initError(e);
-        	return;
+            initError(e);
+            return;
         }
         
         if ((prog = Globals.curProg) == null) {
-        	initError(null);
+            initError(null);
             return;
         }
 
@@ -175,11 +175,11 @@ public class RecEditFragment extends Fragment {
             MDDManager mdd = new MDDManager(beMgr.addr, Globals.muxConns);
             mdd.shutdown();
         } catch (IOException e) {
-        	initError(
-        		new IOException(
-        			Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
-        		)
-        	);
+            initError(
+                new IOException(
+                    Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
+                )
+            );
         }
         
     }
@@ -311,7 +311,9 @@ public class RecEditFragment extends Fragment {
                         FragmentTransaction ft = 
                             getFragmentManager().beginTransaction();
                         ft.replace(containerId, new RecEditSchedFragment());
-                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                        ft.setTransition(
+                            FragmentTransaction.TRANSIT_FRAGMENT_FADE
+                        );
                         ft.addToBackStack(null);
                         ft.commitAllowingStateLoss();
                     }
@@ -327,7 +329,9 @@ public class RecEditFragment extends Fragment {
                         FragmentTransaction ft = 
                             getFragmentManager().beginTransaction();
                         ft.replace(containerId, new RecEditGroupsFragment());
-                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                        ft.setTransition(
+                            FragmentTransaction.TRANSIT_FRAGMENT_FADE
+                        );
                         ft.addToBackStack(null);
                         ft.commitAllowingStateLoss();
                     }
@@ -461,10 +465,10 @@ public class RecEditFragment extends Fragment {
     }
     
     private void initError(Exception e) {
-    	if (e != null)
-    		ErrUtil.err(activity, e);
-    	getFragmentManager().popBackStack();
-    	initErr = true;
+        if (e != null)
+            ErrUtil.err(activity, e);
+        getFragmentManager().popBackStack();
+        initErr = true;
     }
     
     private void done() {

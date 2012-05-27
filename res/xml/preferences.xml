@@ -88,7 +88,28 @@
     		android:entries="@array/remoteStyles"
     		android:entryValues="@array/remoteStyles"
     		android:defaultValue="Button"/>
-    		
+    	
+    	<PreferenceScreen
+            android:key="streamSettings"
+            android:title="Streaming Settings"
+            android:summary="Configure video streaming settings">
+   		
+        <ListPreference
+            android:key="streamComplexity"
+            android:title="Stream Encoding Complexity"
+            android:summary="Higher values require more backend CPU and may not be supported by your device but produce better quality for a given bitrate"
+            android:entries="@array/streamStrings"
+            android:entryValues="@array/streamValues"
+            android:defaultValue="0"/>
+        
+        <CheckBoxPreference android:key="streamExternalPlayer"
+            android:title="Use external video player"
+            android:summaryOn="Using external video player, seeking will not work"
+            android:summaryOff="Using internal video player"
+            android:defaultValue="false"/>
+        
+        </PreferenceScreen>
+    	
     	<CheckBoxPreference android:key="acra.disable"
         	android:title="Disable error reporting"
         	android:summaryOn="Error reporting is disabled"

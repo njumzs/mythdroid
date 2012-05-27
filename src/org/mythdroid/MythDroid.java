@@ -1,31 +1,42 @@
 package org.mythdroid;
 
-import org.acra.CrashReportingApplication;
+import org.acra.*;
+import org.acra.annotation.*;
+import static org.acra.ReportField.*;
 
-import android.os.Bundle;
+import android.app.Application;
 
 /**
  * ACRA error reporting class
  */
-public class MythDroid extends CrashReportingApplication {
-
-    @Override
-    public String getFormId() {
-        boolean m = getPackageName().startsWith("org.mythdroid"); //$NON-NLS-1$
-        return m ? "dFVIWUVVSjBubHlzSUQyeHc4dEpIWHc6MQ" : null;   //$NON-NLS-1$
+@ReportsCrashes(
+    
+    formKey = "dElnQWVCdnF0U3JIZFMxc2lPZ05OM1E6MQ",
+    customReportContent = { 
+        REPORT_ID, APP_VERSION_CODE, PACKAGE_NAME, PHONE_MODEL, BRAND,
+        ANDROID_VERSION, STACK_TRACE, INITIAL_CONFIGURATION,
+        CRASH_CONFIGURATION, DISPLAY, LOGCAT, DEVICE_FEATURES, ENVIRONMENT,
+        SHARED_PREFERENCES, SETTINGS_SYSTEM, SETTINGS_SECURE
+    }, 
+    mode = ReportingInteractionMode.NOTIFICATION,    
+    resNotifTickerText = R.string.crash_notif_ticker_text,
+    resNotifTitle = R.string.crash_notif_title,
+    resNotifText = R.string.crash_notif_text,
+    resNotifIcon = android.R.drawable.stat_notify_error,
+    resDialogText = R.string.crash_dialog_text,
+    resDialogIcon = android.R.drawable.ic_dialog_info,
+    logcatArguments = { 
+        "-s", "-t", "100", "MythDroid", "ConnMgr", "Guide", "WakeService", 
+        "BackendManager", "FrontendLocation", "WakeOnLan", 
+        "ConnectivityReceiver", "ImageCache", "ImageDiskCache"
     }
+)
+public class MythDroid extends Application {
 
-    @Override
-    public Bundle getCrashResources() {
-        boolean m = getPackageName().startsWith("org.mythdroid"); //$NON-NLS-1$
-        Bundle result = new Bundle();
-        result.putInt(RES_NOTIF_TICKER_TEXT, R.string.crash_notif_ticker_text);
-        result.putInt(RES_NOTIF_TITLE, R.string.crash_notif_title);
-        result.putInt(RES_NOTIF_TEXT, R.string.crash_notif_text);
-        result.putInt(RES_NOTIF_ICON, android.R.drawable.stat_notify_error);
-        result.putInt(RES_DIALOG_TEXT, m ? R.string.crash_dialog_text : R.string.mcrash_dialog_text);
-        result.putInt(RES_DIALOG_ICON, android.R.drawable.ic_dialog_info);
-        return result;
+    @Override 
+    public void onCreate() {
+        ACRA.init(this);
+        super.onCreate();
     }
-
+    
 }

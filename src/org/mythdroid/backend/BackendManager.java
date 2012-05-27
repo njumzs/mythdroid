@@ -185,14 +185,24 @@ public class BackendManager {
      */
     public Program getRecording(final String basename) throws IOException {
 
+        Program prog = null;
+        
         if (basename.equalsIgnoreCase("Unknown")) { //$NON-NLS-1$
-            Program prog = new Program();
+            prog = new Program();
             prog.Title = "Unknown"; //$NON-NLS-1$
             return prog;
         }
 
         cmgr.sendString("QUERY_RECORDING BASENAME " + basename); //$NON-NLS-1$
-        return new Program(cmgr.readStringList(), 1);
+        try {
+            prog = new Program(cmgr.readStringList(), 1);
+        } catch (IllegalArgumentException e) {
+            LogUtil.warn(e.getMessage());
+            prog = new Program();
+            prog.Title = "Unknown";  //$NON-NLS-1$
+        }
+        
+        return prog;
 
     }
 
@@ -217,7 +227,12 @@ public class BackendManager {
 
         for (int i = respSize - numFields; i >= 0; i -= numFields) {
             if (!resp[i + groupField].equals("Default")) continue; //$NON-NLS-1$
-            programs.add(new Program(resp, i));
+            try {
+                programs.add(new Program(resp, i));
+            } catch (IllegalArgumentException e) { 
+                LogUtil.warn(e.getMessage());
+                continue; 
+            }
         }
 
         if (Globals.protoVersion > 56)

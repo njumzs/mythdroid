@@ -1,5 +1,4 @@
 <resources>
-    <color name="transparent">#00000000</color>
     <color name="dark_grey_text">#ff0f0f0f</color>
     <color name="dark_grey_text_highlight">#ee8f8f8f</color>
     <color name="light_grey_text">#eedfdfdf</color>

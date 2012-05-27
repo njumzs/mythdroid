@@ -98,7 +98,7 @@
  			android:layout_height="wrap_content"
  			android:layout_marginRight="16dp"
  			android:minWidth="84dp"
-  			android:text="Play"/>
+  			android:text="@string/play"/>
   			
 		<Button
  			android:id="@+id/TVDB"

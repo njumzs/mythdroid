@@ -60,7 +60,7 @@ final public class ErrUtil {
      */
     static public void err(final Context c, final String e) {
         Toast.makeText(c, e, Toast.LENGTH_LONG).show();
-        Log.e("Error", e); //$NON-NLS-1$
+        Log.e("MythDroid", e); //$NON-NLS-1$
     }
 
     /**
@@ -96,7 +96,7 @@ final public class ErrUtil {
                 @Override
                 public void run() {
                     Toast.makeText(c, e, Toast.LENGTH_LONG).show();
-                    Log.e("Error", e); //$NON-NLS-1$
+                    Log.e("MythDroid", e); //$NON-NLS-1$
                 }
             }
         );
@@ -184,7 +184,9 @@ final public class ErrUtil {
                     @Override
                     public void onClick(View v) {
                         ((Activity)c).removeDialog(id);
-                        c.startActivity(new Intent().setClass(c, FrontendList.class));
+                        c.startActivity(
+                            new Intent().setClass(c, FrontendList.class)
+                        );
                     }
                 }
             );

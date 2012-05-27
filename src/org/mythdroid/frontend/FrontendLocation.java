@@ -116,15 +116,15 @@ public class FrontendLocation {
      * @param feMgr a FrontendManager to use
      * @return true if successful, false otherwise
      */
-    public static synchronized Boolean populateLocations(FrontendManager feMgr) {
+    public static Boolean populateLocations(FrontendManager feMgr) {
 
         if (feMgr == null || !feMgr.isConnected())
             return false;
         
         synchronized(locationsLock) {
         
-	        if (hasLocations)
-    	        return false;
+            if (hasLocations)
+                return false;
         
             try {
                 locations = feMgr.getLocs();

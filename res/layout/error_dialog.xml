@@ -21,13 +21,13 @@
         android:layout_height="50dp"
         android:layout_margin="4dp"
         android:textSize="15sp"
-        android:text="OK"/>
+        android:text="@string/ok"/>
     <Button android:id="@+id/editButton"
         android:layout_width="140dp"
         android:layout_height="50dp"
         android:layout_margin="4dp"
         android:textSize="15sp"
         android:text="@string/editFes"
-        android:visibility="gone"/>"
+        android:visibility="gone"/>
     </LinearLayout>
 </RelativeLayout>

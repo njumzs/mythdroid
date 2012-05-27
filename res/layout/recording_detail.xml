@@ -81,9 +81,10 @@
  			android:id="@+id/play"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
- 			android:layout_marginRight="3dp"
+ 			android:layout_marginRight="2dp"
  			android:minWidth="76dp"
 			android:visibility="gone"
+			android:textSize="14sp"
   			android:text="@string/play"/>
   			
  		<Button
@@ -92,14 +93,16 @@
  			android:layout_height="wrap_content"
  			android:minWidth="76dp"
 			android:visibility="gone"
+			android:textSize="14sp"
  			android:text="@string/stopRec"/>
  			
  		<Button
  			android:id="@+id/edit"
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
- 			android:layout_marginLeft="3dp"
+ 			android:layout_marginLeft="2dp"
  			android:minWidth="76dp"
+ 			android:textSize="14sp"
  			android:text="@string/schedule"/>
  			
 		<Button
@@ -107,8 +110,9 @@
  			android:layout_width="wrap_content"
  			android:layout_height="wrap_content"
  			android:minWidth="76dp"
- 			android:layout_marginLeft="3dp"
+ 			android:layout_marginLeft="2dp"
 			android:visibility="gone"
+			android:textSize="14sp"
  			android:text="@string/delete"/>
  			
  	</LinearLayout>

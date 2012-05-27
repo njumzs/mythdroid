@@ -20,6 +20,7 @@ package org.mythdroid.receivers;
 
 import org.mythdroid.frontend.OSDMessage;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.LogUtil;
 import org.mythdroid.util.PhoneUtil;
 
 import android.content.BroadcastReceiver;
@@ -61,21 +62,26 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             number = intent.getStringExtra(
                 android.telephony.TelephonyManager.EXTRA_INCOMING_NUMBER
             );
-
-            if (number != null) {
-                name = PhoneUtil.nameFromNumber(ctx, number);
-
-                if (altOSD)
-                    OSDMessage.XOSD(
-                        ctx, 
-                        Messages.getString("PhoneStateReceiver.0") +  //$NON-NLS-1$
-                            name + " (" + number + ")"   //$NON-NLS-1$//$NON-NLS-2$
-                    );
-                else
-                    try {
-                        OSDMessage.Caller(name, number);
-                    } catch (Exception e) {}
+            
+            if (number == null) {
+                number = Messages.getString("PhoneStateReceiver.1"); //$NON-NLS-1$
+                name   = Messages.getString("StatusBackend.1"); //$NON-NLS-1$
             }
+            else
+                name = PhoneUtil.nameFromNumber(ctx, number);
+            
+            LogUtil.debug("Incoming call from " + number); //$NON-NLS-1$
+
+            if (altOSD)
+                OSDMessage.XOSD(
+                    ctx, 
+                    Messages.getString("PhoneStateReceiver.0") +  //$NON-NLS-1$
+                        name + " (" + number + ")"   //$NON-NLS-1$//$NON-NLS-2$
+                );
+            else
+                try {
+                    OSDMessage.Caller(name, number);
+                } catch (Exception e) {}
 
         }
 
@@ -101,6 +107,8 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                     m += msg.getDisplayMessageBody();
                 }
             }
+            
+            LogUtil.debug("SMS from " + from); //$NON-NLS-1$
             
             if (altOSD)
                 OSDMessage.XOSD(ctx, m);

@@ -89,7 +89,8 @@ public class MDDManager {
      * @param addr String containing address of MDD
      * @return ArrayList<String> containing names of MDD commands
      */
-    public static ArrayList<String> getCommands(String addr) throws IOException {
+    public static ArrayList<String> getCommands(String addr) throws IOException
+    {
         
         final ConnMgr cmgr = sendMsgNoMux(addr, "COMMANDS"); //$NON-NLS-1$
         final ArrayList<String> cmds = new ArrayList<String>();
@@ -118,8 +119,9 @@ public class MDDManager {
     /**
      * Static method, retrieves a list of Videos
      * @param addr String containing address of MDD
-     * @param viddir which video dir to look in (could be a : separated list in mythtv config)
-     * @param subdir String containing directory to enumerate, pass "ROOT" for the root video directory
+     * @param viddir which video dir(s) to look in (could be a : separated list)
+     * @param subdir String containing directory to enumerate, 
+     * pass "ROOT" for the root video directory
      * @return ArrayList of Videos
      * @throws IOException
      */
@@ -156,16 +158,18 @@ public class MDDManager {
      * @param file String containing path to the file
      * @param w int representing desired width of video in pixels
      * @param h int representing desired height of video in pixels
+     * @param enc int representing the desired encoding complexity (0-2)
      * @param vb int representing desired bitrate of video in kb/s
      * @param ab int representing desired bitrate of audio in kb/s
      */
     public static void streamFile(
-            String addr, String file, String sg, int w, int h, int vb, int ab
+            String addr, String file, String sg, int w, int h, int enc,
+            int vb, int ab
     ) throws IOException {
         sendMsg(
             addr,
-            "STREAM " + w + "x" + h + " VB " + vb + " AB " + ab + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-            " SG " + sg + " FILE " + file  //$NON-NLS-1$ //$NON-NLS-2$
+            "STREAM " + w + "x" + h + " ENC " + enc + " VB " + vb + " AB " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ 
+            ab + " SG " + sg + " FILE " + file  //$NON-NLS-1$ //$NON-NLS-2$
         ).disconnect();
     }
 
@@ -231,7 +235,8 @@ public class MDDManager {
      * @param recid int representing RecID of recording
      * @return String contaning recording's storage group
      */
-    public static String getStorageGroup(String addr, int recid) throws IOException {
+    public static String getStorageGroup(String addr, int recid)
+        throws IOException {
         final ConnMgr cmgr = sendMsg(addr, "STORGROUP " + recid); //$NON-NLS-1$
         String sg = cmgr.readLine();
         cmgr.disconnect();
@@ -381,8 +386,8 @@ public class MDDManager {
     /** Disconnect from MDD and clean up internal resources */
     public void shutdown() {
         try {
-			cmgr.dispose();
-		} catch (IOException e) {}
+            cmgr.dispose();
+        } catch (IOException e) {}
     }
 
     private static ConnMgr sendMsg(String addr, String msg) throws IOException {
