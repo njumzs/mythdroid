@@ -20,7 +20,6 @@ package org.mythdroid.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.lang.reflect.InvocationTargetException;
 
 import org.mythdroid.Globals;
 import org.mythdroid.R;
@@ -41,6 +40,7 @@ import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -190,6 +190,17 @@ public abstract class MDActivity extends Activity {
         super.onDestroy();
         removeDialog(FRONTEND_CHOOSER);
     }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            Intent intent = new Intent(this, MythDroid.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            return true;
+        }
+        return false;
+    }
 
     /** Create a dialog allowing user to choose default frontend */
     private Dialog createFrontendDialog() {
@@ -300,21 +311,14 @@ public abstract class MDActivity extends Activity {
             Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.setCurFe
         ).setIcon(drawable.ic_menu_upload_you_tube);
      
-        //If we can, add this to the action bar
-        try {
+        if (MenuItemCompat.setShowAsAction(item, 2)) {
             
-            MenuItem.class.getMethod(
-                "setShowAsAction",  int.class //$NON-NLS-1$
-            ).invoke(item, 2);
-
             View vi = LayoutInflater.from(this).inflate(
                 R.layout.frontend_indicator, null
             );
-                  
+    
             vi.setFocusable(true);
-            vi.setBackgroundResource(
-                android.R.drawable.list_selector_background
-            );
+
             vi.setOnClickListener(
                 new OnClickListener() {
                     @Override
@@ -327,14 +331,10 @@ public abstract class MDActivity extends Activity {
             
             frontendIndicator = (TextView)vi.findViewById(R.id.text);
             updateFrontendIndicator();
-
-            MenuItem.class.getMethod(
-                "setActionView", View.class //$NON-NLS-1$
-            ).invoke(item, vi);
-            
-        } catch (NoSuchMethodException e)     {}
-          catch (IllegalAccessException e)    {}
-          catch (InvocationTargetException e) {}
+    
+            MenuItemCompat.setActionView(item, vi);
+        
+        }
           
     }
     
