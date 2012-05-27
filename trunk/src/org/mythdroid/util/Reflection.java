@@ -55,7 +55,7 @@ public class Reflection {
      */
     public static void setThreadPolicy() {
         /* Allow network activity on UI thread */
-        if (Integer.parseInt(Build.VERSION.SDK) >= 11)
+        if (Build.VERSION.SDK_INT >= 11)
             try {
                 rStrictMode.checkAvailable();
                 rStrictMode.setThreadPolicy();

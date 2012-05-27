@@ -21,7 +21,7 @@ package org.mythdroid.util;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Build.VERSION;
 import android.provider.Contacts;
 
 /** Utility methods for dealing with Contacts */
@@ -38,7 +38,7 @@ public final class PhoneUtil {
         String name = null;
         
         /* Use ContractsContract via reflection on Froyo and above */        
-        if (Integer.parseInt(Build.VERSION.SDK) >= 5)
+        if (VERSION.SDK_INT >= 5)
             try {
                 Reflection.rContactsContract.checkAvailable();
                 Uri uri = Uri.withAppendedPath(
