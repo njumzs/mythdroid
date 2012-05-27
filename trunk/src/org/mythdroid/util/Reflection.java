@@ -38,9 +38,8 @@ public class Reflection {
          */
         public static void setThreadPolicy() {
             StrictMode.setThreadPolicy(
-                new ThreadPolicy.Builder().detectDiskReads()
-                                          .detectDiskWrites()
-                                          .detectNetwork()
+                new ThreadPolicy.Builder().permitDiskReads()
+                                          .permitDiskWrites()
                                           .permitNetwork()
                                           .penaltyLog()
                                           .build()
