@@ -1,6 +1,7 @@
 package org.mythdroid;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TimeZone;
@@ -13,6 +14,7 @@ import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.UPnPListener;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -67,6 +69,8 @@ public class Globals {
         dateFmt.setTimeZone(TimeZone.getDefault());
         utcFmt.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
     }
+    
+    private static UPnPListener upnp = null;
 
     /** A BackendManager representing a connected backend */
     private static BackendManager  beMgr  = null;
@@ -165,7 +169,9 @@ public class Globals {
             
         if (beMgr == null || !beMgr.isConnected()) {
             // See if we can locate a backend via UPnP
-            beMgr = BackendManager.locate();
+            beMgr = new BackendManager(
+                Globals.getUPnPListener().findMasterBackend(550)
+            );
             muxConns = false;
         }
 
@@ -215,6 +221,21 @@ public class Globals {
 
         return wHandler;
 
+    }
+    
+    /**
+     * Get the global UPnPListener
+     * @return the global UPnPListener
+     * @throws SocketException
+     */
+    public static UPnPListener getUPnPListener() throws SocketException {
+        
+        if (upnp != null)
+            return upnp;
+        
+        upnp = new UPnPListener();
+        return upnp;
+        
     }
 
     /** Disconnect and dispose of the currently connected frontend */
