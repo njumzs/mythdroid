@@ -26,7 +26,6 @@ import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.frontend.FrontendLocation;
-import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.frontend.WakeOnLan;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.receivers.ConnectivityReceiver;
@@ -105,8 +104,12 @@ public class MythDroid extends MDListActivity implements
 
         getPreferences();
         
-        // Search for new frontends via UPnP
-        Globals.getWorker().post(FrontendManager.findFrontends);
+        try {
+            // Search for new frontends via UPnP
+            Globals.getUPnPListener().findFrontends();
+        } catch (IOException e) {
+            ErrUtil.logErr(e);
+        }
         
         // Try to grab locations from the frontend in the background
         Globals.getWorker().post(FrontendLocation.getLocations);

@@ -19,45 +19,19 @@
 package org.mythdroid.frontend;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.SocketException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.mythdroid.ConnMgr;
 import org.mythdroid.ConnMgr.onConnectListener;
 import org.mythdroid.Enums.Key;
-import org.mythdroid.Globals;
 import org.mythdroid.data.Program;
-import org.mythdroid.data.XMLHandler;
-import org.mythdroid.data.XMLHandler.Element;
 import org.mythdroid.resource.Messages;
-import org.mythdroid.util.ErrUtil;
-import org.mythdroid.util.LogUtil;
-import org.mythdroid.util.UPnPSearch;
-import org.xml.sax.SAXException;
 
-import android.sax.EndTextElementListener;
-import android.util.Xml;
 
 /** Manages a frontend */
 public class FrontendManager {
 
-    /** Runnable to post to search for new frontends via UPnP */
-    static public Runnable findFrontends = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                for (String url : UPnPSearch.findFrontends())
-                    addFrontend(url);
-            } catch (IOException e) {
-                ErrUtil.logErr(e);
-                return;
-            }
-        }
-    };
-    
     /** String containing the name of the frontend */
     public  String  name = null;
     /** String containing the hostname or IP address of the frontend */
@@ -69,62 +43,6 @@ public class FrontendManager {
     final private Object cmgrLock = new Object(); 
     
     private ConnMgr cmgr          = null;
-    
-    private static void addFrontend(String url) {
-        
-        final String addr = url.substring(7, url.indexOf(':', 7));
-        
-        LogUtil.debug("Found frontend at " + addr); //$NON-NLS-1$
-        
-        if (FrontendDB.hasFrontendWithAddr(Globals.appContext, addr))
-            return;
-        
-        final StringBuilder name = new StringBuilder();
-        final XMLHandler handler = new XMLHandler("root"); //$NON-NLS-1$
-        final Element root  = handler.rootElement();
-        final Element fname = root.getChild("device").getChild("friendlyName"); //$NON-NLS-1$ //$NON-NLS-2$
-
-        fname.setTextElementListener(
-            new EndTextElementListener() {
-                @Override
-                public void end(String text) {
-                    name.append(text.substring(0, text.indexOf(':')));
-                }
-            }
-        );
-        
-        final URL xmlurl;
-        try {
-            xmlurl = new URL(url);
-        } catch (MalformedURLException e) {
-            ErrUtil.logErr(e);
-            return;
-        }
-        
-        try {
-            Xml.parse(xmlurl.openStream(), Xml.Encoding.UTF_8, handler);
-        } catch (SocketException e) {
-            ErrUtil.logErr(e);
-            return;
-        } catch (SAXException e) {
-            ErrUtil.logErr(e);
-            return;
-        } catch (IOException e) {
-            ErrUtil.logErr(e);
-            return;
-        }
-        
-        if (name.length() == 0) return;
-        
-        LogUtil.debug(
-            "Frontend named " + name.toString() + " at " + addr + //$NON-NLS-1$ //$NON-NLS-2$
-            " is new, adding to the FrontendDB" //$NON-NLS-1$
-        );
-        
-        name.setCharAt(0, Character.toUpperCase(name.charAt(0)));
-        FrontendDB.insert(Globals.appContext, name.toString(), addr, null);
-        
-    }
     
     /**
      * Constructor

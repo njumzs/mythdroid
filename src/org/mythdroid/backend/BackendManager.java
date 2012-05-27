@@ -37,7 +37,6 @@ import org.mythdroid.resource.Messages;
 import org.mythdroid.services.MythService;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
-import org.mythdroid.util.UPnPSearch;
 import org.mythdroid.util.UpdateService;
 import org.mythdroid.ConnMgr.onConnectListener;
 import org.w3c.dom.Document;
@@ -110,14 +109,6 @@ public class BackendManager {
             Globals.appContext.startService(intent);
         }
 
-    }
-
-    /**
-     * Find a nearby master backend
-     * @return An initialised BackendManager or null if we couldn't find one
-     */
-    static public BackendManager locate() throws IOException {
-        return new BackendManager(UPnPSearch.findMasterBackend());
     }
 
     /**
