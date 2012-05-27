@@ -21,6 +21,7 @@ import org.mythdroid.util.UPnPListener;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.os.Build.VERSION;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
@@ -242,7 +243,12 @@ public class Globals {
             threadPool = new ThreadPoolExecutor(
                 8, 8, 30, TimeUnit.SECONDS, threadQueue
             );
-            threadPool.allowCoreThreadTimeOut(true);
+            if (VERSION.SDK_INT >= 9)
+                try {
+                    threadPool.getClass().getMethod(
+                        "allowCoreThreadTimeOut", boolean.class //$NON-NLS-1$
+                        ).invoke(threadPool, true);
+                } catch (Exception e) {}
         }
         threadPool.execute(r);
         
