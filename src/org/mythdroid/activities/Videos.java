@@ -50,19 +50,16 @@ public class Videos extends MDActivity implements
     ListView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     final private ImageCache artCache =
-        new ImageCache("videos", 20, 200, 1024*1024*10); //$NON-NLS-1$
+        new ImageCache("videos", 10, 100, 1024*1024*10); //$NON-NLS-1$
     
-    final private SparseArray<String> viddirs = 
-        new SparseArray<String>();
+    final private SparseArray<String> viddirs = new SparseArray<String>();
 
     final private Handler handler   = new Handler();
-    private Thread artThread        = null;
     private ListView lv             = null;
     private ArrayList<Video> videos = null;
     private int viddir              = -1;
     private String path             = "ROOT"; //$NON-NLS-1$
     private TextView dirText        = null;
-    private boolean fetchingArt     = false;
     private boolean largeScreen     = false;
     /** Scale factor for pixel values for different display densities */
     private float scale             = 1;
@@ -115,57 +112,56 @@ public class Videos extends MDActivity implements
     final private Runnable gotVideos = new Runnable() {
         @Override
         public void run() {
+            
             lv.setAdapter(
                 new VideoAdapter(
                     ctx, R.layout.video, videos
                 )
             );
-            if (artThread != null) {
-                fetchingArt = false;
-                artThread.interrupt();
-                try {
-                    artThread.join();
-                } catch (InterruptedException e) {}
-            }
-            fetchingArt = true;
-            artThread = new Thread(fetchArt, "videoArtFetcher"); //$NON-NLS-1$
-            artThread.start();
+            
+            Globals.cancelThreadPoolTasks();
             dismissLoadingDialog();
-        }
-    };
-    
-    /** Fetch posters for the current list of videos */
-    final private Runnable fetchArt = new Runnable() {
-        @Override
-        public void run() {
-
-            Video[] vids = videos.toArray(new Video[videos.size()]);
+            
+            final Video[] vids = videos.toArray(new Video[videos.size()]);
             int numvids = vids.length;
             
             for (int i = 0; i < numvids; i++) {
-                if (!fetchingArt)
-                    break;
-                if (vids[i].poster != null || vids[i].directory) continue;
-                Bitmap bm = artCache.get(vids[i].id);
-                if (bm != null)
-                    vids[i].poster = new BitmapDrawable(bm);
-                else {
-                    float w = (largeScreen ? 175 : 70) * scale + 0.5f;
-                    float h = (largeScreen ? 275 : 110) * scale + 0.5f;
-                    vids[i].getPoster(w, h); 
-                    if (vids[i].poster != null)
-                        artCache.put(vids[i].id, vids[i].poster.getBitmap());
-                }
-                if (vids[i].poster != null)
-                    handler.post(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                ((VideoAdapter)lv.getAdapter())
-                                    .notifyDataSetChanged();
+                
+                final Video vid = vids[i];
+                if (vid.poster != null || vid.directory)  continue;
+                
+                Globals.runOnThreadPool(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            Bitmap bm = artCache.get(vid.id);
+                            if (bm != null)
+                                vid.poster = new BitmapDrawable(bm);
+                            else {
+                                vid.getPoster(
+                                    (largeScreen ? 175 : 70)  * scale + 0.5f,
+                                    (largeScreen ? 275 : 110) * scale + 0.5f
+                                );
+                                
+                                if (vid.poster != null)
+                                    artCache.put(
+                                        vid.id, vid.poster.getBitmap()
+                                    );
                             }
+                            if (vid.poster != null)
+                                handler.post(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ((VideoAdapter)lv.getAdapter())
+                                                .notifyDataSetChanged();
+                                        }
+                                    }
+                                );
                         }
-                    );
+                    }
+               );
+                
             }
 
         }

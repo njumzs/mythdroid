@@ -5,6 +5,9 @@ import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TimeZone;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
@@ -78,6 +81,10 @@ public class Globals {
     private static FrontendManager feMgr  = null;
     /** A handler for the worker thread */
     private static Handler wHandler = null;
+    /** The queue for the thread pool */
+    private static LinkedBlockingQueue<Runnable> threadQueue = null;
+    /** An ExecutorService for accessing the thread pool */
+    private static ThreadPoolExecutor threadPool = null;
     /** A list of addresses that have been checked for updates */
     private static ArrayList<String> updateChecked = new ArrayList<String>(4);
 
@@ -221,6 +228,32 @@ public class Globals {
 
         return wHandler;
 
+    }
+    
+    /**
+     * Run a Runnable on the global thread pool
+     * @param r
+     */
+    public static void runOnThreadPool(Runnable r) {
+        
+        if (threadQueue == null)
+            threadQueue = new LinkedBlockingQueue<Runnable>();
+        if (threadPool == null) {
+            threadPool = new ThreadPoolExecutor(
+                8, 8, 30, TimeUnit.SECONDS, threadQueue
+            );
+            threadPool.allowCoreThreadTimeOut(true);
+        }
+        threadPool.execute(r);
+        
+    }
+    
+    /** Cancel tasks awaiting execution on the global thread pool */
+    public static void cancelThreadPoolTasks() {
+        
+        if (threadQueue == null) return;
+        threadQueue.clear();
+        
     }
     
     /**
