@@ -283,12 +283,12 @@ public class UpdateService extends Service {
         } catch (NameNotFoundException e) { return; }
 
         if (runningVer.compareTo(MDVer) >= 0) {
-            LogUtil.debug("UpdateService: Already running latest version"); //$NON-NLS-1$
+            LogUtil.debug("Already running latest version of MythDroid"); //$NON-NLS-1$
             return;
         }
         
         LogUtil.debug(
-            "UpdateService: Version " + MDVer.toString() + //$NON-NLS-1$
+            "Version " + MDVer.toString() + //$NON-NLS-1$
             " is available (current version is " + runningVer.toString() + ")" //$NON-NLS-1$ //$NON-NLS-2$
         );
         
@@ -403,16 +403,14 @@ public class UpdateService extends Service {
         
         if (currentVer.compareTo(MDDVer) >= 0) {
             LogUtil.debug(
-                "UpdateService: MDD on " + addr +  //$NON-NLS-1$
-                " is already the latest version" //$NON-NLS-1$
+                "MDD on " + addr + " is already the latest version" //$NON-NLS-1$ //$NON-NLS-2$
             );
             return;
         }
         
         LogUtil.debug(
-            "UpdateService: MDD version " + MDDVer.toString() + //$NON-NLS-1$
-            " is available (current version on " + addr + " is " +   //$NON-NLS-1$//$NON-NLS-2$ 
-            currentVer.toString() + ")" //$NON-NLS-1$
+            "MDD ver " + MDDVer.toString() + " is available (current ver on " + //$NON-NLS-1$ //$NON-NLS-2$
+            addr + " is " + currentVer.toString() + ")" //$NON-NLS-1$ //$NON-NLS-2$
         );
         
         if (MDVer != null && MDVer.compareTo(MDDVer) != 0) {
@@ -552,9 +550,7 @@ public class UpdateService extends Service {
                 }
             }
             else
-                ErrUtil.logErr(
-                    "UpdateService - unexpected title: " + entry.title //$NON-NLS-1$
-                );
+                ErrUtil.logErr("Unexpected title: " + entry.title); //$NON-NLS-1$
             
         }
         
