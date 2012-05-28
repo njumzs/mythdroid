@@ -25,6 +25,8 @@ $VERSION = 0.5.3;
 
 use strict;
 use warnings;
+use threads;
+use threads::shared;
 use IO::Socket::INET;
 use IO::Select;
 use POSIX qw(setsid);
@@ -96,8 +98,10 @@ $log->dbg(
 
 my (
     $data, $lcdClient, $lcdServer, $lcdListen, $lcd, $client, $videoDir,
-    $cpus, $streampid, $mythdb
+    $cpus, $streampid, $mythdb, $kaThread
 );
+
+my $kaThreadRunning :shared;
 
 my @clients;
 
@@ -429,6 +433,25 @@ sub clientMsg($) {
 
 }
 
+sub keepAliveThread() {
+
+    while ($kaThreadRunning) {
+        select(undef,undef,undef,1);
+        sendMsg("KEEPALIVE");
+    }
+
+}
+
+sub sendKeepAlives() {
+    $kaThreadRunning = 1;
+    $kaThread = threads->create('keepAliveThread');
+}
+
+sub stopKeepAlives() {
+    $kaThreadRunning = 0;
+    $kaThread->detach();
+}
+
 sub listCommands() {
     # Send a list of MDD commands
     map { sendMsg("COMMAND $_") } (keys %commands);
@@ -470,6 +493,8 @@ sub videoListSG($) {
     my $subdir = shift;
 
     my (@dirs, @vids);
+    
+    sendKeepAlives();
 
     $subdir =~ s/^-?\d+\s//;
     $subdir = '.' if ($subdir eq 'ROOT');
@@ -490,6 +515,8 @@ sub videoListSG($) {
 
     @dirs = sort @dirs;
 
+    stopKeepAlives();
+
     map { sendMsg("-1 DIRECTORY $_") } @dirs;
     map { sendMsg($_) } (@vids);
 
@@ -509,6 +536,8 @@ sub videoList($) {
         $log->dbg("Videos SG exists");
         return videoListSG($subdir);
     }
+    
+    sendKeepAlives();
 
     $videoDir = $mythdb->setting('VideoStartupDir', hostname)
         unless $videoDir;
@@ -520,6 +549,7 @@ sub videoList($) {
         $log->dbg("VideoDirs: @videoDirs");
     }
     else {
+        stopKeepAlives();
         sendMsg("VIDEOLIST DONE");
         return;
     }
@@ -529,6 +559,7 @@ sub videoList($) {
     # Top level and more than one videodir, send numbered list
     if (scalar @videoDirs > 1 && $vd == -1 && $sd eq 'ROOT') {
         my $i = 0;
+        stopKeepAlives();
         map { sendMsg($i++ . " DIRECTORY $_") } @videoDirs;
         sendMsg("VIDEOLIST DONE");
         return;
@@ -554,6 +585,7 @@ sub videoList($) {
     $regex .= '[^/]+$';
 
     @dirs = sort @dirs;
+    stopKeepAlives();
 
     map { sendMsg("$vd DIRECTORY $_") } @dirs;
     map { sendMsg($_) } (@{ $mythdb->getVideos($regex) });
