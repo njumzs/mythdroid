@@ -13,7 +13,7 @@
     	android:layout_height="wrap_content"
     	android:layout_alignParentTop="true"
     	android:gravity="center"
-    	android:text="Backend"
+    	android:text="@string/backend"
     	android:textStyle="bold"
     	android:textSize="20sp"/>
     
@@ -25,7 +25,7 @@
  		android:layout_marginTop="8dp"
  		android:textStyle="bold"
  		android:textSize="18sp"
- 		android:text="Storage"/>
+ 		android:text="@string/storage"/>
  		
  	<TextView
 		android:id="@+id/storageTotal"

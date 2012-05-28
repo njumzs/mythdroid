@@ -136,13 +136,14 @@ public class MDDManager {
                     (subdir == null ? "ROOT" : subdir)); //$NON-NLS-1$
 
         // Uncached SQL queries can take some time with lots of videos
-        cmgr.setTimeout(ConnMgr.timeOut.EXTRALONG);
+        cmgr.setTimeout(ConnMgr.timeOut.LONG);
         
         String line = cmgr.readLine();
         while (line != null && !line.equals("VIDEOLIST DONE")) { //$NON-NLS-1$
-            try {
-                videos.add(new Video(line));
-            } catch (IllegalArgumentException e) { ErrUtil.logWarn(e); }
+            if (!line.equals("KEEPALIVE")) //$NON-NLS-1$
+                try {
+                    videos.add(new Video(line));
+                } catch (IllegalArgumentException e) { ErrUtil.logWarn(e); }
             line = cmgr.readLine();
         }
 

@@ -74,7 +74,7 @@ sub mainloop {
 
         my $method = $req->method;
         my $file = uri_unescape($req->uri->path);
-        my ($width, $height) = $req->uri->query =~ /width=(\d+)&height=(\d+)/;
+        my ($width, $height) = $req->uri->query =~ /[Ww]idth=(\d+)&[Hh]eight=(\d+)/;
 
         if ($width && $height) {
             $log->dbg("HTTPServer: $method $file $width x $height");
