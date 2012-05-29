@@ -27,6 +27,7 @@ import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.Reflection;
+import org.mythdroid.views.ActionView;
 
 import android.R.drawable;
 import android.R.id;
@@ -313,7 +314,7 @@ public abstract class MDActivity extends Activity {
      
         if (MenuItemCompat.setShowAsAction(item, 2)) {
             
-            View vi = LayoutInflater.from(this).inflate(
+            ActionView vi = (ActionView) LayoutInflater.from(this).inflate(
                 R.layout.frontend_indicator, null
             );
     

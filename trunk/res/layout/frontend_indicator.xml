@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<org.mythdroid.views.ActionView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    
     android:id="@+id/layout"
     android:background="@drawable/actionbaritem"
     android:layout_width="wrap_content"
-    android:layout_height="fill_parent"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp">
+    android:layout_height="fill_parent">
 
     <TextView
         android:id="@+id/label"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_marginLeft="5dp"
+        android:gravity="center_vertical"
         android:textSize="18sp"
         android:textColor="#FFFFFF"
         android:text="@string/curFe"/>
@@ -23,8 +24,9 @@
         android:layout_height="fill_parent"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
+        android:gravity="center_vertical"
         android:textSize="18sp"
         android:textColor="#FFFFFF"/>
 
-</LinearLayout>
+</org.mythdroid.views.ActionView>
 
