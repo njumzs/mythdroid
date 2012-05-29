@@ -46,25 +46,25 @@
     	android:focusable="false"/>
    	
 	<ImageButton android:id="@+id/skipForward"
-    	style="@style/MDButton58"
+    	style="@style/MDButtonNormal"
     	android:layout_alignTop="@id/pause"
     	android:layout_toRightOf="@id/pause"
     	android:src="@drawable/skip_forward"/>
     
     <ImageButton android:id="@+id/skipBack"
-		style="@style/MDButton58"
+		style="@style/MDButtonNormal"
     	android:layout_alignTop="@id/pause"
     	android:layout_toLeftOf="@id/pause"
     	android:src="@drawable/skip_back"/>
     	
    <ImageButton android:id="@+id/seekForward"
-    	style="@style/MDButton58"
+    	style="@style/MDButtonNormal"
     	android:layout_alignTop="@id/pause"
     	android:layout_toRightOf="@id/skipForward"
     	android:src="@drawable/seek_forward"/>
     
     <ImageButton android:id="@+id/seekBack"
-    	style="@style/MDButton58"
+    	style="@style/MDButtonNormal"
     	android:layout_alignTop="@id/pause"
     	android:layout_toLeftOf="@id/skipBack"
     	android:src="@drawable/seek_back"/>

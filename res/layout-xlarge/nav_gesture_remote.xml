@@ -7,11 +7,10 @@
 	
 	<ImageButton android:id="@+id/back"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
+		android:layout_height="120dp"
 		android:layout_alignParentBottom="true"
-		android:paddingBottom="8dp"
-		android:layout_marginTop="4dp"
-		android:scaleType="center"
+		android:scaleType="fitCenter"
+		android:background="@drawable/mdbuttonselector"
 		android:src="@drawable/back"/>
 		
 	<TextView android:id="@+id/loc"
