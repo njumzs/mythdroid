@@ -271,6 +271,8 @@ public class NavRemote extends Remote {
             case MENU_BUTTON:
                 gesture = false;
                 break;
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
         setupViews(gesture);

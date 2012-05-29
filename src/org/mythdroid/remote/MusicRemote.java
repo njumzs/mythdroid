@@ -343,6 +343,8 @@ public class MusicRemote extends Remote {
                 key = Key.MENU;
                 activity = NavRemote.class;
                 break;
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
         if (feMgr == null) return true;
