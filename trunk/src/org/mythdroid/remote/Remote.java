@@ -23,6 +23,7 @@ import java.io.IOException;
 import org.mythdroid.Enums.Key;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
+import org.mythdroid.activities.MythDroid;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.Reflection;
@@ -44,6 +45,7 @@ import android.view.GestureDetector;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.GestureDetector.SimpleOnGestureListener;
@@ -313,6 +315,17 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         final boolean onPrepareOptionsMenu = super.onPrepareOptionsMenu(menu);
         setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
         return onPrepareOptionsMenu;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            Intent intent = new Intent(this, MythDroid.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            return true;
+        }
+        return false;
     }
     
     @Override
