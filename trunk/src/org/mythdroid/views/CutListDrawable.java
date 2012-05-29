@@ -47,14 +47,14 @@ public class CutListDrawable extends Drawable {
     @Override
     public void draw(Canvas canvas) {
         
-        int top    = rect.top;
-        int bottom = rect.bottom;
+        float top    = rect.top;
+        float bottom = rect.bottom;
         
-        // Hacky? Honeycomb has a itty bitty progress bar
         if (Build.VERSION.SDK_INT >= 11) {
-            top = 12;
-            bottom = 20;
-        }
+            float center = rect.exactCenterY();
+            top = center - 8;
+            bottom = center + 6;
+        } 
         
         paint.setShader(
             new LinearGradient(
