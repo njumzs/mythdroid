@@ -8,36 +8,36 @@
     android:background="@drawable/metal">
     	
     <ImageButton android:id="@+id/enter"
-    	style="@style/MDButton72"
+    	style="@style/MDButtonLarge"
     	android:layout_centerInParent="true"
     	android:src="@drawable/center"/>
     
     <ImageButton android:id="@+id/up"
-    	style="@style/MDButton72"
+    	style="@style/MDButtonLarge"
     	android:layout_above="@id/enter"
     	android:layout_alignLeft="@id/enter"
     	android:src="@drawable/up"/>
 
   	<ImageButton android:id="@+id/left"
-    	style="@style/MDButton72"
+    	style="@style/MDButtonLarge"
     	android:layout_alignTop="@id/enter"
     	android:layout_toLeftOf="@id/enter"
     	android:src="@drawable/left"/>
   
     <ImageButton android:id="@+id/right"
-    	style="@style/MDButton72"
+    	style="@style/MDButtonLarge"
     	android:layout_toRightOf="@id/enter"
     	android:layout_alignTop="@id/enter"
     	android:src="@drawable/right"/>
     	
     <ImageButton android:id="@+id/down"
-    	style="@style/MDButton72"
+    	style="@style/MDButtonLarge"
     	android:layout_alignLeft="@id/enter"
     	android:layout_below="@id/enter"
     	android:src="@drawable/down"/>
    	
    	<ImageButton android:id="@+id/back"
-    	style="@style/MDButton72"
+    	style="@style/MDButtonLarge"
     	android:layout_alignParentTop="true"
     	android:layout_alignParentLeft="true"
     	android:src="@drawable/back"/>

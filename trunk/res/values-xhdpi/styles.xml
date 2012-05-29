@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ 	<style name="MDButtonNormal" parent="MDButton">
+  	    <item name="android:layout_width">68dp</item>
+        <item name="android:layout_height">68dp</item>
+   	</style>
+   	<style name="MDButtonLarge" parent="MDButton">
+	    <item name="android:layout_width">78dp</item>
+        <item name="android:layout_height">78dp</item>
+   	</style>
+</resources>

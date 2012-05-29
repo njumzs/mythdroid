@@ -6,7 +6,7 @@
 	android:padding="4dp">
 	
 	<ImageButton android:id="@+id/back"
-		style="@style/MDButton72"
+		style="@style/MDButtonLarge"
 		android:layout_alignParentTop="true"
 		android:layout_alignParentLeft="true"
 		android:layout_marginTop="4dp"
@@ -23,14 +23,14 @@
     	style="?android:attr/progressBarStyleHorizontal"/>
 		
 	<ImageButton android:id="@+id/guide"
-		style="@style/MDButton72"
+		style="@style/MDButtonLarge"
 		android:layout_below="@id/progress"
 		android:layout_alignParentLeft="true"
 		android:layout_marginTop="8dp"
 		android:src="@drawable/cal"/>
 		
 	<Button android:id="@+id/num"
-		style="@style/MDButton72"
+		style="@style/MDButtonLarge"
 		android:layout_alignParentLeft="true"
 		android:layout_alignParentBottom="true"
 		android:gravity="center"
@@ -40,25 +40,25 @@
 		android:text="123"/>
 		
 	<ImageButton android:id="@+id/volMute"
-		style="@style/MDButton72"
+		style="@style/MDButtonLarge"
 		android:layout_alignTop="@id/num"
 		android:layout_toRightOf="@id/num"
 		android:src="@drawable/vol_mute"/>
 		
 	<ImageButton android:id="@+id/skip"
-		style="@style/MDButton72"
+		style="@style/MDButtonLarge"
 		android:layout_alignTop="@id/num"
 		android:layout_alignParentRight="true"
 		android:src="@drawable/skip"/>
 				
 	<ImageButton android:id="@+id/enter"
-		style="@style/MDButton72"
+		style="@style/MDButtonLarge"
 		android:layout_alignTop="@id/num"
 		android:layout_toLeftOf="@id/skip"
 		android:src="@drawable/enter"/>
 		
 	<ImageButton android:id="@+id/info"
-		style="@style/MDButton72"
+		style="@style/MDButtonLarge"
 		android:layout_alignTop="@id/guide"
 		android:layout_alignParentRight="true"
 		android:src="@drawable/info"/>

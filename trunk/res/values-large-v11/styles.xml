@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MDNoTitle" parent="android:Theme.Holo">
+        <item name="android:windowActionBar">true</item>
+    </style>
+  	<style name="MDButtonNormal" parent="MDButton">
+  	    <item name="android:layout_width">88dp</item>
+        <item name="android:layout_height">88dp</item>
+   	</style>
+   	<style name="MDButtonLarge" parent="MDButton">
+	    <item name="android:layout_width">112dp</item>
+        <item name="android:layout_height">112dp</item>
+   	</style>
+</resources>

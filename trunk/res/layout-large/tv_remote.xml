@@ -3,7 +3,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/tv_remote"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
     android:padding="8dp"
     android:background="@drawable/metal">
     
@@ -12,24 +12,38 @@
     	android:layout_alignParentLeft="true"
     	android:layout_alignParentTop="true"
     	android:src="@drawable/back"/>
-    	
-   	<ImageButton android:id="@+id/seekForward"
+   	
+   	<ImageButton android:id="@+id/guide"
     	style="@style/MDButtonNormal"
-    	android:layout_alignParentBottom="true"
     	android:layout_alignParentRight="true"
-    	android:layout_marginRight="20dp"
-    	android:src="@drawable/seek_forward"/>
+    	android:layout_alignParentTop="true"
+    	android:src="@drawable/cal"/>
     	
-    <ImageButton android:id="@+id/skipForward"
-    	style="@style/MDButtonNormal"
-    	android:layout_alignTop="@id/seekForward"
-    	android:layout_toLeftOf="@id/seekForward"
-    	android:src="@drawable/skip_forward"/>
-    	
+    <TextView android:id="@+id/title"
+    	android:layout_width="wrap_content"
+    	android:layout_height="wrap_content"
+    	android:layout_toRightOf="@id/back"
+    	android:layout_toLeftOf="@id/guide"
+    	android:layout_marginTop="10dp"
+    	android:gravity="center"
+      	android:textSize="24sp"
+    	android:textStyle="bold"
+    	android:textColor="@color/light_grey_text"/>
+    
+    <SeekBar android:id="@+id/progress"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_below="@id/back"
+    	android:layout_marginTop="8dp"
+    	android:layout_marginLeft="8dp"
+    	android:layout_marginRight="8dp"
+    	android:gravity="center"
+    	style="?android:attr/progressBarStyleHorizontal"/>
+
     <ImageButton android:id="@+id/rec"
     	style="@style/MDButtonNormal"
-    	android:layout_toLeftOf="@id/skipForward"
-    	android:layout_alignTop="@id/seekForward"
+    	android:layout_alignParentBottom="true"
+    	android:layout_centerHorizontal="true"
     	android:src="@drawable/record"/>
     	
    	<ImageButton android:id="@+id/pause"
@@ -37,13 +51,25 @@
     	android:layout_alignLeft="@id/rec"
     	android:layout_above="@id/rec"
     	android:src="@drawable/pause"/>
+	
+	<ImageButton android:id="@+id/skipForward"
+    	style="@style/MDButtonNormal"
+    	android:layout_alignTop="@id/rec"
+    	android:layout_toRightOf="@id/rec"
+    	android:src="@drawable/skip_forward"/>
     
     <ImageButton android:id="@+id/skipBack"
     	style="@style/MDButtonNormal"
     	android:layout_alignTop="@id/rec"
     	android:layout_toLeftOf="@id/rec"
     	android:src="@drawable/skip_back"/>
-    	    
+    	
+   <ImageButton android:id="@+id/seekForward"
+    	style="@style/MDButtonNormal"
+    	android:layout_alignTop="@id/rec"
+    	android:layout_toRightOf="@id/skipForward"
+    	android:src="@drawable/seek_forward"/>
+    
     <ImageButton android:id="@+id/seekBack"
     	style="@style/MDButtonNormal"
     	android:layout_alignTop="@id/rec"
@@ -54,21 +80,23 @@
     	style="@style/MDButtonNormal"
     	android:layout_alignParentRight="true"
     	android:layout_above="@id/seekForward"
-    	android:layout_marginBottom="8dp"
-    	android:src="@drawable/skip"/>
-    	
-    <ImageButton android:id="@+id/guide"
+    	android:layout_marginBottom="20dp"
+    	android:layout_marginRight="25dp"
+    	android:src="@drawable/skip"/>    	
+    
+    <ImageButton android:id="@+id/info"
     	style="@style/MDButtonNormal"
-    	android:layout_above="@id/skip"
-    	android:layout_alignParentRight="true"
-    	android:layout_marginBottom="8dp"
-    	android:src="@drawable/cal"/>    	
+    	android:layout_alignParentLeft="true"
+    	android:layout_above="@id/seekBack"
+    	android:layout_marginBottom="20dp"
+    	android:layout_marginLeft="25dp"
+    	android:src="@drawable/info"/>
     	    	
     <ImageButton android:id="@+id/volUp"
     	style="@style/MDButtonNormal"
     	android:layout_below="@id/back"
     	android:layout_alignLeft="@id/back"
-    	android:layout_marginTop="20dp"
+    	android:layout_marginTop="40dp"
     	android:src="@drawable/vol_up"/>
     
     <ImageButton android:id="@+id/volDown"
@@ -83,26 +111,25 @@
     	android:layout_alignLeft="@id/back"
     	android:src="@drawable/vol_mute"/>
     	
-   	<ImageButton android:id="@+id/left"
-    	style="@style/MDButtonNormal"
-    	android:layout_toRightOf="@id/back"
-    	android:layout_below="@id/back"
-    	android:layout_marginTop="16dp"
-    	android:layout_marginLeft="16dp"
-    	android:src="@drawable/left"/>
-    	
-    <ImageButton android:id="@+id/enter"
-    	style="@style/MDButtonNormal"
-    	android:layout_toRightOf="@id/left"
-    	android:layout_alignTop="@id/left"
-    	android:src="@drawable/center"/>
-    	
     <ImageButton android:id="@+id/up"
     	style="@style/MDButtonNormal"
-    	android:layout_above="@id/enter"
-    	android:layout_alignLeft="@id/enter"
+    	android:layout_alignTop="@id/volUp"
+    	android:layout_centerHorizontal="true"
+    	android:layout_marginTop="28dp"
     	android:src="@drawable/up"/>
-  
+    	
+   	<ImageButton android:id="@+id/enter"
+    	style="@style/MDButtonNormal"
+    	android:layout_alignLeft="@id/up"
+    	android:layout_below="@id/up"
+    	android:src="@drawable/center"/>
+   	
+   	<ImageButton android:id="@+id/left"
+    	style="@style/MDButtonNormal"
+    	android:layout_toLeftOf="@id/enter"
+    	android:layout_alignTop="@id/enter"
+    	android:src="@drawable/left"/>
+    
     <ImageButton android:id="@+id/right"
     	style="@style/MDButtonNormal"
     	android:layout_toRightOf="@id/enter"
@@ -114,47 +141,15 @@
     	android:layout_alignLeft="@id/enter"
     	android:layout_below="@id/enter"
     	android:src="@drawable/down"/>
-    	
-   	<ImageButton android:id="@+id/info"
-    	style="@style/MDButtonNormal"
-    	android:layout_alignTop="@id/guide"
-    	android:layout_alignLeft="@id/pause"
-    	android:src="@drawable/info"/>
 	
 	<Button android:id="@+id/num"
     	style="@style/MDButtonNormal"
-    	android:layout_alignLeft="@id/left"
-    	android:layout_alignParentBottom="true"
-    	android:text="123"
+    	android:layout_alignTop="@id/volUp"
+    	android:layout_alignParentRight="true"
+    	android:textSize="30sp"
     	android:textStyle="bold"
     	android:textColor="#ff333333"
-    	android:textSize="13sp"
-    	android:gravity="center"/>    
-   
-   <TextView android:id="@+id/title"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:layout_alignParentTop="true"
-    	android:layout_alignParentRight="true"
-    	android:layout_toRightOf="@id/up"
-    	android:layout_marginTop="4dp"
-    	android:layout_marginRight="8dp"
-    	android:layout_marginLeft="20dp"
-    	android:gravity="center"
-    	android:textSize="18sp"
-    	android:textStyle="bold"
-    	android:textColor="@color/light_grey_text"/>
-    
-    <SeekBar android:id="@+id/progress"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:layout_alignLeft="@id/title"
- 		android:layout_alignParentRight="true"
-    	android:layout_below="@id/title"
-    	android:layout_marginTop="4dp"
-    	android:layout_marginLeft="24dp"
-    	android:layout_marginBottom="8dp"
-    	android:gravity="center"
-    	style="?android:attr/progressBarStyleHorizontal"/>	
+    	android:text="123"
+    	android:gravity="center"/>    	
    
 </RelativeLayout>
