@@ -38,7 +38,7 @@ public class ImageCache {
     static private Thread diskCacheThread = null;
     static private boolean runDiskCacheThread = true;
     
-    private MemCache<Integer, Bitmap> memCache = null;
+    private MemCache<String, Bitmap> memCache = null;
     private ImageDiskCache diskCache = null;
         
     /**
@@ -60,7 +60,7 @@ public class ImageCache {
         if (diskCache != null && diskCacheThread == null)
             newDiskCacheThread();
         
-        memCache = new MemCache<Integer, Bitmap>(memCapacity, memMaxCapacity);
+        memCache = new MemCache<String, Bitmap>(memCapacity, memMaxCapacity);
         
     }
     
@@ -69,15 +69,16 @@ public class ImageCache {
      * @param key identifier
      * @param value image to cache
      */
-    public void put(final int key, final Bitmap value) {
-        memCache.put(key, value);
+    public void put(final String key, final Bitmap value) {
+        final String k = normalise(key);
+        memCache.put(k, value);
         if (diskCache != null) {
             synchronized (queue) {
                 queue.add(
                     new Runnable() {
                         @Override
                         public void run() {
-                            diskCache.put(String.valueOf(key), value);
+                            diskCache.put(k, value);
                         }
                     }
                 );
@@ -91,13 +92,14 @@ public class ImageCache {
      * @param key identifier
      * @return the cached image
      */
-    public Bitmap get(final int key) {
-        Bitmap ret = memCache.get(key);
+    public Bitmap get(final String key) {
+        final String k = normalise(key);
+        Bitmap ret = memCache.get(k);
         if (ret != null || diskCache == null)
             return ret;
-        ret = diskCache.get(String.valueOf(key));
+        ret = diskCache.get(k);
         if (ret != null)
-            memCache.put(key, ret);
+            memCache.put(k, ret);
         return ret;
     }
     
@@ -153,6 +155,34 @@ public class ImageCache {
         diskCacheThread.setDaemon(true);
         diskCacheThread.setPriority(Thread.MIN_PRIORITY);
         diskCacheThread.start();
+    }
+    
+    private String normalise(String key) {
+        
+        int i = 0;
+        
+        if (key.startsWith("http://")) i = key.indexOf('/', 7);  //$NON-NLS-1$
+        
+        char[] array = key.toCharArray();
+        int size = array.length;
+        char[] dest = new char[size];
+        
+        int j = 0;
+        for (; i < size; i++) {
+            switch (array[i]) {
+                case '/':
+                case '&':
+                case '?':
+                case ';':
+                case ':':
+                    continue;
+                default:
+                    dest[j++] = array[i];
+            }
+        }
+        
+        return String.valueOf(dest, 0, j);
+        
     }
 
 }
