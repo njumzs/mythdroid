@@ -17,6 +17,7 @@ import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.ImageCache;
 import org.mythdroid.util.UPnPListener;
 
 import android.content.Context;
@@ -73,6 +74,10 @@ public class Globals {
         dateFmt.setTimeZone(TimeZone.getDefault());
         utcFmt.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
     }
+    /** An ImageDiskCache for artwork */
+    public static ImageCache artCache = new ImageCache(
+        "artwork", 10, 100, 1024*1024*20 //$NON-NLS-1$
+    );
     
     private static UPnPListener upnp = null;
 
