@@ -23,11 +23,13 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.mythdroid.Enums.ArtworkType;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Key;
 import org.mythdroid.data.Program;
+import org.mythdroid.data.Video;
 import org.mythdroid.data.Program.Commercial;
 import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.mdd.MDDChannelListener;
@@ -45,12 +47,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -119,9 +124,10 @@ public class TVRemote extends Remote {
     private SeekBar          pBar         = null;
     private Timer            timer        = null;
     private int              jumpChan     = -1,     lastProgress    = 0,
-                             endTime      = -1;
+                             endTime      = -1,     videoId         = -1;
     private UpdateStatusTask updateStatus = null;
     private MDDManager       mddMgr       = null;
+    private Program          prog         = null;
     private String           lastFilename = null,   filename     = null,
                              videoTitle   = null;
 
@@ -144,8 +150,17 @@ public class TVRemote extends Remote {
             try {
                 synchronized (feLock) { loc = feMgr.getLoc(); }
             } catch (IOException e) {
-                ErrUtil.postErr(ctx, e);
-                done();
+                ErrUtil.logWarn(e);
+                try {
+                    // Force disposal of the old ConnMgr and a new connection
+                    feMgr.disconnect();
+                    loc = feMgr.getLoc();
+                } catch (IOException e1) {
+                    // Well.. we tried. Give up now, the feMgr is useless
+                    ErrUtil.postErr(ctx, e1);
+                    done();
+                    return;
+                }
                 return;
             }
             
@@ -161,7 +176,7 @@ public class TVRemote extends Remote {
                     new Runnable() {
                         @Override
                         public void run() {
-                            try {
+                       	    try {
                                 Program prog =
                                     Globals.getBackend().getRecording(name);
                                 titleView.setText(prog.Title);
@@ -172,7 +187,6 @@ public class TVRemote extends Remote {
                         }
                     }
                 );
-
             else if (!livetv) {
                 pBar.setProgress(loc.position);
             }
@@ -236,7 +250,10 @@ public class TVRemote extends Remote {
                 else if (filename != null)
                     synchronized (feLock) { feMgr.playFile(filename); }
                 else
-                    synchronized (feLock) { feMgr.playRec(Globals.curProg); }
+                    synchronized (feLock) {
+                        prog = Globals.curProg;
+                        feMgr.playRec(prog); 
+                    }
                 
             } catch (IOException e) {
                 ErrUtil.postErr(ctx, e);
@@ -261,8 +278,7 @@ public class TVRemote extends Remote {
         public void onChannel(
             final String channel, final String title, final String subtitle
         ) {
-            if (videoTitle != null)
-                return;
+            if (videoTitle != null) return;
             handler.post(
                 new Runnable() {
                     @Override
@@ -289,7 +305,7 @@ public class TVRemote extends Remote {
 
         @Override
         public void onExit() {
-                done();
+            done();
         }
 
     };
@@ -306,6 +322,8 @@ public class TVRemote extends Remote {
             filename = intent.getStringExtra(Extras.FILENAME.toString());
         if (intent.hasExtra(Extras.TITLE.toString()))
             videoTitle = intent.getStringExtra(Extras.TITLE.toString());
+        if (intent.hasExtra(Extras.VIDEOID.toString()))
+            videoId = intent.getIntExtra(Extras.VIDEOID.toString(), -1);
         jumpChan = intent.getIntExtra(Extras.JUMPCHAN.toString(), -1);
 
         setResult(RESULT_OK);
@@ -629,7 +647,6 @@ public class TVRemote extends Remote {
                 v.setFocusable(false);
 
             }
-
         }
         else {
             setContentView(R.layout.tv_remote);
@@ -696,10 +713,10 @@ public class TVRemote extends Remote {
         
         if (videoTitle != null) {
             titleView.setText(videoTitle);
+            setBackground(videoId, null, findViewById(R.id.tv_remote));
             return;
         }
 
-        Program prog = null;
         FrontendLocation loc = null;
 
         try {
@@ -712,7 +729,8 @@ public class TVRemote extends Remote {
                 pBar.setVisibility(View.GONE);
                 return;
             }
-            prog = Globals.getBackend().getRecording(loc.filename);
+            if (prog == null)
+                prog = Globals.getBackend().getRecording(loc.filename);
         } catch (IOException e) {
             ErrUtil.err(this, e);
             done();
@@ -732,6 +750,8 @@ public class TVRemote extends Remote {
             setupProgressBar(1000, lastProgress, prog, loc.fps);
         else
             setupProgressBar(loc.end, loc.position, null, loc.fps);
+        
+        setBackground(videoId, prog, findViewById(R.id.tv_remote));
         
     }
     
@@ -782,6 +802,47 @@ public class TVRemote extends Remote {
         LayerDrawable lg = new LayerDrawable(layers);
         lg.setBounds(bounds);
         pBar.setProgressDrawable(lg);
+        
+    }
+    
+    private void setBackground(final int id, final Program prog, final View v) {
+        
+        if (!Globals.haveServices()) return;
+        
+        final DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        final int height = (int)(dm.heightPixels/ 1.5);
+        final int width  = (int)(dm.widthPixels / 1.5);
+        final ArtworkType type =
+            (width > height) ? ArtworkType.fanart : ArtworkType.coverart;
+        
+        Globals.runOnThreadPool(
+            new Runnable() {
+                @Override
+                public void run() {
+                    Bitmap bm = null;
+                    if (videoId != -1)
+                        bm = Video.getArtwork(id, type, width, 0, null);
+                    else if (prog != null)
+                        bm = prog.getArtwork(type, width, 0);
+                    if (bm == null) return;
+                    final BitmapDrawable d = new BitmapDrawable(
+                        getResources(), bm
+                    );
+                    d.setAlpha(65);
+                    handler.post(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                if (v == null) return;
+                                v.setBackgroundDrawable(d);
+                            }
+                        }
+                    );
+                    
+                }
+            }
+        );
         
     }
 
