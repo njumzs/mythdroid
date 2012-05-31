@@ -102,15 +102,15 @@ public class DvrService {
     public int updateRecording(RecordingRule rule)
         throws IOException {
         
-        if (rule.id != -1)
-            recRuleCache.remove(rule.id);
-        
         final JSONObject jo = jc.Post("AddRecordSchedule", rule.toParams()); //$NON-NLS-1$
         
         if (jo == null) return -1;
         
         try {
-            return jo.getInt("int"); //$NON-NLS-1$
+            int id = jo.getInt("int"); //$NON-NLS-1$
+            if (id != -1)
+                recRuleCache.put(id, rule);
+            return id;
         } catch (JSONException e) {
             LogUtil.debug(e.getMessage());
             return -1;
