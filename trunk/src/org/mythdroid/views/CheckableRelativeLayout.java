@@ -27,9 +27,9 @@ import android.widget.CheckedTextView;
 import android.widget.RelativeLayout;
 
 /**
- * A LinearLayout that implements checkable and passes on the checked state
- * to a CheckedTextView with id reclist_title
-  */
+ * A RelativeLayout that implements checkable and passes on the checked state
+ * to a CheckedTextView with id title
+ */
 public class CheckableRelativeLayout extends RelativeLayout 
     implements Checkable {
 
