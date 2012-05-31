@@ -39,8 +39,9 @@ public class ProgramAdapter extends ArrayAdapter<Object> {
         public ProgressBar rec;
     }
 
-    private Context            ctx      = null;
-    private ArrayList<Program> programs = null;
+    private Context            ctx       = null;
+    private ArrayList<Program> programs  = null;
+    private int                resource  = 0;
 
     /**
      * Constructor
@@ -52,6 +53,7 @@ public class ProgramAdapter extends ArrayAdapter<Object> {
         super(ctx, resource, list.toArray());
         this.ctx = ctx;
         this.programs = list;
+        this.resource = resource;
     }
 
     @Override
@@ -60,9 +62,7 @@ public class ProgramAdapter extends ArrayAdapter<Object> {
         ViewHolder vHolder = null;
 
         if (old == null) {
-            old = ((Activity)ctx).getLayoutInflater().inflate(
-                R.layout.recording_list_item, null
-            );
+            old = ((Activity)ctx).getLayoutInflater().inflate(resource, null);
             vHolder = new ViewHolder();
             vHolder.title    = (TextView)old.findViewById(R.id.title);
             vHolder.subtitle = (TextView)old.findViewById(R.id.subtitle);
