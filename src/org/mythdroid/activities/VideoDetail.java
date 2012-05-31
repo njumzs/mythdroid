@@ -20,6 +20,7 @@ package org.mythdroid.activities;
 
 import java.io.IOException;
 
+import org.mythdroid.Enums.ArtworkType;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
@@ -31,8 +32,13 @@ import org.mythdroid.util.ErrUtil;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -48,8 +54,9 @@ import android.view.MenuItem;
  */
 public class VideoDetail extends MDActivity {
 
-    private Video video = null;
-    private Context ctx = this;
+    private Video video     = null;
+    private Context ctx     = this;
+    private Handler handler = new Handler();
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -120,7 +127,6 @@ public class VideoDetail extends MDActivity {
             );
 
         Button play = ((Button)findViewById(R.id.play));
-
         play.setOnClickListener(
             new OnClickListener() {
                 @Override
@@ -149,7 +155,6 @@ public class VideoDetail extends MDActivity {
                 }
             }
         );
-        
         play.setOnLongClickListener(
             new OnLongClickListener() {
                 @Override
@@ -168,6 +173,8 @@ public class VideoDetail extends MDActivity {
                 }
             }
         );
+        
+        setBackground(video, findViewById(R.id.layout));
 
     }
 
@@ -196,6 +203,43 @@ public class VideoDetail extends MDActivity {
         return super.onOptionsItemSelected(item);
 
     }
+    
+    private void setBackground(final Video video, final View v) {
+        
+        if (!Globals.haveServices()) return;
+        
+        final DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        final int height = (int)(dm.heightPixels/ 1.5);
+        final int width  = (int)(dm.widthPixels / 1.5);
+
+        Globals.runOnThreadPool(
+            new Runnable() {
+                @Override
+                public void run() {
+                    Bitmap bm = video.getArtwork(
+                        ArtworkType.fanart, width, 0
+                    );
+                    if (bm == null) return;
+                    final BitmapDrawable d = new BitmapDrawable(
+                        getResources(), bm
+                    );
+                    if (height > width)
+                        d.setGravity(Gravity.FILL_VERTICAL);
+                     d.setAlpha(65);
+                    handler.post(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                v.setBackgroundDrawable(d);
+                            }
+                        }
+                    );
+                    
+                }
+            }
+        );
+}
 
 
 }
