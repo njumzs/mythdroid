@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<org.mythdroid.views.CheckableRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:padding="8sp">
 
-    <TextView android:id="@+id/title"
+    <CheckedTextView android:id="@+id/title"
      	android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/itemselector"
         android:textStyle="bold"
         android:textSize="20sp"/>
 
@@ -43,4 +44,4 @@
 		android:indeterminateOnly="true"
 		style="?android:attr/progressBarStyleSmallTitle"/>
 
-</RelativeLayout>
+</org.mythdroid.views.CheckableRelativeLayout>
