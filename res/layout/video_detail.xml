@@ -33,6 +33,7 @@
  		android:layout_below="@id/subtitle"
 		android:layout_alignParentLeft="true"
 		android:scaleType="fitCenter"
+		android:background="@drawable/imgborder"
 		android:layout_marginTop="10dp"
 		android:layout_marginLeft="16dp"/>
  		

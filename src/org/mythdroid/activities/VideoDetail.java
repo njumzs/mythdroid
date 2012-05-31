@@ -217,16 +217,18 @@ public class VideoDetail extends MDActivity {
             new Runnable() {
                 @Override
                 public void run() {
-                    Bitmap bm = video.getArtwork(
-                        ArtworkType.fanart, width, 0
-                    );
+                    Bitmap bm = null;
+                    if (width > height)
+                        bm = video.getArtwork(ArtworkType.fanart, width, 0);
+                    else
+                        bm = video.getArtwork(ArtworkType.fanart, 0, height);
                     if (bm == null) return;
                     final BitmapDrawable d = new BitmapDrawable(
                         getResources(), bm
                     );
                     if (height > width)
                         d.setGravity(Gravity.FILL_VERTICAL);
-                     d.setAlpha(65);
+                    d.setAlpha(65);
                     handler.post(
                         new Runnable() {
                             @Override
