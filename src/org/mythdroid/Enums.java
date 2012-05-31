@@ -483,5 +483,11 @@ public class Enums {
         }
 
     }
-
+    
+    public enum ArtworkType {
+        coverart,
+        fanart,
+        banner;
+    }
+    
 }
