@@ -31,7 +31,6 @@ use Image::Imlib2;
 
 my $log;
 my @files :shared;
-my $tmpfile = '/tmp/mddimg.jpg';
 
 sub new {
 
@@ -61,7 +60,7 @@ sub addFile($) {
 
 sub mainloop {
 
-    my $lastfile = "";
+    my $i = 0;
 
     my $daemon = HTTP::Daemon->new(LocalPort => 16551)
         or $log->fatal("HTTPServer: Failed to create server: $!");
@@ -69,50 +68,62 @@ sub mainloop {
     $log->dbg("HTTPServer: listening on port 16551");
 
     while (my $client = $daemon->accept) {
-        
-        my $req = $client->get_request;
+        threads->create("processRequest", $client, $log, $i++)->detach();
+    }
 
-        my $method = $req->method;
-        my $file = uri_unescape($req->uri->path);
-        my ($width, $height) = $req->uri->query =~ /[Ww]idth=(\d+)&[Hh]eight=(\d+)/;
+}
 
-        if ($width && $height) {
-            $log->dbg("HTTPServer: $method $file $width x $height");
-        }
-        else {
-            $log->dbg("HTTPServer: $method $file");
-        }
+sub processRequest() {
 
-        if ($method eq 'GET') {
-            unless (grep { $_ eq $file } @files) {
-                $log->dbg("$file is not registered - send 404");
-                $client->send_status_line(404);
-                $client->close;
-                next;
-            }
-            if ($width && $height) {
-                if ($file ne $lastfile) {
-                    my $img = Image::Imlib2->load($file);
-                    unless ($img) {
-                        $client->send_status_line(404);
-                        $client->close;
-                        next;
-                    }
-                    my $simg = $img->create_scaled_image($width,$height);
-                    $simg->image_set_format("jpeg");
-                    $simg->save($tmpfile);
-                    undef $simg;
-                }
-                $lastfile = $file;
-                $file = $tmpfile;
-            }
-            $client->send_file_response($file);
-            $client->close;
-        }
+    my $client = shift;
+    my $log = shift;
+    my $i = shift;
+    my $tmpfile = '/tmp/mddimg' . $i . '.jpg';
 
+    my $req = $client->get_request;
+
+    my $method = $req->method;
+    my $file = uri_unescape($req->uri->path);
+    my ($width, $height) = $req->uri->query =~ /[Ww]idth=(\d+)&[Hh]eight=(\d+)/;
+
+    if ($width && $height) {
+        $log->dbg("HTTPServer: $method $file $width x $height");
+    }
+    else {
+        $log->dbg("HTTPServer: $method $file");
+    }
+
+    if ($method ne 'GET') {
         $client->send_status_line(404);
         $client->close;
     }
+
+    unless (grep { $_ eq $file } @files) {
+        $log->dbg("$file is not registered - send 404");
+        $client->send_status_line(404);
+        $client->close;
+        return;
+    }
+
+    if ($width && $height) {
+        my $img = Image::Imlib2->load($file);
+        unless ($img) {
+            $client->send_status_line(404);
+            $client->close;
+            return;
+        }
+        my $simg = $img->create_scaled_image($width,$height);
+        $simg->image_set_format("jpeg");
+        $simg->save($tmpfile);
+        undef $simg;
+        $client->send_file_response($tmpfile);
+        unlink $tmpfile;
+    }
+    else {
+        $client->send_file_response($file);
+    }
+
+    $client->close;
 
 }
 
