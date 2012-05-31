@@ -33,14 +33,13 @@ import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.HttpFetcher;
 import org.mythdroid.util.LogUtil;
 
-/**
- * A JSON web service client 
- */
+/** A JSON web service client */
 public class JSONClient {
     
     private HttpFetcher fetcher = null;
     private String addr = null;
     private String serv = null;
+    private int port    = 0;
     
     /**
      * Construct a new JSONClient
@@ -50,6 +49,17 @@ public class JSONClient {
         fetcher = new HttpFetcher();
         addr = address;
         serv = service;
+    }
+    
+    /**
+     * Construct a new JSONClient, specifying the port to connect to
+     * @param address IP address or hostname of server
+     */
+    public JSONClient(String address, int port, String service) {
+        fetcher = new HttpFetcher();
+        addr = address;
+        serv = service;
+        this.port = port;
     }
     
     /**
@@ -99,8 +109,8 @@ public class JSONClient {
             );
         
         return new URI(
-            "http", null, addr, 6544, "/" + serv + "/" + method, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            params, null
+            "http", null, addr, port == 0 ? 6544 : port, //$NON-NLS-1$
+            "/" + serv + "/" + method, params, null//$NON-NLS-1$ //$NON-NLS-2$
         );
         
     }
