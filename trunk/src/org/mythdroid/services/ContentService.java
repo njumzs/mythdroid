@@ -19,17 +19,27 @@
 package org.mythdroid.services;
 
 import java.io.IOException;
+import java.util.Date;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mythdroid.Globals;
+import org.mythdroid.Enums.ArtworkType;
 import org.mythdroid.data.StreamInfo;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
+import org.mythdroid.util.MemCache;
+
+import android.graphics.Bitmap;
 
 /** An implementation of the Guide service */
 public class ContentService {
     
-    private JSONClient jc = null;
+    static private MemCache<String, String> artUrlCache =
+        new MemCache<String,String>(10, 40);
+    
+    private JSONClient  jc = null;
     
     /**
      * Construct a client for the Guide service
@@ -40,6 +50,53 @@ public class ContentService {
     }
     
     /**
+     * Fetch artwork for a recording
+     * @param chanid recording chanid
+     * @param start recording StartTime
+     * @param type type of artwork desired
+     * @return Bitmap or null if not found
+     * @throws IOException
+     * @throws JSONException
+     */
+    public Bitmap getRecordingArt(
+        int chanid, Date start, ArtworkType type, int w, int h
+    ) throws IOException, JSONException {
+        
+        String key  = chanid + Globals.utcFmt.format(start) + type.name();
+        String path = artUrlCache.get(key);
+        
+        if (path == null) {
+        
+            JSONArray ja = getArtworkList(chanid, start);
+            int size = ja.length();
+        
+            for (int i = 0; i < size; i++) {
+                JSONObject jo = ja.getJSONObject(i);
+                if (!jo.getString("Type").equals(type.name())) //$NON-NLS-1$
+                    continue;
+                path = jo.getString("URL"); //$NON-NLS-1$
+            }
+            
+        }
+        
+        if (path == null) return null;
+        
+        artUrlCache.put(key, path);
+        
+        path += "&Width=" + w + "&Height=" + h; //$NON-NLS-1$ //$NON-NLS-2$
+        
+        Bitmap bm = Globals.artCache.get(path);
+        if (bm != null) return bm;
+        
+        bm = Globals.getBackend().getImage(path);
+        
+        if (bm != null) Globals.artCache.put(path, bm);
+        
+        return bm;
+        
+    }
+    
+   /**
      * Add a HTTP Live Stream
      * @param chanid channel id
      * @param startTime startTime in UTC ISO format
@@ -152,6 +209,19 @@ public class ContentService {
                 continue;
             }
         }
+        
+    }
+    
+    private JSONArray getArtworkList(int chanid, Date start)
+        throws IOException, JSONException {
+        
+        Params params = new Params();
+        params.put("ChanId", chanid); //$NON-NLS-1$
+        params.put("StartTime", Globals.utcFmt.format(start)); //$NON-NLS-1$
+        
+        JSONObject jo = jc.Get("GetRecordingArtworkList", params); //$NON-NLS-1$
+        jo = jo.getJSONObject("ArtworkInfoList"); //$NON-NLS-1$
+        return jo.getJSONArray("ArtworkInfos"); //$NON-NLS-1$
         
     }
     
