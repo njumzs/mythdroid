@@ -240,7 +240,7 @@ public class BackendManager {
         
         URL url = null;
         try {
-            url = new URL(statusURL + path);
+            url = new URL(statusURL + path.replace(" ", "%20")); //$NON-NLS-1$ //$NON-NLS-2$
         } catch (MalformedURLException e) { 
             ErrUtil.logWarn(e);
             return null; 
