@@ -25,6 +25,7 @@ import java.text.ParseException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mythdroid.Enums.ArtworkType;
 import org.mythdroid.Globals;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
@@ -140,10 +141,37 @@ public class Video {
      * @param x desired width of poster in pixels
      * @param y desired height of poster in pixels
      */
-    public void getPoster(float x, float y) {
+    public Bitmap getArtwork(ArtworkType type, float x, float y) {
+       
+        Bitmap bm = Video.getArtwork(id, type, x, y, coverfile);
+        
+        if (bm == null) return null;
+        
+        if (type == ArtworkType.coverart)
+            poster = new BitmapDrawable(bm);
+        
+        return bm;
 
-        if (coverfile == null)
-            return;
+    }
+    
+    /**
+     * Fetch artwork for a video
+     * @param id id of video
+     * @param type type of artwork
+     * @param x desired width
+     * @param y desired height
+     * @param cover filename of coverfile, null if using services api
+     * @return Bitmap or null if it's not found
+     */
+    public static Bitmap getArtwork(
+        int id, ArtworkType type, float x, float y, String cover
+    ) {
+        
+        if (!Globals.haveServices() && !(type == ArtworkType.coverart))
+            return null;
+        
+        if (!Globals.haveServices() && cover == null)
+            return null;
         
         int w = Math.round(x);
         int h = Math.round(y);
@@ -151,16 +179,17 @@ public class Video {
         URI uri = null;
         try {
             uri = new URI(
-                "http", null, Globals.getBackend().addr,  //$NON-NLS-1$
+                "http", null, Globals.getBackend().addr, //$NON-NLS-1$
                 (Globals.haveServices() ? 6544 : 16551), 
                 (Globals.haveServices() ? 
-                    "/Content/GetVideoArtWork" : coverfile  //$NON-NLS-1$
+                    "/Content/GetVideoArtwork" : cover //$NON-NLS-1$
                 ),
-                (Globals.haveServices() ? "Id=" + id + "&Type=coverart&" : "") + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                (Globals.haveServices() ?
+                    "Id=" + id + "&Type=" + type.name() + "&" : "") + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                 "Width=" + w + "&Height=" + h, null //$NON-NLS-1$ //$NON-NLS-2$
             ); 
-        } catch (URISyntaxException e)  { ErrUtil.logWarn(e); return; } 
-          catch (IOException e)         { ErrUtil.logWarn(e); return; }
+        } catch (URISyntaxException e)  { ErrUtil.logWarn(e); return null; } 
+          catch (IOException e)         { ErrUtil.logWarn(e); return null; }
         
        if (Globals.muxConns)
           try {
@@ -169,26 +198,25 @@ public class Video {
                   (Globals.haveServices() ? "" : "/MDDHTTP") + uri.getPath(), //$NON-NLS-1$ //$NON-NLS-2$
                   uri.getQuery(), null
               );
-          } catch (URISyntaxException e) { ErrUtil.logWarn(e); return; }
+          } catch (URISyntaxException e) { ErrUtil.logWarn(e); return null; }
        
+       Bitmap bm = Globals.artCache.get(uri.toString());
+       if (bm != null) return bm;
+              
        LogUtil.debug("Fetching image from " + uri.toString()); //$NON-NLS-1$
-
-        Bitmap bm = null;
 
         try {
             HttpFetcher fetcher = new HttpFetcher(uri);
             bm = fetcher.getImage();
         } catch (IOException e) { 
             ErrUtil.logWarn(e);
-            return; 
         } catch (OutOfMemoryError e) { 
             ErrUtil.logWarn(e.getMessage());
-            return;
         }
+        
+        if (bm != null) Globals.artCache.put(uri.toString(), bm);
 
-        if (bm == null) return;
-
-        poster = new BitmapDrawable(bm);
+        return bm;
 
     }
 
