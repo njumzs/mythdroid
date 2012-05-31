@@ -29,7 +29,9 @@ import org.json.JSONObject;
 import org.mythdroid.data.XMLHandler.Element;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.services.ContentService;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.Enums.ArtworkType;
 import org.mythdroid.Enums.RecDupIn;
 import org.mythdroid.Enums.RecEpiFilter;
 import org.mythdroid.Enums.RecDupMethod;
@@ -446,22 +448,50 @@ public class Program implements Comparable<Program> {
             Status != RecStatus.RECORDING &&
             Status != RecStatus.CURRENT
         ) return null;
+        
+        String url = 
+            (Globals.haveServices() ? "/Content/" : "/Myth/") +  //$NON-NLS-1$//$NON-NLS-2$
+            "GetPreviewImage?ChanId=" + ChanID + //$NON-NLS-1$
+            "&StartTime=" + //$NON-NLS-1$
+            (Globals.haveServices() ? 
+                Globals.utcFmt.format(RecStartTime) :
+                Globals.dateFmt.format(RecStartTime)
+            );
+        
+        Bitmap bm = Globals.artCache.get(url);
+        if (bm != null) return bm;
 
         try {
-            return Globals.getBackend().getImage(
-                (Globals.haveServices() ? "/Content/" : "/Myth/") +  //$NON-NLS-1$//$NON-NLS-2$
-                "GetPreviewImage?ChanId=" + ChanID + //$NON-NLS-1$
-                "&StartTime=" + //$NON-NLS-1$
-                (Globals.haveServices() ? 
-                    Globals.utcFmt.format(RecStartTime) :
-                    Globals.dateFmt.format(RecStartTime)
-                )
-            );
+            bm = Globals.getBackend().getImage(url);
         } catch (IOException e) { 
             ErrUtil.logWarn(e); 
             return null; 
         }
         
+        if (bm != null) Globals.artCache.put(url, bm);
+        
+        return bm;
+        
+    }
+    
+    /**
+     * Get artwork for the recording 
+     * @return a Bitmap or null if no preview image was found
+     */
+    public Bitmap getArtwork(ArtworkType type, int width, int height) {
+        
+        if (!Globals.haveServices()) return null;
+        
+        try {
+            return 
+                new ContentService(Globals.getBackend().addr)
+                    .getRecordingArt(ChanID, StartTime, type, width, height);
+        } catch (IOException e) {
+            ErrUtil.logWarn(e);
+        } catch (JSONException e) {
+            ErrUtil.logWarn(e);
+        }
+        return null;
     }
 
     /**
