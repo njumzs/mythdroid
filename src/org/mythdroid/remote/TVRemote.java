@@ -360,7 +360,7 @@ public class TVRemote extends Remote {
 
         if (jump && !wasPaused) {
             showDialog(DIALOG_LOAD);
-            Globals.getWorker().post(jumpRun);
+            Globals.runOnThreadPool(jumpRun);
         }
         else
             handler.post(ready);

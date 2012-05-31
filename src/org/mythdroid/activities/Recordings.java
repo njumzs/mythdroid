@@ -265,7 +265,7 @@ public class Recordings extends MDFragmentActivity {
      * Empty the recordings list
      */
     public void empty() {
-        Globals.getWorker().removeCallbacks(getRecordings);
+        Globals.removeThreadPoolTask(getRecordings);
         if (recordings != null)
             recordings.clear();
         recordings = null;
@@ -278,7 +278,7 @@ public class Recordings extends MDFragmentActivity {
     public void refresh() {
         empty();
         showLoadingDialog();
-        Globals.getWorker().post(getRecordings);
+        Globals.runOnThreadPool(getRecordings);
     }
     
     /**

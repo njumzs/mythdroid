@@ -300,6 +300,7 @@ public class Guide extends MDActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Globals.removeThreadPoolTask(getData);
         tbl.removeAllViews();
         channels.clear();
     }
@@ -442,7 +443,7 @@ public class Guide extends MDActivity {
             j += hdrSpan;
         }
 
-        Globals.getWorker().post(getData);
+        Globals.runOnThreadPool(getData);
 
     }
 
