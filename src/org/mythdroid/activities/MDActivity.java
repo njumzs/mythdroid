@@ -330,7 +330,7 @@ public abstract class MDActivity extends Activity {
                 }
             );
             
-            frontendIndicator = (TextView)vi.findViewById(R.id.text);
+            frontendIndicator = (TextView)vi.findViewById(R.id.actionItemText);
             updateFrontendIndicator();
     
             MenuItemCompat.setActionView(item, vi);

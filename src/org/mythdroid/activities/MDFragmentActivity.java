@@ -393,7 +393,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
                 }
             );
             
-            frontendIndicator = (TextView)vi.findViewById(R.id.text);
+            frontendIndicator = (TextView)vi.findViewById(R.id.actionItemText);
             updateFrontendIndicator();
     
             MenuItemCompat.setActionView(item, vi);
