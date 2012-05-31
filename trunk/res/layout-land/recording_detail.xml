@@ -6,15 +6,16 @@
    	android:paddingLeft="8dp"
    	android:paddingRight="8dp">
    	
-   	<ImageView
+   	<org.mythdroid.views.PreviewImageView
 		android:id="@+id/image"
 		android:layout_width="wrap_content" 
  		android:layout_height="wrap_content"
  		android:layout_alignParentRight="true"
  		android:layout_alignParentTop="true"
-		android:adjustViewBounds="true"
-		android:maxHeight="100dp"
-		android:paddingTop="8dp"/>
+ 		android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+ 		android:scaleType="fitXY"
+ 		android:background="@drawable/imgborder"/>
 		
     <TextView
 		android:id="@+id/title"
@@ -122,7 +123,7 @@
 		android:layout_below="@id/category"
 		android:layout_above="@id/buttons"
 		android:layout_alignWithParentIfMissing="true"
-		android:paddingTop="6dp"
+		android:paddingTop="10dp"
 		android:paddingBottom="4dp"
 		android:clipChildren="true">
 		

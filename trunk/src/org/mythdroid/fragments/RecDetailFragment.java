@@ -20,6 +20,7 @@ package org.mythdroid.fragments;
 
 import java.io.IOException;
 
+import org.mythdroid.Enums.ArtworkType;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Extras;
@@ -32,6 +33,7 @@ import org.mythdroid.data.Program;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.views.PreviewImageView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -39,15 +41,18 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -57,6 +62,7 @@ import android.widget.TextView;
 public class RecDetailFragment extends Fragment {
     
     private MDFragmentActivity activity = null;
+    private Handler handler             = new Handler();
     private Program prog                = null;
     private Button stop                 = null;
     private View view                   = null;
@@ -146,8 +152,6 @@ public class RecDetailFragment extends Fragment {
      */
     public void setViews() {
 
-        ((ImageView)view.findViewById(R.id.image))
-            .setImageBitmap(prog.previewImage());
         ((TextView)view.findViewById(R.id.title)).setText(prog.Title);
         ((TextView)view.findViewById(R.id.subtitle)).setText(prog.SubTitle);
         ((TextView)view.findViewById(R.id.channel)).setText(prog.Channel);
@@ -176,6 +180,8 @@ public class RecDetailFragment extends Fragment {
                 }
             }
         );
+        
+        setImages();
 
         // The rest only apply to non-livetv recordings
         if (livetv || prog.Status == null) return;
@@ -202,9 +208,7 @@ public class RecDetailFragment extends Fragment {
 
                 if (!guide) {
                     final Button del = (Button)view.findViewById(R.id.del);
-                    
                     del.setVisibility(View.VISIBLE);
-
                     del.setOnClickListener(
                         new View.OnClickListener() {
                             @Override
@@ -218,7 +222,6 @@ public class RecDetailFragment extends Fragment {
                 }
 
                 final Button play = (Button)view.findViewById(R.id.play);
-
                 play.setVisibility(View.VISIBLE);
                 play.setOnClickListener(
                     new View.OnClickListener() {
@@ -260,6 +263,68 @@ public class RecDetailFragment extends Fragment {
         return prog;
     }
     
+    private void setImages() {
+        
+        final DisplayMetrics dm = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+        final int height  = dm.heightPixels;
+        final int width   = dm.widthPixels;
+        
+        final PreviewImageView iv = 
+            ((PreviewImageView)view.findViewById(R.id.image));
+        if (width > height)
+            iv.setWidth((int)(width > height * 1.5 ? width / 3.5 : width / 3));
+        else
+            iv.setHeight(height / 4);
+        
+        final int artWidth     = (int)(width / 1.5);
+        final ArtworkType type =
+            (width > height) ? ArtworkType.fanart : ArtworkType.coverart;
+        
+        if (Globals.haveServices())
+            Globals.runOnThreadPool(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        Bitmap bm = prog.getArtwork(type, artWidth, 0);
+                        if (bm == null) return;
+                        final BitmapDrawable d = new BitmapDrawable(
+                            activity.getResources(), bm
+                        );
+                        d.setAlpha(65);
+                        handler.post(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (view == null) return;
+                                    view.setBackgroundDrawable(d);
+                                }
+                            }
+                        );
+                    }
+                }
+            );
+        
+        Globals.runOnThreadPool(
+            new Runnable() {
+                @Override
+                public void run() {
+                    final Bitmap bm = prog.previewImage();
+                    if (bm == null) return;
+                    handler.post(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                iv.setImageBitmap(bm);
+                            }
+                        }
+                    );
+                }
+            }
+        );
+        
+    }
+    
     private class deleteDialog extends DialogFragment {
 
         @Override
@@ -284,8 +349,7 @@ public class RecDetailFragment extends Fragment {
                                 if (embedded) {
                                     ((Recordings)activity).deleteRecording();
                                     if (!dualPane)
-                                        getFragmentManager()
-                                            .popBackStack();
+                                        getFragmentManager().popBackStack();
                                 }
                                 else
                                     activity.finish();
