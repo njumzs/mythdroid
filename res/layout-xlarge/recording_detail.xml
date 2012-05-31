@@ -4,7 +4,7 @@
    	android:layout_width="fill_parent"
    	android:layout_height="fill_parent"
    	android:orientation="vertical"
-   	android:paddingLeft="4dp"
+   	android:paddingLeft="24dp"
    	android:paddingRight="16dp">
    	
     <TextView
@@ -24,14 +24,13 @@
  		android:textSize="20sp"
  		android:textStyle="italic"/>
  		
- 	<ImageView
+ 	<org.mythdroid.views.PreviewImageView
 		android:id="@+id/image"
-		android:layout_width="wrap_content" 
+		android:layout_width="fill_parent" 
  		android:layout_height="wrap_content"
  		android:layout_below="@id/subtitle"
 		android:layout_centerHorizontal="true"
-		android:adjustViewBounds="true"
-		android:maxHeight="360dp"
+        android:scaleType="fitCenter"
 		android:paddingTop="22dp"
 		android:paddingBottom="22dp"/>
 		
