@@ -195,7 +195,7 @@ public class UpdateService extends Service {
             }
         );
         
-        Globals.getWorker().post(
+        Globals.runOnWorker(
             new Runnable() {
                 @Override
                 public void run() {
@@ -216,18 +216,16 @@ public class UpdateService extends Service {
         switch (intent.getIntExtra(ACTION, CHECKMD)) {
             
             case CHECKMD:  
-                Globals.getWorker().post(
+                Globals.runOnWorker(
                     new Runnable() {
                         @Override
-                        public void run() {
-                            checkMythDroid();
-                        }
+                        public void run() { checkMythDroid(); }
                     }
                 );
                 break;
                 
             case CHECKMDD: 
-                Globals.getWorker().post(
+                Globals.runOnWorker(
                     new Runnable() {
                         @Override
                         public void run() {
@@ -238,7 +236,7 @@ public class UpdateService extends Service {
                 break;
                 
             case UPDATEMD: 
-                Globals.getWorker().post(
+                Globals.runOnWorker(
                     new Runnable() {
                         @Override
                         public void run() {
@@ -252,7 +250,7 @@ public class UpdateService extends Service {
                 break;
                 
             case UPDATEMDD:
-                Globals.getWorker().post(
+                Globals.runOnWorker(
                     new Runnable() {
                         @Override
                         public void run() {

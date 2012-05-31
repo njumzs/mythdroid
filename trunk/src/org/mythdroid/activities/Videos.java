@@ -62,7 +62,7 @@ public class Videos extends MDActivity implements
     private VideoService videoService = null;
 
     /**
-     * Fetch a list of videos from MDD and then start a Thread to fetch
+     * Fetch a list of videos from MDD and then start threads to fetch
      * the posters
      */
     final private Runnable getVideos  = new Runnable() {
@@ -72,6 +72,10 @@ public class Videos extends MDActivity implements
             /* We use an empty string to denote the root of a 
                top-level directory */
             String tmppath = path.length() > 0 ? path : "ROOT"; //$NON-NLS-1$
+            
+            /* Yikes.. Should be safe since this runnable is already running
+               and there shouldn't be anything else in the queue (we hope!) */
+            Globals.removeAllThreadPoolTasks();
 
             if (!Globals.haveServices()) {
                 String addr = null;
@@ -99,8 +103,6 @@ public class Videos extends MDActivity implements
                     return;
                 }
             
-            Globals.cancelThreadPoolTasks();
-            
             final Video[] vids = videos.toArray(new Video[videos.size()]);
             int numvids = vids.length;
             
@@ -113,13 +115,13 @@ public class Videos extends MDActivity implements
                     new Runnable() {
                         @Override
                         public void run() {
-                                vid.getArtwork(
-                                    ArtworkType.coverart,
-                                    (largeScreen ? 175 : 70)  * scale + 0.5f,
-                                    (largeScreen ? 275 : 110) * scale + 0.5f
-                                );
-                                if (vid.poster != null)
-                                    handler.post(notifyChanged);
+                            vid.getArtwork(
+                                ArtworkType.coverart,
+                                (largeScreen ? 175 : 70)  * scale + 0.5f,
+                                (largeScreen ? 275 : 110) * scale + 0.5f
+                            );
+                            if (vid.poster != null)
+                                handler.post(notifyChanged);
                         }
                     }
                );
@@ -134,23 +136,15 @@ public class Videos extends MDActivity implements
     final private Runnable notifyChanged = new Runnable() {
         @Override
         public void run() {
-            ((VideoAdapter)lv.getAdapter())
-                .notifyDataSetChanged();
+            ((VideoAdapter)lv.getAdapter()).notifyDataSetChanged();
         }
     };
     
     final private Runnable gotVideos = new Runnable() {
         @Override
         public void run() {
-            
-            lv.setAdapter(
-                new VideoAdapter(
-                    ctx, R.layout.video, videos
-                )
-            );
-            
+            lv.setAdapter(new VideoAdapter(ctx, R.layout.video, videos));
             dismissLoadingDialog();
-
         }
     };
 
@@ -183,7 +177,7 @@ public class Videos extends MDActivity implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Globals.getWorker().removeCallbacks(getVideos);
+        Globals.removeThreadPoolTask(getVideos);
     }
 
     @Override
@@ -286,9 +280,9 @@ public class Videos extends MDActivity implements
     }
     
     private void refresh() {
-        Globals.getWorker().removeCallbacks(getVideos);
+        Globals.removeThreadPoolTask(getVideos);
         showDialog(DIALOG_LOAD);
-        Globals.getWorker().post(getVideos);
+        Globals.runOnThreadPool(getVideos);
     }
 
     private String currentDir(String path) {

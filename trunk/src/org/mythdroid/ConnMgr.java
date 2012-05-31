@@ -75,6 +75,19 @@ public class ConnMgr {
     /** An array of weak references to current connections */
     final private static ArrayList<WeakReference<ConnMgr>> conns =
         new ArrayList<WeakReference<ConnMgr>>(8);
+    
+    /* Reap unused ConnMgr's every 30 seconds */
+    static {
+        Globals.scheduleOnWorker(
+            new Runnable() {
+                @Override
+                public void run() {
+                    ConnMgr.reapOld();
+                    Globals.scheduleOnWorker(this, 30000);
+                }
+            }, 30000
+        );
+    }
 
     /** Receive buffer size */
     final private static int        rbufSize         = 128;

@@ -246,7 +246,7 @@ public class StatusRecordersFragment extends ListFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Globals.getWorker().removeCallbacks(refreshEncoders);
+        Globals.removeThreadPoolTask(refreshEncoders);
     }
 
     @Override
@@ -276,9 +276,9 @@ public class StatusRecordersFragment extends ListFragment {
     }
 
     private void refresh() {
-        Globals.getWorker().removeCallbacks(getStatusTask);
+        Globals.removeThreadPoolTask(getStatusTask);
         activity.showLoadingDialog();
-        Globals.getWorker().post(getStatusTask);
+        Globals.runOnThreadPool(getStatusTask);
     }
 
 }

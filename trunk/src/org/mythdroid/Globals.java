@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TimeZone;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -22,7 +23,6 @@ import org.mythdroid.util.UPnPListener;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.os.Build.VERSION;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
@@ -87,12 +87,26 @@ public class Globals {
     private static FrontendManager feMgr  = null;
     /** A handler for the worker thread */
     private static Handler wHandler = null;
+    /** A list of addresses that have been checked for updates */
+    private static ArrayList<String> updateChecked = new ArrayList<String>(4);
+    
     /** The queue for the thread pool */
     private static LinkedBlockingQueue<Runnable> threadQueue = null;
     /** An ExecutorService for accessing the thread pool */
     private static ThreadPoolExecutor threadPool = null;
-    /** A list of addresses that have been checked for updates */
-    private static ArrayList<String> updateChecked = new ArrayList<String>(4);
+    /** A ThreadGroup for the pool threads */
+    private static ThreadGroup poolGroup = new ThreadGroup("GlobalPool"); //$NON-NLS-1$
+    private static ThreadFactory poolFactory = new ThreadFactory() {
+        int num = 0;
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thr = new Thread(poolGroup, r, "poolThread-" + num++); //$NON-NLS-1$
+            thr.setDaemon(true);
+            thr.setPriority(Thread.NORM_PRIORITY - 1);
+            return thr;
+        }
+    };
+    
 
     /**
      * Is the currentFrontend set to 'Here'? 
@@ -112,7 +126,8 @@ public class Globals {
      * @return A FrontendManager connected to a frontend or null if there's a
      * problem
      */
-    public static FrontendManager getFrontend(Context ctx) throws IOException {
+    public static FrontendManager getFrontend(final Context ctx)
+        throws IOException {
 
         String name = currentFrontend;
 
@@ -201,70 +216,57 @@ public class Globals {
     }
 
     /**
-     * Get a Handler for the worker thread
-     * @return a Handler for the worker thread
+     * Run a Runnable on the background worker thread
+     * Runnable's will be run one-at-a-time in the order they are submitted
      */
-    public static Handler getWorker() {
-
-        if (wHandler != null)
-            return wHandler;
-
-        final HandlerThread hThread = new HandlerThread(
-            "worker", Process.THREAD_PRIORITY_BACKGROUND //$NON-NLS-1$
-        );
-
-        hThread.setDaemon(true);
-        hThread.start();
-        // Wait for the thread to start
-        while (!hThread.isAlive()) {}
-
+    public static void runOnWorker(final Runnable r) {
         if (wHandler == null)
-            wHandler = new Handler(hThread.getLooper());
-        
-        // Reap unused, cached ConnMgrs every 30s
-        wHandler.postDelayed(
-            new Runnable() {
-                @Override
-                public void run() {
-                    ConnMgr.reapOld();
-                    wHandler.postDelayed(this, 30000);
-                }
-            }, 30000
-        );
-
-        return wHandler;
-
+            wHandler = createWorker();
+        wHandler.post(r);
+    }
+    
+    /**
+     * Schedule a Runnable to be run in the future on the worker thread
+     * @param r Runnable
+     * @param delay time in milliseconds before it will be run
+     */
+    public static void scheduleOnWorker(final Runnable r, int delay) {
+        if (wHandler == null)
+            wHandler = createWorker();
+        wHandler.postDelayed(r, delay);
     }
     
     /**
      * Run a Runnable on the global thread pool
+     * Runnable's might be run concurrently but will be started in the order
+     * they are submitted
      * @param r
      */
-    public static void runOnThreadPool(Runnable r) {
+    public static void runOnThreadPool(final Runnable r) {
         
         if (threadQueue == null)
             threadQueue = new LinkedBlockingQueue<Runnable>();
-        if (threadPool == null) {
+        if (threadPool == null)
             threadPool = new ThreadPoolExecutor(
-                8, 8, 30, TimeUnit.SECONDS, threadQueue
+                2, 8, 30, TimeUnit.SECONDS, threadQueue, poolFactory
             );
-            if (VERSION.SDK_INT >= 9)
-                try {
-                    threadPool.getClass().getMethod(
-                        "allowCoreThreadTimeOut", boolean.class //$NON-NLS-1$
-                        ).invoke(threadPool, true);
-                } catch (Exception e) {}
-        }
         threadPool.execute(r);
         
     }
     
-    /** Cancel tasks awaiting execution on the global thread pool */
-    public static void cancelThreadPoolTasks() {
-        
+    /**
+     * Remove instances of the specified task from the global thread pool queue
+     * @param r
+     */
+    public static void removeThreadPoolTask(final Runnable r) {
+        if (threadPool == null) return;
+        threadPool.remove(r);
+    }
+    
+    /** Clear the queue of tasks awaiting execution on the global thread pool */
+    public static void removeAllThreadPoolTasks() {
         if (threadQueue == null) return;
         threadQueue.clear();
-        
     }
     
     /**
@@ -309,7 +311,7 @@ public class Globals {
      * @param addr address to check
      * @return true if already checked, false otherwise
      */
-    public static boolean checkedForUpdate(String addr) {
+    public static boolean checkedForUpdate(final String addr) {
         
         if (
             PreferenceManager.getDefaultSharedPreferences(appContext)
@@ -320,6 +322,18 @@ public class Globals {
         if (updateChecked.contains(addr)) return true;
         updateChecked.add(addr);
         return false;
+    }
+    
+    /** Create a new worker thread, return the Handler for it */
+    private static Handler createWorker() {
+        final HandlerThread hThread = new HandlerThread(
+            "worker", Process.THREAD_PRIORITY_BACKGROUND //$NON-NLS-1$
+        );
+        hThread.setDaemon(true);
+        hThread.start();
+        // Wait for the thread to start
+        while (!hThread.isAlive()) {}
+        return new Handler(hThread.getLooper());
     }
     
     /** Test muxed conns, return true if they're available, false otherwise */

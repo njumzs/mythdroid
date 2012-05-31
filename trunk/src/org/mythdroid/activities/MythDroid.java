@@ -112,7 +112,7 @@ public class MythDroid extends MDListActivity implements
         }
         
         // Try to grab locations from the frontend in the background
-        Globals.getWorker().post(FrontendLocation.getLocations);
+        Globals.runOnThreadPool(FrontendLocation.getLocations);
 
         crecv = new ConnectivityReceiver(Globals.appContext);
         

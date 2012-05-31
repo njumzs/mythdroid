@@ -76,13 +76,13 @@ public class Status extends MDFragmentActivity {
         if (findViewById(R.id.statuslistframe) != null)
             embed = false;
         showDialog(DIALOG_LOAD);
-        Globals.getWorker().post(getStatusTask);
+        Globals.runOnThreadPool(getStatusTask);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Globals.getWorker().removeCallbacks(getStatusTask);
+        Globals.removeThreadPoolTask(getStatusTask);
         statusDoc = null;
     }
 
