@@ -3,13 +3,13 @@
 <org.mythdroid.views.ActionView 
     xmlns:android="http://schemas.android.com/apk/res/android"
     
-    android:id="@+id/layout"
+    android:id="@+id/actionItemLayout"
     android:background="@drawable/actionbaritem"
     android:layout_width="wrap_content"
     android:layout_height="fill_parent">
 
     <TextView
-        android:id="@+id/label"
+        android:id="@+id/actionItemLabel"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_marginLeft="5dp"
@@ -19,7 +19,7 @@
         android:text="@string/curFe"/>
 
     <TextView
-        android:id="@+id/text"
+        android:id="@+id/actionItemText"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_marginLeft="5dp"
