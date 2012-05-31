@@ -132,18 +132,22 @@ public class RecListFragment extends ListFragment
      */
     public void setAdapter(ArrayList<Program> recordings) {
         
-        if (recordings.isEmpty()) {
+        if (recordings == null || recordings.isEmpty()) {
             setListAdapter(null);
             return;
         }
             
         setListAdapter(
             new ProgramAdapter(
-                activity, R.layout.recording_list_item,
+                activity, 
+                dualPane ? 
+                    R.layout.checkable_recording_list_item :
+                    R.layout.recording_list_item
+                ,
                 recordings
             )
         );
-        
+
         updateSelection();
         
     }
