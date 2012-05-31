@@ -152,7 +152,7 @@ public class Recordings extends MDFragmentActivity {
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
         if (!isPaused)
-            if (listFragment != null && hasRecordings())
+            if (listFragment != null)
                 listFragment.setAdapter(recordings);
     }
     
@@ -277,7 +277,7 @@ public class Recordings extends MDFragmentActivity {
      */
     public void refresh() {
         empty();
-        showDialog(DIALOG_LOAD);
+        showLoadingDialog();
         Globals.getWorker().post(getRecordings);
     }
     
@@ -295,7 +295,7 @@ public class Recordings extends MDFragmentActivity {
      * reset the listFragment's adapter
      */
     public void invalidate() {
-        if (listFragment != null && hasRecordings())
+        if (listFragment != null)
             listFragment.setAdapter(recordings);
     }
    
@@ -321,6 +321,7 @@ public class Recordings extends MDFragmentActivity {
         
         setContentView(R.layout.recordings);                
         dualPane = findViewById(R.id.recdetails) != null;     
+        
         // Now dualPane reflects the new configuration
    
         listFragment = new RecListFragment();
@@ -329,8 +330,7 @@ public class Recordings extends MDFragmentActivity {
             .commitAllowingStateLoss();
         fm.executePendingTransactions();
 
-        if (hasRecordings())
-            listFragment.setAdapter(recordings);
+        listFragment.setAdapter(recordings);
         
         // Restore the backstack
         for (String frag : backStackFrags) {
