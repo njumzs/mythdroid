@@ -550,19 +550,19 @@ public class TVRemote extends Remote {
                             return;
 
                         case 1:
-                            try {
-                                synchronized (feLock) { 
+                        	synchronized (feLock) { 
+                            	try {
                                     if (feMgr != null) feMgr.sendKey(Key.GUIDE);
+                                } catch (IOException e) {
+                                	ErrUtil.logWarn(e);
+                                	feMgr.disconnect();
+                                	try {
+                                    	feMgr.sendKey(Key.GUIDE);
+                                	} catch (IOException e1) {
+	                                    ErrUtil.err(ctx, e1);
+	                                    return;
+                                	}
                                 }
-                            } catch (IOException e) {
-                                ErrUtil.logWarn(e);
-                                feMgr.disconnect();
-                                try {
-                                    feMgr.sendKey(Key.GUIDE);
-                                } catch (IOException e1) {
-                                    ErrUtil.err(ctx, e1);
-                                }
-                                return;
                             }
                             startActivityForResult(
                                 new Intent().setClass(ctx, NavRemote.class), 0
