@@ -28,7 +28,6 @@ import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.mdd.MDDMusicListener;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
-import org.mythdroid.util.ImageCache;
 import org.mythdroid.Enums.Key;
 
 import android.R.drawable;
@@ -75,9 +74,6 @@ public class MusicRemote extends Remote {
 
     final private Handler handler = new Handler();
     final private Context ctx     = this;
-
-    final private ImageCache artCache =
-        new ImageCache("music", 10, 100, 1024*1024*5); //$NON-NLS-1$
 
     private boolean         jump = true;
     private MDDManager      mddMgr  = null;
@@ -281,7 +277,6 @@ public class MusicRemote extends Remote {
     public void onDestroy() {
        super.onDestroy();
        cleanup();
-       artCache.shutdown();
     }
 
     @Override
@@ -482,25 +477,23 @@ public class MusicRemote extends Remote {
 
     private Bitmap getAlbumArt(int artid) {
 
-        Bitmap bm = artCache.get(artid);
+        String url = (Globals.haveServices() ? "/Content/" : "/Myth/") + //$NON-NLS-1$ //$NON-NLS-2$
+            "GetAlbumArt?" + "Id=" + artid + //$NON-NLS-1$ //$NON-NLS-2$
+            "&Width=" + artView.getWidth() + //$NON-NLS-1$
+            "&Height=" + artView.getHeight(); //$NON-NLS-1$
+        
+        Bitmap bm = Globals.artCache.get(url);
 
-        if (bm != null)
-            return bm;
+        if (bm != null) return bm;
 
         try {
-            bm = Globals.getBackend().getImage(
-                (Globals.haveServices() ? "/Content/" : "/Myth/") + //$NON-NLS-1$ //$NON-NLS-2$
-                "GetAlbumArt?" + "Id=" + artid + //$NON-NLS-1$ //$NON-NLS-2$
-                "&Width=" + artView.getWidth() + //$NON-NLS-1$
-                "&Height=" + artView.getHeight() //$NON-NLS-1$
-            );
+            bm = Globals.getBackend().getImage(url);
         } catch (IOException e) {
             ErrUtil.logWarn(e);
             return null;
         }
     
-        if (bm != null)
-            artCache.put(artid, bm);
+        if (bm != null) Globals.artCache.put(url, bm);
         
         return bm;
 
