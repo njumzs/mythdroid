@@ -227,7 +227,7 @@ public class FrontendManager {
     }
 
     /**
-     * Read lines from until we get a prompt
+     * Read lines until we get a prompt
      * @return array of lines read
      */
     private String[] getResponse(String cmd, ConnMgr.timeOut time)
@@ -286,11 +286,12 @@ public class FrontendManager {
     
     private void checkConnection() throws IOException {
         
-        if (cmgr != null && cmgr.isConnected()) return;
-        
         synchronized (cmgrLock) {
             
-            if (cmgr != null) cmgr.dispose();
+            if (cmgr != null) {
+                if (cmgr.isConnected()) return;
+                cmgr.dispose();
+            }
             
             cmgr = ConnMgr.connect(
                 addr, 6546, 

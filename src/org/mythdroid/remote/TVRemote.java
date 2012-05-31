@@ -432,8 +432,13 @@ public class TVRemote extends Remote {
             if (feMgr != null)
                 try {
                     feMgr.sendKey(key);
-                } catch (IOException e) { ErrUtil.err(this, e); }
-                  catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+                } catch (IOException e) { 
+                    ErrUtil.logWarn(e);
+                    feMgr.disconnect();
+                    try {
+                        feMgr.sendKey(key);
+                    } catch (IOException e1) { ErrUtil.err(this, e1); }
+                } catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
         }
               
         if (key == Key.GUIDE)
@@ -550,7 +555,13 @@ public class TVRemote extends Remote {
                                     if (feMgr != null) feMgr.sendKey(Key.GUIDE);
                                 }
                             } catch (IOException e) {
-                                ErrUtil.err(ctx, e.getMessage());
+                                ErrUtil.logWarn(e);
+                                feMgr.disconnect();
+                                try {
+                                    feMgr.sendKey(Key.GUIDE);
+                                } catch (IOException e1) {
+                                    ErrUtil.err(ctx, e1);
+                                }
                                 return;
                             }
                             startActivityForResult(
@@ -598,7 +609,13 @@ public class TVRemote extends Remote {
                     synchronized (feLock) {
                         if (feMgr != null) feMgr.sendKey(Key.MENU);
                     }
-                } catch (IOException e) { ErrUtil.err(this, e); }
+                } catch (IOException e) { 
+                    ErrUtil.logWarn(e);
+                    feMgr.disconnect();
+                    try {
+                        feMgr.sendKey(Key.MENU);
+                    } catch (IOException e1) { ErrUtil.err(this, e1); }
+                }
                 return true;
             case MENU_GESTURE:
                 gesture = true;
@@ -690,7 +707,13 @@ public class TVRemote extends Remote {
                             if (feMgr != null)
                                 feMgr.sendKey(Key.SKIP_PREV_COMMERCIAL);
                         }
-                    } catch (IOException e) { ErrUtil.err(ctx, e); }
+                    } catch (IOException e) { 
+                        ErrUtil.logWarn(e);
+                        feMgr.disconnect();
+                        try {
+                            feMgr.sendKey(Key.SKIP_PREV_COMMERCIAL);
+                        } catch (IOException e1) { ErrUtil.err(ctx, e1); } 
+                    }
                     return true;
                 }
             }
@@ -773,13 +796,26 @@ public class TVRemote extends Remote {
                         FrontendLocation loc = null;
                         try {
                             synchronized (feLock) { loc = feMgr.getLoc(); }
-                        } catch (IOException e) { return; }
+                        } catch (IOException e) { 
+                            ErrUtil.logWarn(e);
+                            feMgr.disconnect();
+                            try {
+                                loc = feMgr.getLoc();
+                            } catch (IOException e1) { ErrUtil.err(ctx, e1); }
+                            return; 
+                        }
                         if (loc.end <= 0) return;
                         progress = (loc.end * progress) / 1000;
                     }
                     try {
                         synchronized (feLock) { feMgr.seekTo(progress); }
-                    } catch (IOException e) {}
+                    } catch (IOException e) {
+                        ErrUtil.logWarn(e);
+                        feMgr.disconnect();
+                        try {
+                            feMgr.seekTo(progress);
+                        } catch (IOException e1) { ErrUtil.err(ctx, e1); }
+                    }
                 }
 
                 @Override
@@ -867,7 +903,14 @@ public class TVRemote extends Remote {
             try {
                 feMgr.sendKey(Key.VOL_DOWN);
                 feMgr.sendKey(Key.VOL_DOWN);
-            } catch (IOException e) { ErrUtil.err(this, e); }
+            } catch (IOException e) { 
+                ErrUtil.logWarn(e);
+                feMgr.disconnect();
+                try {
+                    feMgr.sendKey(Key.VOL_DOWN);
+                    feMgr.sendKey(Key.VOL_DOWN);
+                } catch (IOException e1) { ErrUtil.err(this, e1); } 
+            }
         }
         onAction();
     }
@@ -878,7 +921,13 @@ public class TVRemote extends Remote {
             if (feMgr == null) return;
             try {
                 feMgr.sendKey(Key.SEEK_BACK);
-            } catch (IOException e) { ErrUtil.err(this, e); }
+            } catch (IOException e) { 
+                ErrUtil.logWarn(e);
+                feMgr.disconnect();
+                try {
+                    feMgr.sendKey(Key.SEEK_BACK);
+                } catch (IOException e1) { ErrUtil.err(this, e1); }
+            }
         }
         onAction();
     }
@@ -889,7 +938,13 @@ public class TVRemote extends Remote {
             if (feMgr == null) return;
             try {
                 feMgr.sendKey(Key.SEEK_FORWARD);
-            } catch (IOException e) { ErrUtil.err(this, e); }
+            } catch (IOException e) {  
+                ErrUtil.logWarn(e);
+                feMgr.disconnect();
+                try {
+                    feMgr.sendKey(Key.SEEK_FORWARD);
+                } catch (IOException e1) { ErrUtil.err(this, e1); } 
+            }
         }
         onAction();
     }
@@ -901,7 +956,14 @@ public class TVRemote extends Remote {
             try {
                 feMgr.sendKey(Key.VOL_UP);
                 feMgr.sendKey(Key.VOL_UP);
-            } catch (IOException e) { ErrUtil.err(this, e); }
+            } catch (IOException e) { 
+                ErrUtil.logWarn(e);
+                feMgr.disconnect();
+                try {
+                    feMgr.sendKey(Key.VOL_UP);
+                    feMgr.sendKey(Key.VOL_UP);
+                } catch (IOException e1) { ErrUtil.err(this, e1); } 
+            }
         }
         onAction();
     }
@@ -912,7 +974,13 @@ public class TVRemote extends Remote {
             if (feMgr == null) return;
             try {
                 feMgr.sendKey(Key.PAUSE);
-            } catch (IOException e) { ErrUtil.err(this, e); }
+            } catch (IOException e) { 
+                ErrUtil.logWarn(e);
+                feMgr.disconnect();
+                try {
+                    feMgr.sendKey(Key.PAUSE);
+                } catch (IOException e1) { ErrUtil.err(this, e1); } 
+            }
         }
         onAction();
     }
