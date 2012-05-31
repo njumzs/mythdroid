@@ -319,7 +319,8 @@ public class ConnMgr {
         if (rbufIdx > -1 && rbuf.length >= rbufIdx + 1)
             line.append(new String(rbuf, 0, rbufIdx + 1));
 
-        rbufIdx = line.length() - 1;
+        if ((rbufIdx = line.length() - 1) == 0)
+            rbufIdx = -1;
 
         // Check for a prompt
         if (rbufIdx >= 1 && line.charAt(0) == '#' && line.charAt(1) == ' ') {
