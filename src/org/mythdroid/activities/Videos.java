@@ -21,6 +21,7 @@ package org.mythdroid.activities;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.mythdroid.Enums.ArtworkType;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
@@ -31,11 +32,8 @@ import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.services.VideoService;
 import org.mythdroid.util.ErrUtil;
-import org.mythdroid.util.ImageCache;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.SparseArray;
@@ -48,9 +46,6 @@ import android.widget.TextView;
 /** MDActivity displays a list of Videos */
 public class Videos extends MDActivity implements
     ListView.OnItemClickListener, AdapterView.OnItemLongClickListener {
-
-    final private ImageCache artCache =
-        new ImageCache("videos", 10, 100, 1024*1024*10); //$NON-NLS-1$
     
     final private SparseArray<String> viddirs = new SparseArray<String>();
 
@@ -103,24 +98,8 @@ public class Videos extends MDActivity implements
                     finish();
                     return;
                 }
-
-            handler.post(gotVideos);
-                
-        }
-    };
-    
-    final private Runnable gotVideos = new Runnable() {
-        @Override
-        public void run() {
-            
-            lv.setAdapter(
-                new VideoAdapter(
-                    ctx, R.layout.video, videos
-                )
-            );
             
             Globals.cancelThreadPoolTasks();
-            dismissLoadingDialog();
             
             final Video[] vids = videos.toArray(new Video[videos.size()]);
             int numvids = vids.length;
@@ -134,35 +113,43 @@ public class Videos extends MDActivity implements
                     new Runnable() {
                         @Override
                         public void run() {
-                            Bitmap bm = artCache.get(vid.id);
-                            if (bm != null)
-                                vid.poster = new BitmapDrawable(bm);
-                            else {
-                                vid.getPoster(
+                                vid.getArtwork(
+                                    ArtworkType.coverart,
                                     (largeScreen ? 175 : 70)  * scale + 0.5f,
                                     (largeScreen ? 275 : 110) * scale + 0.5f
                                 );
-                                
                                 if (vid.poster != null)
-                                    artCache.put(
-                                        vid.id, vid.poster.getBitmap()
-                                    );
-                            }
-                            if (vid.poster != null)
-                                handler.post(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            ((VideoAdapter)lv.getAdapter())
-                                                .notifyDataSetChanged();
-                                        }
-                                    }
-                                );
+                                    handler.post(notifyChanged);
                         }
                     }
                );
                 
             }
+
+            handler.post(gotVideos);
+                
+        }
+    };
+    
+    final private Runnable notifyChanged = new Runnable() {
+        @Override
+        public void run() {
+            ((VideoAdapter)lv.getAdapter())
+                .notifyDataSetChanged();
+        }
+    };
+    
+    final private Runnable gotVideos = new Runnable() {
+        @Override
+        public void run() {
+            
+            lv.setAdapter(
+                new VideoAdapter(
+                    ctx, R.layout.video, videos
+                )
+            );
+            
+            dismissLoadingDialog();
 
         }
     };
@@ -197,7 +184,6 @@ public class Videos extends MDActivity implements
     public void onDestroy() {
         super.onDestroy();
         Globals.getWorker().removeCallbacks(getVideos);
-        artCache.shutdown();
     }
 
     @Override
