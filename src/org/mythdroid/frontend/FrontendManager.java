@@ -125,16 +125,18 @@ public class FrontendManager {
      */
     public FrontendLocation getLoc() throws IOException {
         
-        String loc = getSingleLineResponse("query loc", ConnMgr.timeOut.LONG); //$NON-NLS-1$
+        String loc = getSingleLineResponse(
+            "query loc", ConnMgr.timeOut.EXTRALONG //$NON-NLS-1$
+        );
 
         int i = 0;
-        while (loc.startsWith("ERROR: Timed out") && i++ < 4) { //$NON-NLS-1$
+        while (loc.startsWith("ERROR: Timed out") && i++ < 3) { //$NON-NLS-1$
             
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {}
             
-            loc = getSingleLineResponse("query loc", ConnMgr.timeOut.LONG); //$NON-NLS-1$
+            loc = getSingleLineResponse("query loc", ConnMgr.timeOut.EXTRALONG); //$NON-NLS-1$
             
         }
 
@@ -165,8 +167,9 @@ public class FrontendManager {
      */
     public boolean playRec(final Program prog) throws IOException {
         if (prog == null) throw invalidParam;
-        return 
-            sendCommand("play prog " + prog.playbackID(), ConnMgr.timeOut.LONG); //$NON-NLS-1$
+        return sendCommand(
+            "play prog " + prog.playbackID(), ConnMgr.timeOut.EXTRALONG //$NON-NLS-1$
+        );
     }
 
     /**
@@ -176,7 +179,7 @@ public class FrontendManager {
      */
     public boolean playFile(final String file) throws IOException {
         if (file == null) throw invalidParam;
-        return sendCommand("play file " + file, ConnMgr.timeOut.LONG); //$NON-NLS-1$
+        return sendCommand("play file " + file, ConnMgr.timeOut.EXTRALONG); //$NON-NLS-1$
     }
 
     /**
@@ -185,7 +188,7 @@ public class FrontendManager {
      * @return true if we switched ok, false otherwise
      */
     public boolean playChan(int chanid) throws IOException {
-        return sendCommand("play chanid " + chanid, ConnMgr.timeOut.LONG); //$NON-NLS-1$
+        return sendCommand("play chanid " + chanid, ConnMgr.timeOut.EXTRALONG); //$NON-NLS-1$
     }
     
     /**

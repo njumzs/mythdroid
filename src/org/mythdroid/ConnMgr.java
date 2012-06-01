@@ -49,9 +49,9 @@ public class ConnMgr {
     public enum timeOut {
         /** The default read timeout */
         DEFAULT,
-        /** 5x the default read timeout */
+        /** 4x the default read timeout */
         LONG,
-        /** 10x the default read timeout */
+        /** 8x the default read timeout */
         EXTRALONG,
         /** never timeout */
         INFINITE
@@ -116,7 +116,7 @@ public class ConnMgr {
     /** Our receive buffer */
     private byte[]                  rbuf             = null;
     /** Default socket timeout for connect and read */
-    private int                     timeout          = 2000;
+    private int                     timeout          = 1500;
     /** Hostname of the remote host */
     private String                  hostname         = null;
     private WifiLock                wifiLock         = null;
@@ -796,10 +796,10 @@ public class ConnMgr {
          */
         switch (timeOutModifier) {            
             case LONG:
-                localtimeout *= (localtimeout > 5000 ? 2 : 5);
+                localtimeout *= (localtimeout > 5000 ? 2 : 4);
                 break;
             case EXTRALONG:
-                localtimeout *= (localtimeout > 5000 ? 3 : 10);
+                localtimeout *= (localtimeout > 5000 ? 3 : 8);
                 break;
             default:
                 return;
