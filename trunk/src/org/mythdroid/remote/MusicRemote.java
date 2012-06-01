@@ -167,7 +167,6 @@ public class MusicRemote extends Remote {
                         lastTrack = track;
                         lastDetails = details;
                         lastArtid = artid;
-
                     }
                 }
             );

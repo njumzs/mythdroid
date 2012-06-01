@@ -527,7 +527,7 @@ public class MDDManager {
             track = line.substring(trackidx + 6, artidx - 1);
             artid = Integer.valueOf(line.substring(artidx + 6));
         }
-        else
+        else if (line.length() > trackidx + 6)
             track = line.substring(trackidx + 6);
 
         for (MDDMusicListener l : musicListeners)
