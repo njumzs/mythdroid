@@ -80,13 +80,14 @@ public class MythService {
             String pin = getSetting("SecurityPin"); //$NON-NLS-1$
             
             if (pin == null || pin.length() == 0) {
+                pin = "0000"; //$NON-NLS-1$
                 Params params = new Params("HostName", hostName); //$NON-NLS-1$
                 params.put("Key", "SecurityPin"); //$NON-NLS-1$ //$NON-NLS-2$
-                params.put("Value", "0000"); //$NON-NLS-1$ //$NON-NLS-2$
+                params.put("Value", pin); //$NON-NLS-1$
                 jc.Post("PutSetting", params); //$NON-NLS-1$
             }
             
-            JSONObject jo = jc.Get("GetConnectionInfo", null); //$NON-NLS-1$
+            JSONObject jo = jc.Get("GetConnectionInfo", new Params("Pin", pin)); //$NON-NLS-1$ //$NON-NLS-2$
             if (jo == null) return 0;
             
             try {
