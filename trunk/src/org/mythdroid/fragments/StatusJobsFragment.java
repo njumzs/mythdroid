@@ -94,6 +94,7 @@ public class StatusJobsFragment extends ListFragment {
         NONE        (0,     Messages.getString("StatusJobs.0")), //$NON-NLS-1$
         TRANSCODE   (1,     Messages.getString("StatusJobs.1")), //$NON-NLS-1$
         COMMFLAG    (2,     Messages.getString("StatusJobs.2")), //$NON-NLS-1$
+        METADATA    (4,     Messages.getString("StatusJobs.10")), //$NON-NLS-1$
         SYSTEM      (0xff,  Messages.getString("StatusJobs.3")), //$NON-NLS-1$
         USERJOB1    (0x100, Messages.getString("StatusJobs.4")), //$NON-NLS-1$
         USERJOB2    (0x200, Messages.getString("StatusJobs.5")), //$NON-NLS-1$
