@@ -28,6 +28,9 @@ import org.mythdroid.R.layout;
 import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.StreamInfo;
+import org.mythdroid.frontend.MovePlaybackHelper;
+import org.mythdroid.frontend.OnFrontendReady;
+import org.mythdroid.frontend.OnPlaybackMoved;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.services.ContentService;
@@ -56,6 +59,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.MediaController;
@@ -64,31 +69,54 @@ import android.widget.AdapterView.OnItemClickListener;
 /** MDActivity that displays streamed Video */
 public class VideoPlayer extends MDActivity {
     
+    final private static int DIALOG_QUALITY = 1, DIALOG_MOVE = 2;
+    final private static int MENU_MOVE = 1;
+    
     final private Context ctx        = this;
-    final private int DIALOG_QUALITY = 1;
+    final private Handler handler    = new Handler();
     
     private int            vb = 0, ab = 0, vwidth = 0, vheight = 0, retries = 0;
-    private MDVideoView    videoView   = null;
-    private BackendManager beMgr       = null;
-    private VLCRemote      vlc         = null;
-    private MediaPlayer    mplayer     = null;
-    private Uri            url         = null;
+    private boolean        prepared       = false, doneSeek = false;
+    private MDVideoView    videoView      = null;
+    private BackendManager beMgr          = null;
+    private VLCRemote      vlc            = null;
+    private MediaPlayer    mplayer        = null;
+    private Uri            url            = null;
     private ContentService contentService = null;
-    private StreamInfo     streamInfo  = null;
-
+    private StreamInfo     streamInfo     = null;
+    private int            seekTo         = 0;
+    private MovePlaybackHelper moveHelper = null;
+    
+    final private OnFrontendReady onReady = new OnFrontendReady() {
+        @Override
+        public void onFrontendReady(String name) {
+            handler.post(
+                new Runnable() {
+                    @Override
+                    public void run() { showDialog(DIALOG_MOVE); }
+                }
+            );
+        }
+    };
+    
+    final private OnPlaybackMoved onMoved = new OnPlaybackMoved() {
+        @Override
+        public void onPlaybackMoved() { finish(); }
+    };
+    
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(layout.video_player);
         videoView = (MDVideoView)findViewById(id.videoview);
+        seekTo = getIntent().getIntExtra(Extras.SEEKTO.toString(), 0);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         showDialog(DIALOG_QUALITY);
+        moveHelper = new MovePlaybackHelper(this, onReady, onMoved);
         if (Globals.haveServices()) 
             try {
                 contentService = new ContentService(Globals.getBackend().addr);
-            } catch (IOException e) {
-                ErrUtil.err(this, e);
-            }
+            } catch (IOException e) { ErrUtil.err(this, e); }
     }
 
     @Override
@@ -114,20 +142,47 @@ public class VideoPlayer extends MDActivity {
         super.onResume();
         try {
             beMgr = Globals.getBackend();
-        } catch (Exception e) {
-            ErrUtil.err(this, e);
-            finish();
+        } catch (IOException e) {
+            initError(e.getMessage());
         }
     }
 
     @Override
     public Dialog onCreateDialog(int id) {
         switch (id) {
-            case DIALOG_QUALITY:
-                return createQualityDialog();
+            case DIALOG_QUALITY:    return createQualityDialog();
+            case FRONTEND_CHOOSER:  return moveHelper.frontendChooserDialog();
+            case DIALOG_MOVE: 
+                return moveHelper.movePromptDialog(vlc, videoView); 
+            default:                return super.onCreateDialog(id);
+        }
+    }
+    
+    @Override
+    public void onPrepareDialog(int id, final Dialog dialog) {
+        if (id == DIALOG_MOVE) {
+            moveHelper.prepareMoveDialog(dialog);
+            return;
+        }
+        super.onPrepareDialog(id, dialog);
+    }
+    
+    /** Compose the menu */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(Menu.NONE, MENU_MOVE, Menu.NONE, R.string.moveTo)
+            .setIcon(drawable.ic_menu_upload_you_tube);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case MENU_MOVE:
+                showDialog(FRONTEND_CHOOSER);
+                return true;
             default:
-                return super.onCreateDialog(id);
-
+                return super.onOptionsItemSelected(item);
         }
     }
     
@@ -200,8 +255,7 @@ public class VideoPlayer extends MDActivity {
                 else {
                     Program prog = Globals.curProg;
                     if (prog == null) {
-                        ErrUtil.err(this, Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
-                        finish();
+                        initError(Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
                         return;
                     }
                     streamInfo = contentService.StreamFile(
@@ -220,8 +274,7 @@ public class VideoPlayer extends MDActivity {
                 else {
                     Program prog = Globals.curProg;
                     if (prog == null) {
-                        ErrUtil.err(this, Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
-                        finish();
+                        initError(Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
                         return;
                     }
                     path = prog.Path;
@@ -243,8 +296,7 @@ public class VideoPlayer extends MDActivity {
                 
             }
         } catch (IOException e) {
-            ErrUtil.err(this, e);
-            finish();
+            initError(e.getMessage());
             return;
         }
             
@@ -256,7 +308,6 @@ public class VideoPlayer extends MDActivity {
                 public void run() {
                     playVideo();
                 }
-                
             }, 4000
         );
 
@@ -272,20 +323,18 @@ public class VideoPlayer extends MDActivity {
             } catch (IOException e) { 
                 attempts++;
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e1) {}
             }
             
-        if (vlc != null)
-            return vlc;
+        if (vlc != null) return vlc;
         
         try {
             vlc = new VLCRemote(beMgr.addr);
-        } catch (IOException e) { 
-            ErrUtil.err(this, e);
-        }
-        
+        } catch (IOException e) { ErrUtil.err(this, e); }
+      
         return vlc;
+        
     }
     
     @Override
@@ -333,7 +382,10 @@ public class VideoPlayer extends MDActivity {
             new OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
-                    finish();
+                    if (prepared)
+                        finish();
+                    else
+                        initError(Messages.getString("VideoPlayer.3")); //$NON-NLS-1$
                 }
             }
         );
@@ -344,7 +396,13 @@ public class VideoPlayer extends MDActivity {
                 public boolean onError(MediaPlayer mp, int what, int extra) {
                     LogUtil.warn("MediaPlayer err " + what + " extra " + extra); //$NON-NLS-1$ //$NON-NLS-2$
                     dismissLoadingDialog();
-                    if (retries > 2) return false;
+                    if (retries > 2) {
+                        if (seekTo != 0) {
+                            initError(Messages.getString("VideoPlayer.1")); //$NON-NLS-1$
+                            return true;
+                        }
+                        return false;
+                    }
                     if (mp != null)  mp.reset();
                     retries++;
                     showLoadingDialog();
@@ -354,7 +412,6 @@ public class VideoPlayer extends MDActivity {
                             public void run() {
                                 playVideo();
                             }
-                            
                         }, 2000
                     );
                     return true;
@@ -364,6 +421,21 @@ public class VideoPlayer extends MDActivity {
         
         if (streamInfo == null)
             videoView.setVLC(getVLC());
+        
+        if (seekTo != 0 && !doneSeek) {
+            if (vlc == null) { 
+                initError(Messages.getString("VideoPlayer.2")); //$NON-NLS-1$
+                return;
+            }
+            try {
+                vlc.seek(seekTo * 1000);
+            } catch (IOException e) { 
+                initError(e.getMessage());
+                return;
+            }
+            doneSeek = true;
+        }
+        
         videoView.setMediaController(new MediaController(ctx, false));
         if (streamInfo == null)
             videoView.setOnSeekListener(
@@ -389,6 +461,7 @@ public class VideoPlayer extends MDActivity {
             new OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
+                    prepared = true;
                     dismissLoadingDialog();
                     vwidth = mp.getVideoWidth();
                     vheight = mp.getVideoHeight();
@@ -433,6 +506,16 @@ public class VideoPlayer extends MDActivity {
             }
         );
         
+    }
+    
+    private void initError(String e) {
+        if (e != null)
+            ErrUtil.err(this, e);
+        if (seekTo != 0) {
+            moveHelper.abortMove();
+            return;
+        }
+        finish();
     }
     
 }

@@ -44,7 +44,9 @@ public class Enums {
         /** jumpTo() the program guide (NavRemote) */
         GUIDE,
         /** Video ID to stream (VideoPlayer) */
-        VIDEOID;
+        VIDEOID,
+        /** Position to seek to (TVRemote) */
+        SEEKTO;
     }
 
     /** Recording statuses, with reverse lookup by code */
@@ -490,4 +492,14 @@ public class Enums {
         banner;
     }
     
+    public enum PlaybackLocation {
+        None,
+        WatchingPreRecorded, 
+        WatchingLiveTV,
+        WatchingVideo,
+        WatchingRecording,
+        WatchingDVD, 
+        WatchingBD;
+    }
+
 }
