@@ -81,8 +81,8 @@ public class Globals {
         "artwork", 10, 100, 1024*1024*20 //$NON-NLS-1$
     );
     
+    /** The global UPnPListener */
     private static UPnPListener upnp = null;
-
     /** A BackendManager representing a connected backend */
     private static BackendManager  beMgr  = null;
     /** A FrontendManager representing a connected frontend */
@@ -91,7 +91,6 @@ public class Globals {
     private static Handler wHandler = null;
     /** A list of addresses that have been checked for updates */
     private static ArrayList<String> updateChecked = new ArrayList<String>(4);
-    
     /** The queue for the thread pool */
     private static LinkedBlockingQueue<Runnable> threadQueue = null;
     /** An ExecutorService for accessing the thread pool */
@@ -191,14 +190,17 @@ public class Globals {
         if (beMgr != null && beMgr.isConnected())
             return beMgr;
         
+        boolean mobile = ConnectivityReceiver.networkType() ==
+                             ConnectivityManager.TYPE_MOBILE;
+        
         /* SSH port forwarding or not connected to wifi? 
            Mux conns via MDD's CMux if possible */
         if (
             backend != null &&
             (
-                backend.equals("127.0.0.1") || backend.equals("localhost") || //$NON-NLS-1$ //$NON-NLS-2$
-                ConnectivityReceiver.networkType() ==
-                    ConnectivityManager.TYPE_MOBILE
+                backend.equals("127.0.0.1") || //$NON-NLS-1$
+                backend.equals("localhost") || //$NON-NLS-1$
+                mobile
             ) && 
             testMuxConn()
         )
@@ -209,14 +211,22 @@ public class Globals {
             try {
                 beMgr = new BackendManager(backend);
             } catch (IOException e) {}
-            
-        if (beMgr == null || !beMgr.isConnected()) {
-            // See if we can locate a backend via UPnP
-            beMgr = new BackendManager(
-                Globals.getUPnPListener().findMasterBackend(550)
-            );
-            muxConns = false;
-        }
+        
+        if (beMgr != null && beMgr.isConnected()) return beMgr;
+        
+        // If we're not on wifi, maybe there's a ssh tunnel we can use?
+        if (mobile)
+            try {
+                beMgr = new BackendManager("localhost"); //$NON-NLS-1$
+            } catch (IOException e) {}
+        
+        if (beMgr != null && beMgr.isConnected()) return beMgr;
+        
+        // See if we can locate a backend via UPnP
+        beMgr = new BackendManager(
+            Globals.getUPnPListener().findMasterBackend(550)
+        );
+        muxConns = false;
 
         return beMgr;
 
