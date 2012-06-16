@@ -125,9 +125,17 @@ public class FrontendManager {
      */
     public FrontendLocation getLoc() throws IOException {
         
-        String loc = getSingleLineResponse(
-            "query loc", ConnMgr.timeOut.EXTRALONG //$NON-NLS-1$
-        );
+        String loc = null;
+        
+        try {
+            loc = getSingleLineResponse(
+                "query loc", ConnMgr.timeOut.EXTRALONG //$NON-NLS-1$
+            );
+        } catch (IOException e) {
+            loc = getSingleLineResponse(
+                "query loc", ConnMgr.timeOut.EXTRALONG //$NON-NLS-1$
+            );
+        }
 
         int i = 0;
         while (loc.startsWith("ERROR: Timed out") && i++ < 3) { //$NON-NLS-1$
@@ -168,7 +176,7 @@ public class FrontendManager {
     public boolean playRec(final Program prog) throws IOException {
         if (prog == null) throw invalidParam;
         return sendCommand(
-            "play prog " + prog.playbackID(), ConnMgr.timeOut.EXTRALONG //$NON-NLS-1$
+            "play prog " + prog.playbackID(), ConnMgr.timeOut.LONG //$NON-NLS-1$
         );
     }
 
@@ -217,16 +225,22 @@ public class FrontendManager {
     }
     
     private boolean sendCommand(String cmd) throws IOException {
-        if (getSingleLineResponse(cmd).equals("OK")) //$NON-NLS-1$
-            return true;
-        return false;
+        try {
+            return getSingleLineResponse(cmd).equals("OK"); //$NON-NLS-1$
+        } catch (IOException e) {
+            disconnect();
+            return getSingleLineResponse(cmd).equals("OK"); //$NON-NLS-1$
+        }
     }
     
     private boolean sendCommand(String cmd, ConnMgr.timeOut time)
         throws IOException {
-        if (getSingleLineResponse(cmd, time).equals("OK")) //$NON-NLS-1$
-            return true;
-        return false;
+        try {
+            return getSingleLineResponse(cmd, time).equals("OK"); //$NON-NLS-1$
+        } catch (IOException e) {
+            disconnect();
+            return getSingleLineResponse(cmd, time).equals("OK"); //$NON-NLS-1$
+        }
     }
 
     /**
