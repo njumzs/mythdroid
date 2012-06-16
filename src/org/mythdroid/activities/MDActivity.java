@@ -92,8 +92,7 @@ public abstract class MDActivity extends Activity {
                 if (
                     (
                         !onHere && (
-                            Globals.currentFrontend == null ||
-                            nextActivity == null
+                            Globals.curFe == null || nextActivity == null
                         )
                     ) ||
                     (onHere && (hereActivity == null || nextActivity == null))
@@ -170,11 +169,7 @@ public abstract class MDActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
-        
         updateFrontendIndicator();
-        
-        if (Globals.appContext == null)
-            Globals.appContext = getApplicationContext();
     }
     
     @Override
@@ -198,7 +193,7 @@ public abstract class MDActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            Intent intent = new Intent(this, MythDroid.class);
+            final Intent intent = new Intent(this, MythDroid.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             return true;
@@ -223,7 +218,7 @@ public abstract class MDActivity extends Activity {
                 ) {
                     onHere = false;
                     String fe = (String)av.getAdapter().getItem(pos);
-                    Globals.currentFrontend = fe;
+                    Globals.curFe = fe;
                     updateFrontendIndicator();
                     if (fe.equals(Messages.getString("MDActivity.0"))) // Here //$NON-NLS-1$
                         onHere = true;
@@ -237,7 +232,7 @@ public abstract class MDActivity extends Activity {
 
     private void prepareFrontendDialog(final Dialog dialog) {
 
-        ArrayList<String> list = FrontendDB.getFrontendNames(this);
+        final ArrayList<String> list = FrontendDB.getFrontendNames(this);
 
         if (hereActivity != null || nextActivity == null)
             list.add(Messages.getString("MDActivity.0")); // Here //$NON-NLS-1$
@@ -320,7 +315,7 @@ public abstract class MDActivity extends Activity {
      */
     protected void addFrontendChooser(Menu menu) {
         
-        MenuItem item = menu.add(
+        final MenuItem item = menu.add(
             Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.setCurFe
         ).setIcon(drawable.ic_menu_upload_you_tube);
      
@@ -353,8 +348,8 @@ public abstract class MDActivity extends Activity {
     
     private void updateFrontendIndicator() {
         if (frontendIndicator == null) return;
-        if (Globals.currentFrontend != null)
-            frontendIndicator.setText(Globals.currentFrontend);
+        if (Globals.curFe != null)
+            frontendIndicator.setText(Globals.curFe);
         else
             frontendIndicator.setText(R.string.none);
     }

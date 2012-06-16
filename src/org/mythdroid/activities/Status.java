@@ -75,7 +75,7 @@ public class Status extends MDFragmentActivity {
         setContentView(R.layout.status);
         if (findViewById(R.id.statuslistframe) != null)
             embed = false;
-        showDialog(DIALOG_LOAD);
+        showLoadingDialog();
         Globals.runOnThreadPool(getStatusTask);
     }
 

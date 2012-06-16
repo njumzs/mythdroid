@@ -21,7 +21,6 @@ package org.mythdroid.remote;
 import java.io.IOException;
 
 import org.mythdroid.Enums.Key;
-import org.mythdroid.Globals;
 import org.mythdroid.activities.MDActivity;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.util.ErrUtil;
@@ -255,9 +254,6 @@ public abstract class Remote extends MDActivity
     public void onResume() {
         
         super.onResume();
-        
-        if (Globals.appContext == null)
-            Globals.appContext = getApplicationContext();
         
         if (wakeMessenger != null && wakeConnection != null) 
             try {

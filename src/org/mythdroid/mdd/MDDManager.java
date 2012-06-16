@@ -38,9 +38,9 @@ public class MDDManager {
     private ConnMgr cmgr = null;
     private Thread  recvThread = null;
     
-    final private ArrayList<MDDMenuListener> menuListeners
+    final private ArrayList<MDDMenuListener>    menuListeners
         = new ArrayList<MDDMenuListener>();
-    final private ArrayList<MDDMusicListener> musicListeners
+    final private ArrayList<MDDMusicListener>   musicListeners
         = new ArrayList<MDDMusicListener>();
     final private ArrayList<MDDChannelListener> channelListeners
         = new ArrayList<MDDChannelListener>();

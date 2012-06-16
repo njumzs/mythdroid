@@ -112,7 +112,7 @@ public class Params {
         if (map == null || map.isEmpty())
             return null;
         
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
     
         for (String it : map.keySet()) {
             sb.append(it + "=" + map.get(it) + "&");  //$NON-NLS-1$//$NON-NLS-2$

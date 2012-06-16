@@ -127,7 +127,7 @@ public class JSONClient {
             return null;
         }
         
-        String res = fetcher.getContent();
+        final String res = fetcher.getContent();
         LogUtil.debug("JSON response: " + res); //$NON-NLS-1$
         
         try {

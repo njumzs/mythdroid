@@ -88,7 +88,7 @@ public class VideoService {
         
         int num = ja.length();
         
-        ArrayList<String> subdirs = new ArrayList<String>(16);
+        final ArrayList<String> subdirs = new ArrayList<String>(16);
         
         for (int i = 0; i < num; i++) {
             

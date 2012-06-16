@@ -427,10 +427,15 @@ public class Enums {
         private Category(int color) {
             this.color = color;
         }
-
+       
+        /**
+         * Get the color for this Category
+         * @return int representing the color for this Category
+         */
         public int color() {
             return color;
         }
+        
     }
 
     /** Key mappings for the network control interface */
@@ -480,6 +485,10 @@ public class Enums {
             this.str = str;
         }
 
+        /**
+         * Get the string that this Key represents
+         * @return String that the Key represents
+         */
         public String str() {
             return str;
         }

@@ -73,12 +73,10 @@ public class StatusBackendFragment extends Fragment {
             Node node = nodes.item(i);
             name = node.getNodeName();
             if (name == null) continue;
-            if (name.equals("Storage")) //$NON-NLS-1$
-                StorageNode = node;
-            else if (name.equals("Load")) //$NON-NLS-1$
-                LoadNode = node;
-            else if (name.equals("Guide")) //$NON-NLS-1$
-                GuideNode = node;
+            if (name.equals("Storage"))    StorageNode = node; //$NON-NLS-1$
+            else if (name.equals("Load"))  LoadNode = node; //$NON-NLS-1$
+            else if (name.equals("Guide")) GuideNode = node; //$NON-NLS-1$
+                
         }
 
         if (StorageNode != null) {

@@ -101,6 +101,7 @@ public class BackendManager {
         
         addr = host;
 
+        // Check for MDD updates
         if (!Globals.checkedForUpdate(addr)) {
             Intent intent = new Intent();
             intent.setClass(Globals.appContext, UpdateService.class);
@@ -326,11 +327,9 @@ public class BackendManager {
             protoToken = " " + protoToken; //$NON-NLS-1$
 
         cmgr.sendString("MYTH_PROTO_VERSION " + protoVer + protoToken); //$NON-NLS-1$
-
         if (!cmgr.readStringList()[0].equals("ACCEPT")) return false; //$NON-NLS-1$
 
         cmgr.sendString("ANN Playback " + myAddr + " 0"); //$NON-NLS-1$ //$NON-NLS-2$
-
         if (!cmgr.readStringList()[0].equals("OK")) return false; //$NON-NLS-1$
 
         return true;
@@ -348,9 +347,8 @@ public class BackendManager {
         String key = "ProtoToken." + protoVer; //$NON-NLS-1$
         String token = Messages.getString(key);
 
-        if (token.equals("!" + key + "!")) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (token.equals("!" + key + "!"))//$NON-NLS-1$ //$NON-NLS-2$
             token = ""; //$NON-NLS-1$
-        }
 
         return token.trim();
 

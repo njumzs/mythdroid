@@ -98,8 +98,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
                 if (
                     (
                         !onHere && (
-                            Globals.currentFrontend == null ||
-                            nextActivity == null
+                            Globals.curFe == null || nextActivity == null
                         )
                     ) ||
                     (onHere && (hereActivity == null || nextActivity == null))
@@ -185,9 +184,6 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         
         updateFrontendIndicator();
         
-        if (Globals.appContext == null)
-            Globals.appContext = getApplicationContext();
-        
         isPaused = false;
         if (configChanged)
             resetContentView();
@@ -249,7 +245,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
                 ) {
                     onHere = false;
                     String fe = (String)av.getAdapter().getItem(pos);
-                    Globals.currentFrontend = fe;
+                    Globals.curFe = fe;
                     updateFrontendIndicator();
                     if (fe.equals(Messages.getString("MDActivity.0")))  // Here //$NON-NLS-1$
                         onHere = true;
@@ -383,7 +379,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
      */
     protected void addFrontendChooser(Menu menu) {
         
-        MenuItem item = menu.add(
+        final MenuItem item = menu.add(
             Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.setCurFe
         ).setIcon(drawable.ic_menu_upload_you_tube);
      
@@ -416,8 +412,8 @@ public abstract class MDFragmentActivity extends FragmentActivity {
     
     private void updateFrontendIndicator() {
         if (frontendIndicator == null) return;
-        if (Globals.currentFrontend != null)
-            frontendIndicator.setText(Globals.currentFrontend);
+        if (Globals.curFe != null)
+            frontendIndicator.setText(Globals.curFe);
         else
             frontendIndicator.setText(R.string.none);
     }

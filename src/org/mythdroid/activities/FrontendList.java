@@ -56,7 +56,6 @@ public class FrontendList extends ListActivity implements
     private AlertDialog   feEditor        = null;
     private int           clickedPosition = -1;
     private View          clickedView     = null;
-
     private View          ftr             = null;
 
     @Override
@@ -85,7 +84,6 @@ public class FrontendList extends ListActivity implements
                 .setText(FrontendDB.getDefault(this));
         
         getListView().addHeaderView(ftr);
-
         getListView().setPadding(0, 4, 0, 0);
 
         Cursor c = FrontendDB.getFrontends(this);
@@ -228,8 +226,8 @@ public class FrontendList extends ListActivity implements
                 FrontendDB.delete(this, rowID);
                 String n = ((EditText)feEditor.findViewById(R.id.name))
                              .getText().toString();
-                if (Globals.currentFrontend.equals(n))
-                    Globals.currentFrontend = FrontendDB.getDefault(ctx);
+                if (Globals.curFe.equals(n))
+                    Globals.curFe = FrontendDB.getDefault(ctx);
                 
                 break;
 
@@ -278,7 +276,7 @@ public class FrontendList extends ListActivity implements
     
     private void setDefaultFrontend(String name) {
         FrontendDB.updateDefault(ctx, name);
-        Globals.currentFrontend = name;
+        Globals.curFe = name;
         ((TextView)(ftr.findViewById(R.id.addr))).setText(name);
     }
 

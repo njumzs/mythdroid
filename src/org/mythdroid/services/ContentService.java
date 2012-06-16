@@ -62,16 +62,16 @@ public class ContentService {
         int chanid, Date start, ArtworkType type, int w, int h
     ) throws IOException, JSONException {
         
-        String key  = chanid + Globals.utcFmt.format(start) + type.name();
+        final String key  = chanid + Globals.utcFmt.format(start) + type.name();
         String path = artUrlCache.get(key);
         
         if (path == null) {
         
-            JSONArray ja = getArtworkList(chanid, start);
+            final JSONArray ja = getArtworkList(chanid, start);
             int size = ja.length();
         
             for (int i = 0; i < size; i++) {
-                JSONObject jo = ja.getJSONObject(i);
+                final JSONObject jo = ja.getJSONObject(i);
                 if (!jo.getString("Type").equals(type.name())) //$NON-NLS-1$
                     continue;
                 path = jo.getString("URL"); //$NON-NLS-1$
@@ -151,7 +151,7 @@ public class ContentService {
         params.put("Bitrate", vb); //$NON-NLS-1$
         params.put("AudioBitrate", ab); //$NON-NLS-1$
         
-        JSONObject jo = jc.Get("AddVideoLiveStream", params); //$NON-NLS-1$
+        final JSONObject jo = jc.Get("AddVideoLiveStream", params); //$NON-NLS-1$
         
         try {
             return new StreamInfo(jo.getJSONObject("LiveStreamInfo")); //$NON-NLS-1$
@@ -168,9 +168,9 @@ public class ContentService {
      * @return true if successful, false otherwise
      */
     public boolean RemoveStream(int id) {
-        Params params = new Params("Id", String.valueOf(id)); //$NON-NLS-1$
+        final Params params = new Params("Id", String.valueOf(id)); //$NON-NLS-1$
         try {
-            JSONObject jo = jc.Get("RemoveLiveStream", params); //$NON-NLS-1$
+            final JSONObject jo = jc.Get("RemoveLiveStream", params); //$NON-NLS-1$
             return jo.getBoolean("bool"); //$NON-NLS-1$
         } catch (IOException e) {
             ErrUtil.logErr(e);
@@ -188,7 +188,7 @@ public class ContentService {
     public void WaitForStream(int id) {
         
         int segments = 0;
-        Params params = new Params("Id", String.valueOf(id)); //$NON-NLS-1$
+        final Params params = new Params("Id", String.valueOf(id)); //$NON-NLS-1$
         
         while (segments < 2) {
             try {
@@ -215,7 +215,7 @@ public class ContentService {
     private JSONArray getArtworkList(int chanid, Date start)
         throws IOException, JSONException {
         
-        Params params = new Params();
+        final Params params = new Params();
         params.put("ChanId", chanid); //$NON-NLS-1$
         params.put("StartTime", Globals.utcFmt.format(start)); //$NON-NLS-1$
         
