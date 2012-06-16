@@ -92,13 +92,11 @@ public class XMLHandler extends DefaultHandler {
         private Element getOrCreateElement(String name) {
             Element elem = elements.get(name);
 
-            if (elem != null)
-                return elem;
+            if (elem != null) return elem;
 
             elem = new Element(name);
             elements.put(name, elem);
             return elem;
-
         }
 
     }

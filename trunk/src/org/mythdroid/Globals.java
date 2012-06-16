@@ -35,33 +35,33 @@ public class Globals {
     final public static boolean debug = true;
 
     /** Backend protocol version */
-    public static int protoVersion  = 0;
+    public static int protoVersion    = 0;
     /** Backend version - used only to workaround MythTV r25366 */
-    public static int beVersion = 0;
+    public static int beVersion       = 0;
 
     /** Application context */
-    public static Context appContext = null;
+    public static Context appContext  = null;
 
     /** The name of the current frontend */
-    public static String currentFrontend = null;
+    public static String curFe        = null;
     /** The name of the previous frontend (used by TVRemote's moveTo) */
-    public static String previousFrontend = null;
+    public static String prevFe       = null;
 
     /** Backend address from preferences */
-    public static String backend = null;
+    public static String backend      = null;
     
     /** Mux connections to the backend host via MDD */
-    public static boolean muxConns = false;
+    public static boolean muxConns    = false;
 
+    /** A Program representing the currently selected recording */
+    public static Program curProg     = null;
+    /** A Video representing the currently selected video */
+    public static Video curVid        = null;
+    
     /** To remember where we were */
     public static FrontendLocation lastLocation =
         new FrontendLocation(null, "MainMenu"); //$NON-NLS-1$
-
-    /** A Program representing the currently selected recording */
-    public static Program curProg = null;
-    /** A Video representing the currently selected video */
-    public static Video curVid = null;
-
+    
     /** SimpleDateFormat of yyyy-MM-dd'T'HH:mm:ss */
     final public static SimpleDateFormat dateFmt =
         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
@@ -82,21 +82,21 @@ public class Globals {
     );
     
     /** The global UPnPListener */
-    private static UPnPListener upnp = null;
+    private static UPnPListener upnp      = null;
     /** A BackendManager representing a connected backend */
     private static BackendManager  beMgr  = null;
     /** A FrontendManager representing a connected frontend */
     private static FrontendManager feMgr  = null;
     /** A handler for the worker thread */
-    private static Handler wHandler = null;
+    private static Handler wHandler       = null;
     /** A list of addresses that have been checked for updates */
     private static ArrayList<String> updateChecked = new ArrayList<String>(4);
     /** The queue for the thread pool */
     private static LinkedBlockingQueue<Runnable> threadQueue = null;
     /** An ExecutorService for accessing the thread pool */
-    private static ThreadPoolExecutor threadPool = null;
+    private static ThreadPoolExecutor threadPool             = null;
     /** A ThreadGroup for the pool threads */
-    private static ThreadGroup poolGroup = new ThreadGroup("GlobalPool"); //$NON-NLS-1$
+    private static ThreadGroup poolGroup     = new ThreadGroup("GlobalPool"); //$NON-NLS-1$
     private static ThreadFactory poolFactory = new ThreadFactory() {
         int num = 0;
         @Override
@@ -118,7 +118,8 @@ public class Globals {
      * Get a reference to the singleton Globals object 
      * @return the singleton Globals object
      */
-    public static Globals getInstance() {
+    public static Globals getInstance(Context ctx) {
+        appContext = ctx;
         return instance;
     }
 
@@ -127,9 +128,9 @@ public class Globals {
      * @return true if so, false otherwise
      */
     public static boolean isCurrentFrontendHere() {
-        if (currentFrontend == null)
+        if (curFe == null)
             return false;
-        return currentFrontend.equals(Messages.getString("MDActivity.0")); //$NON-NLS-1$
+        return curFe.equals(Messages.getString("MDActivity.0")); //$NON-NLS-1$
     }
     
     /**
@@ -143,7 +144,7 @@ public class Globals {
     public static FrontendManager getFrontend(final Context ctx)
         throws IOException {
 
-        String name = currentFrontend;
+        String name = curFe;
 
         // Are we already connected to the desired frontend?
         if (feMgr != null && feMgr.isConnected()) {
@@ -171,7 +172,7 @@ public class Globals {
                 name, FrontendDB.getFrontendAddr(ctx, name)
             );
 
-        currentFrontend = feMgr.name;
+        curFe = feMgr.name;
         return feMgr;
 
     }
@@ -363,9 +364,7 @@ public class Globals {
         try {
             cmgr = new ConnMgr(backend, 6543, null, true);
             cmgr.dispose();
-        } catch (IOException e) {
-            return false;
-        }
+        } catch (IOException e) { return false; }
         return true;
     }
 

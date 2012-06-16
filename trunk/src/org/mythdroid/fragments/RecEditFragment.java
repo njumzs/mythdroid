@@ -104,7 +104,11 @@ public class RecEditFragment extends Fragment {
         }
         
         if ((prog = Globals.curProg) == null) {
-            initError(null);
+            initError(
+                new IllegalArgumentException(
+                    Messages.getString("RecEditFragment.0") //$NON-NLS-1$
+                )
+            );
             return;
         }
         
@@ -177,7 +181,11 @@ public class RecEditFragment extends Fragment {
         }
 
         if ((prog = Globals.curProg) == null) {
-            initError(null);
+            initError(
+                new IllegalArgumentException(
+                    Messages.getString("RecEditFragment.0") //$NON-NLS-1$
+                )
+            );
             return view;
         }
         
@@ -207,8 +215,8 @@ public class RecEditFragment extends Fragment {
                 initError(
                     new IOException(
                         Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
-                        )
-                    );
+                    )
+                );
             }
         
     }

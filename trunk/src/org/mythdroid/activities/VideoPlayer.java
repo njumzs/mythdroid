@@ -142,9 +142,7 @@ public class VideoPlayer extends MDActivity {
         super.onResume();
         try {
             beMgr = Globals.getBackend();
-        } catch (IOException e) {
-            initError(e.getMessage());
-        }
+        } catch (IOException e) { initError(e.getMessage()); }
     }
 
     @Override

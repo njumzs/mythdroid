@@ -177,9 +177,7 @@ public class MovePlaybackHelper {
                     ) {
                         FrontendLocation loc = null;
                         try {
-                            synchronized (feLock) {
-                                loc = feMgr.getLoc(); 
-                            }
+                            synchronized (feLock) { loc = feMgr.getLoc(); }
                         } catch (IOException e) {
                             ErrUtil.err(ctx, e);
                             return;
@@ -309,9 +307,9 @@ public class MovePlaybackHelper {
         final Bundle extras = ((Activity)ctx).getIntent().getExtras();
         if (extras != null)
             intent.putExtras(extras);
-        Globals.previousFrontend = Globals.currentFrontend;
+        Globals.prevFe = Globals.curFe;
         if (!isAbort)
-            Globals.currentFrontend = moveTo;
+            Globals.curFe = moveTo;
         ctx.startActivity(intent);
         onMoved.onPlaybackMoved();
     }
@@ -319,8 +317,8 @@ public class MovePlaybackHelper {
     /** Abort a failed move, try to resume on the previous frontend */
     public void abortMove() {
         
-        String cur  = Globals.currentFrontend;
-        String prev = Globals.previousFrontend;
+        String cur  = Globals.curFe;
+        String prev = Globals.prevFe;
         
         if (prev == null || cur.equals(prev)) return;
             
@@ -330,7 +328,7 @@ public class MovePlaybackHelper {
             Messages.getString("TVRemote.13") + prev //$NON-NLS-1$
         );
         
-        Globals.currentFrontend = prev;
+        Globals.curFe = prev;
         
         moveToNewFrontend(
             new Intent(

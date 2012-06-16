@@ -60,7 +60,7 @@ public class Video {
      */
     public Video(String line) throws IllegalArgumentException {
 
-        if (line.matches("^[0-9-]+ DIRECTORY .+")) { //$NON-NLS-1$
+        if (line.matches("^[0-9-]+ DIRECTORY")) { //$NON-NLS-1$
             dir   = Integer.valueOf(line.substring(0, line.indexOf(" "))); //$NON-NLS-1$
             title = line.substring(line.indexOf("DIRECTORY") + 10); //$NON-NLS-1$
             directory = true;
@@ -79,21 +79,21 @@ public class Video {
         fields[0] = fields[0].replaceFirst("VIDEO ", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
         try {
-            id          = Integer.valueOf(fields[ID]);
-            title       = fields[TITLE];
-            subtitle    = fields[SUBTITLE];
-            director    = fields[DIRECTOR];
-            plot        = fields[PLOT];
-            homepage    = fields[HOMEPAGE];
-            year        = fields[YEAR].matches("[0-9]+") ? //$NON-NLS-1$
-                              Integer.valueOf(fields[YEAR]) : 0;
-            rating      = fields[USERRATING].matches("[0-9.]+") ? //$NON-NLS-1$
-                              Float.parseFloat(fields[USERRATING]) : 0;
-            length      = fields[LENGTH].matches("[0-9]+") ? //$NON-NLS-1$
-                              Integer.valueOf(fields[LENGTH]) : 0;
-            filename    = fields[FILENAME];
+            id       = Integer.valueOf(fields[ID]);
+            title    = fields[TITLE];
+            subtitle = fields[SUBTITLE];
+            director = fields[DIRECTOR];
+            plot     = fields[PLOT];
+            homepage = fields[HOMEPAGE];
+            filename = fields[FILENAME];
+            year     = fields[YEAR].matches("[0-9]+") ? //$NON-NLS-1$
+                           Integer.valueOf(fields[YEAR]) : 0;
+            rating   = fields[USERRATING].matches("[0-9.]+") ? //$NON-NLS-1$
+                           Float.parseFloat(fields[USERRATING]) : 0;
+            length   = fields[LENGTH].matches("[0-9]+") ? //$NON-NLS-1$
+                           Integer.valueOf(fields[LENGTH]) : 0;
             if (fields.length > COVER)
-                coverfile   = fields[COVER];
+                coverfile = fields[COVER];
         } catch (NumberFormatException e) { 
             throw new IllegalArgumentException(
                 Messages.getString("Video.1") + e.getMessage() //$NON-NLS-1$
@@ -109,16 +109,16 @@ public class Video {
      * @throws ParseException 
      */
     public Video(JSONObject jo) throws ParseException, JSONException {
-        id       = jo.getInt("Id"); //$NON-NLS-1$
-        title    = jo.getString("Title"); //$NON-NLS-1$
-        subtitle = jo.getString("SubTitle"); //$NON-NLS-1$
-        director = jo.getString("Director"); //$NON-NLS-1$
-        plot     = jo.getString("Description"); //$NON-NLS-1$
-        homepage = jo.getString("HomePage"); //$NON-NLS-1$
-        rating   = jo.getInt("UserRating"); //$NON-NLS-1$
-        length   = jo.getInt("Length"); //$NON-NLS-1$
-        filename = jo.getString("FileName"); //$NON-NLS-1$
-        coverfile = jo.getString("Coverart"); //$NON-NLS-1$
+        id             = jo.getInt("Id"); //$NON-NLS-1$
+        title          = jo.getString("Title"); //$NON-NLS-1$
+        subtitle       = jo.getString("SubTitle"); //$NON-NLS-1$
+        director       = jo.getString("Director"); //$NON-NLS-1$
+        plot           = jo.getString("Description"); //$NON-NLS-1$
+        homepage       = jo.getString("HomePage"); //$NON-NLS-1$
+        rating         = jo.getInt("UserRating"); //$NON-NLS-1$
+        length         = jo.getInt("Length"); //$NON-NLS-1$
+        filename       = jo.getString("FileName"); //$NON-NLS-1$
+        coverfile      = jo.getString("Coverart"); //$NON-NLS-1$
         String release = jo.getString("ReleaseDate"); //$NON-NLS-1$
         if (release.length() > 0)
             year = Globals.dateFmt.parse(release).getYear();
@@ -129,8 +129,7 @@ public class Video {
      * @return String containing path to the video
      */
     public String getPath() throws IOException {
-        if (filename.startsWith("/")) //$NON-NLS-1$
-            return filename;
+        if (filename.startsWith("/")) return filename; //$NON-NLS-1$
         return "myth://Videos@" + Globals.getBackend().addr + "/" + filename; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
@@ -144,7 +143,6 @@ public class Video {
     public Bitmap getArtwork(ArtworkType type, float x, float y) {
        
         Bitmap bm = Video.getArtwork(id, type, x, y, coverfile);
-        
         if (bm == null) return null;
         
         if (type == ArtworkType.coverart)

@@ -112,7 +112,7 @@ public class MythService {
             if (hostName == null && (hostName = getHostName()) == null)
                 return null;
             
-            Params params = new Params("HostName", hostName); //$NON-NLS-1$
+            final Params params = new Params("HostName", hostName); //$NON-NLS-1$
             params.put("Key", key); //$NON-NLS-1$
             JSONObject jo = jc.Get("GetSetting", params); //$NON-NLS-1$
             if (jo == null) return null;
@@ -134,7 +134,7 @@ public class MythService {
          */
         public String[] getStorageGroups() throws IOException {
             
-           ArrayList<String> dirs = new ArrayList<String>();
+           final ArrayList<String> dirs = new ArrayList<String>();
            
            if (hostName == null && (hostName = getHostName()) == null)
                return null;

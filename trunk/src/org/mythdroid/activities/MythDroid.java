@@ -41,7 +41,6 @@ import android.R.layout;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -83,13 +82,11 @@ public class MythDroid extends MDListActivity implements
     public void onCreate(Bundle icicle) {
 
         super.onCreate(icicle);
-
-        Globals.appContext = getApplicationContext();
         
-        if (Globals.currentFrontend == null) {
-            Globals.currentFrontend = FrontendDB.getDefault(this);
-            if (Globals.currentFrontend == null)
-                Globals.currentFrontend = FrontendDB.getFirstFrontendName(this);
+        if (Globals.curFe == null) {
+            Globals.curFe = FrontendDB.getDefault(this);
+            if (Globals.curFe == null)
+                Globals.curFe = FrontendDB.getFirstFrontendName(this);
         }
             
         setContentView(R.layout.mainmenu);
@@ -111,7 +108,7 @@ public class MythDroid extends MDListActivity implements
         // Try to grab locations from the frontend in the background
         Globals.runOnThreadPool(FrontendLocation.getLocations);
 
-        crecv = new ConnectivityReceiver(Globals.appContext);
+        crecv = new ConnectivityReceiver(getApplicationContext());
         
         // Check for MythDroid updates
         Intent intent = new Intent();
@@ -154,29 +151,27 @@ public class MythDroid extends MDListActivity implements
         Class<?> activity = null;
 
         switch (pos) {
+            case RECORDINGS: activity = Recordings.class; break;
+            case VIDEOS:     activity = Videos.class;     break;
+            case GUIDE:      activity = Guide.class;      break;
+            case STATUS:     activity = Status.class;     break;
             case TV:
                 if (
-                    Globals.currentFrontend != null && 
-                    !Globals.currentFrontend.equals(
+                    Globals.curFe != null &&
+                    !Globals.curFe.equals(
                         Messages.getString("MDActivity.0") //$NON-NLS-1$
                     )
-                ) {
+                )
                     activity = TVRemote.class;
-                } else {
+                else {
                     onItemLongClick(list,item,pos,id);
                     return;
                 }
                 break;
-            case RECORDINGS:
-                activity = Recordings.class;
-                break;
-            case VIDEOS:
-                activity = Videos.class;
-                break;
             case MUSIC:
                 if (
-                    Globals.currentFrontend != null && 
-                    !Globals.currentFrontend.equals(
+                    Globals.curFe != null && 
+                    !Globals.curFe.equals(
                         Messages.getString("MDActivity.0") //$NON-NLS-1$
                     )
                 ) {
@@ -185,12 +180,6 @@ public class MythDroid extends MDListActivity implements
                     onItemLongClick(list,item,pos,id);
                     return;
                 }
-                break;
-            case GUIDE:
-                activity = Guide.class;
-                break;
-            case STATUS:
-                activity = Status.class;
                 break;
         }
         
@@ -230,40 +219,22 @@ public class MythDroid extends MDListActivity implements
 
     @Override
     public Dialog onCreateDialog(int id) {
-
         switch (id) {
-
-            case DIALOG_GUIDE:
-                return createGuideDialog();
-            case WAKE_FRONTEND:
-                return createWakeDialog();
-            case MDD_COMMAND:
-                return createMddDialog();
-            default:
-                return super.onCreateDialog(id);
-
+            case DIALOG_GUIDE:  return createGuideDialog();
+            case WAKE_FRONTEND: return createWakeDialog();
+            case MDD_COMMAND:   return createMddDialog();
+            default:            return super.onCreateDialog(id);
         }
-
     }
 
     @Override
     public void onPrepareDialog(int id, final Dialog dialog) {
-
         switch (id) {
-
-            case DIALOG_GUIDE:
-                prepareGuideDialog(dialog);
-                return;
-            case WAKE_FRONTEND:
-                prepareWakeDialog(dialog);
-                return;
-            case MDD_COMMAND:
-                prepareMddDialog(dialog);
-                return;
-            default:
-                super.onPrepareDialog(id, dialog);
+            case DIALOG_GUIDE:  prepareGuideDialog(dialog); return;
+            case WAKE_FRONTEND: prepareWakeDialog(dialog);  return;
+            case MDD_COMMAND:   prepareMddDialog(dialog);   return;
+            default:            super.onPrepareDialog(id, dialog);
         }
-
     }
 
     /** Populate the pop-up menu */
@@ -319,14 +290,7 @@ public class MythDroid extends MDListActivity implements
         getPreferences();
         try {
             Globals.getBackend();
-        } catch (IOException e) {
-            ErrUtil.err(this, e);
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration config) {
-        super.onConfigurationChanged(config);
+        } catch (IOException e) { ErrUtil.err(this, e); }
     }
 
     private Dialog createGuideDialog() {
@@ -381,11 +345,9 @@ public class MythDroid extends MDListActivity implements
 
         final ArrayList<String> items = new ArrayList<String>(3);
         items.add(Messages.getString("MDActivity.0")); // Here //$NON-NLS-1$
-        if (Globals.currentFrontend != null)
+        if (Globals.curFe != null)
             // On <defaultFrontend>
-            items.add(
-                Messages.getString("MythDroid.22") + Globals.currentFrontend //$NON-NLS-1$
-            );
+            items.add(Messages.getString("MythDroid.22") + Globals.curFe); //$NON-NLS-1$
         items.add(Messages.getString("MythDroid.23")); // Choose frontend //$NON-NLS-1$
 
         final ListView lv = ((AlertDialog)dialog).getListView();
@@ -416,7 +378,7 @@ public class MythDroid extends MDListActivity implements
                     String name = (String)av.getAdapter().getItem(pos);
                     try {
                         WakeOnLan.wake(name);
-                        Globals.currentFrontend = name;
+                        Globals.curFe = name;
                     } catch (Exception e) { ErrUtil.err(ctx, e); }
                     d.dismiss();
                 }

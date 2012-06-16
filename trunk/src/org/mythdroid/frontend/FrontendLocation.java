@@ -130,7 +130,7 @@ public class FrontendLocation {
             niceLocation = getNiceLocation(location);
             if (location.equals("playmusic"))  //$NON-NLS-1$
                 music = true;
-            if (location.equals("musicplaylists")) //$NON-NLS-1$
+            else if (location.equals("musicplaylists")) //$NON-NLS-1$
                 musiceditor = true;
             return;
         }

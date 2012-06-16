@@ -39,7 +39,7 @@ public class MythDroid extends Application {
     @Override 
     public void onCreate() {
         ACRA.init(this);
-        globalsInstance = Globals.getInstance(); 
+        globalsInstance = Globals.getInstance(this); 
         super.onCreate();
     }
     

@@ -123,10 +123,12 @@ public class Channel implements Comparable<Channel> {
     /** Construct an empty Channel */
     public Channel() {}
     
-    /** Construct a Channel from a "Channel" JSONObject
+    /** 
+     * Construct a Channel from a "Channel" JSONObject
      * @param jo Channel JSONObject 
      * @throws JSONException 
-     * @throws ParseException */
+     * @throws ParseException
+     */ 
     public Channel(JSONObject jo) throws JSONException, ParseException {
         callSign = jo.getString("CallSign"); //$NON-NLS-1$
         num = jo.getString("ChanNum"); //$NON-NLS-1$

@@ -37,11 +37,7 @@ public class FrontendManager {
     /** String containing the hostname or IP address of the frontend */
     public  String  addr = null;
     
-    final private IllegalArgumentException invalidParam =
-        new IllegalArgumentException(Messages.getString("FrontendManager.2")); //$NON-NLS-1$
-    
     final private Object cmgrLock = new Object(); 
-    
     private ConnMgr cmgr          = null;
     
     /**
@@ -84,7 +80,10 @@ public class FrontendManager {
      * @return true if we jumped ok, false otherwise
      */
     public boolean jumpTo(final String loc) throws IOException {
-        if (loc == null) throw invalidParam;
+        if (loc == null)
+            throw new IllegalArgumentException(
+                Messages.getString("FrontendManager.3") //$NON-NLS-1$
+            );
         return sendCommand("jump " + loc, ConnMgr.timeOut.EXTRALONG); //$NON-NLS-1$
     }
 
@@ -95,7 +94,10 @@ public class FrontendManager {
      */
     public boolean jumpTo(FrontendLocation loc) throws IOException
     {
-        if (loc == null || loc.location == null) throw invalidParam;
+        if (loc == null || loc.location == null)
+            throw new IllegalArgumentException(
+                Messages.getString("FrontendManager.3") //$NON-NLS-1$
+            );
         return jumpTo(loc.location.toLowerCase());
     }
 
@@ -105,7 +107,10 @@ public class FrontendManager {
      * @return true if the frontend accepted the key, false otherwise
      */
     public boolean sendKey(final String key) throws IOException {
-        if (key == null) throw invalidParam;
+        if (key == null)
+            throw new IllegalArgumentException(
+                Messages.getString("FrontendManager.4") //$NON-NLS-1$
+            );
         return sendCommand("key " + key); //$NON-NLS-1$
     }
     
@@ -115,7 +120,10 @@ public class FrontendManager {
      * @return true if the frontend accepted the key, false otherwise
      */
     public boolean sendKey(final Key key) throws IOException {
-        if (key == null) throw invalidParam;
+        if (key == null)
+            throw new IllegalArgumentException(
+                Messages.getString("FrontendManager.4") //$NON-NLS-1$
+            );
         return sendKey(key.str());
     }
 
@@ -174,7 +182,10 @@ public class FrontendManager {
      * @return true if starting playing ok, false otherwise
      */
     public boolean playRec(final Program prog) throws IOException {
-        if (prog == null) throw invalidParam;
+        if (prog == null)
+            throw new IllegalArgumentException(
+                Messages.getString("FrontendManager.5") //$NON-NLS-1$
+            );
         return sendCommand(
             "play prog " + prog.playbackID(), ConnMgr.timeOut.LONG //$NON-NLS-1$
         );
@@ -186,7 +197,10 @@ public class FrontendManager {
      * @return true if starting playing ok, false otherwise
      */
     public boolean playFile(final String file) throws IOException {
-        if (file == null) throw invalidParam;
+        if (file == null)
+            throw new IllegalArgumentException(
+                Messages.getString("FrontendManager.6") //$NON-NLS-1$
+            );
         return sendCommand("play file " + file, ConnMgr.timeOut.EXTRALONG); //$NON-NLS-1$
     }
 

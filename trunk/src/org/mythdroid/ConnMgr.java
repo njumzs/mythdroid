@@ -227,7 +227,7 @@ public class ConnMgr {
         if (ocl != null)
             oCLs.add(ocl);
         
-        boolean wifi = 
+        final boolean wifi = 
                 ConnectivityReceiver.networkType() == 
                     ConnectivityManager.TYPE_WIFI;
 
@@ -244,8 +244,8 @@ public class ConnMgr {
         
         if (wifi) { 
             wifiLock = ((WifiManager)Globals.appContext
-                .getSystemService(Context.WIFI_SERVICE))
-                .createWifiLock("MythDroid"); //$NON-NLS-1$
+                           .getSystemService(Context.WIFI_SERVICE))
+                           .createWifiLock("MythDroid"); //$NON-NLS-1$
             wifiLock.acquire();
         }
 
@@ -297,9 +297,7 @@ public class ConnMgr {
     public void sendString(String str) throws IOException {
 
         str = String.format("%-8d", str.length()) + str; //$NON-NLS-1$
-
         LogUtil.debug("sendString: " + str); //$NON-NLS-1$
-
         write(str.getBytes());
 
     }
@@ -310,7 +308,9 @@ public class ConnMgr {
      */
     public void sendStringList(final String[] list) throws IOException {
 
-        StringBuilder sb = new StringBuilder(list[0]);
+        StringBuilder sb = new StringBuilder(list.length * 16);
+
+        sb.append(list[0]);
 
         for (int i = 1; i < list.length; i++)
             sb.append("[]:[]").append(list[i]); //$NON-NLS-1$
@@ -325,7 +325,7 @@ public class ConnMgr {
      */
     public String readLine() throws IOException {
 
-        StringBuilder line = new StringBuilder(16);
+        final StringBuilder line = new StringBuilder(16);
         int r = -1;
 
         // Have left over buffered data?
@@ -381,7 +381,7 @@ public class ConnMgr {
     
                 r = read(buf, 0, rbufSize);
     
-                String extra = new String(buf, 0 , r);
+                final String extra = new String(buf, 0 , r);
                 line.append(extra);
     
                 // If the buffer was empty and we got 2 bytes, check for a #
@@ -507,19 +507,21 @@ public class ConnMgr {
         for (int i = 0; i < con.length; i++) {
 
             @SuppressWarnings("unchecked")
-            WeakReference<ConnMgr> r = (WeakReference<ConnMgr>)con[i];  
+            final WeakReference<ConnMgr> r = (WeakReference<ConnMgr>)con[i];  
 
             if (r == null) continue;
-            ConnMgr c = r.get();
+            final ConnMgr c = r.get();
             if (c == null) continue;
             synchronized (c.sockLock) {
                 c.reconnectPending = true;
                 iU = c.inUse;
             }
+            // If it was in use, just disconnect it
             if (iU)
                 c.doDisconnect();
+            // Otherwise, dispose of it completely
             else
-                try { c.dispose(); } catch (IOException e1) {}
+                try { c.dispose(); } catch (IOException e) {}
 
         }
 
@@ -535,10 +537,10 @@ public class ConnMgr {
         for (int i = 0; i < con.length; i++) {
 
             @SuppressWarnings("unchecked")
-            WeakReference<ConnMgr> r = (WeakReference<ConnMgr>)con[i];    
+            final WeakReference<ConnMgr> r = (WeakReference<ConnMgr>)con[i];    
             
             if (r == null) continue;
-            ConnMgr c = r.get();
+            final ConnMgr c = r.get();
             if (c == null) continue;
             try {
                 c.doConnect(c.timeout);
@@ -555,7 +557,7 @@ public class ConnMgr {
         
         if (conns == null || conns.isEmpty()) return;
         
-        long now = System.currentTimeMillis();
+        final long now = System.currentTimeMillis();
         
         Object con[] = null;
         
@@ -564,14 +566,14 @@ public class ConnMgr {
         for (int i = 0; i < con.length; i++) {
 
             @SuppressWarnings("unchecked")
-            WeakReference<ConnMgr> r = (WeakReference<ConnMgr>)con[i];    
+            final WeakReference<ConnMgr> r = (WeakReference<ConnMgr>)con[i];    
 
             if (r == null) continue;
-            ConnMgr c = r.get();
+            final ConnMgr c = r.get();
             if (c == null) continue;
             synchronized (c.sockLock) {
                 if (c.inUse == false && c.lastUsed + maxAge < now)
-                    try { c.dispose(); } catch (IOException e1) {}
+                    try { c.dispose(); } catch (IOException e) {}
             }
             
         }
@@ -586,11 +588,13 @@ public class ConnMgr {
      */
     static private ConnMgr findExisting(final String host, final int port) {
         
+        /* Try to find a ConnMgr that's connected to the right host and port
+           and is not currently in use */
         synchronized (conns) {
             for (WeakReference<ConnMgr> r : conns) {
 
                 if (r == null) continue;
-                ConnMgr c = r.get();
+                final ConnMgr c = r.get();
                 if (c == null) continue;
                 synchronized (c.sockLock) {
                     if (
@@ -648,8 +652,10 @@ public class ConnMgr {
                             Messages.getString("ConnMgr.1") + hostname //$NON-NLS-1$
                         );
                 } catch (SocketTimeoutException e) {
+                    // Try again
                     continue;
                 } catch (IOException e) {
+                    // Connection was refused
                     throw
                         new IOException(
                             Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
@@ -662,6 +668,7 @@ public class ConnMgr {
                 
             }
             
+            // We didn't get a connection after 3 tries, give up
             if (!sock.isConnected())
                 throw
                     new SocketTimeoutException(
@@ -694,6 +701,7 @@ public class ConnMgr {
         }
     }
 
+    /* Our own version of read() that retries if there's trouble */
     private int read(byte[] buf, final int off, final int len) 
     	throws IOException {
 
@@ -730,6 +738,7 @@ public class ConnMgr {
 
     }
 
+    /* Our own version of write() that waits for a connection if necessary */
     private void write(final byte[] buf) throws IOException {
 
         if (!isConnected())
@@ -781,6 +790,8 @@ public class ConnMgr {
         
     }
     
+    /* Retry a failed read, but wait for a connection and resend the last sent
+       message first */
     private int retryRead(byte[] buf, final int off, final int len)
     	throws IOException {
     	
