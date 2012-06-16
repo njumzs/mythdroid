@@ -3,6 +3,7 @@
 	<style name="MDNoTitle" parent="android:Theme.Holo">
   		<item name="android:windowActionBar">true</item>
   	</style>
+  	<style name="MDFullScreen" parent="android:Theme.Holo.NoActionBar.Fullscreen"/>
    	<style name="MDButtonNormal" parent="MDButton">
 		<item name="android:layout_width">160dp</item>
     	<item name="android:layout_height">160dp</item>
