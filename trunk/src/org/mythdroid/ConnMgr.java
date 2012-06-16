@@ -633,12 +633,13 @@ public class ConnMgr {
         
         synchronized (sockLock) {
 
-            sock = new Socket();
-            sock.setTcpNoDelay(true);
-            sock.setSoTimeout(timeout);
-                
             for (int i = 0; i < 3; i++) {
+                
                 LogUtil.debug("Connecting to " + addr); //$NON-NLS-1$
+                sock = new Socket();
+                sock.setTcpNoDelay(true);
+                sock.setSoTimeout(timeout);
+                
                 try {
                     sock.connect(sockAddr, timeout / 2);
                 } catch (UnknownHostException e) {
@@ -647,29 +648,33 @@ public class ConnMgr {
                             Messages.getString("ConnMgr.1") + hostname //$NON-NLS-1$
                         );
                 } catch (SocketTimeoutException e) {
-                    if (i < 3)
-                        continue;
-                    throw
-                        new IOException(
-                            Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
-                                Messages.getString("ConnMgr.4") //$NON-NLS-1$
-                        );
+                    continue;
                 } catch (IOException e) {
                     throw
                         new IOException(
                             Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
-                                Messages.getString("ConnMgr.7") //$NON-NLS-1$
+                            Messages.getString("ConnMgr.7") //$NON-NLS-1$
                         );
                 }
+                
                 if (sock.isConnected())
                     break;
+                
             }
+            
+            if (!sock.isConnected())
+                throw
+                    new SocketTimeoutException(
+                        Messages.getString("ConnMgr.2") + addr +  //$NON-NLS-1$
+                        Messages.getString("ConnMgr.4") //$NON-NLS-1$
+                    );
             
             reconnectPending = false;
             os = sock.getOutputStream();
             is = sock.getInputStream();
             LogUtil.debug("Connection to " + addr + " successful"); //$NON-NLS-1$ //$NON-NLS-2$
             inUse = true;
+            
         }
 
         // Execute onConnectListeners
