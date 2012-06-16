@@ -29,7 +29,7 @@ import org.mythdroid.data.Video;
 import org.mythdroid.util.LogUtil;
 import org.mythdroid.util.MemCache;
 
-/** An implementation of the Myth service */
+/** An implementation of the Video service */
 public class VideoService {
     
     private JSONClient jc = null;
@@ -109,7 +109,7 @@ public class VideoService {
                     name = vid.filename.substring(subdir.length() + 1);
                 
                 int slash;
-                if ((slash = name.indexOf('/')) != -1) {
+                if ((slash = name.indexOf('/')) > 0) {
                     String dir = name.substring(0, slash);
                     if (!subdirs.contains(dir))
                         subdirs.add(dir);
