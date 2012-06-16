@@ -19,9 +19,14 @@
 package org.mythdroid.frontend;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.mythdroid.Globals;
+import org.mythdroid.Enums.PlaybackLocation;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
 
@@ -45,17 +50,19 @@ public class FrontendLocation {
     
     private static HashMap<String, String> locations = null;
    
-    @SuppressWarnings("all")
-    public String  location  = null, niceLocation = null;
-    @SuppressWarnings("all")
-    public int     position, end;
-    @SuppressWarnings("all")
-    public float   fps;
-    @SuppressWarnings("all")
-    public float   rate;
-    @SuppressWarnings("all")
-    public String  filename;
-    @SuppressWarnings("all")
+    @SuppressWarnings("javadoc")
+    public int chanid, chapter, numchapters, volume, position, end;
+    
+    @SuppressWarnings("javadoc")
+    public String playedtime, remainingtime, location, niceLocation, title,
+                  subtitle, audiotrack, filename;
+    
+    @SuppressWarnings("javadoc")
+    public Date starttime;
+    
+    @SuppressWarnings("javadoc")
+    public float   fps, rate;
+    @SuppressWarnings("javadoc")
     public boolean
         video = false, livetv = false, music = false, musiceditor = false;
     
@@ -91,17 +98,13 @@ public class FrontendLocation {
 
         if (loc.startsWith("playback ")) //$NON-NLS-1$
             parsePlaybackLoc(loc);
-        else if (loc.startsWith("error")) //$NON-NLS-1$
-            location = niceLocation = "Error"; //$NON-NLS-1$
-        else
-            niceLocation = locations.get(loc);
-
-        if (niceLocation == null)
-            niceLocation = "Unknown"; //$NON-NLS-1$
-        else if (loc.equals("playmusic"))  //$NON-NLS-1$
-            music = true;
-        else if (loc.equals("musicplaylists")) //$NON-NLS-1$
-            musiceditor = true;
+        else {
+            niceLocation = getNiceLocation(loc);
+            if (loc.equals("playmusic"))  //$NON-NLS-1$
+                music = true;
+            else if (loc.equals("musicplaylists")) //$NON-NLS-1$
+                musiceditor = true;
+        }
 
         LogUtil.debug(
             "loc: " + loc +  //$NON-NLS-1$
@@ -109,6 +112,36 @@ public class FrontendLocation {
             " niceLocation: " + niceLocation //$NON-NLS-1$
         );
 
+    }
+    
+    /**
+     * Construct a FrontendStatus from a FrontendStatus JSONObject
+     * @param jo FrontendStatus JSONObject
+     * @throws JSONException
+     * @throws ParseException
+     */
+    public FrontendLocation(JSONObject jo) throws JSONException, ParseException {
+        
+        JSONObject state     = jo.getJSONObject("State"); //$NON-NLS-1$
+        location             = state.getString("state"); //$NON-NLS-1$
+        
+        if (location.equals("idle")) { //$NON-NLS-1$
+            location = state.getString("currentlocation"); //$NON-NLS-1$
+            niceLocation = getNiceLocation(location);
+            if (location.equals("playmusic"))  //$NON-NLS-1$
+                music = true;
+            if (location.equals("musicplaylists")) //$NON-NLS-1$
+                musiceditor = true;
+            return;
+        }
+        
+        switch (PlaybackLocation.valueOf(location)) {
+            case WatchingLiveTV: livetv = true; break;
+            case WatchingVideo:  video  = true; break;
+        }
+        
+        parseJSONPlaybackLoc(state);
+        
     }
 
     /**
@@ -142,6 +175,12 @@ public class FrontendLocation {
         return true;
 
     }
+    
+    private static String getNiceLocation(String loc) {
+        if (loc.startsWith("error")) return "Error"; //$NON-NLS-1$ //$NON-NLS-2$
+        if (locations.containsKey(loc)) return locations.get(loc);
+        return "Unknown"; //$NON-NLS-1$
+    }
 
     private void parsePlaybackLoc(String loc) {
 
@@ -158,6 +197,10 @@ public class FrontendLocation {
                 rate = Float.parseFloat(
                     tok[5].substring(0, tok[5].lastIndexOf('x'))
                 );
+            chanid = Integer.parseInt(tok[6]);
+            try {
+                starttime = Globals.dateFmt.parse(tok[7]);
+            } catch (ParseException e) {}
             filename = tok[9];
             fps = Float.parseFloat(tok[tok.length - 1]);
             if (tok[1].equals("livetv")) livetv = true; //$NON-NLS-1$
@@ -185,13 +228,34 @@ public class FrontendLocation {
             "position: " + position +  //$NON-NLS-1$
             " end: " + end +  //$NON-NLS-1$
             " rate: " + rate +  //$NON-NLS-1$
+            " chanid: " + chanid + //$NON-NLS-1$
             " filename: " + filename +  //$NON-NLS-1$
             " livetv: " + livetv //$NON-NLS-1$
         );
 
     }
+    
+    private void parseJSONPlaybackLoc(JSONObject state) 
+        throws NumberFormatException, JSONException, ParseException {
+        
+        chanid          = Integer.valueOf(state.getString("chanid")); //$NON-NLS-1$
+        chapter         = Integer.valueOf(state.getString("chapteridx")); //$NON-NLS-1$
+        numchapters     = Integer.valueOf(state.getString("totalchapters")); //$NON-NLS-1$
+        volume          = Integer.valueOf(state.getString("volume")); //$NON-NLS-1$
+        rate            = Float.parseFloat(state.getString("playspeed")); //$NON-NLS-1$
+        chapter         = Integer.valueOf(state.getString("chapteridx")); //$NON-NLS-1$
+        position        = Integer.valueOf(state.getString("secondsplayed")); //$NON-NLS-1$
+        end             = Integer.valueOf(state.getString("totalseconds")); //$NON-NLS-1$
+        playedtime      = state.getString("playedtime"); //$NON-NLS-1$
+        remainingtime   = state.getString("remainingtime"); //$NON-NLS-1$
+        title           = state.getString("title"); //$NON-NLS-1$
+        subtitle        = state.getString("subtitle"); //$NON-NLS-1$
+        audiotrack      = state.getString("audiotrack"); //$NON-NLS-1$
+        starttime       = Globals.utcFmt.parse(state.getString("starttime")); //$NON-NLS-1$
+        
+    }
 
-    private int timeToInt(String time) {
+    private static int timeToInt(String time) {
 
         final String tm[] = time.split(":"); //$NON-NLS-1$
 
