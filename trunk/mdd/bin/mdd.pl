@@ -175,7 +175,7 @@ else { $log->warn("Failed to chuid to user $user") }
 $log->warn('mdd is running as root - streaming will not work')
     if ($> == 0);
 
-if ($backend && !$debug) {
+if ($backend) {
     $log->dbg("Daemonise");
     chdir '/'                 or $log->err("Couldn't chdir() to /: $!");
     open STDIN, '/dev/null'   or $log->err("Couldn't open() /dev/null: $!");
@@ -186,8 +186,7 @@ if ($backend && !$debug) {
     setsid                    or $log->err("Couldn't setsid(): $!");
     umask 0;
 }
-
-elsif (!$backend) {
+else {
 
     $lcd = MDD::LCD->new();
     $log->dbg("Start LCD server with arguments: @ARGV");
@@ -303,10 +302,7 @@ MDD - MythDroid Daemon
 Usage:
 
     --help    [-h]      - Show this message
-    --debug   [-d]      - Debug mode
-
-If debug mode is enabled MDD will run in the foreground regardless of 
-installation mode and debug information will be written to /tmp/mdd.log 
+    --debug   [-d]      - Output debug information to /tmp/mdd.log
 
 EOF
 
