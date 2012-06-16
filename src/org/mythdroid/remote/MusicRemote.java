@@ -146,7 +146,7 @@ public class MusicRemote extends Remote {
 
     };
 
-    private class mddListener implements MDDMusicListener {
+    final private MDDMusicListener mddListener = new MDDMusicListener() {
         @Override
         public void onMusic(
             final String artist, final String album,
@@ -245,7 +245,7 @@ public class MusicRemote extends Remote {
         setupViews();
 
         if (mddMgr != null)
-            mddMgr.setMusicListener(new mddListener());
+            mddMgr.setMusicListener(mddListener);
 
         try {
             if (jump && !feMgr.getLoc().music)

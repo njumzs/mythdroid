@@ -71,7 +71,7 @@ public class NavRemote extends Remote {
         }
     };
 
-    private class mddListener implements MDDMenuListener {
+    final private MDDMenuListener mddListener = new MDDMenuListener() {
         @Override
         public void onMenuItem(final String menu, final String item) {
            handler.post(
@@ -154,7 +154,7 @@ public class NavRemote extends Remote {
             } catch (IOException e) { mddMgr = null; }
 
             if (mddMgr != null) {
-                mddMgr.setMenuListener(new mddListener());
+                mddMgr.setMenuListener(mddListener);
             }
         }
         
