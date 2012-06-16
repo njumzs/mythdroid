@@ -8,6 +8,7 @@ description     "MythDroid Daemon"
 start on started mythtv-backend
 stop on stopping mythtv-backend
 
+expect fork
 respawn
 respawn limit 5 10
 

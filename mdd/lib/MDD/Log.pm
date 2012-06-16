@@ -62,7 +62,6 @@ sub warn($) {
     my $msg  = shift;
     my $date = date();
     print { $self->{FH} } "$date - Warning - $msg\n";
-    print STDERR "MDD: $date - Warning - $msg\n";
 }
 
 sub err($) {
@@ -70,7 +69,6 @@ sub err($) {
     my $msg  = shift;
     my $date = date();
     print { $self->{FH} } "$date - Error -   $msg\n";
-    print STDERR "MDD: $date - Error -   $msg\n";
 }
 
 sub fatal($) {
