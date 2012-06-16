@@ -37,13 +37,11 @@ import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.UpdateService;
 
 import android.R.drawable;
-import android.R.id;
 import android.R.layout;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -52,7 +50,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -416,14 +413,11 @@ public class MythDroid extends MDListActivity implements
                 public void onItemClick(
                     AdapterView<?> av, View v, int pos, long id
                 ) {
-                    Cursor c =
-                        ((SimpleCursorAdapter)av.getAdapter()).getCursor();
-                    c.moveToPosition(pos);
+                    String name = (String)av.getAdapter().getItem(pos);
                     try {
-                        WakeOnLan.Wake(c.getString(FrontendDB.HWADDR));
+                        WakeOnLan.wake(name);
+                        Globals.currentFrontend = name;
                     } catch (Exception e) { ErrUtil.err(ctx, e); }
-                    Globals.currentFrontend = c.getString(FrontendDB.NAME);
-                    c.close();
                     d.dismiss();
                 }
             }
@@ -435,17 +429,16 @@ public class MythDroid extends MDListActivity implements
 
     private void prepareWakeDialog(final Dialog dialog) {
 
-        final SimpleCursorAdapter ca = new SimpleCursorAdapter(
-            ctx, R.layout.simple_list_item_1, FrontendDB.getFrontends(this),
-            new String[] { "name" }, new int[] { id.text1 } //$NON-NLS-1$
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+            ctx, R.layout.simple_list_item_1, FrontendDB.getFrontendNames(ctx)
         );
 
-        if (ca.getCount() < 1) {
+        if (adapter.getCount() < 1) {
             ErrUtil.errDialog(ctx, dialog, R.string.noFes, WAKE_FRONTEND);
             return;
         }
 
-        ((AlertDialog)dialog).getListView().setAdapter(ca);
+        ((AlertDialog)dialog).getListView().setAdapter(adapter);
 
     }
 
