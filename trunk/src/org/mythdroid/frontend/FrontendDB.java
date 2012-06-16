@@ -189,6 +189,23 @@ public class FrontendDB {
     }
     
     /**
+     * Get the mac address of the frontend with the given name
+     * @param ctx Context
+     * @param name name of the frontend
+     * @return mac (hardware) address of the frontend
+     */
+    public static String getFrontendHwAddr(Context ctx, String name) {
+        if (db == null || cached == null || cached.isClosed()) initDB(ctx);
+        cached.moveToFirst();
+        while (!cached.isAfterLast()) {
+            if (cached.getString(NAME).equals(name))
+                return cached.getString(HWADDR);
+            cached.moveToNext();
+        }
+        return null;
+    }
+    
+    /**
      * Determine whether a frontend with a given address is defined
      * @param ctx Context
      * @param addr address to search for
