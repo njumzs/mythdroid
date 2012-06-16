@@ -18,9 +18,12 @@
 
 package org.mythdroid.frontend;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.LogUtil;
@@ -35,7 +38,7 @@ public class WakeOnLan {
      * Send a wake on lan packet
      * @param hwaddr String containing the MAC address of the target
      */
-    public static void Wake(String hwaddr) throws Exception {
+    public static void wake(String hwaddr) throws Exception {
         addr = parseAddr(hwaddr);
         for (int i = 0; i < 6; i++)
             buf[i] = (byte)0xff;
@@ -53,6 +56,50 @@ public class WakeOnLan {
         dgram.setPort(7);
         sock.send(dgram);
         sock.close();
+    }
+    
+    /**
+     * Try to wake a frontend and block until it's ready
+     * @param name Name of frontend
+     * @param addr Address of frontend
+     * @param hwaddr MAC address of frontend
+     * @throws Exception
+     */
+    public static void wakeFrontend(String name, String addr, String hwaddr) 
+        throws Exception {
+        
+        wake(hwaddr);
+        
+        final Thread thisThread = Thread.currentThread();
+        final Timer timer = new Timer();
+
+        timer.schedule(
+            new TimerTask() {
+                @Override
+                public void run() {
+                    thisThread.interrupt();
+                }
+            }, 60000
+        );
+        
+        FrontendManager mgr = null;
+        String error = null;
+        
+        while (mgr == null) {
+            try { 
+                mgr = new FrontendManager(name, addr);
+            } catch (IOException e) { error = e.getMessage(); }
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                timer.cancel();
+                throw new IOException(error);
+            }
+        }
+        
+        timer.cancel();
+        return;
+        
     }
 
     private static byte[] parseAddr(String addr)
