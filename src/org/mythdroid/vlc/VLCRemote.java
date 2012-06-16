@@ -71,7 +71,7 @@ public class VLCRemote {
     
     /**
      * Seek to the given position
-     * @param msecs position in seconds
+     * @param msecs position in milliseconds
      * @throws IOException
      */
     public void seek(int msecs) throws IOException {
