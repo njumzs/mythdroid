@@ -22,15 +22,10 @@ import java.io.IOException;
 
 import org.mythdroid.Enums.Key;
 import org.mythdroid.Globals;
-import org.mythdroid.R;
-import org.mythdroid.activities.MythDroid;
+import org.mythdroid.activities.MDActivity;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.util.ErrUtil;
-import org.mythdroid.util.Reflection;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -45,13 +40,13 @@ import android.view.GestureDetector;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.GestureDetector.SimpleOnGestureListener;
 
 /** Base class for remotes */
-public abstract class Remote extends Activity implements View.OnClickListener {
+public abstract class Remote extends MDActivity 
+    implements View.OnClickListener {
 
     /** Your FrontendManager */
     protected FrontendManager feMgr  = null;
@@ -61,9 +56,6 @@ public abstract class Remote extends Activity implements View.OnClickListener {
 
     /** Result codes for when a remote is startActivityForResult()'d */
     final protected int REMOTE_RESULT_FINISH = RESULT_FIRST_USER;
-    
-    /** A loading dialog */
-    final protected int DIALOG_LOAD = -1;
 
     /** Scale factor for pixel values for different display densities */
     private float scale = 1;
@@ -236,8 +228,6 @@ public abstract class Remote extends Activity implements View.OnClickListener {
                        .getBoolean("moveWake", true); //$NON-NLS-1$
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         
-        Reflection.setThreadPolicy();
-        
         if (moveWake) {
             wakeConnection = new ServiceConnection() {
                 @Override
@@ -290,12 +280,6 @@ public abstract class Remote extends Activity implements View.OnClickListener {
     }
     
     @Override
-    public void onSaveInstanceState(Bundle icicle) {
-        removeDialog(DIALOG_LOAD);
-        super.onSaveInstanceState(icicle);
-    }
-    
-    @Override
     public void onDestroy() {
         super.onDestroy();
         if (isFinishing() && wakeConnection != null)
@@ -317,30 +301,6 @@ public abstract class Remote extends Activity implements View.OnClickListener {
         return onPrepareOptionsMenu;
     }
     
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            Intent intent = new Intent(this, MythDroid.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            return true;
-        }
-        return false;
-    }
-    
-    @Override
-    public Dialog onCreateDialog(int id) {
-        switch (id) {
-            case DIALOG_LOAD:
-                final ProgressDialog d = new ProgressDialog(this);
-                d.setIndeterminate(true);
-                d.setMessage(getResources().getString(R.string.loading));
-                return d;
-        }
-        
-        return null;
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent me) {
         if (gDetector != null && gDetector.onTouchEvent(me))
