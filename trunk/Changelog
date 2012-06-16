@@ -19,6 +19,14 @@ Update scheduling related fragments to use services api where available
 Update Video related activities to use services api where available
 Don't use HLS for streaming yet though - it's really low bandwidth and seeking doesn't work
 Make the logo button in the action bar take us back to the root activity where appropriate 
+Many layout and visual fixes
+Fixed drawing of cutlists on honeycomb+
+Remove extraneous red highlight in recordings list when displayed on a phone
+Show cover/fanart in recording detail, tv remote and video detail backgrounds
+MDD: Thread the HTTPServer for much faster video poster fetching
+Draw a border around posters/preview images
+Add ability to move in-progress playback between frontends and/or the device
+itself
 
 In 0.5.3:
 
