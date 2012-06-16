@@ -10,7 +10,7 @@ sub create_account {
     return if (getpwnam $user);
     print "Creating $user user account..\n";
     $self->do_system(
-        "useradd -d /dev/null -c 'Added by MDD' -U $user -s /sbin/nologin"
+        "useradd -r -d /dev/null -c 'Added by MDD' -U $user -s /sbin/nologin"
     );
 
 }
