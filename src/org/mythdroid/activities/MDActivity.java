@@ -305,6 +305,11 @@ public abstract class MDActivity extends Activity {
         stringExtras.put(name, value);
     }
     
+    /**
+     * Add an Bundle of Extras to the Intent used to start child
+     * activities when the frontend chooser finishes
+     * @param extras Bundle of extras
+     */
     protected void setExtras(Bundle extras) {
         bundleExtras = extras;
     }
