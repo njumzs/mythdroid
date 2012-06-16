@@ -75,6 +75,7 @@
     <string name="mddCmds">MDD Commands</string>
     <string name="noMddCmds">No MDD commands are defined</string>
     <string name="streamQuality">Select stream quality</string>
+    <string name="moveTo">Move to ...</string>
     <string name="crash_notif_ticker_text">MythDroid has crashed, please send a report...</string>
     <string name="crash_notif_title">MythDroid has crashed...</string>
     <string name="crash_notif_text">Please click here to help fix the issue.</string>
