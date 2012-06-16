@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<style name="MDNoTitle" parent="android:Theme.NoTitleBar"/>
+	<style name="MDFullScreen" parent="android:Theme.NoTitleBar.Fullscreen"/>
 	<style name="MDButton">
 	    <item name="android:scaleType">fitCenter</item>
         <item name="android:focusable">false</item>
