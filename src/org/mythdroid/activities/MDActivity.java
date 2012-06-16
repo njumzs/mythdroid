@@ -72,6 +72,7 @@ public abstract class MDActivity extends Activity {
     protected Class<?> nextActivity = null, hereActivity = null;
 
     /** Extras to put in the intent passed to nextActivity */
+    private Bundle bundleExtras = null;
     final private ArrayList<String> boolExtras = new ArrayList<String>();
     final private HashMap<String, Integer> intExtras =
         new HashMap<String, Integer>();
@@ -101,8 +102,10 @@ public abstract class MDActivity extends Activity {
                 final Intent intent = new Intent().setClass(
                     ctx, onHere ? hereActivity : nextActivity
                 );
+                if (bundleExtras != null)
+                    intent.putExtras(bundleExtras);
                 for (String extra : boolExtras)
-                    intent.putExtra(extra,true);
+                    intent.putExtra(extra, true);
                 for (String extra : intExtras.keySet())
                     intent.putExtra(extra, intExtras.get(extra).intValue());
                 for (String extra : stringExtras.keySet())
@@ -300,6 +303,10 @@ public abstract class MDActivity extends Activity {
      */
     protected void setExtra(String name, String value) {
         stringExtras.put(name, value);
+    }
+    
+    protected void setExtras(Bundle extras) {
+        bundleExtras = extras;
     }
 
     /**
