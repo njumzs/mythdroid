@@ -9,5 +9,6 @@ start on started mythtv-backend
 stop on stopping mythtv-backend
 
 respawn
+respawn limit 5 10
 
 exec mdd.pl
