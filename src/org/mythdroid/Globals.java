@@ -44,6 +44,8 @@ public class Globals {
 
     /** The name of the current frontend */
     public static String currentFrontend = null;
+    /** The name of the previous frontend (used by TVRemote's moveTo) */
+    public static String previousFrontend = null;
 
     /** Backend address from preferences */
     public static String backend = null;
@@ -107,6 +109,19 @@ public class Globals {
         }
     };
     
+    /* We'll keep a reference to this in our Application class so that
+       the GC doesn't get rid of unreferenced members occasionally */
+    private static Globals instance = new Globals();
+    
+    private Globals() {}
+    
+    /** 
+     * Get a reference to the singleton Globals object 
+     * @return the singleton Globals object
+     */
+    public static Globals getInstance() {
+        return instance;
+    }
 
     /**
      * Is the currentFrontend set to 'Here'? 
@@ -275,13 +290,9 @@ public class Globals {
      * @throws SocketException
      */
     public static UPnPListener getUPnPListener() throws SocketException {
-        
-        if (upnp != null)
-            return upnp;
-        
+        if (upnp != null) return upnp;
         upnp = new UPnPListener();
         return upnp;
-        
     }
 
     /** Disconnect and dispose of the currently connected frontend */

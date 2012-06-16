@@ -33,9 +33,13 @@ import android.app.Application;
 )
 public class MythDroid extends Application {
 
+    @SuppressWarnings("unused")
+    private Globals globalsInstance = null;
+    
     @Override 
     public void onCreate() {
         ACRA.init(this);
+        globalsInstance = Globals.getInstance(); 
         super.onCreate();
     }
     
