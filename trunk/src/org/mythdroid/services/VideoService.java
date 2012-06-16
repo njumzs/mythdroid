@@ -26,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mythdroid.data.Video;
+import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
 import org.mythdroid.util.MemCache;
 
@@ -96,8 +97,13 @@ public class VideoService {
                 Video vid = null;
                 
                 if ((vid = videoCache.get(i)) == null) {
-                    vid = new Video(ja.getJSONObject(i));
-                    videoCache.put(i, vid);
+                    try {
+                        vid = new Video(ja.getJSONObject(i));
+                        videoCache.put(i, vid);
+                    } catch (IllegalArgumentException e) {
+                        ErrUtil.logWarn(e);
+                        continue;
+                    }
                 }
                 
                 if (!subdir.equals("ROOT") && !vid.filename.startsWith(subdir)) //$NON-NLS-1$
@@ -128,7 +134,9 @@ public class VideoService {
         }
         
         for (String name : subdirs) {
-            videos.add(new Video("-1 DIRECTORY " + name)); //$NON-NLS-1$
+            try {
+                videos.add(new Video("-1 DIRECTORY " + name)); //$NON-NLS-1$
+            } catch (IllegalArgumentException e) { ErrUtil.logWarn(e); }            
         }
         
         return videos;
