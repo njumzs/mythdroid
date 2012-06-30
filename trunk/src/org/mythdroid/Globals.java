@@ -234,6 +234,16 @@ public class Globals {
     }
     
     /**
+     * Set the timezone of the backend we're connected to
+     * @param zone String containing name of the timezone
+     */
+    public static void setBackendTimezone(String zone) {
+        TimeZone tz = TimeZone.getTimeZone(zone);
+        dispFmt.setTimeZone(tz);
+        dateFmt.setTimeZone(tz);
+    }
+    
+    /**
      * Returns true if the backend supports the Services API
      * @return true if the backend supports the Services API, false otherwise
      */

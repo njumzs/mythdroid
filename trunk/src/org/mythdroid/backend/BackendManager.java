@@ -100,6 +100,8 @@ public class BackendManager {
         );
         
         addr = host;
+        
+        Globals.setBackendTimezone(getTimezone());
 
         // Check for MDD updates
         if (!Globals.checkedForUpdate(addr)) {
@@ -126,6 +128,16 @@ public class BackendManager {
      */
     public String getStatusURL() {
         return statusURL;
+    }
+    
+    /**
+     * Get the timezone string from the backend
+     * @return String containing timezone
+     * @throws IOException
+     */
+    public String getTimezone() throws IOException {
+        cmgr.sendString("QUERY_TIME_ZONE"); //$NON-NLS-1$
+        return cmgr.readStringList()[0];
     }
 
     /**
