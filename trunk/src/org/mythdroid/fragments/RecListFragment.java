@@ -38,6 +38,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -157,7 +158,10 @@ public class RecListFragment extends ListFragment
      */
     public void updateSelection() {
         
-        int maxIndex = lv.getAdapter().getCount() - 1;
+        ListAdapter adapter = lv.getAdapter();
+        if (adapter == null) return;
+        
+        int maxIndex = adapter.getCount() - 1;
         
         if (maxIndex >= 0) 
             activity.checkedIndex = Math.min(activity.checkedIndex, maxIndex);
