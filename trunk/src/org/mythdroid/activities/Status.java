@@ -116,6 +116,9 @@ public class Status extends MDFragmentActivity {
     }
     
     private void installFragments() {
+        
+        if (statusDoc == null) return;
+        
         if (!embed) {
             FragmentTransaction ft = 
                 getSupportFragmentManager().beginTransaction();
@@ -133,6 +136,7 @@ public class Status extends MDFragmentActivity {
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.commitAllowingStateLoss();
         }
+        
     }
     
     @Override
