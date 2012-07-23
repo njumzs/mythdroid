@@ -60,7 +60,7 @@ public class Video {
      */
     public Video(String line) throws IllegalArgumentException {
 
-        if (line.matches("^[0-9-]+ DIRECTORY")) { //$NON-NLS-1$
+        if (line.matches("^[0-9-]+ DIRECTORY .+")) { //$NON-NLS-1$
             dir   = Integer.valueOf(line.substring(0, line.indexOf(" "))); //$NON-NLS-1$
             title = line.substring(line.indexOf("DIRECTORY") + 10); //$NON-NLS-1$
             directory = true;
