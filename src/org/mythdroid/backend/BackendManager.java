@@ -131,8 +131,8 @@ public class BackendManager {
     }
     
     /**
-     * Get the timezone string from the backend
-     * @return String containing timezone
+     * Get the timezone from the backend
+     * @return String containing timezone id
      * @throws IOException
      */
     public String getTimezone() throws IOException {
