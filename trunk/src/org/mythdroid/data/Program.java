@@ -525,6 +525,7 @@ public class Program implements Comparable<Program> {
                 } catch (IllegalArgumentException e1) { continue; }
             }
         } catch (IOException e) { return commercials; }
+          catch (IllegalArgumentException e) { return commercials; }
           finally { fetchedCutList = true; }
         return commercials;
     }
