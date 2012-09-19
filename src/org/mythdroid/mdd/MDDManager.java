@@ -246,6 +246,9 @@ public class MDDManager {
     public static int[][] getCutList(String addr, Program prog) 
         throws IOException {
         
+        if (prog == null || prog.RecStartTime == null)
+            throw(new IllegalArgumentException("Null or invalid Program")); //$NON-NLS-1$
+            
         final ConnMgr cmgr = sendMsg(
             addr, "CUTLIST " + prog.ChanID + " " + //$NON-NLS-1$ //$NON-NLS-2$ 
             prog.RecStartTime.getTime() / 1000 
