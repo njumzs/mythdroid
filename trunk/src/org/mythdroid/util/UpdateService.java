@@ -157,10 +157,9 @@ public class UpdateService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-        
-        handleCommand(intent);
+        if (intent != null)
+            handleCommand(intent);
         return Service.START_NOT_STICKY;
-
     }
     
     @Override
