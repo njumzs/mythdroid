@@ -69,7 +69,7 @@ public class VideoAdapter extends ArrayAdapter<Object> {
 
         ViewHolder vHolder = null;
 
-        if (old == null) {
+        if (old == null || old.getTag() == null) {
             old = ((Activity)ctx).getLayoutInflater().inflate(
                 R.layout.video, null
             );

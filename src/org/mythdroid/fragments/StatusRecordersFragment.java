@@ -177,7 +177,7 @@ public class StatusRecordersFragment extends ListFragment {
 
             ViewHolder vHolder = null;
 
-            if (old == null) {
+            if (old == null || old.getTag() == null) {
                 old = activity.getLayoutInflater().inflate(
                     R.layout.encoder_list_item, null
                 );

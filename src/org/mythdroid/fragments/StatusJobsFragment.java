@@ -203,7 +203,7 @@ public class StatusJobsFragment extends ListFragment {
 
             ViewHolder vHolder = null;
 
-            if (old == null) {
+            if (old == null || old.getTag() == null) {
                 old = activity.getLayoutInflater().inflate(
                     R.layout.job_list_item, null
                 );

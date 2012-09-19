@@ -61,7 +61,7 @@ public class ProgramAdapter extends ArrayAdapter<Object> {
 
         ViewHolder vHolder = null;
 
-        if (old == null) {
+        if (old == null || old.getTag() == null) {
             old = ((Activity)ctx).getLayoutInflater().inflate(resource, null);
             vHolder = new ViewHolder();
             vHolder.title    = (TextView)old.findViewById(R.id.title);
