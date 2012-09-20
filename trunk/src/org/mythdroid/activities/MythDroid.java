@@ -377,7 +377,7 @@ public class MythDroid extends MDListActivity implements
                 ) {
                     String name = (String)av.getAdapter().getItem(pos);
                     try {
-                        WakeOnLan.wake(name);
+                        WakeOnLan.wake(FrontendDB.getFrontendHwAddr(ctx, name));
                         Globals.curFe = name;
                     } catch (Exception e) { ErrUtil.err(ctx, e); }
                     d.dismiss();
