@@ -187,7 +187,7 @@ public class FrontendManager {
                 Messages.getString("FrontendManager.5") //$NON-NLS-1$
             );
         return sendCommand(
-            "play prog " + prog.playbackID(), ConnMgr.timeOut.LONG //$NON-NLS-1$
+            "play prog " + prog.playbackID(), ConnMgr.timeOut.EXTRALONG //$NON-NLS-1$
         );
     }
 
