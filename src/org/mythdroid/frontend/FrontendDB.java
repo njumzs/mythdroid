@@ -57,7 +57,7 @@ public class FrontendDB {
             db.execSQL(
                 "CREATE TABLE IF NOT EXISTS " + FRONTEND_TABLE + //$NON-NLS-1$
                 " (_id INTEGER PRIMARY KEY AUTOINCREMENT" + //$NON-NLS-1$
-                ", addr TEXT, name TEXT, hwaddr TEXT);" //$NON-NLS-1$
+                ", addr TEXT, name TEXT, hwaddr TEXT, discovered INTEGER);" //$NON-NLS-1$
             );
             db.execSQL(
                 "CREATE TABLE IF NOT EXISTS " + DEFAULT_TABLE + //$NON-NLS-1$
