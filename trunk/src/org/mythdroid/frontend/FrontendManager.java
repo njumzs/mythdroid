@@ -98,11 +98,6 @@ public class FrontendManager {
             throw new IllegalArgumentException(
                 Messages.getString("FrontendManager.3") //$NON-NLS-1$
             );
-        /* This isn't a valid location for the jump command but might have
-           been saved in Globals.lastLocation, little choice but to jump to the
-           main menu instead */ 
-        if (loc.location.endsWith(".xml")) //$NON-NLS-1$
-            return jumpTo("mainmenu"); //$NON-NLS-1$
         return jumpTo(loc.location.toLowerCase());
     }
 
