@@ -34,15 +34,16 @@ import android.database.CursorIndexOutOfBoundsException;
 public class FrontendDB {
 
     @SuppressWarnings("all")
-    final public static int     ID = 0, ADDR = 1, NAME = 2, HWADDR = 3;
+    final public static int     ID = 0, ADDR = 1, NAME = 2, HWADDR = 3,
+                                DISCOVERED = 4;
 
     final private static String DB_NAME        = "MythDroid.db"; //$NON-NLS-1$
-    final private static int    DB_VERSION     = 4;
+    final private static int    DB_VERSION     = 5;
     final private static String FRONTEND_TABLE = "frontends"; //$NON-NLS-1$
-    final private static String DEFAULT_TABLE = "defaultFE"; //$NON-NLS-1$
+    final private static String DEFAULT_TABLE  = "defaultFE"; //$NON-NLS-1$
 
-    private static SQLiteDatabase db           = null;
-    private static Cursor         cached       = null;
+    private static SQLiteDatabase    db        = null;
+    private static Cursor            cached    = null;
     private static ArrayList<String> namesList = null;
     
     private static class DBOpenHelper extends SQLiteOpenHelper {
@@ -67,15 +68,23 @@ public class FrontendDB {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVer, int newVer) {
-            //db.execSQL("DROP TABLE IF EXISTS " + FRONTEND_TABLE); //$NON-NLS-1$
-            db.execSQL("DROP TABLE IF EXISTS " + DEFAULT_TABLE); //$NON-NLS-1$
-            onCreate(db);
+            if (oldVer < 4) {
+                db.execSQL("DROP TABLE IF EXISTS " + DEFAULT_TABLE); //$NON-NLS-1$
+                onCreate(db);
+            }
+            if (oldVer < 5) {
+                db.execSQL(
+                    "ALTER TABLE " + FRONTEND_TABLE + //$NON-NLS-1$
+                    " ADD COLUMN discovered INTEGER;" //$NON-NLS-1$
+                );
+            }
         }
 
     }
 
     /**
-     * Get a cursor listing the frontends - columns are ID, ADDR and NAME
+     * Get a cursor listing the frontends - columns are ID, ADDR, NAME and 
+     * DISCOVERED
      * @return Cursor
      */
     public static Cursor getFrontends(Context ctx) {
@@ -120,6 +129,27 @@ public class FrontendDB {
         } catch (CursorIndexOutOfBoundsException e) {} 
           catch (SQLException e) { ErrUtil.logWarn(e); }
         return newDefault;
+    }
+    
+    /**
+     * Get a list of names of frontends that were discovered via UPnP
+     * @param ctx Context
+     * @return An ArrayList<String> of frontend names
+     */
+    public static ArrayList<String> getDiscoveredFrontends(Context ctx) {
+        
+        if (db == null || cached == null || cached.isClosed()) initDB(ctx);
+        
+        ArrayList<String> discovered = new ArrayList<String>(4);
+        if (cached.moveToFirst()) { 
+            do  {
+                if (cached.getInt(DISCOVERED) == 1)
+                    discovered.add(cached.getString(NAME));
+            } while(cached.moveToNext());
+        }
+        
+        return discovered;
+        
     }
 
     /**
@@ -230,7 +260,7 @@ public class FrontendDB {
      *  existed
      */
     public static boolean insert(
-        Context ctx, String name, String addr, String hwaddr
+        Context ctx, String name, String addr, String hwaddr, Boolean discovered
     ) {
 
         if (db == null || cached == null || cached.isClosed()) initDB(ctx);
@@ -239,6 +269,7 @@ public class FrontendDB {
         cv.put("addr", addr.trim()); //$NON-NLS-1$
         cv.put("name", name.trim()); //$NON-NLS-1$
         cv.put("hwaddr", hwaddr != null ? hwaddr.trim() : null); //$NON-NLS-1$
+        cv.put("discovered", discovered ? 1 : 0); //$NON-NLS-1$
 
         Cursor c = db.rawQuery(
             "SELECT _id from " + FRONTEND_TABLE + " WHERE name = ?",  //$NON-NLS-1$ //$NON-NLS-2$
@@ -307,6 +338,25 @@ public class FrontendDB {
             updateDefault(ctx, getFirstFrontendName(ctx));
       
     }
+    
+    /**
+     * Delete a frontend record
+     * @param ctx Context
+     * @param name name of the frontend
+     */
+    public static void delete(Context ctx, String name) {
+        if (db == null || cached == null || cached.isClosed()) initDB(ctx);
+        
+        cached.moveToFirst();
+        while (!cached.isAfterLast()) {
+            if (cached.getString(NAME).equals(name)) {
+                delete(ctx, cached.getInt(ID));
+                return;
+            }
+            cached.moveToNext();
+        }
+        
+    }
 
     /** Close the frontend database */
     public static void close() {
@@ -325,7 +375,8 @@ public class FrontendDB {
     private static void initDB(Context ctx) {
         db = new DBOpenHelper(ctx).getWritableDatabase();
         cached = db.rawQuery(
-            "SELECT _id, addr, name, hwaddr from " + FRONTEND_TABLE, null //$NON-NLS-1$
+            "SELECT _id, addr, name, hwaddr, discovered from " + FRONTEND_TABLE, //$NON-NLS-1$
+            null
         );
     }
 

@@ -101,9 +101,7 @@ public class MythDroid extends MDListActivity implements
         try {
             // Search for new frontends via UPnP
             Globals.getUPnPListener().findFrontends();
-        } catch (IOException e) {
-            ErrUtil.logErr(e);
-        }
+        } catch (IOException e) { ErrUtil.logErr(e); }
         
         // Try to grab locations from the frontend in the background
         Globals.runOnThreadPool(FrontendLocation.getLocations);
