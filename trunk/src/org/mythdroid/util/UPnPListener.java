@@ -17,10 +17,12 @@ import org.mythdroid.Globals;
 import org.mythdroid.data.XMLHandler;
 import org.mythdroid.data.XMLHandler.Element;
 import org.mythdroid.frontend.FrontendDB;
+import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
 import org.xml.sax.SAXException;
 
+import android.content.Context;
 import android.os.Process;
 import android.sax.EndTextElementListener;
 import android.util.Xml;
@@ -98,6 +100,28 @@ public class UPnPListener {
             
         }
     };
+    
+    private final Runnable cleanDiscoveredFrontends = new Runnable() {
+        @Override
+        public void run() {
+            Context ctx = Globals.appContext;
+            ArrayList<String> fes = FrontendDB.getDiscoveredFrontends(ctx);
+            FrontendManager feMgr = null;
+            for (String fe : fes) {
+                try {
+                    feMgr = new FrontendManager(
+                        fe, FrontendDB.getFrontendAddr(ctx, fe)
+                    );
+                    feMgr.disconnect();
+                } catch (IOException e) {
+                    LogUtil.debug(
+                        "Frontend " + fe + " isn't reachable now, remove" //$NON-NLS-1$ //$NON-NLS-2$
+                    );
+                    FrontendDB.delete(ctx, fe);
+                }
+            }
+        }
+    };
      
     /**
      * Construct a new UPnPListener
@@ -112,6 +136,7 @@ public class UPnPListener {
     
     /**
      * Find a master backend via UPnP
+     * @param timeout timeout in milliseconds
      * @throws IOException
      */
     public String findMasterBackend(int timeout) throws IOException {
@@ -150,6 +175,7 @@ public class UPnPListener {
     public void findFrontends() throws IOException {
         LogUtil.debug("Start UPnP search for frontends"); //$NON-NLS-1$
         sendSearch(FRONTEND_UPNP_ID);
+        Globals.scheduleOnWorker(cleanDiscoveredFrontends, 1000);
     }
     
     static private void sendSearch(String search) throws IOException {
@@ -235,7 +261,9 @@ public class UPnPListener {
         );
         
         name.setCharAt(0, Character.toUpperCase(name.charAt(0)));
-        FrontendDB.insert(Globals.appContext, name.toString(), addr, null);
+        FrontendDB.insert(
+            Globals.appContext, name.toString(), addr, null, true
+        );
         
     }
     

@@ -208,7 +208,7 @@ public class FrontendList extends ListActivity implements
                 }
 
                 if (rowID < 1) {
-                    if (!FrontendDB.insert(this, name, addr, hwaddr))
+                    if (!FrontendDB.insert(this, name, addr, hwaddr, false))
                         ErrUtil.err(
                             ctx, Messages.getString("FrontendList.5") + name //$NON-NLS-1$
                         );
