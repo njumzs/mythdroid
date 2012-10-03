@@ -325,7 +325,8 @@ public class RecDetailFragment extends Fragment {
         
     }
     
-    private class deleteDialog extends DialogFragment {
+    @SuppressWarnings("javadoc")
+    public class deleteDialog extends DialogFragment {
 
         @Override
         public Dialog onCreateDialog(Bundle icicle) {
@@ -362,7 +363,8 @@ public class RecDetailFragment extends Fragment {
         
     }
 
-    private class stopDialog extends DialogFragment {
+    @SuppressWarnings("javadoc")
+    public class stopDialog extends DialogFragment {
         @Override
         public Dialog onCreateDialog(Bundle icicle) {
             return
