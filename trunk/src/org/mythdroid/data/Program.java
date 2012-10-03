@@ -485,7 +485,7 @@ public class Program implements Comparable<Program> {
         try {
             return 
                 new ContentService(Globals.getBackend().addr)
-                    .getRecordingArt(ChanID, StartTime, type, width, height);
+                    .getRecordingArt(ChanID, RecStartTime, type, width, height);
         } catch (IOException e) {
             ErrUtil.logWarn(e);
         } catch (JSONException e) {
