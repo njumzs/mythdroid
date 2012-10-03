@@ -58,10 +58,6 @@ public class Globals {
     /** A Video representing the currently selected video */
     public static Video curVid        = null;
     
-    /** To remember where we were */
-    public static FrontendLocation lastLocation =
-        new FrontendLocation(null, "MainMenu"); //$NON-NLS-1$
-    
     /** SimpleDateFormat of yyyy-MM-dd'T'HH:mm:ss */
     final public static SimpleDateFormat dateFmt =
         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
@@ -81,6 +77,9 @@ public class Globals {
         "artwork", 10, 100, 1024*1024*20 //$NON-NLS-1$
     );
     
+    /** To remember where we were */
+    private static FrontendLocation lastLocation =
+        new FrontendLocation(null, "MainMenu"); //$NON-NLS-1$
     /** The global UPnPListener */
     private static UPnPListener upnp      = null;
     /** A BackendManager representing a connected backend */
@@ -225,7 +224,7 @@ public class Globals {
         
         // See if we can locate a backend via UPnP
         beMgr = new BackendManager(
-            Globals.getUPnPListener().findMasterBackend(550)
+            Globals.getUPnPListener().findMasterBackend(950)
         );
         muxConns = false;
 
@@ -335,6 +334,26 @@ public class Globals {
         if (wHandler != null)
             wHandler.getLooper().quit();
         wHandler = null;
+    }
+    
+    /**
+     * Update the global lastLocation field, used to remember the last
+     * location of a frontend prior to a jump elsewhere
+     * @param loc FrontendLocation representing the last location
+     */
+    public static void setLastLocation(final FrontendLocation loc) {
+        /* We don't want to store locations that might result in a loop
+           if we jump to them, or that we can't jump to anyway */
+        if (
+            loc == null || loc.video || loc.music ||
+            loc.location.endsWith(".xml") //$NON-NLS-1$
+        ) return;
+        lastLocation = loc;
+    }
+    
+    /** Get the global lastLocation */
+    public static FrontendLocation getLastLocation() {
+        return lastLocation;
     }
     
     /**
