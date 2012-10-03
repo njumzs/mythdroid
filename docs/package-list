@@ -8,5 +8,7 @@ org.mythdroid.mdd
 org.mythdroid.receivers
 org.mythdroid.remote
 org.mythdroid.resource
+org.mythdroid.services
 org.mythdroid.util
 org.mythdroid.views
+org.mythdroid.vlc
