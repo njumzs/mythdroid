@@ -28,6 +28,7 @@ import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.mdd.MDDMusicListener;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.LogUtil;
 import org.mythdroid.Enums.Key;
 
 import android.R.drawable;
@@ -378,8 +379,14 @@ public class MusicRemote extends Remote {
                         try {
                             switch(which) {
                                 case Dialog.BUTTON_POSITIVE:
-                                    if (jump)
-                                        feMgr.jumpTo(Globals.lastLocation);
+                                    if (jump) {
+                                        LogUtil.debug(
+                                            "MusicRemote is finishing, jumping" + //$NON-NLS-1$
+                                            " back to " + //$NON-NLS-1$
+                                            Globals.getLastLocation().location
+                                        );
+                                        feMgr.jumpTo(Globals.getLastLocation());
+                                    }
                                     else {
                                         feMgr.sendKey(Key.ESCAPE);
                                         feMgr.sendKey(Key.ENTER);

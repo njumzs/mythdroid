@@ -39,6 +39,7 @@ import org.mythdroid.mdd.MDDChannelListener;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.LogUtil;
 import org.mythdroid.views.CutListDrawable;
 import org.mythdroid.activities.Guide;
 import org.mythdroid.activities.VideoPlayer;
@@ -900,8 +901,12 @@ public class TVRemote extends Remote {
     private synchronized void done() {
         synchronized (feLock) {
             if (feMgr != null && feMgr.isConnected() && jump) {
+                LogUtil.debug(
+                    "TVRemote is finishing, jumping back to " + //$NON-NLS-1$
+                    Globals.getLastLocation().location
+                );
                 try {
-                    feMgr.jumpTo(Globals.lastLocation);
+                    feMgr.jumpTo(Globals.getLastLocation());
                 } catch (IOException e) { ErrUtil.postErr(this, e); }
                 catch (IllegalArgumentException e) { ErrUtil.postErr(this, e); }
             }

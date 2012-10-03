@@ -378,11 +378,11 @@ public class NavRemote extends Remote {
         }
 
         if (newLoc.video) {
-            if (lastLoc != null)
-                Globals.lastLocation = lastLoc;
             if (calledByRemote)
                 finish();
             else {
+                if (lastLoc != null)
+                    Globals.setLastLocation(lastLoc);
                 final Intent intent =
                     new Intent().setClass(this, TVRemote.class)
                                 .putExtra(Extras.DONTJUMP.toString(), true);
@@ -394,8 +394,8 @@ public class NavRemote extends Remote {
         }
 
         else if (newLoc.music) {
-            if (lastLoc != null)
-                Globals.lastLocation = lastLoc;
+            if (!calledByRemote && lastLoc != null)
+                Globals.setLastLocation(lastLoc);
             startActivity(
                 new Intent()
                     .setClass(this, MusicRemote.class)
