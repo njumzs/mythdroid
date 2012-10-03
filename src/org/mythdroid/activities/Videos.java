@@ -136,7 +136,8 @@ public class Videos extends MDActivity implements
     final private Runnable notifyChanged = new Runnable() {
         @Override
         public void run() {
-            ((VideoAdapter)lv.getAdapter()).notifyDataSetChanged();
+            if (lv != null && lv.getAdapter() != null)
+                ((VideoAdapter)lv.getAdapter()).notifyDataSetChanged();
         }
     };
     
