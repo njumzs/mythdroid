@@ -18,6 +18,8 @@
 
 package org.mythdroid.remote;
 
+import java.lang.ref.WeakReference;
+
 import org.mythdroid.util.LogUtil;
 
 import android.app.KeyguardManager;
@@ -57,7 +59,7 @@ public class WakeService extends Service implements SensorEventListener {
         filter.addAction(Intent.ACTION_SCREEN_ON);
     }
      
-    final private Messenger messenger = new Messenger(new MessageHandler());
+    final private Messenger messenger = new Messenger(new MessageHandler(this));
     
     private SensorManager   sensorMgr = null;
     private Sensor          sensor = null;
@@ -95,33 +97,42 @@ public class WakeService extends Service implements SensorEventListener {
 
     };
     
-    private class MessageHandler extends Handler {
+    private static class MessageHandler extends Handler {
+        
+        private final WeakReference<WakeService> target;
+        
+        MessageHandler(WakeService ws) {
+            target = new WeakReference<WakeService>(ws);
+        }
+        
         @Override
         public synchronized void handleMessage(Message msg) {
+            
+            WakeService ws = target.get();
             
             switch (msg.what) {
              
                 case MSG_START:
-                    if (isStarted) return;
+                    if (ws.isStarted) return;
                     LogUtil.debug("Start monitoring"); //$NON-NLS-1$
-                    registerReceiver(screenStateReceiver, filter);
-                    sensorMgr.registerListener(
-                        WakeService.this, sensor,
+                    ws.registerReceiver(ws.screenStateReceiver, filter);
+                    ws.sensorMgr.registerListener(
+                        ws, ws.sensor,
                         SensorManager.SENSOR_DELAY_NORMAL
                     );
-                    partialLock.acquire();
-                    startTime = System.currentTimeMillis();
-                    isStarted = true;
+                    ws.partialLock.acquire();
+                    ws.startTime = System.currentTimeMillis();
+                    ws.isStarted = true;
                     break;
                 
                 case MSG_STOP:
-                    if (!isStarted) return;
+                    if (!ws.isStarted) return;
                     LogUtil.debug("Stop monitoring"); //$NON-NLS-1$
-                    if (partialLock.isHeld())
-                        partialLock.release();
-                    unregisterReceiver(screenStateReceiver);
-                    sensorMgr.unregisterListener(WakeService.this);
-                    isStarted = false;
+                    if (ws.partialLock.isHeld())
+                        ws.partialLock.release();
+                    ws.unregisterReceiver(ws.screenStateReceiver);
+                    ws.sensorMgr.unregisterListener(ws);
+                    ws.isStarted = false;
                     break;
                     
                 default:
