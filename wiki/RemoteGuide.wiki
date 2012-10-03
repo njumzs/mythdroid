@@ -36,7 +36,7 @@ In the gesture interface, the following gestures are recognised:
  * Tap - pause / unpause
  
 The menu button gives you the choice of showing the OSD menu on the frontend 
-or switching interfaces (button or gesture).
+or switching interfaces (button or gesture). It also allows you to move playback to a different frontend or to the Android device - see [MoveTo].
 
 The default TV remote style (gesture or standard) can be configured in 
 !MythDroid's [SettingsGuide settings].
