@@ -2,13 +2,12 @@ Non-trivial user visible changes
 
 In 0.6.0:
 
-MDD: Only add files to the HTTPServer whitelist as needed; not all at once
+Add ability to move in-progress playback between frontends and/or the device itself
+Show cover/fanart in recording detail, tv remote and video detail backgrounds
 Add a stream complexity setting and external player support (but with no seeking)
-Modify stream quality choices
-MDD: Add stream complexity support
 Add update checking for MythDroid and MDD and a preference to disable it 
+Many layout and visual fixes
 Add KEEPALIVE support to MDDManager and MDD's video enumeration functions
-MDD: Add version checking and update download functionality
 Add version mismatch log warning to UpdateService
 Automatically find MythTV 0.25+ frontends via UPnP and add them to the FrontendDB if they're new
 Add protocol tokens for protoVersions up to 72
@@ -17,16 +16,16 @@ Update Guide to use services api where available
 Update Status to use services api where available
 Update scheduling related fragments to use services api where available
 Update Video related activities to use services api where available
-Don't use HLS for streaming yet though - it's really low bandwidth and seeking doesn't work
-Make the logo button in the action bar take us back to the root activity where appropriate 
-Many layout and visual fixes
+Implement HLS but don't use it yet - it's really low bandwidth and seeking doesn't work
+Fix problems that occur when device is in different timezone to backend
 Fixed drawing of cutlists on honeycomb+
 Remove extraneous red highlight in recordings list when displayed on a phone
-Show cover/fanart in recording detail, tv remote and video detail backgrounds
+Make the logo button in the action bar take us back to the root activity where appropriate 
+MDD: Fixed upstart script
 MDD: Thread the HTTPServer for much faster video poster fetching
-Draw a border around posters/preview images
-Add ability to move in-progress playback between frontends and/or the device
-itself
+MDD: Only add files to the HTTPServer whitelist as needed; not all at once
+MDD: Add version checking and update download functionality
+MDD: create a system account (hidden from most display managers)
 
 In 0.5.3:
 
