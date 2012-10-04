@@ -480,7 +480,7 @@ public class Program implements Comparable<Program> {
      */
     public Bitmap getArtwork(ArtworkType type, int width, int height) {
         
-        if (!Globals.haveServices()) return null;
+        if (!Globals.haveServices() || RecStartTime == null) return null;
         
         try {
             return 
