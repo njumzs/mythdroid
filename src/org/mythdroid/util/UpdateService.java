@@ -489,7 +489,7 @@ public class UpdateService extends Service {
         
         notification.setLatestEventInfo(
             getApplicationContext(), title,  message,
-            PendingIntent.getBroadcast(Globals.appContext, 0, null, 0)
+            PendingIntent.getActivity(Globals.appContext, 0, new Intent(), 0)
         );
 
         nm.notify(-1, notification);
