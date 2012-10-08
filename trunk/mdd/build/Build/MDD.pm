@@ -41,7 +41,7 @@ sub install_frontend {
     $dst  = "$dir/mythlcd"; 
     $path = "$dir/mythlcdserver";
 
-    unless ((`file $path`)[0] =~ /perl/) {
+    unless ((`file $path`)[0] =~ /perl/i) {
         print "cp $path -> $dst\n";
         copy($path, $dst) or die "$!\n";
         chmod(0755, $dst) 
