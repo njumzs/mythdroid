@@ -708,30 +708,38 @@ public class ConnMgr {
         int ret = -1;
         
         try {
-            ret = is.read(buf, off, len);
-        } catch (SocketTimeoutException e) {
-            
-            final String msg = 
-                String.format(Messages.getString("ConnMgr.5"), addr); //$NON-NLS-1$ 
-
-            LogUtil.debug(msg);
-
-            if (!isConnected()) {
+        
+            try {
+                ret = is.read(buf, off, len);
+            } catch (SocketTimeoutException e) {
+                
+                final String msg = 
+                    String.format(Messages.getString("ConnMgr.5"), addr); //$NON-NLS-1$ 
+    
+                LogUtil.debug(msg);
+    
+                if (!isConnected()) {
+                    LogUtil.warn(
+                        "Disconnected from " + addr + ", wait for reconnect"  //$NON-NLS-1$ //$NON-NLS-2$
+                    );
+                    return retryRead(buf, off, len);
+                }
+                
+                dispose();
+                throw new SocketTimeoutException(msg);
+    
+            }
+    
+            if (ret == -1) {
                 LogUtil.warn(
-                    "Disconnected from " + addr + ", wait for reconnect"  //$NON-NLS-1$ //$NON-NLS-2$
+                    "Read from " + addr + " failed, wait for reconnect" //$NON-NLS-1$ //$NON-NLS-2$
                 );
+                doDisconnect();
                 return retryRead(buf, off, len);
             }
             
-            dispose();
-            throw new SocketTimeoutException(msg);
-
-        }
-
-        if (ret == -1) {
-            LogUtil.warn("Read from " + addr + " failed, wait for reconnect"); //$NON-NLS-1$ //$NON-NLS-2$
-            doDisconnect();
-            return retryRead(buf, off, len);
+        } catch (StackOverflowError se) {
+            throw new IOException("Error reading from " + addr); //$NON-NLS-1$
         }
        
         return ret;
