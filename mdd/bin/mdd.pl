@@ -112,7 +112,7 @@ my (%commands, %videos, %storageGroups);
 
 my $stream_cmd = $config{stream} ||
     '/usr/bin/vlc -vvv -I oldrc --rc-host 0.0.0.0:16547 --rc-fake-tty '      .
-    '--file-caching=2000 --rtsp-timeout=-1 %FILE% '                          . 
+    '--file-caching=2000 --rtsp-timeout=-1 --codec=avcodec %FILE% '          . 
     '--sout=\'#transcode{vcodec=h264,venc=x264{no-cabac,keyint=50,ref=1,'    .
     'level=31,bframes=0,bpyramid=none,profile=baseline,no-weightb,weightp=0,'.
     'no-8x8dct,trellis=0,me=dia,subme=1,no-mbtree,partitions=none,'          .
