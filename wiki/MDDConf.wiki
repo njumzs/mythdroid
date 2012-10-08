@@ -11,8 +11,8 @@ by editing /etc/mdd.conf.
 ||debug||true or false||false||Setting debug to true makes MDD write extra information in the log||
 ||logfile||path||/tmp/mdd.log||Set the path of MDD's log file||
 ||user||username||mdd||Set the username that mdd will switch to if it's run as root||
-||cmux||true or false||true||Enable or disable MDD's CMux module||
-||cmux_extra_ports||Space separated list of port numbers||None||A list of extra ports that CMux will permit connections to||
+||cmux||true or false||true||Enable or disable MDD's [CMux] module||
+||cmux_extra_ports||Space separated list of port numbers||None||A list of extra ports that [CMux] will permit connections to||
 ||command||name => command||None||A MDD command that will be available from !MythDroid, multiple definitions are permitted||
 ||stream||command||See [StreamingGuide Streaming Guide]||See [StreamingGuide Streaming Guide]||
 
