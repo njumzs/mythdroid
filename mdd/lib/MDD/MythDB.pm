@@ -99,7 +99,8 @@ sub new {
     bless $self, $class;
 
     $self->{VidDBVer} = $self->settingNoHost('mythvideo.DBSchemaVer');
-    $log->dbg("Video DB schema version is $self->{VidDBVer}") if $log;
+    $log->dbg("Video DB schema version is $self->{VidDBVer}")
+        if $log && $self->{VidDBVer};
 
     return $self;
 }
