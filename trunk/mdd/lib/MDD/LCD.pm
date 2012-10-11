@@ -150,7 +150,7 @@ sub command($) {
     elsif ($data =~ s/^SWITCH_TO_CHANNEL\s+//) {
         return $self->channel($data);
     }
-    elsif ($data =~ /^SET_CHANNEL_PROGRESS.*([\.\d]+)/) {
+    elsif ($data =~ /^SET_CHANNEL_PROGRESS.*?([\.\d]+)$/) {
         return $self->channelProgress($1);
     }
     elsif ($data =~ /^SWITCH_TO_TIME/) {
