@@ -137,7 +137,12 @@ public class BackendManager {
      */
     public String getTimezone() throws IOException {
         cmgr.sendString("QUERY_TIME_ZONE"); //$NON-NLS-1$
-        return cmgr.readStringList()[0];
+        String tz = cmgr.readStringList()[0];
+        if (tz != null) {
+            tz.replace(' ', '_');
+            LogUtil.debug("Backend timezone: " + tz); //$NON-NLS-1$
+        }
+        return tz;
     }
 
     /**
