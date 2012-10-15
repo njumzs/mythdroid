@@ -204,7 +204,7 @@ sub ACTION_uninstall {
         my $dst  = "$dir/mythlcd"; 
         my $path = "$dir/mythlcdserver";
 
-        if ((`file $path`)[0] =~ /perl/) {
+        if ((`file $path`)[0] =~ /perl/i) {
             copy($dst, $path) or croak "$!\n";
         }
         unlink $dst;
