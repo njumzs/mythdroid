@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="mainMenuItems">
+        <item>Guarda TV</item>
+	   <item>Registrazioni</item>
+	   <item>Video</item>
+	   <item>Musica</item>
+	   <item>Guida</item>
+	   <item>Stato</item>
+    </string-array>
+    <string-array name="remoteStyles">
+	   <item>Bottone</item>
+	   <item>Gesture</item>
+    </string-array>
+    <string-array name="streamingRates">
+	   <item>Video 1024   Audio 160   (1184 kb/s)</item>
+	   <item>Video  512   Audio 128    (640 kb/s)</item>
+	   <item>Video  384   Audio  96    (480 kb/s)</item>
+	   <item>Video  192   Audio  64    (256 kb/s)</item>
+    </string-array>
+    <string-array name="streamStrings">
+        <item>Baseline - bassa</item>
+        <item>Baseline - media</item>
+        <item>Main     - alta</item>
+    </string-array>
+    <string-array name="streamValues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+</resources>
