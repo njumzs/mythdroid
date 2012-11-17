@@ -11,8 +11,11 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.HttpParams;
 import org.mythdroid.resource.Messages;
 
 import android.graphics.Bitmap;
@@ -28,6 +31,12 @@ public class HttpFetcher {
     /** Constructor */
     public HttpFetcher() {
         client = new DefaultHttpClient();
+        ClientConnectionManager cmgr = client.getConnectionManager();
+        HttpParams params = client.getParams();
+        client = new DefaultHttpClient(
+            new ThreadSafeClientConnManager(params, cmgr.getSchemeRegistry()),
+            params
+        );
     }
     
     /**
@@ -65,7 +74,7 @@ public class HttpFetcher {
         if (code != 200) 
             throw new IOException(Messages.getString("HttpFetcher.0") + code); //$NON-NLS-1$
         entity = resp.getEntity();
-        
+
     }
     
     /**
@@ -117,6 +126,8 @@ public class HttpFetcher {
         
         st.close();
         entity.consumeContent();
+        entity = null;
+        resp   = null;
         return new String(buf);
         
     }
@@ -134,9 +145,13 @@ public class HttpFetcher {
             );
         
         final InputStream is = new BufferedHttpEntity(entity).getContent();
-        final Bitmap bm = BitmapFactory.decodeStream(is);
+        final BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inScaled = false;
+        final Bitmap bm = BitmapFactory.decodeStream(is, null, opts);
         is.close();
         entity.consumeContent();
+        entity = null;
+        resp   = null;
         return bm;
         
     }
@@ -155,6 +170,7 @@ public class HttpFetcher {
         
         entity.writeTo(output);
         entity.consumeContent();
+        entity = null;
         
     }
 
