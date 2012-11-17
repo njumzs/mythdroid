@@ -58,7 +58,8 @@ public class BackendManager {
     public String addr = null;
 
     static final private String myAddr = "android"; //$NON-NLS-1$
-
+    
+    final private Object cmgrLock = new Object();
     private String  statusURL = null;
     private ConnMgr cmgr      = null;
 
@@ -87,17 +88,19 @@ public class BackendManager {
             "Connecting to " + host +  //$NON-NLS-1$
             ":6543 (ProtoVer " + Globals.protoVersion +")" //$NON-NLS-1$ //$NON-NLS-2$
         );
-
-        cmgr = ConnMgr.connect(host, 6543, new onConnectListener() {
-                @Override
-                public void onConnect(ConnMgr cmgr) throws IOException {
-                    if (!announce(cmgr))
-                        throw new IOException(
-                            Messages.getString("BackendManager.0") //$NON-NLS-1$)
-                        );
-                }
-            }, Globals.muxConns
-        );
+        
+        synchronized (cmgrLock) {
+            cmgr = ConnMgr.connect(host, 6543, new onConnectListener() {
+                    @Override
+                    public void onConnect(ConnMgr cmgr) throws IOException {
+                        if (!announce(cmgr))
+                            throw new IOException(
+                                Messages.getString("BackendManager.0") //$NON-NLS-1$)
+                            );
+                    }
+                }, Globals.muxConns
+            );
+        }
         
         addr = host;
         
@@ -119,7 +122,9 @@ public class BackendManager {
      * @return true if we are connected, false otherwise
      */
     public boolean isConnected() {
-        return (cmgr != null && cmgr.isConnected());
+        synchronized (cmgrLock) {
+            return (cmgr != null && cmgr.isConnected());
+        }
     }
 
     /**
@@ -136,8 +141,11 @@ public class BackendManager {
      * @throws IOException
      */
     public String getTimezone() throws IOException {
-        cmgr.sendString("QUERY_TIME_ZONE"); //$NON-NLS-1$
-        String tz = cmgr.readStringList()[0];
+        String tz = null;
+        synchronized (cmgrLock) {
+            cmgr.sendString("QUERY_TIME_ZONE"); //$NON-NLS-1$
+            tz = cmgr.readStringList()[0];
+        }
         if (tz != null) {
             tz = tz.replace(' ', '_');
             LogUtil.debug("Backend timezone: " + tz); //$NON-NLS-1$
@@ -160,13 +168,15 @@ public class BackendManager {
             return prog;
         }
 
-        cmgr.sendString("QUERY_RECORDING BASENAME " + basename); //$NON-NLS-1$
-        try {
-            prog = new Program(cmgr.readStringList(), 1);
-        } catch (IllegalArgumentException e) {
-            LogUtil.warn(e.getMessage());
-            prog = new Program();
-            prog.Title = "Unknown";  //$NON-NLS-1$
+        synchronized (cmgrLock) {
+            cmgr.sendString("QUERY_RECORDING BASENAME " + basename); //$NON-NLS-1$
+            try {
+                prog = new Program(cmgr.readStringList(), 1);
+            } catch (IllegalArgumentException e) {
+                LogUtil.warn(e.getMessage());
+                prog = new Program();
+                prog.Title = "Unknown";  //$NON-NLS-1$
+            }
         }
         
         return prog;
@@ -179,14 +189,18 @@ public class BackendManager {
      */
     public ArrayList<Program> getRecordings() throws IOException {
 
-        // QUERY_RECORDINGS can take a few seconds..
-        cmgr.setTimeout(ConnMgr.timeOut.LONG);
+        String resp[] = null;
         
-        String type = "Ascending"; //$NON-NLS-1$
-        if (Globals.protoVersion < 65) 
-            type = "Play"; //$NON-NLS-1$
-        cmgr.sendString("QUERY_RECORDINGS " + type); //$NON-NLS-1$
-        final String[] resp = cmgr.readStringList();
+        synchronized (cmgrLock) {
+            // QUERY_RECORDINGS can take a few seconds..
+            cmgr.setTimeout(ConnMgr.timeOut.LONG);
+        
+            String type = "Ascending"; //$NON-NLS-1$
+            if (Globals.protoVersion < 65) 
+                type = "Play"; //$NON-NLS-1$
+            cmgr.sendString("QUERY_RECORDINGS " + type); //$NON-NLS-1$
+            resp = cmgr.readStringList();
+        }
 
         int respSize = resp.length;
         int numFields = Program.numFields();
@@ -201,7 +215,6 @@ public class BackendManager {
                 programs.add(new Program(resp, i));
             } catch (IllegalArgumentException e) { 
                 LogUtil.warn(e.getMessage());
-                continue; 
             }
         }
 
@@ -219,8 +232,10 @@ public class BackendManager {
     public void stopRecording(final Program prog) throws IOException {
         final String[] list = prog.stringList();
         list[0] = "STOP_RECORDING"; //$NON-NLS-1$
-        cmgr.sendStringList(list);
-        cmgr.readStringList();
+        synchronized (cmgrLock) {
+            cmgr.sendStringList(list);
+            cmgr.readStringList();
+        }
     }
 
 
@@ -231,8 +246,10 @@ public class BackendManager {
     public void deleteRecording(final Program prog) throws IOException {
         final String[] list = prog.stringList();
         list[0]= "DELETE_RECORDING"; //$NON-NLS-1$
-        cmgr.sendStringList(list);
-        cmgr.readStringList();
+        synchronized (cmgrLock) {
+            cmgr.sendStringList(list);
+            cmgr.readStringList();
+        }
     }
 
     /**
@@ -240,13 +257,15 @@ public class BackendManager {
      * @param recid integer recording id
      */
     public void reschedule(int recid) throws IOException {
-        if (Globals.protoVersion >= 73)
-            cmgr.sendString(
-                "RESCHEDULE_RECORDINGS MATCH " + recid + " 0 0 - MythDroid" //$NON-NLS-1$ //$NON-NLS-2$
-            );
-        else
-            cmgr.sendString("RESCHEDULE_RECORDINGS " + recid); //$NON-NLS-1$
-        cmgr.readStringList();
+        synchronized (cmgrLock) {
+            if (Globals.protoVersion >= 73)
+                cmgr.sendString(
+                    "RESCHEDULE_RECORDINGS MATCH " + recid + " 0 0 - MythDroid" //$NON-NLS-1$ //$NON-NLS-2$
+                    );
+            else
+                cmgr.sendString("RESCHEDULE_RECORDINGS " + recid); //$NON-NLS-1$
+            cmgr.readStringList();
+        }
     }
     
     /**
@@ -278,7 +297,9 @@ public class BackendManager {
         LogUtil.debug("Fetching image from " + url.toString()); //$NON-NLS-1$
 
         try {
-            return BitmapFactory.decodeStream(url.openStream());
+            final BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inScaled = false;
+            return BitmapFactory.decodeStream(url.openStream(), null, opts);
         } catch (IOException e) {
             ErrUtil.logWarn(e);
             return null;
@@ -288,7 +309,9 @@ public class BackendManager {
 
     /** Disconnect from the backend */
     public void done() {
-        cmgr.disconnect();
+        synchronized (cmgrLock) {
+            cmgr.disconnect();
+        }
     }
 
     /**
@@ -342,12 +365,14 @@ public class BackendManager {
         // prefix a space for the actual request
         if (protoToken.length() > 0)
             protoToken = " " + protoToken; //$NON-NLS-1$
+        
+        synchronized (cmgrLock) {
+            cmgr.sendString("MYTH_PROTO_VERSION " + protoVer + protoToken); //$NON-NLS-1$
+            if (!cmgr.readStringList()[0].equals("ACCEPT")) return false; //$NON-NLS-1$
 
-        cmgr.sendString("MYTH_PROTO_VERSION " + protoVer + protoToken); //$NON-NLS-1$
-        if (!cmgr.readStringList()[0].equals("ACCEPT")) return false; //$NON-NLS-1$
-
-        cmgr.sendString("ANN Playback " + myAddr + " 0"); //$NON-NLS-1$ //$NON-NLS-2$
-        if (!cmgr.readStringList()[0].equals("OK")) return false; //$NON-NLS-1$
+            cmgr.sendString("ANN Playback " + myAddr + " 0"); //$NON-NLS-1$ //$NON-NLS-2$
+            if (!cmgr.readStringList()[0].equals("OK")) return false; //$NON-NLS-1$
+        }
 
         return true;
 
