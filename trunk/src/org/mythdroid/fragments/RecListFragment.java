@@ -75,9 +75,6 @@ public class RecListFragment extends ListFragment
         View detailsFrame = getActivity().findViewById(R.id.recdetails);
         dualPane = detailsFrame != null && 
                    detailsFrame.getVisibility() == View.VISIBLE;
-       
-        if (!activity.hasRecordings())
-            activity.refresh();
         
     }
     
