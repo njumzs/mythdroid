@@ -157,6 +157,10 @@ public class TVRemote extends Remote {
                     ErrUtil.postErr(ctx, e);
                     done();
                     return;
+                }  catch (IllegalArgumentException e) {
+                    ErrUtil.postErr(ctx, e);
+                    done();
+                    return;
                 }
             }
             
@@ -263,7 +267,6 @@ public class TVRemote extends Remote {
                 initError(e.getMessage());
                 return;
             } catch (InterruptedException e) {}
-              
             
             handler.post(ready);
 
@@ -769,6 +772,9 @@ public class TVRemote extends Remote {
         } catch (IOException e) {
             initError(e.getMessage());
             return false;
+        }  catch (IllegalArgumentException e) {
+            initError(e.getMessage());
+            return false;
         }
         
         endTime = loc.end;
@@ -811,6 +817,9 @@ public class TVRemote extends Remote {
                         } catch (IOException e) { 
                             ErrUtil.err(ctx, e);
                             return; 
+                        }  catch (IllegalArgumentException e) {
+                            ErrUtil.err(ctx, e);
+                            return;
                         }
                         if (loc.end <= 0) return;
                         progress = (loc.end * progress) / 1000;

@@ -18,6 +18,7 @@
 
 package org.mythdroid.frontend;
 
+import android.annotation.SuppressLint;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +38,7 @@ public class FrontendManager {
     /** String containing the hostname or IP address of the frontend */
     public  String  addr = null;
     
-    final private Object cmgrLock = new Object(); 
+    final private Object cmgrLock = new Object();
     private ConnMgr cmgr          = null;
     
     /**
@@ -92,7 +93,8 @@ public class FrontendManager {
      * @param loc a FrontendLocation to jump to
      * @return true if we jumped ok, false otherwise
      */
-    public boolean jumpTo(FrontendLocation loc) throws IOException
+	@SuppressLint("DefaultLocale")
+	public boolean jumpTo(FrontendLocation loc) throws IOException
     {
         if (loc == null || loc.location == null)
             throw new IllegalArgumentException(
@@ -131,7 +133,8 @@ public class FrontendManager {
      * Get the current frontend location
      * @return a FrontendLocation
      */
-    public FrontendLocation getLoc() throws IOException {
+    public FrontendLocation getLoc()
+        throws IOException, IllegalArgumentException {
         
         String loc = null;
         
@@ -155,8 +158,9 @@ public class FrontendManager {
             loc = getSingleLineResponse("query loc", ConnMgr.timeOut.EXTRALONG); //$NON-NLS-1$
             
         }
-
+        
         return new FrontendLocation(this, loc);
+        
     }
 
     /**
