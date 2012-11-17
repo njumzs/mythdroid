@@ -49,13 +49,12 @@ public class FrontendList extends ListActivity implements
     DialogInterface.OnClickListener {
 
     final static private int
-        ADD_DIALOG  = 0, DEFAULT_DIALOG = 1, EDIT_DIALOG = 2;
+        ADD_DIALOG  = 0, DEFAULT_DIALOG  = 1, EDIT_DIALOG = 2;
 
     final private Context ctx             = this;
 
     private AlertDialog   feEditor        = null;
-    private int           clickedPosition = -1;
-    private View          clickedView     = null;
+    private int           clickedPosition = 0;
     private View          ftr             = null;
 
     @Override
@@ -68,8 +67,10 @@ public class FrontendList extends ListActivity implements
 
         ((TextView)(hdr.findViewById(R.id.name))).setText(R.string.addFe);
         ((TextView)(hdr.findViewById(R.id.addr))).setText(R.string.clickAddFe);
+        
+        ListView lv = getListView();
 
-        getListView().addHeaderView(hdr);
+        lv.addHeaderView(hdr);
 
         ftr = getLayoutInflater().inflate(
             R.layout.frontend_list_item, null
@@ -83,8 +84,8 @@ public class FrontendList extends ListActivity implements
             ((TextView)(ftr.findViewById(R.id.addr)))
                 .setText(FrontendDB.getDefault(this));
         
-        getListView().addHeaderView(ftr);
-        getListView().setPadding(0, 4, 0, 0);
+        lv.addHeaderView(ftr);
+        lv.setPadding(0, 4, 0, 0);
 
         Cursor c = FrontendDB.getFrontends(this);
 
@@ -95,19 +96,28 @@ public class FrontendList extends ListActivity implements
                 new int[] { R.id.addr, R.id.name, R.id.hwaddr }
             )
         );
+        
+        if (icicle != null)
+            clickedPosition = icicle.getInt("clickedPosition"); //$NON-NLS-1$
 
+    }
+    
+    @Override
+    public void onSaveInstanceState(Bundle bundle) {
+        bundle.putInt("clickedPosition", clickedPosition); //$NON-NLS-1$
     }
 
     @Override
     public Dialog onCreateDialog(int id) {
 
-        View editor = getLayoutInflater().inflate(
-            R.layout.frontend_editor, null
-        );
-
+        View editor = null;
+        
         switch (id) {
 
             case ADD_DIALOG:
+                editor = getLayoutInflater().inflate(
+                    R.layout.frontend_editor, null
+                );
                 feEditor = new AlertDialog.Builder(this)
                                .setView(editor)
                                .setPositiveButton(R.string.save, this)
@@ -116,6 +126,9 @@ public class FrontendList extends ListActivity implements
                 break;
 
             case EDIT_DIALOG:
+                editor = getLayoutInflater().inflate(
+                    R.layout.frontend_editor, null
+                );
                 feEditor = new AlertDialog.Builder(this)
                                .setView(editor)
                                .setPositiveButton(R.string.save, this)
@@ -125,8 +138,8 @@ public class FrontendList extends ListActivity implements
                 break;
 
             case DEFAULT_DIALOG:
-                final Dialog d = createDefaultFrontendDialog();
-                return d;
+                return createDefaultFrontendDialog();
+                
         }
 
         return feEditor;
@@ -139,14 +152,15 @@ public class FrontendList extends ListActivity implements
 
             case EDIT_DIALOG:
 
-                if (clickedView == null) return;
-
-                CharSequence name = ((TextView)clickedView
-                                        .findViewById(R.id.name)).getText();
-                CharSequence addr = ((TextView)clickedView
-                                        .findViewById(R.id.addr)).getText();
-                CharSequence hwaddr = ((TextView)clickedView
-                                        .findViewById(R.id.hwaddr)).getText();
+                View v = this.getListView().getChildAt(clickedPosition);
+                if (v == null) return;
+                
+                CharSequence name =
+                    ((TextView)v.findViewById(R.id.name)).getText();
+                CharSequence addr =
+                    ((TextView)v.findViewById(R.id.addr)).getText();
+                CharSequence hwaddr =
+                    ((TextView)v.findViewById(R.id.hwaddr)).getText();
 
                 ((EditText)dialog.findViewById(R.id.name)).setText(name);
                 ((EditText)dialog.findViewById(R.id.addr)).setText(addr);
@@ -163,6 +177,7 @@ public class FrontendList extends ListActivity implements
             case DEFAULT_DIALOG:
                 prepareDefaultFrontendDialog(dialog);
                 break;
+                
         }
     }
 
@@ -170,7 +185,6 @@ public class FrontendList extends ListActivity implements
     public void onListItemClick(ListView list, View item, int pos, long itemid)
     {
         clickedPosition = pos;
-        clickedView = item;
         switch (pos) {
             case ADD_DIALOG:
                 showDialog(ADD_DIALOG);
@@ -226,7 +240,7 @@ public class FrontendList extends ListActivity implements
                 FrontendDB.delete(this, rowID);
                 String n = ((EditText)feEditor.findViewById(R.id.name))
                              .getText().toString();
-                if (Globals.curFe.equals(n))
+                if (Globals.curFe != null && Globals.curFe.equals(n))
                     Globals.curFe = FrontendDB.getDefault(ctx);
                 
                 break;
