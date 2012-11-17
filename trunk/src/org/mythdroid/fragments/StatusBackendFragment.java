@@ -22,7 +22,6 @@ import java.util.Date;
 
 import org.mythdroid.Globals;
 import org.mythdroid.R;
-import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.activities.Status;
 import org.mythdroid.resource.Messages;
 import org.w3c.dom.Document;
@@ -30,6 +29,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -40,23 +40,27 @@ import android.widget.TextView;
 /** Displays backend status */
 public class StatusBackendFragment extends Fragment {
 
-    private MDFragmentActivity activity = null;
+    private Status activity = null;
     
-    @Override
+	@SuppressLint("DefaultLocale")
+	@Override
     public View onCreateView(
         LayoutInflater inflater, ViewGroup container, Bundle icicle
     ) {
 
         if (container == null) return null;
-        activity = (MDFragmentActivity)getActivity();
+        activity = (Status)getActivity();
         View view = inflater.inflate(R.layout.status_backend, null, false);
 
-        if (Status.statusDoc == null && !Status.getStatus(activity)) {
+        Document doc = activity.getStatus();
+        
+        if (doc == null && !activity.fetchStatus()) {
             activity.finish();
             return view;
         }
 
-        Document doc = Status.statusDoc;
+        if (doc == null)
+            doc = activity.getStatus();
 
         Node info = doc.getElementsByTagName("MachineInfo").item(0); //$NON-NLS-1$
 

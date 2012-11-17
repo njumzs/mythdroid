@@ -26,7 +26,6 @@ import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.Program;
 import org.mythdroid.resource.Messages;
-import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.activities.RecordingDetail;
 import org.mythdroid.activities.Status;
 import org.w3c.dom.Document;
@@ -53,7 +52,7 @@ public class StatusJobsFragment extends ListFragment {
      
     final private ArrayList<Job> jobs = new ArrayList<Job>(8);
     
-    private MDFragmentActivity activity = null;
+    private Status activity = null;
 
     private enum JobStatus {
         QUEUED  (1),     PENDING  (2),     STARTING (3),     RUNNING  (4),
@@ -250,17 +249,21 @@ public class StatusJobsFragment extends ListFragment {
         LayoutInflater inflater, ViewGroup container, Bundle icicle
     ) {
         if (container == null) return null;
-        activity = (MDFragmentActivity)getActivity();
+        activity = (Status)getActivity();
         View view = inflater.inflate(R.layout.status_jobs, null, false);
         ((TextView)view.findViewById(R.id.emptyMsg))
             .setText(R.string.noJobs);
        
-        if (Status.statusDoc == null && !Status.getStatus(activity)) {
+        Document doc = activity.getStatus();
+        
+        if (doc == null && !activity.fetchStatus()) {
             activity.finish();
             return view;
         }
 
-        Document doc = Status.statusDoc;
+        if (doc == null)
+            doc = activity.getStatus();
+        
         NodeList jobNodes = doc.getElementsByTagName("Job"); //$NON-NLS-1$
 
         for (int i = 0; i < jobNodes.getLength(); i++)
