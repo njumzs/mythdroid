@@ -18,6 +18,7 @@
 
 package org.mythdroid.frontend;
 
+import android.annotation.SuppressLint;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
@@ -87,7 +88,9 @@ public class FrontendLocation {
      * Constructor
      * @param loc String describing location
      */
-    public FrontendLocation(FrontendManager feMgr, String loc) {
+	@SuppressLint("DefaultLocale")
+	public FrontendLocation(FrontendManager feMgr, String loc)
+        throws IllegalArgumentException {
 
         location = loc;
 
@@ -182,7 +185,7 @@ public class FrontendLocation {
         return "Unknown"; //$NON-NLS-1$
     }
 
-    private void parsePlaybackLoc(String loc) {
+    private void parsePlaybackLoc(String loc) throws IllegalArgumentException {
 
         final String[] tok = loc.split(" "); //$NON-NLS-1$
         niceLocation = tok[0] + " " + tok[1]; //$NON-NLS-1$
@@ -190,6 +193,8 @@ public class FrontendLocation {
         position = timeToInt(tok[2]);
 
         if (tok[1].equals("recorded") || tok[1].equals("livetv")) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (tok.length < 11)
+                throw new IllegalArgumentException("Invalid FE loc: " + loc); //$NON-NLS-1$
             end = timeToInt(tok[4]);
             if (tok[5].equals("pause")) //$NON-NLS-1$
                 rate = 0;
@@ -202,10 +207,17 @@ public class FrontendLocation {
                 starttime = Globals.dateFmt.parse(tok[7]);
             } catch (ParseException e) {}
             filename = tok[9];
-            fps = Float.parseFloat(tok[tok.length - 1]);
+            try {
+                fps = Float.parseFloat(tok[tok.length - 1]);
+            } catch (NumberFormatException e) {
+                fps = 0;
+            }
+            
             if (tok[1].equals("livetv")) livetv = true; //$NON-NLS-1$
         }
         else if (tok[1].equals("video")) { //$NON-NLS-1$
+            if (tok.length < 7)
+                throw new IllegalArgumentException("Invalid FE loc: " + loc); //$NON-NLS-1$
             end = -1;
             if (tok[3].equals("pause")) //$NON-NLS-1$
                 rate = 0;
@@ -214,7 +226,11 @@ public class FrontendLocation {
                     tok[3].substring(0, tok[3].lastIndexOf('x'))
                 );
             filename = "Video"; //$NON-NLS-1$
-            fps = Float.parseFloat(tok[tok.length - 1]);
+            try {
+                fps = Float.parseFloat(tok[tok.length - 1]);
+            } catch (NumberFormatException e) {
+                fps = 0;
+            }
         }
         else {
             rate = loc.contains("pause") ? 0 : -1; //$NON-NLS-1$
@@ -255,7 +271,7 @@ public class FrontendLocation {
         
     }
 
-    private static int timeToInt(String time) {
+    private static int timeToInt(String time) throws NumberFormatException {
 
         final String tm[] = time.split(":"); //$NON-NLS-1$
 

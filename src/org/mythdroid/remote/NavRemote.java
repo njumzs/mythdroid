@@ -147,6 +147,7 @@ public class NavRemote extends Remote {
                 feMgr.jumpTo("guidegrid"); //$NON-NLS-1$
             updateLoc();
         } catch (IOException e) { ErrUtil.err(this, e); }
+          catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
 
         if (!calledByRemote) {
             try {
@@ -195,6 +196,9 @@ public class NavRemote extends Remote {
                 onResume();
             updateLoc();
         } catch (IOException e) { 
+            ErrUtil.err(this, e);
+            finish();
+        } catch (IllegalArgumentException e) {
             ErrUtil.err(this, e);
             finish();
         }
@@ -310,6 +314,7 @@ public class NavRemote extends Remote {
         try {
             updateLoc();
         } catch (IOException e) { ErrUtil.err(this, e); }
+          catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
     }
 
     /**
@@ -333,6 +338,7 @@ public class NavRemote extends Remote {
             try {
                 updateLoc();
             } catch (IOException e) { ErrUtil.err(this, e); }
+              catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
 
         if (gesture) {
             findViewById(R.id.back).setOnClickListener(this);
@@ -351,14 +357,15 @@ public class NavRemote extends Remote {
     /**
      * Update the frontend location display, start another remote if appropriate
      */
-    private void updateLoc() throws IOException {
+    private void updateLoc() throws IOException, IllegalArgumentException {
 
         if (
             calledByMusicRemote || feMgr == null    ||
             locView == null     || itemView == null
         ) return;
 
-        final FrontendLocation newLoc = feMgr.getLoc();
+        FrontendLocation newLoc = feMgr.getLoc();
+        
         locS = newLoc.niceLocation;
         itemS = ""; //$NON-NLS-1$
         if (mddMgr == null) {

@@ -255,6 +255,10 @@ public class MusicRemote extends Remote {
             ErrUtil.err(this, e);
             finish();
             return;
+        } catch (IllegalArgumentException e) {
+            ErrUtil.err(ctx, e);
+            finish();
+            return;
         }
     }
 

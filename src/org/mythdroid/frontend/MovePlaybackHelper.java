@@ -181,6 +181,9 @@ public class MovePlaybackHelper {
                         } catch (IOException e) {
                             ErrUtil.err(ctx, e);
                             return;
+                        } catch (IllegalArgumentException e) {
+                            ErrUtil.err(ctx, e);
+                            return;
                         }
                         Intent intent =
                             new Intent(ctx, VideoPlayer.class);
@@ -256,6 +259,9 @@ public class MovePlaybackHelper {
                 try {
                     synchronized (feLock) { loc = feMgr.getLoc(); }
                 } catch (IOException e) {
+                    ErrUtil.err(ctx, e);
+                    return;
+                } catch (IllegalArgumentException e) {
                     ErrUtil.err(ctx, e);
                     return;
                 }
