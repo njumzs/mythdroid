@@ -103,12 +103,8 @@ public class Videos extends MDActivity implements
                     return;
                 }
             
-            final Video[] vids = videos.toArray(new Video[videos.size()]);
-            int numvids = vids.length;
-            
-            for (int i = 0; i < numvids; i++) {
+            for (final Video vid : videos) {
                 
-                final Video vid = vids[i];
                 if (vid.poster != null || vid.directory)  continue;
                 
                 Globals.runOnThreadPool(
@@ -171,14 +167,21 @@ public class Videos extends MDActivity implements
                 finish();
             }
         
-        refresh();
-        
     }
     
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
         Globals.removeThreadPoolTask(getVideos);
+        videos.clear();
+        videos = null;
+        lv.setAdapter(null);
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        refresh();
     }
 
     @Override
