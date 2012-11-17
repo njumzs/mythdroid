@@ -338,14 +338,17 @@ public class Guide extends MDActivity {
             case DIALOG_DATE:
                 return new DatePickerDialog(this,
                     new OnDateSetListener() {
+                        private boolean done = false;
                         @Override
                         public void onDateSet(
                             DatePicker view, int year, int month, int day
                         ) {
+                            if (done) return;
                             now.setYear(year - 1900);
                             now.setMonth(month);
                             now.setDate(day);
                             displayGuide(now);
+                            done = true;
                         }
                     },
                     now.getYear() + 1900, now.getMonth(), now.getDate()
@@ -354,13 +357,16 @@ public class Guide extends MDActivity {
             case DIALOG_TIME:
                 return new TimePickerDialog(this,
                     new OnTimeSetListener() {
+                        private boolean done = false;
                         @Override
                         public void onTimeSet(
                             TimePicker view, int hour, int min
                         ) {
+                            if (done) return;
                             now.setHours(hour);
                             now.setMinutes(min);
                             displayGuide(now);
+                            done = true;
                         }
                     },
                     now.getHours(), now.getMinutes(), true
