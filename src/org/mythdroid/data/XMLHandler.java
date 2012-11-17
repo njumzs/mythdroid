@@ -148,7 +148,10 @@ public class XMLHandler extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String name, String qname) {
-        if (!curElem.name.equals(name)) return;
+        if (
+            curElem == null || curElem.name == null ||
+            !curElem.name.equals(name)
+        ) return;
         if (curElem.text.length() > 0) {
             curElem.textListener.end(curElem.text);
             curElem.text = ""; //$NON-NLS-1$
