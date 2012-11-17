@@ -147,6 +147,20 @@ public class Recordings extends MDFragmentActivity {
         super.onDestroy();
         empty();
     }
+    
+    @Override 
+    public void onResume() {
+        super.onResume();
+        refresh();
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        empty();
+        if (listFragment != null)
+            listFragment.setAdapter(null);
+    }
 
     @Override
     public void onConfigurationChanged(Configuration config) {
@@ -269,7 +283,6 @@ public class Recordings extends MDFragmentActivity {
         if (recordings != null)
             recordings.clear();
         recordings = null;
-        Globals.curProg = null;
     }
 
     /**
