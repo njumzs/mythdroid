@@ -45,6 +45,7 @@ import org.mythdroid.util.LogUtil;
 import org.xml.sax.SAXException;
 
 import android.R.drawable;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -70,6 +71,7 @@ import android.widget.TimePicker;
 import android.widget.TableRow.LayoutParams;
 
 /** Display a program guide */
+@SuppressLint("SimpleDateFormat")
 public class Guide extends MDActivity {
 
     /**
@@ -92,7 +94,7 @@ public class Guide extends MDActivity {
     /** ArrayList of channel objects, capacity ensured during XML parsing */
     private ArrayList<Channel> channels = new ArrayList<Channel>();
 
-    final private SimpleDateFormat
+	final private SimpleDateFormat
         date = new SimpleDateFormat("d MMM yy"), //$NON-NLS-1$
         time = new SimpleDateFormat("HH:mm"); //$NON-NLS-1$
     
