@@ -46,7 +46,7 @@ import android.support.v4.app.FragmentTransaction;
 public class Status extends MDFragmentActivity {
 
     /** The status XML doc from the backend */
-    public static Document   statusDoc   = null;
+    public Document          statusDoc   = null;
     /** Are we embedding the child fragments? */ 
     public boolean           embed       = true;
     final private Context    ctx         = this;
@@ -55,7 +55,7 @@ public class Status extends MDFragmentActivity {
     final private Runnable getStatusTask = new Runnable() {
         @Override
         public void run() {
-            final boolean ok = getStatus(ctx);
+            final boolean ok = fetchStatus();
             handler.post(
                 new Runnable() {
                     @Override
@@ -87,10 +87,9 @@ public class Status extends MDFragmentActivity {
     }
 
     /**
-     * Get new statusDoc from the backend
-     * @param ctx Context
+     * Fetch a new XML status document from the backend
      */
-    public static boolean getStatus(Context ctx) {
+    public boolean fetchStatus() {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         URL url = null;
@@ -113,6 +112,14 @@ public class Status extends MDFragmentActivity {
         
         return statusDoc != null;
 
+    }
+    
+    /**
+     * Get the status XML document
+     * @return status XML document
+     */
+    public Document getStatus() {
+        return statusDoc;
     }
     
     private void installFragments() {

@@ -55,14 +55,13 @@ public class StatusRecordersFragment extends ListFragment {
     final private Handler handler           = new Handler();
     
     private Status activity                 = null;
-    private Document doc                    = null;
     private ArrayList<Encoder> encoders     = new ArrayList<Encoder>();
 
     final private Runnable refreshEncoders = new Runnable() {
         @Override
         public void run() {
 
-            doc = Status.statusDoc;
+            final Document doc = activity.getStatus();
             
             if (doc == null) {
                 activity.finish();
@@ -92,7 +91,7 @@ public class StatusRecordersFragment extends ListFragment {
         @Override
         public void run() {
             
-            if (!Status.getStatus(activity) && Status.statusDoc == null) {
+            if (!activity.fetchStatus()) {
                 activity.dismissLoadingDialog();
                 ErrUtil.postErr(
                     activity, Messages.getString("StatusRecorders.3") //$NON-NLS-1$

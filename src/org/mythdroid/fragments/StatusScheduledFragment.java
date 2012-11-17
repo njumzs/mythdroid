@@ -24,7 +24,6 @@ import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.ProgramAdapter;
-import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.activities.RecordingDetail;
 import org.mythdroid.activities.Status;
 import org.w3c.dom.Document;
@@ -45,22 +44,25 @@ public class StatusScheduledFragment extends ListFragment {
 
     private ArrayList<Program> recordings = new ArrayList<Program>(10);
     
-    private MDFragmentActivity activity = null;
+    private Status activity = null;
 
     @Override
     public View onCreateView(
         LayoutInflater inflater, ViewGroup container, Bundle icicle
     ) {
         if (container == null) return null;
-        activity = (MDFragmentActivity)getActivity();
+        activity = (Status)getActivity();
         View view = inflater.inflate(R.layout.status_scheduled, null, false);
         
-        if (Status.statusDoc == null && !Status.getStatus(activity)) {
+        Document doc = activity.getStatus();
+        
+        if (doc == null && !activity.fetchStatus()) {
             activity.finish();
             return view;
         }
 
-        Document doc = Status.statusDoc;
+        if (doc == null)
+            doc = activity.getStatus();
 
         Node scheduled = doc.getElementsByTagName("Scheduled").item(0); //$NON-NLS-1$
 
