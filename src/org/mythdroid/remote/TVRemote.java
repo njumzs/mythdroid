@@ -412,6 +412,9 @@ public class TVRemote extends Remote {
             timer.purge();
             timer = null;
         }
+        
+        findViewById(R.id.tv_remote).setBackgroundDrawable(null);
+        
     }
 
     @Override
@@ -782,6 +785,7 @@ public class TVRemote extends Remote {
 
         if (livetv) {
             lastFilename = loc.filename;
+            setBackground(-1, Globals.curProg, findViewById(R.id.tv_remote));
             return true;
         }
 
@@ -854,7 +858,12 @@ public class TVRemote extends Remote {
     
     private void setBackground(final int id, final Program prog, final View v) {
         
-        if (!Globals.haveServices()) return;
+        final Drawable metal = getResources().getDrawable(R.drawable.metal);
+        
+        if (!Globals.haveServices()) {
+            v.setBackgroundDrawable(metal);
+            return;
+        }
         
         final DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -872,11 +881,10 @@ public class TVRemote extends Remote {
                         bm = Video.getArtwork(id, type, width, 0, null);
                     else if (prog != null)
                         bm = prog.getArtwork(type, width, 0);
-                    if (bm == null) return;
-                    final BitmapDrawable d = new BitmapDrawable(
-                        getResources(), bm
-                    );
-                    d.setAlpha(65);
+                    final Drawable d = (bm == null) ?
+                        metal : new BitmapDrawable(getResources(), bm);
+                    if (bm != null)
+                        d.setAlpha(65);
                     handler.post(
                         new Runnable() {
                             @Override
