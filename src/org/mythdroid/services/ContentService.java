@@ -62,6 +62,8 @@ public class ContentService {
         int chanid, Date start, ArtworkType type, int w, int h
     ) throws IOException, JSONException {
         
+        if (start == null) return null;
+        
         final String key  = chanid + Globals.utcFmt.format(start) + type.name();
         String path = artUrlCache.get(key);
         
