@@ -74,7 +74,7 @@ public class ImageCache {
      */
     public void put(final String key, final Bitmap value) {
         final String k = normalise(key);
-        if (memMax > 0 && value.getRowBytes() * value.getHeight() <= memMax)
+        if (memMax == 0 || value.getRowBytes() * value.getHeight() <= memMax)
             memCache.put(k, value);
         if (diskCache != null) {
             synchronized (queue) {
