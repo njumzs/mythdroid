@@ -47,6 +47,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -122,13 +123,6 @@ public class RecDetailFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (!embedded && activity != null) 
-            activity.setResult(Activity.RESULT_OK);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         if (activity == null) activity = (MDFragmentActivity)getActivity();
@@ -138,6 +132,20 @@ public class RecDetailFragment extends Fragment {
             return;
         }
         setViews();
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        ((PreviewImageView)view.findViewById(R.id.image)).setImageBitmap(null);
+        view.setBackgroundDrawable(null);
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (!embedded && activity != null) 
+            activity.setResult(Activity.RESULT_OK);
     }
 
     @Override
@@ -326,10 +334,14 @@ public class RecDetailFragment extends Fragment {
     }
     
     @SuppressWarnings("javadoc")
-    public class deleteDialog extends DialogFragment {
+    public static class deleteDialog extends DialogFragment {
 
         @Override
         public Dialog onCreateDialog(Bundle icicle) {
+            final FragmentActivity activity = getActivity();
+            final RecDetailFragment rdf = 
+                (RecDetailFragment)activity.getSupportFragmentManager()
+                    .findFragmentById(android.R.id.content);
             return
                 new AlertDialog.Builder(activity)
                     .setTitle(R.string.delRec)
@@ -340,16 +352,18 @@ public class RecDetailFragment extends Fragment {
                             public void onClick(
                                 DialogInterface dialog, int which) {
                                 try {
-                                    Globals.getBackend().deleteRecording(prog);
+                                    Globals.getBackend().deleteRecording(
+                                        rdf.prog
+                                    );
                                 } catch (IOException e) {
                                     ErrUtil.err(activity, e);
                                     dialog.dismiss();
                                     return;
                                 }
                                 dialog.dismiss();
-                                if (embedded) {
+                                if (rdf.embedded) {
                                     ((Recordings)activity).deleteRecording();
-                                    if (!dualPane)
+                                    if (!rdf.dualPane)
                                         getFragmentManager().popBackStack();
                                 }
                                 else
@@ -357,16 +371,20 @@ public class RecDetailFragment extends Fragment {
                             }
                         }
                     )
-                    .setNegativeButton(R.string.no, no)
+                    .setNegativeButton(R.string.no, rdf.no)
                     .create();
         }
         
     }
 
     @SuppressWarnings("javadoc")
-    public class stopDialog extends DialogFragment {
+    public static class stopDialog extends DialogFragment {
         @Override
         public Dialog onCreateDialog(Bundle icicle) {
+            final FragmentActivity activity = getActivity();
+            final RecDetailFragment rdf = 
+                (RecDetailFragment)activity.getSupportFragmentManager()
+                    .findFragmentById(android.R.id.content);
             return
                 new AlertDialog.Builder(activity)
                     .setTitle(R.string.stopRecording)
@@ -378,22 +396,24 @@ public class RecDetailFragment extends Fragment {
                                 DialogInterface dialog, int which
                             ) {
                                 try {
-                                    Globals.getBackend().stopRecording(prog);
+                                    Globals.getBackend().stopRecording(
+                                        rdf.prog
+                                    );
                                 } catch (IOException e) {
                                     ErrUtil.err(getActivity(), e);
                                     dialog.dismiss();
                                     return;
                                 }
-                                stop.setVisibility(View.GONE);
-                                prog.Status = RecStatus.RECORDED;
-                                setViews();
-                                if (embedded)
+                                rdf.stop.setVisibility(View.GONE);
+                                rdf.prog.Status = RecStatus.RECORDED;
+                                rdf.setViews();
+                                if (rdf.embedded)
                                     ((Recordings)activity).invalidate();
                                 dialog.dismiss();
                             }
                         }
                     )
-                    .setNegativeButton(R.string.no, no)
+                    .setNegativeButton(R.string.no, rdf.no)
                     .create();
         }
     }
