@@ -3,7 +3,6 @@
     android:id="@+id/tv_remote"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
-	android:background="@drawable/metal"
 	android:padding="4dp">
 	
 	<ImageButton android:id="@+id/back"
