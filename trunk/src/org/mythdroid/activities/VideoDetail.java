@@ -65,6 +65,12 @@ public class VideoDetail extends MDActivity {
         setContentView(R.layout.video_detail);
         setViews();
     }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        findViewById(R.id.layout).setBackgroundDrawable(null);
+    }
 
     private void setViews() {
 
