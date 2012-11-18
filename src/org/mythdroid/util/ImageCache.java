@@ -40,16 +40,17 @@ public class ImageCache {
     
     private MemCache<String, Bitmap> memCache = null;
     private ImageDiskCache diskCache = null;
+    private long memMax = 0;
         
     /**
      * Constructor
      * @param name name of the cache
-     * @param memCapacity initial capacity of MemCache in number of images
-     * @param memMaxCapacity maximum capacity of MemCache in number of images
+     * @param memCapacity initial capacity of MemCache in bytes
+     * @param memMaxCapacity maximum capacity of MemCache in bytes
      * @param diskMaxSize maximum size of disk backed cache in bytes
      */
     public ImageCache(
-        String name, int memCapacity, int memMaxCapacity, int diskMaxSize
+        String name, int memCapacity, int memMaxCapacity, long memMaxSize, int diskMaxSize
     ) {
         try {
             diskCache = new ImageDiskCache(name, diskMaxSize);
@@ -62,6 +63,8 @@ public class ImageCache {
         
         memCache = new MemCache<String, Bitmap>(memCapacity, memMaxCapacity);
         
+        memMax = memMaxSize;
+        
     }
     
     /**
@@ -71,7 +74,8 @@ public class ImageCache {
      */
     public void put(final String key, final Bitmap value) {
         final String k = normalise(key);
-        memCache.put(k, value);
+        if (memMax > 0 && value.getRowBytes() * value.getHeight() <= memMax)
+            memCache.put(k, value);
         if (diskCache != null) {
             synchronized (queue) {
                 queue.add(
@@ -136,7 +140,7 @@ public class ImageCache {
                                } catch (InterruptedException e) {}
                            try {
                                r = queue.removeFirst();
-                           } catch (NoSuchElementException e) { return; }
+                           } catch (NoSuchElementException e) { continue; }
                        }
                        
                        try {
@@ -146,6 +150,8 @@ public class ImageCache {
                                "Exception in diskCacheThread: " + e.getMessage() //$NON-NLS-1$
                            );
                        }
+                       r = null;
+                       
                    }
                    
                 }
@@ -157,7 +163,7 @@ public class ImageCache {
         diskCacheThread.start();
     }
     
-    private String normalise(String key) {
+    private String normalise(final String key) {
         
         int i = 0;
         
