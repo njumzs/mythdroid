@@ -75,7 +75,7 @@
     <string name="mddCmds">Comandi MDD</string>
     <string name="noMddCmds">Nessun comando MDD definito</string>
     <string name="streamQuality">Seleziona qualità streaming</string>
-    <string name="moveTo">Muovi su...</string>
+    <string name="moveTo">Muovi Su</string>
     <string name="crash_notif_ticker_text">MythDroid è crashato, per favore inviare un report...</string>
     <string name="crash_notif_title">MythDroid è crashato...</string>
     <string name="crash_notif_text">Premi qui per aiutarci a risolvere il problema.</string>

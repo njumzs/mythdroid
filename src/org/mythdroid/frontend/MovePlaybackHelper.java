@@ -311,8 +311,11 @@ public class MovePlaybackHelper {
      */
     public void moveToNewFrontend(Intent intent, boolean isAbort) {
         final Bundle extras = ((Activity)ctx).getIntent().getExtras();
-        if (extras != null)
+        if (extras != null) {
+            extras.remove(Extras.SEEKTO.toString());
+            extras.remove(Extras.JUMPCHAN.toString());
             intent.putExtras(extras);
+        }
         Globals.prevFe = Globals.curFe;
         if (!isAbort)
             Globals.curFe = moveTo;

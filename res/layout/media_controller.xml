@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <RelativeLayout
+        android:id="@+id/mctrlBottomPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#c0303030"
+        android:padding="16dp">
+    
+	    <TextView android:id="@+id/mctrlCurTime"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_marginTop="16dp"
+	        android:layout_marginLeft="10dp"
+	        android:layout_marginRight="8dp"
+	        android:textSize="14sp"
+            android:textStyle="bold"/>
+	    
+	    <TextView
+	        android:id="@+id/mctrlTotalTime"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentRight="true"
+	        android:layout_marginTop="16dp"
+	        android:layout_marginLeft="8dp"
+	        android:layout_marginRight="10dp"
+	        android:textSize="14sp"
+	        android:textStyle="bold"/>
+	    
+	    <SeekBar android:id="@+id/mctrlProgress"
+	        android:focusable="false"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_toRightOf="@id/mctrlCurTime"
+	        android:layout_toLeftOf="@id/mctrlTotalTime"
+	        android:layout_alignBottom="@id/mctrlCurTime"/>
+	
+	</RelativeLayout>
+	    
+    <ImageButton
+        android:id="@+id/mctrlPause"
+        style="@style/MDButtonNormal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/mctrlBottomPanel"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="6dp"
+        android:src="@drawable/pause" />
+    
+    <Button
+        android:id="@+id/mctrlMoveTo"
+        style="@style/MDButtonNormal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/mctrlBottomPanel"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="6dp"
+        android:layout_marginRight="6dp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:text="@string/moveTo"/>
+    
+    <RelativeLayout android:id="@+id/mctrlTopPanel"
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:padding="12dp"
+        android:background="#c0303030">
+    
+        <TextView android:id="@+id/mctrlTitle"
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="10dp"
+            android:textSize="28sp"
+            android:textStyle="bold"/>
+    
+    </RelativeLayout>
+
+</RelativeLayout>
