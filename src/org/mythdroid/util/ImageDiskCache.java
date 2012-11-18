@@ -45,7 +45,7 @@ public class ImageDiskCache {
     static final private String cachePath =
         "/Android/data/org.mythdroid/cache/"; //$NON-NLS-1$
     
-    private long sizeOnDisk = 0, maxSizeOnDisk = 0;
+    private long sizeOnDisk = 0, maxSizeOnDisk = 0, maxImageSize = 0;
     private File cacheDir = null;
     
     /**
@@ -77,7 +77,8 @@ public class ImageDiskCache {
             LogUtil.debug("using existing cache named " + name); //$NON-NLS-1$
         
         maxSizeOnDisk = maxSize;
-        sizeOnDisk = getSizeOnDisk();
+        maxImageSize  = maxSize / 8; 
+        sizeOnDisk    = getSizeOnDisk();
         
     }
     
@@ -88,6 +89,9 @@ public class ImageDiskCache {
      * @return true if cached successfully, false otherwise
      */
     public boolean put(String key, Bitmap value) {
+        
+        if (value.getHeight() * value.getRowBytes() > maxImageSize)
+            return false;
         
         if (!checkStorageState(STORAGE_WRITABLE))
             return false;
