@@ -21,6 +21,7 @@ import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ImageCache;
 import org.mythdroid.util.UPnPListener;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.Handler;
@@ -59,22 +60,25 @@ public class Globals {
     public static Video curVid        = null;
     
     /** SimpleDateFormat of yyyy-MM-dd'T'HH:mm:ss */
-    final public static SimpleDateFormat dateFmt =
+    @SuppressLint("SimpleDateFormat")
+	final public static SimpleDateFormat dateFmt =
         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
     /** SimpleDateFormat of HH:mm, EEE d MMM yy */
-    final public static SimpleDateFormat dispFmt =
+    @SuppressLint("SimpleDateFormat")
+	final public static SimpleDateFormat dispFmt =
         new SimpleDateFormat("HH:mm, EEE d MMM yy"); //$NON-NLS-1$
     /** SimpleDataFormat like dateFmt but in UTC */
-    final public static SimpleDateFormat utcFmt = 
+    @SuppressLint("SimpleDateFormat")
+	final public static SimpleDateFormat utcFmt = 
         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$;
     static {
         dispFmt.setTimeZone(TimeZone.getDefault());
         dateFmt.setTimeZone(TimeZone.getDefault());
         utcFmt.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
     }
-    /** An ImageDiskCache for artwork */
+    /** An ImageCache for artwork */
     public static ImageCache artCache = new ImageCache(
-        "artwork", 10, 100, 1024*1024*20 //$NON-NLS-1$
+        "artwork", 32, 64, Runtime.getRuntime().maxMemory() / 16, 1024*1024*128 //$NON-NLS-1$
     );
     
     /** To remember where we were */
