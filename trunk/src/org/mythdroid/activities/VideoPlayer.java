@@ -36,6 +36,7 @@ import org.mythdroid.resource.Messages;
 import org.mythdroid.services.ContentService;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
+import org.mythdroid.views.MDMediaController;
 import org.mythdroid.views.MDVideoView;
 import org.mythdroid.views.MDVideoView.OnSeekListener;
 import org.mythdroid.vlc.VLCRemote;
@@ -59,18 +60,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.MediaController;
 import android.widget.AdapterView.OnItemClickListener;
 
 /** MDActivity that displays streamed Video */
 public class VideoPlayer extends MDActivity {
     
     final private static int DIALOG_QUALITY = 1, DIALOG_MOVE = 2;
-    final private static int MENU_MOVE = 1;
     
     final private Context ctx        = this;
     final private Handler handler    = new Handler();
@@ -86,6 +83,7 @@ public class VideoPlayer extends MDActivity {
     private StreamInfo     streamInfo     = null;
     private int            seekTo         = 0;
     private MovePlaybackHelper moveHelper = null;
+    private String         title          = null;
     
     final private OnFrontendReady onReady = new OnFrontendReady() {
         @Override
@@ -163,25 +161,6 @@ public class VideoPlayer extends MDActivity {
             return;
         }
         super.onPrepareDialog(id, dialog);
-    }
-    
-    /** Compose the menu */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_MOVE, Menu.NONE, R.string.moveTo)
-            .setIcon(drawable.ic_menu_upload_you_tube);
-        return true;
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case MENU_MOVE:
-                showDialog(FRONTEND_CHOOSER);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
     
     private Dialog createQualityDialog() {
@@ -268,6 +247,7 @@ public class VideoPlayer extends MDActivity {
                 if (intent.hasExtra(Extras.FILENAME.toString())) {
                     path = intent.getStringExtra(Extras.FILENAME.toString());
                     sg = "Default"; //$NON-NLS-1$
+                    title = intent.getStringExtra(Extras.TITLE.toString());
                 }
                 else {
                     Program prog = Globals.curProg;
@@ -275,6 +255,7 @@ public class VideoPlayer extends MDActivity {
                         initError(Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
                         return;
                     }
+                    title = prog.Title;
                     path = prog.Path;
                     if (prog.StorGroup != null)
                         sg = prog.StorGroup;
@@ -434,7 +415,17 @@ public class VideoPlayer extends MDActivity {
             doneSeek = true;
         }
         
-        videoView.setMediaController(new MediaController(ctx, false));
+        MDMediaController mctrl = new MDMediaController(ctx);
+        mctrl.setTitle(title);
+        mctrl.setMoveToListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showDialog(FRONTEND_CHOOSER);
+                }
+            }
+        );
+        videoView.setMediaController(mctrl);
         if (streamInfo == null)
             videoView.setOnSeekListener(
                 new OnSeekListener() {
