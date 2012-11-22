@@ -22,7 +22,9 @@ import java.lang.ref.WeakReference;
 
 import org.mythdroid.util.LogUtil;
 
+import android.annotation.SuppressLint;
 import android.app.KeyguardManager;
+import android.app.KeyguardManager.KeyguardLock;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -65,6 +67,7 @@ public class WakeService extends Service implements SensorEventListener {
     private Sensor          sensor = null;
     private PowerManager    pm = null;
     private KeyguardManager km = null;
+    private KeyguardLock    kl = null;
     private WakeLock        partialLock = null;
     private float           last0 = 0, last1 = 0, last2 = 0;
     private boolean         isStarted = false;
@@ -76,7 +79,8 @@ public class WakeService extends Service implements SensorEventListener {
      */
     private BroadcastReceiver screenStateReceiver = new BroadcastReceiver() {
 
-        @Override
+        @SuppressLint("Wakelock")
+		@Override
         public void onReceive(Context context, Intent intent) {
 
             sensorMgr.unregisterListener(WakeService.this);
@@ -105,7 +109,8 @@ public class WakeService extends Service implements SensorEventListener {
             target = new WeakReference<WakeService>(ws);
         }
         
-        @Override
+        @SuppressLint("Wakelock")
+		@Override
         public synchronized void handleMessage(Message msg) {
             
             WakeService ws = target.get();
@@ -148,12 +153,17 @@ public class WakeService extends Service implements SensorEventListener {
         
         sensorMgr = (SensorManager)getApplicationContext()
                         .getSystemService(Context.SENSOR_SERVICE);
-
         sensor = sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         
         km = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
+        kl = km.newKeyguardLock(tag);
+        try {
+            kl.disableKeyguard();
+        } catch (SecurityException e) {
+            LogUtil.error("Not allowed to disable keyguard"); //$NON-NLS-1$
+        }
+        
         pm = (PowerManager)getSystemService(POWER_SERVICE);
-
         partialLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, tag);
         
     }
@@ -166,6 +176,11 @@ public class WakeService extends Service implements SensorEventListener {
             sensorMgr.unregisterListener(WakeService.this);
             if (partialLock.isHeld())
                 partialLock.release();
+        }
+        try {
+            kl.reenableKeyguard();
+        } catch (SecurityException e) {
+            LogUtil.error("Not allowed to reenable keyguard"); //$NON-NLS-1$
         }
     }
 
@@ -203,14 +218,11 @@ public class WakeService extends Service implements SensorEventListener {
             return;
         
         LogUtil.debug("Waking up"); //$NON-NLS-1$
-        
         pm.newWakeLock(
             PowerManager.SCREEN_BRIGHT_WAKE_LOCK |
             PowerManager.ACQUIRE_CAUSES_WAKEUP,
             tag
         ).acquire(wakeTime);
-
-        km.newKeyguardLock(tag).disableKeyguard();
 
     }
 

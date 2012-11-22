@@ -24,15 +24,19 @@ import org.mythdroid.Enums.Key;
 import org.mythdroid.activities.MDActivity;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.Reflection;
 
+import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
+import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.view.GestureDetector;
@@ -64,6 +68,7 @@ public abstract class Remote extends MDActivity
     private GestureDetector     gDetector      = null;
     private ServiceConnection   wakeConnection = null;
     private Messenger           wakeMessenger  = null;
+    private PowerManager        pm             = null;
 
     private class RemoteGestureListener extends SimpleOnGestureListener {
 
@@ -83,7 +88,7 @@ public abstract class Remote extends MDActivity
         private float              scrolledX            = 0, scrolledY = 0;
         private int                scrollLock           = SCROLL_LOCK_UNLOCKED;
         private boolean            fling                = false;
-
+        
         @Override
         public boolean onSingleTapConfirmed(MotionEvent me) {
             onTap();
@@ -246,35 +251,45 @@ public abstract class Remote extends MDActivity
                 new Intent().setClass(this, WakeService.class),
                 wakeConnection, BIND_AUTO_CREATE
             );
+            pm = (PowerManager)getSystemService(Service.POWER_SERVICE);
         }
+        
         
     }
 
     @Override
     public void onResume() {
-        
         super.onResume();
-        
-        if (wakeMessenger != null && wakeConnection != null) 
-            try {
-                Message msg = new Message();
-                msg.what = WakeService.MSG_STOP;
-                wakeMessenger.send(msg);
-            } catch (RemoteException e) { ErrUtil.err(this, e); }
-
+        if (wakeMessenger == null || wakeConnection == null)
+            return;
+        try {
+            Message msg = new Message();
+            msg.what = WakeService.MSG_STOP;
+            wakeMessenger.send(msg);
+        } catch (RemoteException e) { ErrUtil.reportErr(this, e); }
     }
 
-    @Override
+	@Override
     public void onPause() {
         super.onPause();
-        if (wakeMessenger != null && wakeConnection != null && !isFinishing()) 
-            try {
-                Message msg = new Message();
-                msg.what = WakeService.MSG_START;
-                wakeMessenger.send(msg);
-            } catch (RemoteException e) { ErrUtil.err(this, e); }
+        
+        boolean screenOn = false;
+        if (VERSION.SDK_INT >= 7)
+            screenOn = Reflection.rPowerManager.isScreenOn(pm);
+        if (
+            wakeMessenger == null || wakeConnection == null ||
+            isFinishing() || screenOn
+        ) 
+            return;
+        
+        try {
+            Message msg = new Message();
+            msg.what = WakeService.MSG_START;
+            wakeMessenger.send(msg);
+        } catch (RemoteException e) { ErrUtil.reportErr(this, e); }
+        
     }
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -374,7 +389,7 @@ public abstract class Remote extends MDActivity
             }
             onAction();
         } catch (IOException e) { ErrUtil.err(this, e); }
-          catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+          catch (IllegalArgumentException e) { ErrUtil.reportErr(this, e); }
           
         return true;
 
