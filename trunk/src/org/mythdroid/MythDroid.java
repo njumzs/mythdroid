@@ -6,8 +6,10 @@ import static org.acra.ReportField.*;
 
 import android.app.Application;
 
+/** The Application */
+
 /**
- * ACRA error reporting class
+ * ACRA error reporting configuration
  */
 @ReportsCrashes(
     
@@ -34,6 +36,7 @@ import android.app.Application;
         "DvrService", "MythService", "VideoService"
     }
 )
+
 public class MythDroid extends Application {
 
     @SuppressWarnings("unused")
