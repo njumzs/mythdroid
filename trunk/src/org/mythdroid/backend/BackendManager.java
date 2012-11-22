@@ -347,6 +347,7 @@ public class BackendManager {
         }
 
         Node status = doc.getElementsByTagName("Status").item(0); //$NON-NLS-1$
+        if (status == null) throw new IOException();
         NamedNodeMap attr = status.getAttributes();
         return Integer.parseInt(attr.getNamedItem("protoVer").getNodeValue()); //$NON-NLS-1$
 
