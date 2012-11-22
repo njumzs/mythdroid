@@ -18,6 +18,7 @@
 
 package org.mythdroid.util;
 
+import org.acra.ACRA;
 import org.mythdroid.R;
 import org.mythdroid.activities.FrontendList;
 import org.mythdroid.resource.Messages;
@@ -138,6 +139,73 @@ final public class ErrUtil {
         if (msg == null)
             msg = e.getClass().getName();
         LogUtil.warn(msg);
+    }
+    
+    /**
+     * Send an error report
+     * @param e Exception to report
+     */
+    static public void report(Exception e) {
+        Runtime r = Runtime.getRuntime();
+        ACRA.getErrorReporter().putCustomData(
+            "MemFree ", String.valueOf(r.freeMemory() / 1024) + "K" //$NON-NLS-1$ //$NON-NLS-2$
+        );
+        ACRA.getErrorReporter().putCustomData(
+            "MemTotal", String.valueOf(r.totalMemory() / 1024) + "K" //$NON-NLS-1$ //$NON-NLS-2$
+        );
+        ACRA.getErrorReporter().putCustomData(
+            "MemMax  ", String.valueOf(r.maxMemory() / 1024) + "K" //$NON-NLS-1$ //$NON-NLS-2$
+        );
+        ACRA.getErrorReporter().handleSilentException(e);
+    }
+    
+    /**
+     * Send an error report
+     * @param msg message to report
+     */
+    static public void report(String msg) {
+        Exception e = new Exception(msg);
+        report(e);
+    }
+    
+    /**
+     * Inform user of an exception and report it - call from UI thread
+     * @param c context
+     * @param e exception whose message we will display
+     */
+    static public void reportErr(final Context c, final Exception e) {
+        err(c, e);
+        report(e);
+    }
+    
+    /**
+     * Inform user of a message and report it - call from UI thread
+     * @param c context
+     * @param e message to display
+     */
+    static public void reportErr(final Context c, final String e) {
+        err(c, e);
+        report(e);
+    }
+
+    /**
+     * Inform user of an exception and report it - call from non-UI thread
+     * @param c context
+     * @param e exception whose message we will display
+     */
+    static public void postReportErr(final Context c, final Exception e) {
+        postErr(c, e);
+        report(e);
+    }
+
+    /**
+     * Inform user of a message - call from non-UI thread
+     * @param c context
+     * @param e message to display
+     */
+    static public void postReportErr(final Context c, final String e) {
+        postErr(c, e);
+        report(e);
     }
 
     /**
