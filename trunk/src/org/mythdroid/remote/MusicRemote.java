@@ -256,7 +256,7 @@ public class MusicRemote extends Remote {
             finish();
             return;
         } catch (IllegalArgumentException e) {
-            ErrUtil.err(ctx, e);
+            ErrUtil.reportErr(ctx, e);
             finish();
             return;
         }
@@ -292,7 +292,7 @@ public class MusicRemote extends Remote {
             try {
                 feMgr.sendKey(key);
             } catch (IOException e) { ErrUtil.err(this, e); }
-              catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+              catch (IllegalArgumentException e) { ErrUtil.reportErr(this, e); }
 
         super.onClick(v);
 
@@ -354,7 +354,7 @@ public class MusicRemote extends Remote {
             ErrUtil.err(this, e);
             return true;
         } catch (IllegalArgumentException e) { 
-            ErrUtil.err(this, e);
+            ErrUtil.reportErr(this, e);
             return true;
         }
 
@@ -406,7 +406,7 @@ public class MusicRemote extends Remote {
                             }
                         } catch (IOException e) { ErrUtil.err(ctx, e); }
                           catch (IllegalArgumentException e) {
-                              ErrUtil.err(ctx, e); 
+                              ErrUtil.reportErr(ctx, e); 
                           }
 
                         finish();

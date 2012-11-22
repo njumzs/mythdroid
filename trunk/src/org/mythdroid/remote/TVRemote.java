@@ -263,7 +263,8 @@ public class TVRemote extends Remote {
             } catch (IOException e) {
                 initError(e.getMessage());
                 return;
-            } catch (IllegalArgumentException e) { 
+            } catch (IllegalArgumentException e) {
+                ErrUtil.report(e);
                 initError(e.getMessage());
                 return;
             } catch (InterruptedException e) {}
@@ -469,7 +470,9 @@ public class TVRemote extends Remote {
                 try {
                     feMgr.sendKey(key);
                 } catch (IOException e) { ErrUtil.err(this, e); }
-                  catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+                  catch (IllegalArgumentException e) {
+                      ErrUtil.reportErr(this, e);
+                }
         }
               
         if (key == Key.GUIDE)
@@ -822,7 +825,7 @@ public class TVRemote extends Remote {
                             ErrUtil.err(ctx, e);
                             return; 
                         }  catch (IllegalArgumentException e) {
-                            ErrUtil.err(ctx, e);
+                            ErrUtil.reportErr(ctx, e);
                             return;
                         }
                         if (loc.end <= 0) return;

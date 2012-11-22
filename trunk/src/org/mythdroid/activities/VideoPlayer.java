@@ -252,6 +252,7 @@ public class VideoPlayer extends MDActivity {
                 else {
                     Program prog = Globals.curProg;
                     if (prog == null) {
+                        ErrUtil.report(Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
                         initError(Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
                         return;
                     }
@@ -439,7 +440,7 @@ public class VideoPlayer extends MDActivity {
                             mplayer.setDataSource(ctx, url);
                             mplayer.prepareAsync();
                         } catch (Exception e) {
-                            ErrUtil.err(ctx, e);
+                            ErrUtil.reportErr(ctx, e);
                             finish();
                         }
                     }

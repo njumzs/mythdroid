@@ -147,7 +147,7 @@ public class NavRemote extends Remote {
                 feMgr.jumpTo("guidegrid"); //$NON-NLS-1$
             updateLoc();
         } catch (IOException e) { ErrUtil.err(this, e); }
-          catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+          catch (IllegalArgumentException e) { ErrUtil.reportErr(this, e); }
 
         if (!calledByRemote) {
             try {
@@ -199,7 +199,7 @@ public class NavRemote extends Remote {
             ErrUtil.err(this, e);
             finish();
         } catch (IllegalArgumentException e) {
-            ErrUtil.err(this, e);
+            ErrUtil.reportErr(this, e);
             finish();
         }
     }
@@ -230,7 +230,7 @@ public class NavRemote extends Remote {
                         break;
                 }
             } catch (IOException e) { ErrUtil.err(this, e); }
-              catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+              catch (IllegalArgumentException e) { ErrUtil.reportErr(this, e); }
 
         super.onClick(v);
 
@@ -314,7 +314,7 @@ public class NavRemote extends Remote {
         try {
             updateLoc();
         } catch (IOException e) { ErrUtil.err(this, e); }
-          catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+          catch (IllegalArgumentException e) { ErrUtil.reportErr(this, e); }
     }
 
     /**
@@ -338,7 +338,7 @@ public class NavRemote extends Remote {
             try {
                 updateLoc();
             } catch (IOException e) { ErrUtil.err(this, e); }
-              catch (IllegalArgumentException e) { ErrUtil.err(this, e); }
+              catch (IllegalArgumentException e) { ErrUtil.reportErr(this, e); }
 
         if (gesture) {
             findViewById(R.id.back).setOnClickListener(this);

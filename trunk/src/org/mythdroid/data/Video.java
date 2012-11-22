@@ -69,12 +69,15 @@ public class Video {
 
         String[] fields = line.split("\\|\\|"); //$NON-NLS-1$
 
-        if (fields.length < COVER)
-            throw new IllegalArgumentException(
+        if (fields.length < COVER) {
+            IllegalArgumentException e = new IllegalArgumentException(
                 String.format(
                     Messages.getString("Video.0"), fields.length, COVER //$NON-NLS-1$
                 )
             );
+            ErrUtil.report(e);
+            throw e;
+        }
         
         fields[0] = fields[0].replaceFirst("VIDEO ", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -94,7 +97,8 @@ public class Video {
                            Integer.valueOf(fields[LENGTH]) : 0;
             if (fields.length > COVER)
                 coverfile = fields[COVER];
-        } catch (NumberFormatException e) { 
+        } catch (NumberFormatException e) {
+            ErrUtil.report(e);
             throw new IllegalArgumentException(
                 Messages.getString("Video.1") + e.getMessage() //$NON-NLS-1$
             );

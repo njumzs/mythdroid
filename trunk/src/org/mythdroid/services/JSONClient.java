@@ -75,6 +75,10 @@ public class JSONClient {
         } catch (URISyntaxException e) {
             ErrUtil.logErr(e);
             return null;
+        } catch (IllegalStateException e) {
+            ErrUtil.logErr(e);
+            ErrUtil.report(e);
+            return null;
         }
     }
     
@@ -90,6 +94,10 @@ public class JSONClient {
             return Request(new HttpPost(CreateURI(path, query)));
         } catch (URISyntaxException e) {
             ErrUtil.logErr(e);
+            return null;
+        } catch (IllegalStateException e) {
+            ErrUtil.logErr(e);
+            ErrUtil.report(e);
             return null;
         }
     }
