@@ -127,6 +127,7 @@ public class RecDetailFragment extends Fragment {
         super.onResume();
         if (activity == null) activity = (MDFragmentActivity)getActivity();
         if ((prog = Globals.curProg) == null) {
+            ErrUtil.report("Globals.curProg was null!"); //$NON-NLS-1$
             if (!dualPane) getFragmentManager().popBackStack(); 
             if (!embedded) activity.finish();
             return;
