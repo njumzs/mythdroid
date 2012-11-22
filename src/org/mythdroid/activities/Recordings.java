@@ -359,7 +359,7 @@ public class Recordings extends MDFragmentActivity {
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
             } catch (Exception e) {
-                ErrUtil.err(this, e);
+                ErrUtil.reportErr(this, e);
                 return;
             }
         }

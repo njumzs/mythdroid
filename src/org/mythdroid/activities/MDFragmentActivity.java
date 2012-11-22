@@ -311,7 +311,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         try {
             f = fm.findFragmentById(android.R.id.content);
         } catch (Exception e) { 
-            ErrUtil.err(this, e);
+            ErrUtil.reportErr(this, e);
             return;
         }
         
@@ -324,7 +324,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         try {
             f = f.getClass().newInstance();
         } catch (Exception e) {
-            ErrUtil.err(this, e);
+            ErrUtil.reportErr(this, e);
             return;
         }
         f.setArguments(args);

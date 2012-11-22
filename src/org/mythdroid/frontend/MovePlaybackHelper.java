@@ -182,7 +182,7 @@ public class MovePlaybackHelper {
                             ErrUtil.err(ctx, e);
                             return;
                         } catch (IllegalArgumentException e) {
-                            ErrUtil.err(ctx, e);
+                            ErrUtil.reportErr(ctx, e);
                             return;
                         }
                         Intent intent =
@@ -262,7 +262,7 @@ public class MovePlaybackHelper {
                     ErrUtil.err(ctx, e);
                     return;
                 } catch (IllegalArgumentException e) {
-                    ErrUtil.err(ctx, e);
+                    ErrUtil.reportErr(ctx, e);
                     return;
                 }
                 final Intent intent = new Intent(ctx, TVRemote.class);
