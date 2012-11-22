@@ -89,13 +89,14 @@ public class Program implements Comparable<Program> {
 
             ctx = context;
 
-            elem.setEndElementListener(new EndElementListener() {
-                @Override
-                public void end() {
-                    listener.program(prog);
-
+            elem.setEndElementListener(
+                new EndElementListener() {
+                    @Override
+                    public void end() {
+                        listener.program(prog);
+                    }
                 }
-            });
+            );
 
             elem.getChild("Channel").setStartElementListener( //$NON-NLS-1$
                 new StartElementListener() {
@@ -270,6 +271,7 @@ public class Program implements Comparable<Program> {
     /**
      * Construct a Program from a stringlist
      * @param list a stringlist (e.g. from a backend)
+     * @param off offset in the array of first element
      */
     public Program(String[] list, int off) {
 
