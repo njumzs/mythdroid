@@ -3,6 +3,7 @@ package org.mythdroid.util;
 import android.annotation.TargetApi;
 import android.net.Uri;
 import android.os.Build;
+import android.os.PowerManager;
 import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
 import android.provider.ContactsContract;
@@ -93,6 +94,23 @@ public class Reflection {
          */
         public static String getDisplayName() {
             return ContactsContract.PhoneLookup.DISPLAY_NAME;
+        }
+        
+    }
+    
+    /**
+     * Wrapped PowerManager
+     */
+    @TargetApi(7)
+    public static class rPowerManager {
+        
+        /**
+         * Find out whether the screen is on
+         * @param pm PowerManager object
+         * @return true if it is, false otherwise
+         */
+        public static boolean isScreenOn(PowerManager pm) {
+            return pm.isScreenOn();
         }
         
     }
