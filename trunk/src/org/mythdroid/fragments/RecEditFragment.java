@@ -104,6 +104,7 @@ public class RecEditFragment extends Fragment {
         }
         
         if ((prog = Globals.curProg) == null) {
+            ErrUtil.report(Messages.getString("RecEditFragment.0")); //$NON-NLS-1$
             initError(
                 new IllegalArgumentException(
                     Messages.getString("RecEditFragment.0") //$NON-NLS-1$
