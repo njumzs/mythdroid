@@ -173,7 +173,8 @@ public class Videos extends MDActivity implements
     public void onPause() {
         super.onPause();
         Globals.removeThreadPoolTask(getVideos);
-        videos.clear();
+        if (videos != null)
+            videos.clear();
         videos = null;
         lv.setAdapter(null);
     }
