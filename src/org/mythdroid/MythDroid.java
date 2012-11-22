@@ -16,7 +16,7 @@ import android.app.Application;
         REPORT_ID, APP_VERSION_CODE, PACKAGE_NAME, PHONE_MODEL, BRAND,
         ANDROID_VERSION, STACK_TRACE, INITIAL_CONFIGURATION,
         CRASH_CONFIGURATION, DISPLAY, LOGCAT, DEVICE_FEATURES, ENVIRONMENT,
-        SHARED_PREFERENCES, SETTINGS_SYSTEM, SETTINGS_SECURE
+        SHARED_PREFERENCES, SETTINGS_SYSTEM, SETTINGS_SECURE, CUSTOM_DATA
     }, 
     mode = ReportingInteractionMode.NOTIFICATION,    
     resNotifTickerText = R.string.crash_notif_ticker_text,
@@ -27,8 +27,11 @@ import android.app.Application;
     resDialogIcon = android.R.drawable.ic_dialog_info,
     logcatArguments = { 
         "-s", "-t", "100", "MythDroid", "ConnMgr", "Guide", "WakeService", 
-        "BackendManager", "FrontendLocation", "WakeOnLan", 
-        "ConnectivityReceiver", "ImageCache", "ImageDiskCache"
+        "BackendManager", "FrontendLocation", "WakeOnLan", "JSONClient", 
+        "ConnectivityReceiver", "ImageCache", "ImageDiskCache", "Status",
+        "UPnPListener", "AndroidRuntime", "dalvikvm", "UpdateService", "Video",
+        "PhoneStateReceiver", "MusicRemote", "TVRemote", "ContentService",
+        "DvrService", "MythService", "VideoService"
     }
 )
 public class MythDroid extends Application {
