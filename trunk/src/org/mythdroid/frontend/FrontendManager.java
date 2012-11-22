@@ -133,8 +133,7 @@ public class FrontendManager {
      * Get the current frontend location
      * @return a FrontendLocation
      */
-    public FrontendLocation getLoc()
-        throws IOException, IllegalArgumentException {
+    public FrontendLocation getLoc() throws IOException {
         
         String loc = null;
         
