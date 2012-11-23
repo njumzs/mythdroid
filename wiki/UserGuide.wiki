@@ -6,10 +6,7 @@ If you have wireless enabled and a MythTV backend is on the local network
 !MythDroid will hopefully locate it automatically and you will be presented 
 with the main menu.
 
-!MythDroid can't locate frontends automatically - you have to configure them. 
-To do this, press the menu button and select 'Settings'. Then select 'Frontends 
-Config' and add your frontends (a MAC address is not required unless you want 
-to be able to Wake On LAN the frontend). 
+If you're running MythTV 0.25 or above !MythDroid should locate your frontends automatically. Otherwise, or if your frontends are not switched on, you'll have to configure them. To do this, press the menu button and select 'Settings'. Then select 'Frontends Config' and add your frontends (a MAC address is not required unless you want to be able to Wake On LAN the frontend). 
 
 See the [SettingsGuide settings guide] for more information on !MythDroid's 
 settings.
@@ -18,7 +15,7 @@ settings.
 
 The menu button brings up a menu that lets you configure !MythDroid, start 
 the appropriate remote (depending on frontend state), set the 
-_current frontend_, wake up a frontend (via Wake On LAN) or run an 
+_current frontend_, wake up a frontend (via Wake On LAN) or run a 
 [MDD 'MDD command'] on a frontend. 
 
 The _current frontend_ is the frontend on which actions will take place when 
@@ -43,9 +40,7 @@ refresh the recordings list.
 
 == Videos ==
 
-If [MDD MDD] is installed on your backend, the videos activity allows 
-you to browse videos stored there. Short pressing a video will take you to the  
-Video Detail activity, which shows you more information about the video and 
+If you're running MythTV 0.24 or below you'll need MDD installed on your backend for the Videos activity to work. Short pressing a video will take you to the Video Detail activity, which shows you more information about the video and 
 offers the opportunity to play it or open the video's TVDB entry in the 
 browser. Short pressing the play button will play the video on the 
 _current frontend_. Long pressing the play button will allow you to choose 
@@ -53,7 +48,4 @@ which frontend should play the video.
 
 == Program Guide ==
 
-Pressing on a program will bring up additional details about the program. Short 
-pressing a channel will play that channel in LiveTV on the _current frontend_. 
-Long pressing a channel will display the frontend chooser. The menu allows you  
-to change the guide start date and time.
+Pressing on a program will bring up additional details about the program and allow you to add or edit a recording schedule. Short pressing a channel will play that channel in LiveTV on the _current frontend_. Long pressing a channel will display the frontend chooser. The menu allows you to change the guide start date and time.
