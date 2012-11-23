@@ -51,31 +51,33 @@ public class Enums {
 
     /** Recording statuses, with reverse lookup by code */
     public enum RecStatus {
-        MISSEDFUTURE (-11,   Messages.getString("Program.48")), //$NON-NLS-1$
-        TUNER        (-10,   Messages.getString("Program.49")), //$NON-NLS-1$
-        FAILED       (-9,    Messages.getString("Program.0")),  //$NON-NLS-1$
-        TUNERBUSY    (-8,    Messages.getString("Program.13")), //$NON-NLS-1$
-        LOWSPACE     (-7,    Messages.getString("Program.14")), //$NON-NLS-1$
-        CANCELLED    (-6,    Messages.getString("Program.15")), //$NON-NLS-1$
-        MISSED       (-5,    Messages.getString("Program.16")), //$NON-NLS-1$
-        ABORTED      (-4,    Messages.getString("Program.17")), //$NON-NLS-1$
-        RECORDED     (-3,    Messages.getString("Program.18")), //$NON-NLS-1$
-        RECORDING    (-2,    Messages.getString("Program.19")), //$NON-NLS-1$
-        WILLRECORD   (-1,    Messages.getString("Program.20")), //$NON-NLS-1$
-        UNKNOWN      (0,     Messages.getString("Program.21")), //$NON-NLS-1$
-        DONTRECORD   (1,     Messages.getString("Program.22")), //$NON-NLS-1$
-        PREVIOUS     (2,     Messages.getString("Program.23")), //$NON-NLS-1$
-        CURRENT      (3,     Messages.getString("Program.24")), //$NON-NLS-1$
-        EARLIER      (4,     Messages.getString("Program.25")), //$NON-NLS-1$
-        TOOMANY      (5,     Messages.getString("Program.26")), //$NON-NLS-1$
-        NOTLISTED    (6,     Messages.getString("Program.27")), //$NON-NLS-1$
-        CONFLICT     (7,     Messages.getString("Program.28")), //$NON-NLS-1$
-        LATER        (8,     Messages.getString("Program.29")), //$NON-NLS-1$
-        REPEAT       (9,     Messages.getString("Program.30")), //$NON-NLS-1$
-        INACTIVE     (10,    Messages.getString("Program.31")), //$NON-NLS-1$
-        NEVERRECORD  (11,    Messages.getString("Program.32")), //$NON-NLS-1$
-        OFFLINE      (12,    Messages.getString("Program.33")), //$NON-NLS-1$
-        OTHER        (13,    Messages.getString("Program.34")); //$NON-NLS-1$
+        OTHERRECORDING (-13,   Messages.getString("Program.51")), //$NON-NLS-1$
+        OTHERTUNING    (-12,   Messages.getString("Program.50")), //$NON-NLS-1$
+        MISSEDFUTURE   (-11,   Messages.getString("Program.48")), //$NON-NLS-1$
+        TUNER          (-10,   Messages.getString("Program.49")), //$NON-NLS-1$
+        FAILED         (-9,    Messages.getString("Program.0")),  //$NON-NLS-1$
+        TUNERBUSY      (-8,    Messages.getString("Program.13")), //$NON-NLS-1$
+        LOWSPACE       (-7,    Messages.getString("Program.14")), //$NON-NLS-1$
+        CANCELLED      (-6,    Messages.getString("Program.15")), //$NON-NLS-1$
+        MISSED         (-5,    Messages.getString("Program.16")), //$NON-NLS-1$
+        ABORTED        (-4,    Messages.getString("Program.17")), //$NON-NLS-1$
+        RECORDED       (-3,    Messages.getString("Program.18")), //$NON-NLS-1$
+        RECORDING      (-2,    Messages.getString("Program.19")), //$NON-NLS-1$
+        WILLRECORD     (-1,    Messages.getString("Program.20")), //$NON-NLS-1$
+        UNKNOWN        (0,     Messages.getString("Program.21")), //$NON-NLS-1$
+        DONTRECORD     (1,     Messages.getString("Program.22")), //$NON-NLS-1$
+        PREVIOUS       (2,     Messages.getString("Program.23")), //$NON-NLS-1$
+        CURRENT        (3,     Messages.getString("Program.24")), //$NON-NLS-1$
+        EARLIER        (4,     Messages.getString("Program.25")), //$NON-NLS-1$
+        TOOMANY        (5,     Messages.getString("Program.26")), //$NON-NLS-1$
+        NOTLISTED      (6,     Messages.getString("Program.27")), //$NON-NLS-1$
+        CONFLICT       (7,     Messages.getString("Program.28")), //$NON-NLS-1$
+        LATER          (8,     Messages.getString("Program.29")), //$NON-NLS-1$
+        REPEAT         (9,     Messages.getString("Program.30")), //$NON-NLS-1$
+        INACTIVE       (10,    Messages.getString("Program.31")), //$NON-NLS-1$
+        NEVERRECORD    (11,    Messages.getString("Program.32")), //$NON-NLS-1$
+        OFFLINE        (12,    Messages.getString("Program.33")), //$NON-NLS-1$
+        OTHER          (13,    Messages.getString("Program.34")); //$NON-NLS-1$
 
         private int     code;
         private String  msg;

@@ -552,6 +552,9 @@ public class Guide extends MDActivity {
                 break;
             case WILLRECORD:
             case RECORDING:
+            case TUNER:
+            case OTHERTUNING:
+            case OTHERRECORDING:
                 icon = willRecordIcon;
                 break;
             case CANCELLED:
@@ -559,6 +562,9 @@ public class Guide extends MDActivity {
             case DONTRECORD:
             case FAILED:
             case TUNERBUSY:
+            case MISSED:
+            case MISSEDFUTURE:
+            case LOWSPACE:
                 icon = failedIcon;
                 break;
             case CONFLICT:
