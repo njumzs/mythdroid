@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import org.mythdroid.ConnMgr;
 import org.mythdroid.ConnMgr.onConnectListener;
@@ -33,6 +34,10 @@ import org.mythdroid.resource.Messages;
 /** Manages a frontend */
 public class FrontendManager {
 
+    static final private Pattern
+        feLocPat = Pattern.compile(".*\\s+-\\s+.*"), //$NON-NLS-1$
+        feLocSep = Pattern.compile(" - "); //$NON-NLS-1$
+    
     /** String containing the name of the frontend */
     public  String  name = null;
     /** String containing the hostname or IP address of the frontend */
@@ -172,8 +177,8 @@ public class FrontendManager {
         final String[] lines = getResponse("help jump", ConnMgr.timeOut.LONG); //$NON-NLS-1$
         int numlines = lines.length;
         for (int i = 0; i < numlines; i++) {
-            if (!lines[i].matches(".*\\s+-\\s+.*")) continue; //$NON-NLS-1$
-            String[] l = lines[i].split(" - "); //$NON-NLS-1$
+            if (!feLocPat.matcher(lines[i]).matches()) continue;
+            String[] l = feLocSep.split(lines[i]);
             locs.put(l[0].trim(), l[1].trim());
         }
         return locs;

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import org.json.JSONException;
 import org.mythdroid.Globals;
@@ -82,6 +83,8 @@ public class Guide extends MDActivity {
     final private static int MENU_DATE    = 0, MENU_TIME = 1;
     final private static int DIALOG_DATE  = 0, DIALOG_TIME = 1;
 
+    final private static Pattern catPat = Pattern.compile("[\\s/-]"); //$NON-NLS-1$
+    
     /**
      * Change numHours to configure how many hours are displayed at a time 
      * This value is doubled for devices with one screen dimension > 1000 pixels 
@@ -617,10 +620,8 @@ public class Guide extends MDActivity {
                 layout.leftMargin = layout.rightMargin = 1;
             layout.height = rowHeight;
 
-            String cat = progs[i].Category.toLowerCase()
-                                 .replaceAll(" ", "") //$NON-NLS-1$ //$NON-NLS-2$
-                                 .replaceAll("/", "") //$NON-NLS-1$ //$NON-NLS-2$
-                                 .replaceAll("-", ""); //$NON-NLS-1$ //$NON-NLS-2$
+            String cat =
+                catPat.matcher(progs[i].Category.toLowerCase()).replaceAll(""); //$NON-NLS-1$
 
             try {
                 tv.setBackgroundColor(Category.valueOf(cat).color());
