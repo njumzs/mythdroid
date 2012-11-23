@@ -30,6 +30,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Pattern;
 
 import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
@@ -93,6 +94,8 @@ public class ConnMgr {
     final private static int        rbufSize         = 128;
     /** Maximum age of unused connections in milliseconds */
     final private static int        maxAge           = 60000;
+    
+    final private static Pattern sepPat = Pattern.compile("\\[\\]:\\[\\]"); //$NON-NLS-1$
     
     /** List of onConnect callbacks */
     final private ArrayList<onConnectListener> oCLs = 
@@ -462,7 +465,7 @@ public class ConnMgr {
         }
         int len = Integer.parseInt(new String(bytes).trim());
         bytes = readBytes(len);
-        return new String(bytes).split("\\[\\]:\\[\\]"); //$NON-NLS-1$
+        return sepPat.split(new String(bytes));
     }
 
     /**

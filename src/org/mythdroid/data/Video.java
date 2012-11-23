@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.regex.Pattern;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,8 +40,13 @@ import android.graphics.drawable.BitmapDrawable;
 public class Video {
 
     final private static int
-    ID = 0, TITLE = 1, SUBTITLE = 2, DIRECTOR = 3, PLOT = 4, HOMEPAGE = 5,
-    YEAR = 6, USERRATING = 7, LENGTH = 8, FILENAME = 9, COVER = 10;
+        ID = 0, TITLE = 1, SUBTITLE = 2, DIRECTOR = 3, PLOT = 4, HOMEPAGE = 5,
+        YEAR = 6, USERRATING = 7, LENGTH = 8, FILENAME = 9, COVER = 10;
+    
+    final private static Pattern
+        splitPat  = Pattern.compile("\\|\\|"), //$NON-NLS-1$
+        dirPat    = Pattern.compile("^[0-9-]+ DIRECTORY .+"), //$NON-NLS-1$
+        digitsPat = Pattern.compile("[0-9]+"); //$NON-NLS-1$
     
     @SuppressWarnings("all")
     public String 
@@ -60,14 +66,15 @@ public class Video {
      */
     public Video(String line) throws IllegalArgumentException {
 
-        if (line.matches("^[0-9-]+ DIRECTORY .+")) { //$NON-NLS-1$
-            dir   = Integer.valueOf(line.substring(0, line.indexOf(" "))); //$NON-NLS-1$
+        if (dirPat.matcher(line).matches()) {
+            dir = Integer.valueOf(line.
+                substring(0, line.indexOf(" "))); //$NON-NLS-1$
             title = line.substring(line.indexOf("DIRECTORY") + 10); //$NON-NLS-1$
             directory = true;
             return;
         }
 
-        String[] fields = line.split("\\|\\|"); //$NON-NLS-1$
+        String[] fields = splitPat.split(line);
 
         if (fields.length < COVER) {
             IllegalArgumentException e = new IllegalArgumentException(
@@ -79,7 +86,7 @@ public class Video {
             throw e;
         }
         
-        fields[0] = fields[0].replaceFirst("VIDEO ", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        fields[0] = fields[0].substring(line.indexOf("VIDEO") + 6); //$NON-NLS-1$
 
         try {
             id       = Integer.valueOf(fields[ID]);
@@ -89,11 +96,11 @@ public class Video {
             plot     = fields[PLOT];
             homepage = fields[HOMEPAGE];
             filename = fields[FILENAME];
-            year     = fields[YEAR].matches("[0-9]+") ? //$NON-NLS-1$
+            year     = digitsPat.matcher(fields[YEAR]).matches() ?
                            Integer.valueOf(fields[YEAR]) : 0;
-            rating   = fields[USERRATING].matches("[0-9.]+") ? //$NON-NLS-1$
+            rating   = digitsPat.matcher(fields[USERRATING]).matches() ?
                            Float.parseFloat(fields[USERRATING]) : 0;
-            length   = fields[LENGTH].matches("[0-9]+") ? //$NON-NLS-1$
+            length   = digitsPat.matcher(fields[LENGTH]).matches() ?
                            Integer.valueOf(fields[LENGTH]) : 0;
             if (fields.length > COVER)
                 coverfile = fields[COVER];

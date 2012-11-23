@@ -20,6 +20,7 @@
 package org.mythdroid.vlc;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import org.mythdroid.ConnMgr;
 import org.mythdroid.Globals;
@@ -30,6 +31,8 @@ import org.mythdroid.Globals;
 public class VLCRemote {
     
     final static private int port = 16547;
+    
+    final static private Pattern digitsPat = Pattern.compile("[0-9]+"); //$NON-NLS-1$
     
     private ConnMgr cmgr = null;
 
@@ -89,7 +92,7 @@ public class VLCRemote {
         
         String result = ""; //$NON-NLS-1$
         
-        while (!result.matches("[0-9]+")) //$NON-NLS-1$
+        while (!digitsPat.matcher(result).matches())
             result = cmgr.readLine();
         
         return Integer.parseInt(result);
