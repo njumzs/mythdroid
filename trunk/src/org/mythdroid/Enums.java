@@ -54,7 +54,7 @@ public class Enums {
         OTHERRECORDING (-13,   Messages.getString("Program.51")), //$NON-NLS-1$
         OTHERTUNING    (-12,   Messages.getString("Program.50")), //$NON-NLS-1$
         MISSEDFUTURE   (-11,   Messages.getString("Program.48")), //$NON-NLS-1$
-        TUNER          (-10,   Messages.getString("Program.49")), //$NON-NLS-1$
+        TUNING         (-10,   Messages.getString("Program.49")), //$NON-NLS-1$
         FAILED         (-9,    Messages.getString("Program.0")),  //$NON-NLS-1$
         TUNERBUSY      (-8,    Messages.getString("Program.13")), //$NON-NLS-1$
         LOWSPACE       (-7,    Messages.getString("Program.14")), //$NON-NLS-1$

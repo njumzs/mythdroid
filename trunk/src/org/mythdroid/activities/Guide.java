@@ -552,7 +552,7 @@ public class Guide extends MDActivity {
                 break;
             case WILLRECORD:
             case RECORDING:
-            case TUNER:
+            case TUNING:
             case OTHERTUNING:
             case OTHERRECORDING:
                 icon = willRecordIcon;
