@@ -123,15 +123,17 @@ public class VideoPlayer extends MDActivity {
         try {
             videoView.stopPlayback();
         } catch (IllegalArgumentException e) {}
-        if (beMgr != null)
-            try {
-                MDDManager.stopStream(beMgr.addr);
-            } catch (IOException e) { ErrUtil.err(ctx, e); }
-        if (vlc != null)
-            try {
-                vlc.disconnect();
-            } catch (IOException e) { ErrUtil.err(ctx, e); }
-        if (streamInfo != null)
+        if (streamInfo == null) {
+            if (beMgr != null)
+                try {
+                    MDDManager.stopStream(beMgr.addr);
+                } catch (IOException e) { ErrUtil.err(ctx, e); }
+            if (vlc != null)
+                try {
+                    vlc.disconnect();
+                } catch (IOException e) { ErrUtil.err(ctx, e); }
+        }
+        else
             contentService.RemoveStream(streamInfo.id);
     }
 
@@ -212,8 +214,8 @@ public class VideoPlayer extends MDActivity {
 
         DisplayMetrics dm = getResources().getDisplayMetrics();
         
-        int h = (dm.heightPixels + 15) & ~0xf;
         int w = (dm.widthPixels + 15) & ~0xf;
+        if (w > 1280) w = 1280;
 
         try {
             Intent intent = getIntent();
@@ -226,18 +228,20 @@ public class VideoPlayer extends MDActivity {
                 if (intent.hasExtra(Extras.VIDEOID.toString())) {
                     id = intent.getIntExtra(Extras.VIDEOID.toString(), -1);
                     streamInfo = contentService.StreamFile(
-                        id, w, h, vb * 1000, ab * 1000
+                        id, w, 0, vb * 1000, ab * 1000
                     );
                 }
                 else {
                     Program prog = Globals.curProg;
                     if (prog == null) {
+                        ErrUtil.report(Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
                         initError(Messages.getString("VideoPlayer.0")); //$NON-NLS-1$
                         return;
                     }
+                    title = prog.Title;
                     streamInfo = contentService.StreamFile(
-                        prog.ChanID, Globals.utcFmt.format(prog.StartTime), 
-                        w, h, vb * 1000, ab * 1000
+                        prog.ChanID, Globals.utcFmt.format(prog.RecStartTime), 
+                        w, 0, vb * 1000, ab * 1000
                     );
                 }
 
