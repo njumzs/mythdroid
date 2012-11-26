@@ -274,7 +274,7 @@ public abstract class Remote extends MDActivity
         super.onPause();
         
         boolean screenOn = false;
-        if (VERSION.SDK_INT >= 7)
+        if (VERSION.SDK_INT >= 7 && pm != null)
             screenOn = Reflection.rPowerManager.isScreenOn(pm);
         if (
             wakeMessenger == null || wakeConnection == null ||
