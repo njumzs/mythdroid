@@ -19,26 +19,29 @@
 package org.mythdroid.backend;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.InputStream;
 import java.net.SocketTimeoutException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-
-import org.mythdroid.ConnMgr;
 import org.mythdroid.Globals;
 import org.mythdroid.data.Program;
+import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.services.MythService;
+import org.mythdroid.util.ConnMgr;
+import org.mythdroid.util.DatabaseUtil;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.HttpFetcher;
 import org.mythdroid.util.LogUtil;
 import org.mythdroid.util.UpdateService;
-import org.mythdroid.ConnMgr.onConnectListener;
+import org.mythdroid.util.ConnMgr.onConnectListener;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -46,7 +49,6 @@ import org.xml.sax.SAXException;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 /**
  * A BackendManager locates and manages a master backend, providing
@@ -114,6 +116,12 @@ public class BackendManager {
             intent.putExtra(UpdateService.ADDR, addr);
             Globals.appContext.startService(intent);
         }
+        
+        try {
+            String key = MDDManager.getKey(host);
+            if (key != null)
+                DatabaseUtil.addKey(Globals.appContext, key);
+        } catch (IOException e) {}
 
     }
 
@@ -275,35 +283,15 @@ public class BackendManager {
      */
     public Bitmap getImage(String path) {
         
-        URL url = null;
+        URI uri = null;
         try {
-            url = new URL(statusURL + path.replace(" ", "%20")); //$NON-NLS-1$ //$NON-NLS-2$
-        } catch (MalformedURLException e) { 
+            uri = new URI(statusURL + path.replace(" ", "%20")); //$NON-NLS-1$ //$NON-NLS-2$
+        } catch (URISyntaxException e) { 
             ErrUtil.logWarn(e);
             return null; 
         }
         
-        if (Globals.muxConns) 
-            try {
-                url = new URL(
-                    url.getProtocol() + "://" + url.getHost() + ":16550" + //$NON-NLS-1$ //$NON-NLS-2$
-                    url.getFile()
-                );
-            } catch (MalformedURLException e) {
-                ErrUtil.logWarn(e);
-                return null;
-            }
-        
-        LogUtil.debug("Fetching image from " + url.toString()); //$NON-NLS-1$
-
-        try {
-            final BitmapFactory.Options opts = new BitmapFactory.Options();
-            opts.inScaled = false;
-            return BitmapFactory.decodeStream(url.openStream(), null, opts);
-        } catch (IOException e) {
-            ErrUtil.logWarn(e);
-            return null;
-        }
+        return HttpFetcher.getImage(uri, Globals.muxConns);
         
     }
 
@@ -325,19 +313,15 @@ public class BackendManager {
         URL url = new URL(sURL + "/xml"); //$NON-NLS-1$
         Document doc;
         
-        if (Globals.muxConns)
-            url = new URL(
-                url.getProtocol() + "://" + url.getHost() +  ":16550/xml"  //$NON-NLS-1$ //$NON-NLS-2$
-            );
-        
         LogUtil.debug("Fetching XML from " + url.toString()); //$NON-NLS-1$
-        
-        URLConnection urlConn = url.openConnection();
-        urlConn.setConnectTimeout(3000);
-        urlConn.setReadTimeout(4000);
 
+        InputStream is = 
+            new HttpFetcher(url.toString(), Globals.muxConns).getInputStream();
+        
+        if (is == null) throw new IOException();
+        
         try {
-            doc = dbf.newDocumentBuilder().parse(urlConn.getInputStream());
+            doc = dbf.newDocumentBuilder().parse(is);
         } catch (SocketTimeoutException e) {
             throw new IOException(Messages.getString("BackendManager.1")); //$NON-NLS-1$
         } catch (SAXException e) {

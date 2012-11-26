@@ -46,7 +46,7 @@ public class JSONClient {
      * @param address IP address or hostname of server
      */
     public JSONClient(String address, String service) {
-        fetcher = new HttpFetcher();
+        fetcher = new HttpFetcher(Globals.muxConns);
         addr = address;
         serv = service;
     }
@@ -56,7 +56,7 @@ public class JSONClient {
      * @param address IP address or hostname of server
      */
     public JSONClient(String address, int port, String service) {
-        fetcher = new HttpFetcher();
+        fetcher = new HttpFetcher(Globals.muxConns);
         addr = address;
         serv = service;
         this.port = port;
@@ -110,12 +110,6 @@ public class JSONClient {
         if (query != null)
             params = query.toString();
         
-        if (Globals.muxConns)
-            return new URI(
-                "http", null, addr, 16550, "/" + serv + "/" + method, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                params, null 
-            );
-        
         return new URI(
             "http", null, addr, port == 0 ? 6544 : port, //$NON-NLS-1$
             "/" + serv + "/" + method, params, null//$NON-NLS-1$ //$NON-NLS-2$
@@ -129,7 +123,7 @@ public class JSONClient {
         LogUtil.debug("JSON request: " + req.getURI().toString()); //$NON-NLS-1$
         
         try {
-            fetcher.fetch(req);
+            fetcher.request(req);
         } catch (ClientProtocolException e) {
             ErrUtil.logErr(e);
             return null;

@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.HashSet;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -12,10 +14,14 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.mythdroid.Globals;
 import org.mythdroid.resource.Messages;
 
 import android.graphics.Bitmap;
@@ -24,19 +30,80 @@ import android.graphics.BitmapFactory;
 /** A utility class for fetching stuff via HTTP */
 public class HttpFetcher {
     
+    static private HttpClient defaultClient = null, muxedClient = null;
+    
+    private HttpClient client = null;
     private HttpResponse resp = null;
     private HttpEntity entity = null;
-    private HttpClient client = null;
+    
+    
+    /**
+     * Fetch an image from the supplied uri, or the cache if we can
+     * @param uri uri of image to fetch
+     * @param muxed used muxed connections via CMux?
+     * @return a Bitmap, or null upon error
+     */
+    public static Bitmap getImage(URI uri, boolean muxed) {
+        
+        Bitmap bm = Globals.artCache.get(uri.toString());
+        if (bm != null) return bm;
+               
+        LogUtil.debug("Fetching image from " + uri.toString()); //$NON-NLS-1$
+
+         try {
+             bm = new HttpFetcher(uri, Globals.muxConns).getImage();
+         } catch (IOException e) { 
+             ErrUtil.logWarn(e);
+         } catch (OutOfMemoryError e) { 
+             ErrUtil.logWarn(e.getMessage());
+         }
+         
+         if (bm != null) Globals.artCache.put(uri.toString(), bm);
+
+         return bm;
+         
+    }
     
     /** Constructor */
-    public HttpFetcher() {
+    public HttpFetcher(boolean muxed) {
+        
+        if (muxed && muxedClient != null) {
+            client = muxedClient;
+            return;
+        }
+        if (!muxed && client != null) {
+            client = defaultClient;
+            return;
+        }
+        
         client = new DefaultHttpClient();
         ClientConnectionManager cmgr = client.getConnectionManager();
-        HttpParams params = client.getParams();
+        HttpParams params = client.getParams().copy();
+        SchemeRegistry registry;
+        if (muxed) {
+            registry = SocketUtil.muxedSchemeRegistry(
+                DatabaseUtil.getKeys(Globals.appContext)
+            );
+            HashSet<Header> headers = new HashSet<Header>();
+            headers.add(new BasicHeader("Connection", "close")); //$NON-NLS-1$ //$NON-NLS-2$
+            params.setParameter("http.default-headers", headers); //$NON-NLS-1$
+        }
+        else {
+            registry = cmgr.getSchemeRegistry();
+        }
+        
+        HttpConnectionParams.setConnectionTimeout(params, 4000);
+        HttpConnectionParams.setSoTimeout(params, 4000);
+        
         client = new DefaultHttpClient(
-            new ThreadSafeClientConnManager(params, cmgr.getSchemeRegistry()),
-            params
+            new ThreadSafeClientConnManager(params, registry), params
         );
+        
+        if (muxed)
+            muxedClient = client;
+        else
+            defaultClient = client;
+
     }
     
     /**
@@ -45,8 +112,9 @@ public class HttpFetcher {
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public HttpFetcher(String url) throws ClientProtocolException, IOException {
-        client = new DefaultHttpClient();
+    public HttpFetcher(String url, boolean muxed)
+        throws ClientProtocolException, IOException {
+        this(muxed);
         get(URI.create(url));
     }
     
@@ -56,8 +124,8 @@ public class HttpFetcher {
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public HttpFetcher(URI uri) throws IOException {
-        client = new DefaultHttpClient();
+    public HttpFetcher(URI uri, boolean muxed) throws IOException {
+        this(muxed);
         get(uri);
     }
     
@@ -74,7 +142,6 @@ public class HttpFetcher {
         if (code != 200) 
             throw new IOException(Messages.getString("HttpFetcher.0") + code); //$NON-NLS-1$
         entity = resp.getEntity();
-
     }
     
     /**
@@ -83,7 +150,7 @@ public class HttpFetcher {
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public void fetch(HttpUriRequest req)
+    public void request(HttpUriRequest req)
         throws ClientProtocolException, IOException {
         
         resp = client.execute(req);
@@ -92,6 +159,21 @@ public class HttpFetcher {
             throw new IOException(Messages.getString("HttpFetcher.0") + code); //$NON-NLS-1$
         entity = resp.getEntity();
         
+    }
+    
+    /**
+     * Get an InputStream for reading the content
+     * @return an InputStream
+     * @throws IllegalStateException
+     * @throws IOException
+     */
+    public InputStream getInputStream()
+        throws IllegalStateException, IOException {
+        if (entity == null)
+            throw new IllegalStateException(
+                Messages.getString("HttpFetcher.1") //$NON-NLS-1$
+            );
+        return entity.getContent();
     }
     
     /**

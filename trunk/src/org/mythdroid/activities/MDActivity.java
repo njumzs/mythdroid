@@ -23,8 +23,8 @@ import java.util.HashMap;
 
 import org.mythdroid.Globals;
 import org.mythdroid.R;
-import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.DatabaseUtil;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.Reflection;
 import org.mythdroid.views.ActionView;
@@ -193,7 +193,7 @@ public abstract class MDActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            final Intent intent = new Intent(this, MythDroid.class);
+            final Intent intent = new Intent(this, Main.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             return true;
@@ -232,7 +232,7 @@ public abstract class MDActivity extends Activity {
 
     private void prepareFrontendDialog(final Dialog dialog) {
 
-        final ArrayList<String> list = FrontendDB.getFrontendNames(this);
+        final ArrayList<String> list = DatabaseUtil.getFrontendNames(this);
 
         if (hereActivity != null || nextActivity == null)
             list.add(Messages.getString("MDActivity.0")); // Here //$NON-NLS-1$

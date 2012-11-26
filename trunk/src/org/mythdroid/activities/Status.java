@@ -18,6 +18,8 @@
 
 package org.mythdroid.activities;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,6 +33,7 @@ import org.mythdroid.fragments.StatusRecordersFragment;
 import org.mythdroid.fragments.StatusScheduledFragment;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.HttpFetcher;
 import org.mythdroid.util.LogUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -100,12 +103,13 @@ public class Status extends MDFragmentActivity {
                 );
             else
                 url = new URL(Globals.getBackend().getStatusURL() + "/xml"); //$NON-NLS-1$
-            if (Globals.muxConns)
-                url = new URL(
-                    "http://" + url.getHost() + ":16550" + url.getFile() //$NON-NLS-1$ //$NON-NLS-2$
-                );
             LogUtil.debug("Fetching XML from " + url.toString()); //$NON-NLS-1$
-            statusDoc = dbf.newDocumentBuilder().parse(url.openStream());
+            InputStream is = 
+                new HttpFetcher(url.toString(), Globals.muxConns)
+                    .getInputStream();
+            if (is == null)
+                throw new IOException(Messages.getString("Status.4")); //$NON-NLS-1$
+            statusDoc = dbf.newDocumentBuilder().parse(is);
         } catch (SAXException e) {
             ErrUtil.postErr(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
         } catch (Exception e) { ErrUtil.postErr(ctx, e); }

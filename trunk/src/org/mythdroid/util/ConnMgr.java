@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.mythdroid;
+package org.mythdroid.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,9 +32,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Pattern;
 
+import org.mythdroid.Globals;
 import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
-import org.mythdroid.util.LogUtil;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -133,6 +133,8 @@ public class ConnMgr {
     private byte[]                  lastSent         = null;
     /** The timeOut modifier for the next read */
     private timeOut                 timeOutModifier  = timeOut.DEFAULT;
+    /** Will this connection be muxed via CMux? */
+    private boolean                 mux              = false;
     
     /**
      * Make a connection, reuse an existing connection if possible
@@ -185,10 +187,10 @@ public class ConnMgr {
      * @param host String with hostname or dotted decimal IP address
      * @param port integer port number
      * @param ocl callback to call upon successful connection
-     * @param mux connection will be muxed via MDD if true
+     * @param muxed connection will be muxed via MDD if true
      */
     public ConnMgr(
-        final String host, final int port, onConnectListener ocl, boolean mux
+        final String host, final int port, onConnectListener ocl, boolean muxed
     ) throws IOException {
 
         if (host == null || host.length() < 1)
@@ -197,29 +199,9 @@ public class ConnMgr {
         if (port < 0 || port > 65535)
             throw new IOException(Messages.getString("ConnMgr.9") + port); //$NON-NLS-1$
         
-        if (mux)
-            // Add a callback that sets up the muxed connection
-            oCLs.add(
-                new onConnectListener() {
-                    @Override
-                    public void onConnect(ConnMgr cmgr) throws IOException {
-                        byte[] buf = new byte[512];
-                        synchronized (cmgr.is) {
-                            // Tell CMux which port we want to connect to
-                            cmgr.write(String.valueOf(port).getBytes());
-                            // Get the response
-                            cmgr.read(buf, 0, 2);
-                            if (buf[0] == 'O' && buf[1] == 'K')
-                                return;
-                            // There was a problem, read the rest of the err msg
-                            cmgr.read(buf, 2, 510);
-                        }
-                        throw new IOException(new String(buf));
-                    }
-                }
-            );
-        
-        sockAddr = new InetSocketAddress(host, mux ? 16550 : port);
+        mux = muxed;
+
+        sockAddr = new InetSocketAddress(host, port);
 
         if (sockAddr == null || sockAddr.getAddress() == null)
             throw new IOException(Messages.getString("ConnMgr.6") + host); //$NON-NLS-1$
@@ -643,9 +625,12 @@ public class ConnMgr {
             for (int i = 0; i < 3; i++) {
                 
                 LogUtil.debug("Connecting to " + addr); //$NON-NLS-1$
-                sock = new Socket();
-                sock.setTcpNoDelay(true);
-                sock.setSoTimeout(timeout);
+                if (mux)
+                    sock = new SocketUtil.MuxedSocket(
+                        DatabaseUtil.getKeys(Globals.appContext), timeout
+                    );
+                else
+                    sock = new SocketUtil.PlainSocket(timeout);
                 
                 try {
                     sock.connect(sockAddr, timeout / 2);

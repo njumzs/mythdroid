@@ -19,6 +19,7 @@
 package org.mythdroid.activities;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.services.GuideService;
 import org.mythdroid.util.ErrUtil;
+import org.mythdroid.util.HttpFetcher;
 import org.mythdroid.util.LogUtil;
 import org.xml.sax.SAXException;
 
@@ -515,15 +517,14 @@ public class Guide extends MDActivity {
                 "&StartChanId=0" + "&NumOfChannels=-1" + "&Details=1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             );
 
-            if (Globals.muxConns)
-                url = new URL(
-                    url.getProtocol() + "://" + url.getHost() +  //$NON-NLS-1$
-                    ":16550" + url.getFile()  //$NON-NLS-1$
-                );
+            LogUtil.debug("Fetching XML from " + url.toString()); //$NON-NLS-1$
             
-            LogUtil.debug("Fetching XML from " + url.toExternalForm()); //$NON-NLS-1$
+            InputStream is = 
+                new HttpFetcher(url.toString(), Globals.muxConns).getInputStream();
+            if (is == null)
+                throw new IOException(Messages.getString("Guide.0")); //$NON-NLS-1$
             
-            Xml.parse(url.openStream(), Xml.Encoding.UTF_8, handler);
+            Xml.parse(is, Xml.Encoding.UTF_8, handler);
    
         } catch (SAXException e) {
             ErrUtil.postErr(this, Messages.getString("Guide.13")); //$NON-NLS-1$

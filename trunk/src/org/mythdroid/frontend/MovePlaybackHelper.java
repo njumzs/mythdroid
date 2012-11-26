@@ -25,11 +25,11 @@ import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.activities.VideoPlayer;
-import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.frontend.WakeOnLan;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.DatabaseUtil;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.views.MDVideoView;
 import org.mythdroid.vlc.VLCRemote;
@@ -63,13 +63,13 @@ public class MovePlaybackHelper {
         
         @Override
         public void run() {
-            String addr = FrontendDB.getFrontendAddr(ctx, moveTo);
+            String addr = DatabaseUtil.getFrontendAddr(ctx, moveTo);
             try {
                 new FrontendManager(moveTo, addr); 
                 onReady.onFrontendReady(moveTo);
             } catch (SocketTimeoutException e) {
                 // The box might be asleep or turned off, can we wake it?
-                String hwaddr = FrontendDB.getFrontendHwAddr(ctx, moveTo);
+                String hwaddr = DatabaseUtil.getFrontendHwAddr(ctx, moveTo);
                 if (hwaddr == null) {
                     ErrUtil.postErr(
                         ctx, e.getMessage() + Messages.getString("TVRemote.4") //$NON-NLS-1$

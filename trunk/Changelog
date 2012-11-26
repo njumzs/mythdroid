@@ -1,5 +1,22 @@
 Non-trivial user visible changes
 
+In 0.6.3:
+
+Minimise memory usage throughout, release large bitmaps for collection faster
+Fix TVRemote's progress bar not updated by MDD
+Fix invalid timezones sent by mythbackend with spaces in the name 
+Fix double drawing in Guide updates when choosing new time or date
+Fix a few races with additional locking in BackendManager
+Fix Status activities not displaying in tablet portrait layout
+Improved image caching
+Use our own MediaController in VideoPlayer, make "Move To" available on every device
+Improved 'wake on movement' functionality
+Automated secure, remote connectivity via CMux (see http://code.google.com/p/mythdroid/source/detail?r=854)
+
+In 0.6.1 and 0.6.2:
+
+Fix update notification crash
+
 In 0.6.0:
 
 Add ability to move in-progress playback between frontends and/or the device itself

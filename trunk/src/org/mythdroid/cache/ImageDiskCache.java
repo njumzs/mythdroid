@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.mythdroid.util;
+package org.mythdroid.cache;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.LogUtil;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

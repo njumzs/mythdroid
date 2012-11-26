@@ -37,7 +37,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.PopupWindow;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -53,7 +52,7 @@ public class MDMediaController extends MediaController {
     private Context              ctx;
     private PopupWindow          popupWindow;
     private View                 anchor, rootView;
-    private ProgressBar          progress;
+    private SeekBar              progress;
     private TextView             endTime, curTime, titleView;
     private String               title;
     private int                  duration;
@@ -297,11 +296,10 @@ public class MDMediaController extends MediaController {
             if (moveToButton != null)
                 moveToButton.setOnClickListener(moveToListener);
 
-        progress = (ProgressBar)v.findViewById(R.id.mctrlProgress);
+        progress = (SeekBar)v.findViewById(R.id.mctrlProgress);
         if (progress != null) {
-            SeekBar seeker = (SeekBar)progress;
-            seeker.setOnSeekBarChangeListener(seekListener);
-            seeker.setThumbOffset(1);
+            progress.setOnSeekBarChangeListener(seekListener);
+            progress.setThumbOffset(1);
             progress.setMax(1000);
         }
 

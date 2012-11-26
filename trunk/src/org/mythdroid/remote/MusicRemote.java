@@ -492,20 +492,12 @@ public class MusicRemote extends Remote {
             "&Width=" + artView.getWidth() + //$NON-NLS-1$
             "&Height=" + artView.getHeight(); //$NON-NLS-1$
         
-        Bitmap bm = Globals.artCache.get(url);
-
-        if (bm != null) return bm;
-
         try {
-            bm = Globals.getBackend().getImage(url);
+            return Globals.getBackend().getImage(url);
         } catch (IOException e) {
             ErrUtil.logWarn(e);
             return null;
         }
-    
-        if (bm != null) Globals.artCache.put(url, bm);
-        
-        return bm;
 
     }
 

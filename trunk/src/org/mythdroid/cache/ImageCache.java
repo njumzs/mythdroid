@@ -16,12 +16,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.mythdroid.util;
+package org.mythdroid.cache;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
+import org.mythdroid.util.LogUtil;
 
 import android.graphics.Bitmap;
 

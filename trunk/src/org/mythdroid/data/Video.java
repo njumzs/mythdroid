@@ -31,7 +31,6 @@ import org.mythdroid.Globals;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.HttpFetcher;
-import org.mythdroid.util.LogUtil;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -199,33 +198,8 @@ public class Video {
             ); 
         } catch (URISyntaxException e)  { ErrUtil.logWarn(e); return null; } 
           catch (IOException e)         { ErrUtil.logWarn(e); return null; }
-        
-       if (Globals.muxConns)
-          try {
-              uri = new URI(
-                  "http", null, uri.getHost(), 16550, //$NON-NLS-1$
-                  (Globals.haveServices() ? "" : "/MDDHTTP") + uri.getPath(), //$NON-NLS-1$ //$NON-NLS-2$
-                  uri.getQuery(), null
-              );
-          } catch (URISyntaxException e) { ErrUtil.logWarn(e); return null; }
-       
-       Bitmap bm = Globals.artCache.get(uri.toString());
-       if (bm != null) return bm;
-              
-       LogUtil.debug("Fetching image from " + uri.toString()); //$NON-NLS-1$
 
-        try {
-            HttpFetcher fetcher = new HttpFetcher(uri);
-            bm = fetcher.getImage();
-        } catch (IOException e) { 
-            ErrUtil.logWarn(e);
-        } catch (OutOfMemoryError e) { 
-            ErrUtil.logWarn(e.getMessage());
-        }
-        
-        if (bm != null) Globals.artCache.put(uri.toString(), bm);
-
-        return bm;
+       return HttpFetcher.getImage(uri, Globals.muxConns);
 
     }
 

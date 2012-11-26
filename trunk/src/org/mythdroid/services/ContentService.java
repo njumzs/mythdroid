@@ -26,10 +26,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mythdroid.Globals;
 import org.mythdroid.Enums.ArtworkType;
+import org.mythdroid.cache.MemCache;
 import org.mythdroid.data.StreamInfo;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
-import org.mythdroid.util.MemCache;
 
 import android.graphics.Bitmap;
 
@@ -87,14 +87,7 @@ public class ContentService {
         
         path += "&Width=" + w + "&Height=" + h; //$NON-NLS-1$ //$NON-NLS-2$
         
-        Bitmap bm = Globals.artCache.get(path);
-        if (bm != null) return bm;
-        
-        bm = Globals.getBackend().getImage(path);
-        
-        if (bm != null) Globals.artCache.put(path, bm);
-        
-        return bm;
+        return Globals.getBackend().getImage(path);
         
     }
     

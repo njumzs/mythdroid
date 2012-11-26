@@ -9,7 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 import org.mythdroid.mdd.MDDManager;
+import org.mythdroid.util.DatabaseUtil;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 /** Format and display messages on the MythTV OSD */
@@ -46,10 +48,12 @@ final public class OSDMessage {
         "</mythnotify>";  //$NON-NLS-1$
 
     /** SimpleDateFormat of EEE d MMM yy */
-    final private static SimpleDateFormat dateFmt =
+    @SuppressLint("SimpleDateFormat")
+	final private static SimpleDateFormat dateFmt =
         new SimpleDateFormat("EEE d MMM yy"); //$NON-NLS-1$
     /** SimpleDateFormat of HH:mm */
-    final private static SimpleDateFormat timeFmt =
+    @SuppressLint("SimpleDateFormat")
+	final private static SimpleDateFormat timeFmt =
         new SimpleDateFormat("HH:mm"); //$NON-NLS-1$
 
     static {
@@ -104,10 +108,10 @@ final public class OSDMessage {
      * @param msg Message to display
      */
     public static void XOSD(Context ctx, String msg) {
-        for (String fe : FrontendDB.getFrontendNames(ctx))
+        for (String fe : DatabaseUtil.getFrontendNames(ctx))
             try {
                 MDDManager.osdMsg(
-                    FrontendDB.getFrontendAddr(ctx, fe), msg
+                    DatabaseUtil.getFrontendAddr(ctx, fe), msg
                 );
             } catch (IOException e) {}
     }
