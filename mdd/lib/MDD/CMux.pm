@@ -263,7 +263,6 @@ sub writeSock {
 
     my $con = shift;
     my $buf = shift;
-    $log->dbg("Writing: $buf\n");
     return syswrite($con->{sock}, $buf) unless (exists $con->{sendcipher});
     return syswrite($con->{sock}, $con->{sendcipher}->encrypt($buf));
 
