@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.HashSet;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -18,7 +16,6 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.mythdroid.Globals;
@@ -79,18 +76,12 @@ public class HttpFetcher {
         client = new DefaultHttpClient();
         ClientConnectionManager cmgr = client.getConnectionManager();
         HttpParams params = client.getParams().copy();
-        SchemeRegistry registry;
-        if (muxed) {
-            registry = SocketUtil.muxedSchemeRegistry(
-                DatabaseUtil.getKeys(Globals.appContext)
-            );
-            HashSet<Header> headers = new HashSet<Header>();
-            headers.add(new BasicHeader("Connection", "close")); //$NON-NLS-1$ //$NON-NLS-2$
-            params.setParameter("http.default-headers", headers); //$NON-NLS-1$
-        }
-        else {
-            registry = cmgr.getSchemeRegistry();
-        }
+        SchemeRegistry registry =
+            muxed ?
+                SocketUtil.muxedSchemeRegistry(
+                    DatabaseUtil.getKeys(Globals.appContext)
+                ) :
+                cmgr.getSchemeRegistry();
         
         HttpConnectionParams.setConnectionTimeout(params, 4000);
         HttpConnectionParams.setSoTimeout(params, 8000);
