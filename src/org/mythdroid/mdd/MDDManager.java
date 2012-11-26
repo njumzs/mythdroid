@@ -21,12 +21,12 @@ package org.mythdroid.mdd;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.mythdroid.ConnMgr;
 import org.mythdroid.Globals;
 import org.mythdroid.Enums.RecType;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.Video;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.ConnMgr;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.UpdateService;
 
@@ -130,6 +130,21 @@ public class MDDManager {
         String ver = cmgr.readLine();
         cmgr.disconnect();
         return ver;
+    }
+    
+    /**
+     * Get a CMux key from MDD
+     * @param addr String containing address of MDD
+     * @return String containing the key in hex
+     * @throws IOException
+     */
+    public static String getKey(String addr) throws IOException {
+        final ConnMgr cmgr = sendMsg(addr, "KEY"); //$NON-NLS-1$
+        String key = cmgr.readLine();
+        cmgr.disconnect();
+        if (key != null && key.equals("ERROR")) //$NON-NLS-1$
+            return null;
+        return key;
     }
     
     /**

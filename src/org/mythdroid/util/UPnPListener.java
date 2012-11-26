@@ -16,7 +16,6 @@ import java.util.TimerTask;
 import org.mythdroid.Globals;
 import org.mythdroid.data.XMLHandler;
 import org.mythdroid.data.XMLHandler.Element;
-import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
@@ -105,19 +104,19 @@ public class UPnPListener {
         @Override
         public void run() {
             Context ctx = Globals.appContext;
-            ArrayList<String> fes = FrontendDB.getDiscoveredFrontends(ctx);
+            ArrayList<String> fes = DatabaseUtil.getDiscoveredFrontends(ctx);
             FrontendManager feMgr = null;
             for (String fe : fes) {
                 try {
                     feMgr = new FrontendManager(
-                        fe, FrontendDB.getFrontendAddr(ctx, fe)
+                        fe, DatabaseUtil.getFrontendAddr(ctx, fe)
                     );
                     feMgr.disconnect();
                 } catch (IOException e) {
                     LogUtil.debug(
                         "Frontend " + fe + " isn't reachable now, remove" //$NON-NLS-1$ //$NON-NLS-2$
                     );
-                    FrontendDB.delete(ctx, fe);
+                    DatabaseUtil.delete(ctx, fe);
                 }
             }
         }
@@ -216,7 +215,7 @@ public class UPnPListener {
         
         LogUtil.debug("Found frontend at " + addr); //$NON-NLS-1$
         
-        if (FrontendDB.hasFrontendWithAddr(Globals.appContext, addr)) return;
+        if (DatabaseUtil.hasFrontendWithAddr(Globals.appContext, addr)) return;
         
         final StringBuilder name = new StringBuilder();
         final XMLHandler handler = new XMLHandler("root"); //$NON-NLS-1$
@@ -261,7 +260,7 @@ public class UPnPListener {
         );
         
         name.setCharAt(0, Character.toUpperCase(name.charAt(0)));
-        FrontendDB.insert(
+        DatabaseUtil.insert(
             Globals.appContext, name.toString(), addr, null, true
         );
         

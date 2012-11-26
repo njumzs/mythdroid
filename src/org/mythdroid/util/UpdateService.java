@@ -324,7 +324,7 @@ public class UpdateService extends Service {
         
         HttpFetcher fetcher = null;
         try {
-            fetcher = new HttpFetcher(url);
+            fetcher = new HttpFetcher(url, false);
         } catch (ClientProtocolException e) {
             ErrUtil.logErr(e);
             notify(

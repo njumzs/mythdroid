@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import org.mythdroid.ConnMgr;
-import org.mythdroid.ConnMgr.onConnectListener;
 import org.mythdroid.Enums.Key;
 import org.mythdroid.data.Program;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.ConnMgr;
+import org.mythdroid.util.ConnMgr.onConnectListener;
 
 
 /** Manages a frontend */

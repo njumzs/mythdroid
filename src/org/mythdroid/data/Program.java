@@ -459,20 +459,13 @@ public class Program implements Comparable<Program> {
                 Globals.utcFmt.format(RecStartTime) :
                 Globals.dateFmt.format(RecStartTime)
             );
-        
-        Bitmap bm = Globals.artCache.get(url);
-        if (bm != null) return bm;
 
         try {
-            bm = Globals.getBackend().getImage(url);
+            return Globals.getBackend().getImage(url);
         } catch (IOException e) { 
             ErrUtil.logWarn(e); 
             return null; 
         }
-        
-        if (bm != null) Globals.artCache.put(url, bm);
-        
-        return bm;
         
     }
     

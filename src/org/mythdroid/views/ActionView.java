@@ -1,13 +1,16 @@
 package org.mythdroid.views;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
 /** Custom view for action bar items */
 public class ActionView extends LinearLayout {
 
-    @SuppressWarnings("javadoc")
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	@SuppressWarnings("javadoc")
     public ActionView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }

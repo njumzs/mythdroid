@@ -35,7 +35,7 @@
         	android:excludeFromRecents="true"
         	android:finishOnTaskLaunch="true"/>
         
-        <activity android:name=".activities.MythDroid" 
+        <activity android:name="org.mythdroid.activities.Main" 
         	android:label="@string/appName"
         	android:configChanges="keyboardHidden|orientation">
           <intent-filter>
@@ -50,18 +50,6 @@
         	
         <activity android:name=".activities.RecordingDetail" 
         	android:label="Program Details"
-        	android:configChanges="keyboardHidden|orientation"/>
-        	
-         <activity android:name="fragments.RecordingEdit" 
-        	android:label="Edit Schedule"
-        	android:configChanges="keyboardHidden|orientation"/>
-        
-        <activity android:name=".activities.RecordingEditSched" 
-        	android:label="Scheduling Options"
-        	android:configChanges="keyboardHidden|orientation"/>
-        	
-        <activity android:name=".activities.RecordingEditGroups" 
-        	android:label="Groups Options"
         	android:configChanges="keyboardHidden|orientation"/>
         	
         <activity android:name=".activities.Prefs" 

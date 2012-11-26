@@ -20,8 +20,8 @@ package org.mythdroid.activities;
 
 import org.mythdroid.Globals;
 import org.mythdroid.R;
-import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.DatabaseUtil;
 import org.mythdroid.util.ErrUtil;
 
 import android.app.AlertDialog;
@@ -78,16 +78,16 @@ public class FrontendList extends ListActivity implements
 
         ((TextView)(ftr.findViewById(R.id.name))).setText(R.string.defFe);
 
-        String defFE = FrontendDB.getDefault(this);
+        String defFE = DatabaseUtil.getDefault(this);
         
         if (defFE != null)
             ((TextView)(ftr.findViewById(R.id.addr)))
-                .setText(FrontendDB.getDefault(this));
+                .setText(DatabaseUtil.getDefault(this));
         
         lv.addHeaderView(ftr);
         lv.setPadding(0, 4, 0, 0);
 
-        Cursor c = FrontendDB.getFrontends(this);
+        Cursor c = DatabaseUtil.getFrontends(this);
 
         setListAdapter(
             new SimpleCursorAdapter(
@@ -222,26 +222,26 @@ public class FrontendList extends ListActivity implements
                 }
 
                 if (rowID < 1) {
-                    if (!FrontendDB.insert(this, name, addr, hwaddr, false))
+                    if (!DatabaseUtil.insert(this, name, addr, hwaddr, false))
                         ErrUtil.err(
                             ctx, Messages.getString("FrontendList.5") + name //$NON-NLS-1$
                         );
-                    if (FrontendDB.getFrontendNames(ctx).size() == 1)
+                    if (DatabaseUtil.getFrontendNames(ctx).size() == 1)
                         setDefaultFrontend(name);
                 }
 
                 else
-                    FrontendDB.update(this, rowID, name, addr, hwaddr);
+                    DatabaseUtil.update(this, rowID, name, addr, hwaddr);
 
                 break;
 
             case AlertDialog.BUTTON_NEUTRAL:
 
-                FrontendDB.delete(this, rowID);
+                DatabaseUtil.delete(this, rowID);
                 String n = ((EditText)feEditor.findViewById(R.id.name))
                              .getText().toString();
                 if (Globals.curFe != null && Globals.curFe.equals(n))
-                    Globals.curFe = FrontendDB.getDefault(ctx);
+                    Globals.curFe = DatabaseUtil.getDefault(ctx);
                 
                 break;
 
@@ -276,7 +276,7 @@ public class FrontendList extends ListActivity implements
 
     private void prepareDefaultFrontendDialog(final Dialog dialog) {
 
-        ArrayList<String> list = FrontendDB.getFrontendNames(this);
+        ArrayList<String> list = DatabaseUtil.getFrontendNames(this);
 
         list.add(Messages.getString("MDActivity.0")); // Here //$NON-NLS-1$
 
@@ -289,7 +289,7 @@ public class FrontendList extends ListActivity implements
     }
     
     private void setDefaultFrontend(String name) {
-        FrontendDB.updateDefault(ctx, name);
+        DatabaseUtil.updateDefault(ctx, name);
         Globals.curFe = name;
         ((TextView)(ftr.findViewById(R.id.addr))).setText(name);
     }

@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mythdroid.cache.MemCache;
 import org.mythdroid.data.Video;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
-import org.mythdroid.util.MemCache;
 
 /** An implementation of the Video service */
 public class VideoService {

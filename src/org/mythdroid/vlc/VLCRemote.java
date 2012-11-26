@@ -22,8 +22,8 @@ package org.mythdroid.vlc;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import org.mythdroid.ConnMgr;
 import org.mythdroid.Globals;
+import org.mythdroid.util.ConnMgr;
 
 /**
  * Manage a connection to VLC's remote control interface

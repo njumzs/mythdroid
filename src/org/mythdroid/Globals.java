@@ -13,12 +13,13 @@ import java.util.concurrent.TimeUnit;
 import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
 import org.mythdroid.data.Video;
-import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.frontend.FrontendManager;
 import org.mythdroid.receivers.ConnectivityReceiver;
 import org.mythdroid.resource.Messages;
-import org.mythdroid.util.ImageCache;
+import org.mythdroid.util.ConnMgr;
+import org.mythdroid.util.DatabaseUtil;
+import org.mythdroid.cache.ImageCache;
 import org.mythdroid.util.UPnPListener;
 
 import android.annotation.SuppressLint;
@@ -160,10 +161,10 @@ public class Globals {
 
         // If unspecified, connect to the first defined frontend
         if (name == null) {
-            if ((name = FrontendDB.getFirstFrontendName(ctx)) == null)
+            if ((name = DatabaseUtil.getFirstFrontendName(ctx)) == null)
                 throw new IOException(Messages.getString("Globals.1")); //$NON-NLS-1$
             feMgr = 
-                new FrontendManager(name, FrontendDB.getFirstFrontendAddr(ctx));
+                new FrontendManager(name, DatabaseUtil.getFirstFrontendAddr(ctx));
         }
         
         else if (name.equals(Messages.getString("MDActivity.0"))) //$NON-NLS-1$
@@ -172,7 +173,7 @@ public class Globals {
         // Connect to the specified frontend
         else
             feMgr = new FrontendManager(
-                name, FrontendDB.getFrontendAddr(ctx, name)
+                name, DatabaseUtil.getFrontendAddr(ctx, name)
             );
 
         curFe = feMgr.name;
@@ -228,7 +229,7 @@ public class Globals {
         
         // See if we can locate a backend via UPnP
         beMgr = new BackendManager(
-            Globals.getUPnPListener().findMasterBackend(950)
+            getUPnPListener().findMasterBackend(950)
         );
         muxConns = false;
 

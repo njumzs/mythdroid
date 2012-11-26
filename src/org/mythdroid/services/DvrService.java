@@ -23,9 +23,9 @@ import java.text.ParseException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mythdroid.cache.MemCache;
 import org.mythdroid.data.RecordingRule;
 import org.mythdroid.util.LogUtil;
-import org.mythdroid.util.MemCache;
 
 /** An implementation of the Myth service */
 public class DvrService {

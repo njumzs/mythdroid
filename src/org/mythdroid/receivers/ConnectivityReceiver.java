@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.mythdroid.ConnMgr;
+import org.mythdroid.util.ConnMgr;
 import org.mythdroid.util.LogUtil;
 
 import android.content.BroadcastReceiver;

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
-import org.mythdroid.frontend.FrontendDB;
 import org.mythdroid.frontend.FrontendLocation;
 import org.mythdroid.frontend.WakeOnLan;
 import org.mythdroid.mdd.MDDManager;
@@ -33,6 +32,7 @@ import org.mythdroid.remote.MusicRemote;
 import org.mythdroid.remote.NavRemote;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.DatabaseUtil;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.UpdateService;
 
@@ -55,7 +55,7 @@ import android.widget.AdapterView.OnItemClickListener;
 /**
  * MDListActivity, entry point, the 'main menu'
  */
-public class MythDroid extends MDListActivity implements
+public class Main extends MDListActivity implements
     AdapterView.OnItemLongClickListener {
 
     /** Menu IDs */
@@ -84,9 +84,9 @@ public class MythDroid extends MDListActivity implements
         super.onCreate(icicle);
         
         if (Globals.curFe == null) {
-            Globals.curFe = FrontendDB.getDefault(this);
+            Globals.curFe = DatabaseUtil.getDefault(this);
             if (Globals.curFe == null)
-                Globals.curFe = FrontendDB.getFirstFrontendName(this);
+                Globals.curFe = DatabaseUtil.getFirstFrontendName(this);
         }
             
         setContentView(R.layout.mainmenu);
@@ -122,7 +122,7 @@ public class MythDroid extends MDListActivity implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        FrontendDB.close();
+        DatabaseUtil.close();
     }
 
     @Override
@@ -375,7 +375,7 @@ public class MythDroid extends MDListActivity implements
                 ) {
                     String name = (String)av.getAdapter().getItem(pos);
                     try {
-                        WakeOnLan.wake(FrontendDB.getFrontendHwAddr(ctx, name));
+                        WakeOnLan.wake(DatabaseUtil.getFrontendHwAddr(ctx, name));
                         Globals.curFe = name;
                     } catch (Exception e) { ErrUtil.err(ctx, e); }
                     d.dismiss();
@@ -390,7 +390,7 @@ public class MythDroid extends MDListActivity implements
     private void prepareWakeDialog(final Dialog dialog) {
 
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-            ctx, R.layout.simple_list_item_1, FrontendDB.getFrontendNames(ctx)
+            ctx, R.layout.simple_list_item_1, DatabaseUtil.getFrontendNames(ctx)
         );
 
         if (adapter.getCount() < 1) {

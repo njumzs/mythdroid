@@ -16,11 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.mythdroid.frontend;
+package org.mythdroid.util;
 
 import java.util.ArrayList;
 
-import org.mythdroid.util.ErrUtil;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -31,16 +30,17 @@ import android.database.SQLException;
 import android.database.CursorIndexOutOfBoundsException;
 
 /** Manage a sqlite database of frontends */
-public class FrontendDB {
+public class DatabaseUtil {
 
     @SuppressWarnings("all")
     final public static int     ID = 0, ADDR = 1, NAME = 2, HWADDR = 3,
                                 DISCOVERED = 4;
 
     final private static String DB_NAME        = "MythDroid.db"; //$NON-NLS-1$
-    final private static int    DB_VERSION     = 5;
+    final private static int    DB_VERSION     = 6;
     final private static String FRONTEND_TABLE = "frontends"; //$NON-NLS-1$
     final private static String DEFAULT_TABLE  = "defaultFE"; //$NON-NLS-1$
+    final private static String KEYS_TABLE     = "cmuxKeys"; //$NON-NLS-1$
 
     private static SQLiteDatabase    db        = null;
     private static Cursor            cached    = null;
@@ -64,6 +64,10 @@ public class FrontendDB {
                 " (default_id INTEGER PRIMARY KEY AUTOINCREMENT" + //$NON-NLS-1$
                 ", name TEXT);" //$NON-NLS-1$
             );
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS " + KEYS_TABLE + //$NON-NLS-1$
+                " (_id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT);" //$NON-NLS-1$
+            );
         }
 
         @Override
@@ -77,6 +81,10 @@ public class FrontendDB {
                     "ALTER TABLE " + FRONTEND_TABLE + //$NON-NLS-1$
                     " ADD COLUMN discovered INTEGER;" //$NON-NLS-1$
                 );
+            }
+            if (oldVer < 6) {
+                db.execSQL("DROP TABLE IF EXISTS " + KEYS_TABLE); //$NON-NLS-1$
+                onCreate(db);
             }
         }
 
@@ -356,6 +364,58 @@ public class FrontendDB {
             cached.moveToNext();
         }
         
+    }
+    
+    /**
+     * Add a CMux key to the database
+     * @param ctx Context
+     * @param key key as a hex string
+     */
+    public static void addKey(Context ctx, String key) {
+        if (db == null) initDB(ctx);
+        try {
+            Cursor c = db.query(
+                KEYS_TABLE, new String[] { "_id", "key"},  //$NON-NLS-1$ //$NON-NLS-2$
+                null, null, null, null, null
+            );
+            c.moveToFirst();
+            while (!c.isAfterLast()) {
+                if (c.getString(1).equals(key)) {
+                    c.close();
+                    return;
+                }
+                c.moveToNext();
+            }
+        } catch (CursorIndexOutOfBoundsException e) {} 
+          catch (SQLException e) { ErrUtil.logWarn(e); }
+        ContentValues values = new ContentValues();
+        values.put("key", key); //$NON-NLS-1$
+        db.insert(KEYS_TABLE, null, values);
+    }
+    
+    /**
+     * Get a list of CMux keys
+     * @param ctx Context
+     * @return ArrayList of keys as hex strings
+     */
+    public static ArrayList<String> getKeys(Context ctx) {
+        if (db == null) initDB(ctx);
+        ArrayList<String> keys = new ArrayList<String>();
+        try {
+            Cursor c = db.query(
+                KEYS_TABLE, new String[] { "_id", "key"},  //$NON-NLS-1$ //$NON-NLS-2$
+                null, null, null, null, null
+            );
+            keys.ensureCapacity(c.getCount());
+            c.moveToFirst();
+            while (!c.isAfterLast()) {
+                keys.add(c.getString(1));
+                c.moveToNext();
+            }
+            c.close();
+        } catch (CursorIndexOutOfBoundsException e) {} 
+          catch (SQLException e) { ErrUtil.logWarn(e); }
+        return keys;
     }
 
     /** Close the frontend database */
