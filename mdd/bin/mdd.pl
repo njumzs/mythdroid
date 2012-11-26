@@ -21,12 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end comment
 =cut
 
-our $VERSION = '0.6.2';
+our $VERSION = '0.6.3';
 
 use strict;
 use warnings;
 use threads;
 use threads::shared;
+use Socket qw(IPPROTO_TCP TCP_NODELAY);
 use IO::Socket::INET;
 use IO::Select;
 use POSIX qw(setsid);
@@ -130,6 +131,7 @@ my @clientMsgs = (
     { regex => qr/^STOPSTREAM$/,     proc => \&stopStreaming             },
     { regex => qr/^STORGROUPS$/,     proc => \&getStorGroups             },
     { regex => qr/^RECGROUPS$/,      proc => \&getRecGroups              },
+    { regex => qr/^KEY$/,            proc => \&getKey                    },
     { regex => qr/^COMMAND (.*)$/,   proc => sub { runCommand($1) }      },
     { regex => qr/^VIDEOLIST (.*)$/, proc => sub { videoList($1) }       },
     { regex => qr/^STREAM (.*)$/,    proc => sub { streamFile($1) }      },
@@ -208,6 +210,10 @@ else {
 if (exists $config{cmux_extra_ports}) {
     MDD::CMux->addAllowedPorts(split ' ', $config{cmux_extra_ports});
 }
+if (MDD::ConfigData->feature('crypt') && exists $config{key}) {
+    $log->dbg("Setting CMux key to $config{key}");
+    MDD::CMux->setKey($config{key});
+}
 if (exists $config{cmux}) {
     if ($config{cmux} =~ /true/i) { MDD::CMux->new($log) }
 }
@@ -244,7 +250,10 @@ undef @handles;
 # Connect to the real mythlcdserver
 unless ($backend) {
     $log->dbg("Connect to real mythlcdserver");
-    if ($lcdServer = $lcd->connect()) { $s->add($lcdServer) }
+    if ($lcdServer = $lcd->connect()) { 
+        $lcdServer->setsockopt(IPPROTO_TCP, TCP_NODELAY, 1);
+        $s->add($lcdServer);
+    }
     else { $log->err("Couldn't connect to mythlcdserver") }
 }
     
@@ -255,7 +264,10 @@ while (my @ready = $s->can_read) {
         
         if (!$backend && $fd == $lcdListen) {
             $log->dbg("New connection from mythfrontend");
-            if ($lcdClient = $fd->accept) { $s->add($lcdClient) }
+            if ($lcdClient = $fd->accept) {
+                $lcdClient->setsockopt(IPPROTO_TCP, TCP_NODELAY, 1);
+                $s->add($lcdClient); 
+            }
             next;
         }
         elsif ($fd == $listen) {
@@ -316,6 +328,7 @@ sub handleMdConn($) {
     my $fd = shift;
 
     return unless ($client = $fd->accept);
+    $client->setsockopt(IPPROTO_TCP, TCP_NODELAY, 1);
 
     $s->add($client);
     push @clients, $client;
@@ -456,8 +469,8 @@ sub stopKeepAlives() {
     $kaThread->detach();
 }
 
+# Send a list of MDD commands
 sub listCommands() {
-    # Send a list of MDD commands
     map { sendMsg("COMMAND $_") } (keys %commands);
     sendMsg("COMMANDS DONE");
 }
@@ -476,10 +489,47 @@ sub runCommand($) {
 
 }
 
+# Send our version string
 sub sendVersion() {
     sendMsg($VERSION);
 }
+
+# Send our cryptographic key if we have one and the request
+# came from a private subnet (our LAN, we assume)
+sub getKey() {
     
+    my $addr  = $client->sockhost;
+    my $paddr = $client->peerhost;
+
+    unless (defined $paddr && $addr ne $paddr && exists $config{key}) {
+        sendMsg("ERROR");
+        return;
+    }
+
+    my @octets = split /\./, $paddr;
+
+    if (
+        MDD::ConfigData->feature('crypt') && exists $config{key} &&
+        (
+            # 127/8, 10/8
+            $octets[0] == 127 || $octets[0] == 10 ||
+            # 172.16/16
+            ($octets[0] == 172 && $octets[1] >= 16 && $octets[1] <= 31) ||
+            # 192.168/24
+            ($octets[0] == 192 && $octets[1] == 168)
+        )
+    ) {
+        $log->dbg("Sending CMux key to $paddr");
+        sendMsg($config{key});
+    }
+    else {
+        $log->dbg("Won't send CMux key to $paddr");
+        sendMsg("ERROR");
+    }
+
+}
+
+# Display an OSD message, if we can
 sub osdMsg($) {
 
     unless (MDD::ConfigData->feature('xosd_support')) {
@@ -602,6 +652,8 @@ sub videoList($) {
 
 }
 
+# Find a file in a storage group, return the full path 
+# or undef if we couldn't find it
 sub findFileSG($$) {
 
     my $sgd = shift;
@@ -749,7 +801,7 @@ sub getStorGroups() {
 
 }
 
-# get a list of recording groups
+# Get a list of recording groups
 sub getRecGroups() {
 
     map { sendMsg($_) } (@{$mythdb->getRecGroups()});
@@ -757,11 +809,13 @@ sub getRecGroups() {
 
 }
 
+# Get a list of cuts (adverts)
 sub getCutList($$) {
     map { sendMsg($_) } (@{$mythdb->getCutList(shift, shift)});
     sendMsg("CUTLIST DONE");
 }
 
+# Download a new version of ourselves
 sub downloadUpdate($$) {
 
     my $version = shift;

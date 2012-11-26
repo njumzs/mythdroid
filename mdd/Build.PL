@@ -20,6 +20,10 @@ my $build = Build::MDD->new(
         xosd_support        => {
             description         => 'Alternative XOSD-based OSD',
             requires            => { 'X::Osd' => 0 }
+        },
+        crypt               => {
+            description         => 'CMux authentication and encryption',
+            requires            => { 'Crypt::Rijndael' => 0 },
         }
     }
 );
@@ -31,10 +35,15 @@ my $backend = ! $build->y_n(
 $build->feature('backend' => $backend);
 
 unless ($backend) {
-    if (!$build->feature('xosd_support')) {
-        print "X::Osd was not found" .
-              " - the alternative XOSD-based OSD will not be available\n";
-    }
-}
+    if (!$build->feature('xosd_support')) { 
+        print "\nX::Osd was not found" . 
+              " - the alternative XOSD-based OSD will not be available\n\n"; 
+    } 
+} 
+ 
+if (!$build->feature('crypt')) { 
+    print "\nCrypt::Rijndael was not found" . 
+          " - connections to CMux will be unauthenticated and insecure\n\n"; 
+} 
 
 $build->create_build_script;

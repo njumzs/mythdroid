@@ -68,6 +68,18 @@ sub install_conf {
         chmod(0644, "$confdir/mdd.conf")
             or warn "chmod of $confdir/mdd.conf failed\n";
     }
+    my $haskey = 0;
+    open C, "+<$confdir/mdd.conf" or die "$!\n";
+    while (<C>) {
+        return if (/^\s*key\s*=/);
+    }
+    open R, "</dev/urandom" or die "$!\n";
+    my $read = sysread(R, $key, 16);
+    die "Failed to read random key from /dev/urandom!" if ($read < 16);
+    print C "\n# Randomly generated CMux authentication / encryption key\n";
+    print C "key = " . unpack("H*", $key) . "\n";
+    close R;
+    close C;
 
 }
 

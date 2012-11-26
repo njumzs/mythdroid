@@ -23,10 +23,13 @@ package MDD::CMux;
 use strict;
 use warnings;
 use threads;
+use Socket qw(IPPROTO_TCP TCP_NODELAY);
+eval "use Crypt::Rijndael";
+eval "use MDD::CFB";
 
 my %conns;
 my $mux_port = 16550;
-my $log;
+my ($log, $key);
 
 my @allowed_ports = ( 6543, 6544, 16546, 16547, 16551 );
 
@@ -38,6 +41,9 @@ sub new {
     my $self = {};
 
     bless($self, $class);
+
+    $log->warn("CMux: No key - connections will be insecure")
+        unless (defined $key);
     
     $self->setup();
     
@@ -62,6 +68,7 @@ sub setup {
     $self->{select} = IO::Select->new($self->{listen});
 }
 
+# Add a list of ports to the allowed ports list
 sub addAllowedPorts {
 
     foreach my $port (@_) {
@@ -71,30 +78,59 @@ sub addAllowedPorts {
 
 }
 
+# Set the encryption key
+sub setKey {
+    my $class = shift;
+    $key = pack("H*", shift);
+}
+
+# Initialise a new connection pair
 sub initConn {
     
     my $self = shift;
     my $c = shift;
-    my ($port, $data);
+    my ($port, $data, $con);
 
     my $peer = $c->peerhost . ':' . $c->peerport;
 
     $log->dbg("CMux: New connection from $peer");
 
+    # Disable nagle's algorithm
+    $c->setsockopt(IPPROTO_TCP, TCP_NODELAY, 1);
+    
+    $con = { sock => $c };
     my $sel = IO::Select->new($c);
-
-    unless ($sel->can_read(2)) {
-        $log->dbg("Timeout waiting for port/data from $peer");
+    
+    # Authenticate the client if we have a key and they're not coming
+    # from localhost
+    if (defined $key && (substr($c->peerhost,0,3) ne '127')) {
+        my $iv = authenticate($c, $sel);
+        unless (defined $iv) {
+            $log->dbg("CMux: $peer failed to authenticate");
+            $c->close;
+            return;
+        }
+        # Initialise the send and recv ciphers (AES CFB8)
+        $con->{sendcipher} = MDD::CFB->new($key, $iv);
+        $con->{recvcipher} = MDD::CFB->new($key, $iv);
+        $log->dbg("CMux: $peer authenticated successfully, encryption enabled");
+    }
+    
+    # Find out what remote port they're after
+    unless ($sel->can_read(4)) {
+        $log->dbg("CMux: Timeout waiting for port/data from $peer");
         $c->close;
         return;
     }
 
-    unless (sysread($c, $port, 512)) {
-        $log->dbg("Failed to read port/data from $peer");
+    unless (readSock($con, $port, 512)) {
+        $log->dbg("CMux: Failed to read port/data from $peer");
         $c->close;
         return;
     }
 
+    # We can get rid of this hacky HTTP handling at some point
+    # MythDroid versions 0.6.3 and above don't need it
     if ($port =~ /^GET/ || $port =~ /^POST/ || $port =~ /^HEAD/) {
         $data = $port;
         if ($data =~ s#/MDDHTTP##) {
@@ -108,7 +144,8 @@ sub initConn {
         chomp($port);
         $port =~ s/\s+$//;
     }
-
+    
+    # Check it's in the list of allowed ports
     unless (grep { $_ == $port } @allowed_ports) {
         my $msg = "CMux: connections to port $port are not permitted";
         $log->err($msg);
@@ -117,8 +154,8 @@ sub initConn {
         return;
     }
 
-
-    $conns{$c} = IO::Socket::INET->new(
+    # Make the new connection
+    $conns{$c}{sock} = IO::Socket::INET->new(
         PeerAddr => "localhost:$port"
     ) or do {
         my $msg = "CMux: Connection to localhost:$port failed: $!";
@@ -127,19 +164,108 @@ sub initConn {
         close $c;
         return;
     };
+    $conns{$c}{sock}->setsockopt(IPPROTO_TCP, TCP_NODELAY, 1);
 
+    # More hacky HTTP handling that we can remove at some point
     if ($data) {
-        syswrite($conns{$c}, $data);
+        writeSock($conns{$c}, $data);
     }
     else {
-        syswrite($c, "OK");
+        writeSock($con, "OK");
     }
 
-    $conns{$conns{$c}} = $c;
+    # Store the two connections in the global conns hash
+    $conns{$conns{$c}{sock}} = $con;
+    # Add the connections to our select set
     $self->{select}->add($c);
-    $self->{select}->add($conns{$c});
+    $self->{select}->add($conns{$c}{sock});
 
     $log->dbg("CMux: Opened connection to localhost:$port");
+
+}
+
+sub authenticate {
+
+    my $c = shift;
+    my $sel = shift;
+    
+    my $peer = $c->peerhost . ':' . $c->peerport;
+
+    # Send a nonce / iv
+    open R, "</dev/urandom" or do {
+        $log->err("Cmux: Failed to read nonce: $!");
+        return undef;
+    };
+    my $nonce;
+    if (sysread(R, $nonce, 16) < 16) {
+        $log->err("CMux: Failed to read nonce");
+        return undef;
+    }
+    syswrite($c, $nonce);
+
+    # Read the encrypted nonce response and check that it's valid
+    # Allow up to 10 attempts
+    foreach (0 .. 10) { 
+        
+        unless ($sel->can_read(4)) {
+            $log->dbg("CMux: Timeout waiting for encrypted nonce from $peer");
+            return undef;
+        }
+
+        my $encrypted;
+
+        unless (sysread($c, $encrypted, 16)) {
+            $log->dbg("CMux: Failed to read encrypted nonce from $peer");
+            return undef;
+        }
+
+        if (length($encrypted) != 16) {
+            $log->dbg("CMux: Received nonce with invalid length");
+            syswrite($c, "ER");
+            return undef;
+        }
+
+        # Decrypt the nonce and check that it's what we sent them
+        my $cipher  = Crypt::Rijndael->new($key, Crypt::Rijndael::MODE_ECB());
+        my $decrypt = $cipher->decrypt($encrypted);
+
+        if (
+            join("",unpack("H*", $cipher->decrypt($encrypted))) eq
+            join("",unpack("H*", $nonce))
+        ) {
+            syswrite($c, "OK");
+            return $nonce;
+        }
+
+        # They didn't use the correct key
+        syswrite($c, "ER");
+        next;
+    }
+
+    # We failed to authenticate them
+    return undef;
+
+}
+
+# Read from a socket, decrypt the data if appropriate
+sub readSock {
+
+    my $ret = sysread($_[0]->{sock}, $_[1], $_[2]);
+    return $ret unless ($ret && exists $_[0]->{recvcipher});
+
+    $_[1] = $_[0]->{recvcipher}->decrypt($_[1]);
+    return length($_[1]);
+
+}
+
+# Write to a socket, encrypt the date if appropriate
+sub writeSock {
+
+    my $con = shift;
+    my $buf = shift;
+    $log->dbg("Writing: $buf\n");
+    return syswrite($con->{sock}, $buf) unless (exists $con->{sendcipher});
+    return syswrite($con->{sock}, $con->{sendcipher}->encrypt($buf));
 
 }
 
@@ -150,7 +276,7 @@ sub handleDisconnect {
 
     return unless $c;
 
-    my $c2 = $conns{$c};
+    my $c2 = $conns{$c}{sock};
     $log->dbg(
         "CMux: Closing connection to " . $c->peerhost . ":" . $c->peerport
     );
@@ -161,6 +287,8 @@ sub handleDisconnect {
     $self->{select}->remove($c2);
     $c->close;
     $c2->close;
+    delete $conns{$c};
+    delete $conns{$c2};
 
 }
 
@@ -179,13 +307,13 @@ sub mainloop {
                 next;
             }
             
-            unless ($len = sysread($fd, $data, 1024)) {
+            unless ($len = readSock($conns{$conns{$fd}{sock}}, $data, 4096)) {
                 # Someone disconnected
                 $self->handleDisconnect($fd);
                 next;
             }
 
-            if (! defined(syswrite($conns{$fd}, $data, $len))) {
+            if (! defined(writeSock($conns{$fd}, $data))) {
                 $log->warn("Error writing to socket: $!");
             }
 
