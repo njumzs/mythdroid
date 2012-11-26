@@ -36,7 +36,6 @@ import org.mythdroid.util.LogUtil;
 /** A JSON web service client */
 public class JSONClient {
     
-    private HttpFetcher fetcher = null;
     private String addr = null;
     private String serv = null;
     private int port    = 0;
@@ -46,7 +45,6 @@ public class JSONClient {
      * @param address IP address or hostname of server
      */
     public JSONClient(String address, String service) {
-        fetcher = new HttpFetcher(Globals.muxConns);
         addr = address;
         serv = service;
     }
@@ -56,7 +54,6 @@ public class JSONClient {
      * @param address IP address or hostname of server
      */
     public JSONClient(String address, int port, String service) {
-        fetcher = new HttpFetcher(Globals.muxConns);
         addr = address;
         serv = service;
         this.port = port;
@@ -122,14 +119,15 @@ public class JSONClient {
         req.setHeader("Accept", "application/json"); //$NON-NLS-1$ //$NON-NLS-2$
         LogUtil.debug("JSON request: " + req.getURI().toString()); //$NON-NLS-1$
         
+        String res = null;
+        
         try {
-            fetcher.request(req);
+            res = new HttpFetcher(req, Globals.muxConns).getContent();
         } catch (ClientProtocolException e) {
             ErrUtil.logErr(e);
             return null;
         }
         
-        final String res = fetcher.getContent();
         LogUtil.debug("JSON response: " + res); //$NON-NLS-1$
         
         try {
