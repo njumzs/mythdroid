@@ -342,7 +342,10 @@ public class RecDetailFragment extends Fragment {
             final FragmentActivity activity = getActivity();
             final RecDetailFragment rdf = 
                 (RecDetailFragment)activity.getSupportFragmentManager()
-                    .findFragmentById(android.R.id.content);
+                    .findFragmentById(
+                        activity.getClass().equals(RecDetailFragment.class) ?
+                            android.R.id.content : R.id.recdetails
+                    );
             return
                 new AlertDialog.Builder(activity)
                     .setTitle(R.string.delRec)
@@ -385,7 +388,10 @@ public class RecDetailFragment extends Fragment {
             final FragmentActivity activity = getActivity();
             final RecDetailFragment rdf = 
                 (RecDetailFragment)activity.getSupportFragmentManager()
-                    .findFragmentById(android.R.id.content);
+                    .findFragmentById(
+                        activity.getClass().equals(RecDetailFragment.class) ?
+                            android.R.id.content : R.id.recdetails
+                    );
             return
                 new AlertDialog.Builder(activity)
                     .setTitle(R.string.stopRecording)
