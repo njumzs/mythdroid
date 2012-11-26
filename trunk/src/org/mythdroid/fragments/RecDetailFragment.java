@@ -354,17 +354,19 @@ public class RecDetailFragment extends Fragment {
                         new OnClickListener() {
                             @Override
                             public void onClick(
-                                DialogInterface dialog, int which) {
+                                DialogInterface dialog, int which
+                            ) {
+                                dialog.dismiss();
+                                
                                 try {
                                     Globals.getBackend().deleteRecording(
                                         rdf.prog
                                     );
                                 } catch (IOException e) {
                                     ErrUtil.err(activity, e);
-                                    dialog.dismiss();
                                     return;
                                 }
-                                dialog.dismiss();
+                                
                                 if (rdf.embedded) {
                                     ((Recordings)activity).deleteRecording();
                                     if (!rdf.dualPane)
@@ -402,21 +404,22 @@ public class RecDetailFragment extends Fragment {
                             public void onClick(
                                 DialogInterface dialog, int which
                             ) {
+                                dialog.dismiss();
+                                
                                 try {
                                     Globals.getBackend().stopRecording(
                                         rdf.prog
                                     );
                                 } catch (IOException e) {
                                     ErrUtil.err(getActivity(), e);
-                                    dialog.dismiss();
                                     return;
                                 }
+                                
                                 rdf.stop.setVisibility(View.GONE);
                                 rdf.prog.Status = RecStatus.RECORDED;
                                 rdf.setViews();
                                 if (rdf.embedded)
                                     ((Recordings)activity).invalidate();
-                                dialog.dismiss();
                             }
                         }
                     )
