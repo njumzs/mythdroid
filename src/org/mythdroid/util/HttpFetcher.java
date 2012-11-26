@@ -93,7 +93,7 @@ public class HttpFetcher {
         }
         
         HttpConnectionParams.setConnectionTimeout(params, 4000);
-        HttpConnectionParams.setSoTimeout(params, 4000);
+        HttpConnectionParams.setSoTimeout(params, 8000);
         
         client = new DefaultHttpClient(
             new ThreadSafeClientConnManager(params, registry), params
