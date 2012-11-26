@@ -55,6 +55,8 @@ import android.widget.AdapterView.OnItemSelectedListener;
 /** Edit a recording rule */
 public class RecEditFragment extends Fragment {
 
+    /** recording rule id for the current recording rule */
+    static public int           recId;
     /** Duplicate matching method for the current recording rule */
     static public RecDupMethod  dupMethod;
     /** Duplicate matching type for the current recording rule */
@@ -113,6 +115,7 @@ public class RecEditFragment extends Fragment {
             return;
         }
         
+        recId       = prog.RecID;        
         type        = prog.Type;
         prio        = prog.RecPrio;
         dupMethod   = prog.DupMethod;
@@ -122,13 +125,13 @@ public class RecEditFragment extends Fragment {
         storGroup   = prog.StorGroup;
 
         if (!Globals.haveServices()) {
-            if (prog.RecID != -1)
+            if (recId != -1)
                 try {
                     type = prog.Type =
-                        MDDManager.getRecType(beMgr.addr, prog.RecID);
+                        MDDManager.getRecType(beMgr.addr, recId);
                     if (storGroup == null) {
                         storGroup = prog.StorGroup =
-                            MDDManager.getStorageGroup(beMgr.addr, prog.RecID);
+                            MDDManager.getStorageGroup(beMgr.addr, recId);
                     }
                 } catch (IOException e) { initError(e); }
             rule = new RecordingRule();
@@ -136,7 +139,7 @@ public class RecEditFragment extends Fragment {
         else {
             dvr = new DvrService(beMgr.addr);
             try {
-                rule = dvr.getRecRule(prog.RecID);
+                rule = dvr.getRecRule(recId);
             } catch (JSONException e) {
                 initError(e);
             } catch (ParseException e) {
@@ -483,13 +486,18 @@ public class RecEditFragment extends Fragment {
             } catch (IOException e) {
                 ErrUtil.err(activity, e);
             }
-        else
+        else {
+            /* We need to use the program start time, not that of the rule
+               Strange, but true because of the implementation of 
+               AddRecordSchedule in the services api
+            */
+            rule.startTime = prog.StartTime;
             try {
                 recid = dvr.updateRecording(rule);
             } catch (IOException e) {
                 ErrUtil.err(activity, e);
             }
-
+        }
         prog.RecID = recid;
 
         if (recid == -1) {

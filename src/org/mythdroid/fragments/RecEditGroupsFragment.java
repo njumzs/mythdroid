@@ -134,15 +134,18 @@ public class RecEditGroupsFragment extends Fragment {
             android.R.layout.simple_spinner_dropdown_item
         );
 
-        int pos = 0;
+        int pos = 0, defaultPos =-1;
 
         if (RecEditFragment.recGroup != null)
-            for (pos = 0; pos < recGroups.length; pos++)
+            for (pos = 0; pos < recGroups.length; pos++) {
                 if (recGroups[pos].equals(RecEditFragment.recGroup))
                     break;
+                if (recGroups[pos].equals("Default")) //$NON-NLS-1$
+                    defaultPos = pos;
+            }
 
         if (pos >= recGroups.length)
-            pos = 0;
+            pos = defaultPos != -1 ? defaultPos : 0;
         
         recGroupSpinner.setAdapter(recGroupAdapter);
         recGroupSpinner.setSelection(pos);
@@ -171,15 +174,19 @@ public class RecEditGroupsFragment extends Fragment {
             android.R.layout.simple_spinner_dropdown_item
         );
 
-        pos = 0;
+        pos = 0; 
+        defaultPos = -1;
 
         if (RecEditFragment.storGroup != null)
-            for (pos = 0; pos < storGroups.length; pos++)
+            for (pos = 0; pos < storGroups.length; pos++) {
                 if (storGroups[pos].equals(RecEditFragment.storGroup))
                     break;
-
+                if (storGroups[pos].equals("Default")) //$NON-NLS-1$
+                    defaultPos = pos;
+            }
+        
         if (pos >= storGroups.length)
-            pos = 0;
+            pos = defaultPos != -1 ? defaultPos : 0;
         
         storGroupSpinner.setAdapter(storGroupAdapter);
         storGroupSpinner.setSelection(pos);

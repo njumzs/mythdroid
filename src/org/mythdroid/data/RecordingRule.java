@@ -143,24 +143,14 @@ public class RecordingRule {
      */
     public Params toParams() {
         Params params = new Params();
-        params.put("Id", id); //$NON-NLS-1$
         params.put("ParentId", parentid); //$NON-NLS-1$
         params.put("Inactive", inactive); //$NON-NLS-1$
-        params.put("Title", title); //$NON-NLS-1$
-        params.put("SubTitle", subtitle); //$NON-NLS-1$
-        params.put("Description", description); //$NON-NLS-1$
         params.put("Season", season); //$NON-NLS-1$
         params.put("Episode", episode); //$NON-NLS-1$
-        params.put("Category", category); //$NON-NLS-1$
         params.put("StartTime", Globals.utcFmt.format(startTime)); //$NON-NLS-1$
         params.put("EndTime", Globals.utcFmt.format(endTime)); //$NON-NLS-1$
-        params.put("SeriesId", seriesid); //$NON-NLS-1$
-        params.put("ProgramId", programid); //$NON-NLS-1$
         params.put("Inetref", inetref); //$NON-NLS-1$
         params.put("ChanId", chanid); //$NON-NLS-1$
-        params.put("Callsign", callsign); //$NON-NLS-1$
-        params.put("Day", day); //$NON-NLS-1$
-        params.put("Time", time); //$NON-NLS-1$
         params.put("FindId", findid); //$NON-NLS-1$
         params.put("Type", type.json()); //$NON-NLS-1$
         params.put("SearchType", searchtype); //$NON-NLS-1$
@@ -186,10 +176,6 @@ public class RecordingRule {
         params.put("AutoUserJob3", autojob3); //$NON-NLS-1$
         params.put("AutoUserJob4", autojob4); //$NON-NLS-1$
         params.put("Transcoder", transcoder); //$NON-NLS-1$
-        params.put("NextRecording", nextrec); //$NON-NLS-1$
-        params.put("LastRecorded", lastrec); //$NON-NLS-1$
-        params.put("LastDeleted", lastdel); //$NON-NLS-1$
-        params.put("AverageDelay", avgdelay); //$NON-NLS-1$
         return params;
     }
 

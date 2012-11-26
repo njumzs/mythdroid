@@ -97,7 +97,12 @@ public class RecEditSchedFragment extends Fragment {
             dupMatchAdapter.add(method.msg());
 
         dupMatchSpinner.setAdapter(dupMatchAdapter);
-        dupMatchSpinner.setSelection(RecEditFragment.dupMethod.ordinal());
+        if (RecEditFragment.recId == 0 || RecEditFragment.dupMethod == null)
+            dupMatchSpinner.setSelection(
+                dupMatchAdapter.getPosition(RecDupMethod.SUBTHENDESC.msg())
+            );
+        else
+            dupMatchSpinner.setSelection(RecEditFragment.dupMethod.ordinal());
         dupMatchSpinner.setOnItemSelectedListener(
             new OnItemSelectedListener() {
                 @Override
@@ -128,7 +133,12 @@ public class RecEditSchedFragment extends Fragment {
             dupInAdapter.add(set.msg());
 
         dupInSpinner.setAdapter(dupInAdapter);
-        dupInSpinner.setSelection(RecEditFragment.dupIn.ordinal());
+        if (RecEditFragment.recId == 0 || RecEditFragment.dupIn == null)
+            dupInSpinner.setSelection(
+                dupInAdapter.getPosition(RecDupIn.ALL.msg())
+            );
+        else
+            dupInSpinner.setSelection(RecEditFragment.dupIn.ordinal());
         dupInSpinner.setOnItemSelectedListener(
             new OnItemSelectedListener() {
                 @Override
@@ -159,7 +169,10 @@ public class RecEditSchedFragment extends Fragment {
             epiFilterAdapter.add(filter.msg());
 
         epiFilterSpinner.setAdapter(epiFilterAdapter);
-        epiFilterSpinner.setSelection(RecEditFragment.epiFilter.ordinal());
+        if (RecEditFragment.epiFilter == null)
+            epiFilterSpinner.setSelection(RecEpiFilter.NONE.ordinal());
+        else
+            epiFilterSpinner.setSelection(RecEditFragment.epiFilter.ordinal());
         epiFilterSpinner.setOnItemSelectedListener(
             new OnItemSelectedListener() {
                 @Override
