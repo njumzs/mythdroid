@@ -61,7 +61,10 @@ public class HttpFetcher {
          
     }
     
-    /** Constructor */
+    /**
+     * Constructor
+     * @param muxed used muxed connections?
+     */
     public HttpFetcher(boolean muxed) {
         
         if (muxed && muxedClient != null) {
@@ -100,6 +103,7 @@ public class HttpFetcher {
     /**
      * Constructor, executes a GET request of the supplied url
      * @param url String containing url to fetch
+     * @param muxed used muxed connections?
      * @throws ClientProtocolException
      * @throws IOException
      */
@@ -112,12 +116,25 @@ public class HttpFetcher {
     /**
      * Constructor, executes a GET request of the supplied url
      * @param uri URI to fetch
+     * @param muxed used muxed connections?
      * @throws ClientProtocolException
      * @throws IOException
      */
     public HttpFetcher(URI uri, boolean muxed) throws IOException {
         this(muxed);
         get(uri);
+    }
+    
+    /**
+     * Constructor, executes the supplied request
+     * @param req request to execute
+     * @param muxed used muxed connections?
+     * @throws IOException
+     */
+    public HttpFetcher(HttpUriRequest req, boolean muxed)
+        throws IOException, ClientProtocolException {
+        this(muxed);
+        request(req);
     }
     
     /**
