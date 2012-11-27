@@ -148,12 +148,14 @@ public class RecordingRule {
         params.put("Season", season); //$NON-NLS-1$
         params.put("Episode", episode); //$NON-NLS-1$
         params.put("StartTime", Globals.utcFmt.format(startTime)); //$NON-NLS-1$
-        params.put("EndTime", Globals.utcFmt.format(endTime)); //$NON-NLS-1$
-        params.put("Inetref", inetref); //$NON-NLS-1$
+        params.put("EndTime", Globals.utcFmt.format(endTime)); //$NON-NLS-1$#
+        if (inetref != null)
+            params.put("Inetref", inetref); //$NON-NLS-1$
         params.put("ChanId", chanid); //$NON-NLS-1$
         params.put("FindId", findid); //$NON-NLS-1$
         params.put("Type", type.json()); //$NON-NLS-1$
-        params.put("SearchType", searchtype); //$NON-NLS-1$
+        if (searchtype != null)
+            params.put("SearchType", searchtype); //$NON-NLS-1$
         params.put("RecPriority", recpriority); //$NON-NLS-1$
         params.put("PreferredInput", preferredinput); //$NON-NLS-1$
         params.put("StartOffset", startoffset); //$NON-NLS-1$
@@ -161,10 +163,14 @@ public class RecordingRule {
         params.put("DupMethod", dupMethod.json()); //$NON-NLS-1$
         params.put("DupIn", dupIn.json()); //$NON-NLS-1$
         params.put("Filter", filter); //$NON-NLS-1$
-        params.put("RecProfile", recProfile); //$NON-NLS-1$
-        params.put("RecGroup", recGroup); //$NON-NLS-1$
-        params.put("StorageGroup", storGroup); //$NON-NLS-1$
-        params.put("PlayGroup", playGroup); //$NON-NLS-1$
+        if (recProfile != null)
+            params.put("RecProfile", recProfile); //$NON-NLS-1$
+        if (recGroup != null)
+            params.put("RecGroup", recGroup); //$NON-NLS-1$
+        if (storGroup != null)
+            params.put("StorageGroup", storGroup); //$NON-NLS-1$
+        if (playGroup != null)
+            params.put("PlayGroup", playGroup); //$NON-NLS-1$
         params.put("AutoExpire", autoexpire); //$NON-NLS-1$
         params.put("MaxEpisodes", maxepisodes); //$NON-NLS-1$
         params.put("MaxNewest", maxnewest); //$NON-NLS-1$
