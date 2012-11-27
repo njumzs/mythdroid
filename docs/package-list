@@ -1,6 +1,7 @@
 org.mythdroid
 org.mythdroid.activities
 org.mythdroid.backend
+org.mythdroid.cache
 org.mythdroid.data
 org.mythdroid.fragments
 org.mythdroid.frontend
