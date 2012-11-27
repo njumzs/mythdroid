@@ -28,7 +28,6 @@ import org.mythdroid.Enums.RecDupIn;
 import org.mythdroid.Enums.RecDupMethod;
 import org.mythdroid.Enums.RecEpiFilter;
 import org.mythdroid.Enums.RecType;
-import org.mythdroid.activities.Guide;
 import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.backend.BackendManager;
 import org.mythdroid.data.Program;
@@ -433,7 +432,6 @@ public class RecEditFragment extends Fragment {
                         }
                     }
                     prog.RecID = -1;
-                    activity.setResult(Guide.REFRESH_NEEDED);
                     done();
                     return;
                 }
@@ -520,7 +518,6 @@ public class RecEditFragment extends Fragment {
             ErrUtil.err(activity, e);
         }
 
-        activity.setResult(Guide.REFRESH_NEEDED);
         done();
 
     }
