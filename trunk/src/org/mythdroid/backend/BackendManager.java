@@ -267,9 +267,12 @@ public class BackendManager {
     public void reschedule(int recid) throws IOException {
         synchronized (cmgrLock) {
             if (Globals.protoVersion >= 73)
-                cmgr.sendString(
-                    "RESCHEDULE_RECORDINGS MATCH " + recid + " 0 0 - MythDroid" //$NON-NLS-1$ //$NON-NLS-2$
-                    );
+                cmgr.sendStringList(
+                    new String[] {
+                        "RESCHEDULE_RECORDINGS", //$NON-NLS-1$
+                        "MATCH " + recid + " 0 0 - MythDroid" //$NON-NLS-1$ //$NON-NLS-2$
+                    }
+                );
             else
                 cmgr.sendString("RESCHEDULE_RECORDINGS " + recid); //$NON-NLS-1$
             cmgr.readStringList();
