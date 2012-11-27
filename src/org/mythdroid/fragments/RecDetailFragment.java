@@ -25,7 +25,6 @@ import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Extras;
 import org.mythdroid.Enums.RecStatus;
-import org.mythdroid.activities.Guide;
 import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.activities.Recordings;
 import org.mythdroid.activities.VideoPlayer;
@@ -147,13 +146,6 @@ public class RecDetailFragment extends Fragment {
         super.onDestroy();
         if (!embedded && activity != null) 
             activity.setResult(Activity.RESULT_OK);
-    }
-
-    @Override
-    public void onActivityResult(int reqCode, int resCode, Intent data) {
-        if (!guide || resCode != Guide.REFRESH_NEEDED)
-            return;
-        activity.setResult(Guide.REFRESH_NEEDED);
     }
 
     /**

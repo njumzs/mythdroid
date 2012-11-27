@@ -49,7 +49,6 @@ import org.xml.sax.SAXException;
 
 import android.R.drawable;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -81,7 +80,6 @@ public class Guide extends MDActivity {
      * A resultCode that child activities should set via setResult() to tell
      * Guide to refresh when they finish
      */
-    final public static int  REFRESH_NEEDED = Activity.RESULT_FIRST_USER + 1;
     final private static int MENU_DATE    = 0, MENU_TIME = 1;
     final private static int DIALOG_DATE  = 0, DIALOG_TIME = 1;
 
@@ -300,18 +298,22 @@ public class Guide extends MDActivity {
                 return;
             }
 
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
         displayGuide(new Date());
-
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
         Globals.removeThreadPoolTask(getData);
         tbl.removeAllViews();
         channels.clear();
     }
-
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(Menu.NONE, MENU_DATE, Menu.NONE, R.string.chStartDate)
@@ -384,12 +386,6 @@ public class Guide extends MDActivity {
 
         }
 
-    }
-
-    @Override
-    public void onActivityResult(int reqCode, int resCode, Intent data) {
-        if (resCode == REFRESH_NEEDED)
-            displayGuide(now);
     }
 
     @Override
