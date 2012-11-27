@@ -492,6 +492,13 @@ public class RecEditFragment extends Fragment {
                AddRecordSchedule in the services api
             */
             rule.startTime = prog.StartTime;
+            
+            // New recording, fill in some sensible defaults
+            if (prog.RecID != 1) {
+                rule.autoexpire = true;
+                rule.autoflag   = true;
+                rule.autometa   = true;
+            }
             try {
                 recid = dvr.updateRecording(rule);
             } catch (IOException e) {
