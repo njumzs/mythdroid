@@ -33,8 +33,10 @@ public class RecordingDetail extends MDFragmentActivity {
         if (icicle != null) return;
         RecDetailFragment rdf = new RecDetailFragment();
         rdf.setArguments(getIntent().getExtras());
-        getSupportFragmentManager().beginTransaction()
-            .replace(android.R.id.content, rdf).commitAllowingStateLoss();
+        getSupportFragmentManager()
+            .beginTransaction()
+                .replace(android.R.id.content, rdf, "RecDetailFragment") //$NON-NLS-1$
+                    .commitAllowingStateLoss();
     }
     
 }

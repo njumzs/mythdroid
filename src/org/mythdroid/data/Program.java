@@ -400,15 +400,25 @@ public class Program implements Comparable<Program> {
     public Program(JSONObject jo) throws JSONException, ParseException {
         
         JSONObject RecordInfo  = jo.getJSONObject("Recording"); //$NON-NLS-1$
+        JSONObject ChannelInfo = null;
+        
+        try {
+            ChannelInfo = jo.getJSONObject("Channel"); //$NON-NLS-1$
+        } catch (JSONException e) {}
+        
+        if (ChannelInfo != null) {
+            ChanID  = ChannelInfo.getInt("ChanId"); //$NON-NLS-1$
+            Channel = ChannelInfo.getString("CallSign"); //$NON-NLS-1$
+        }
         
         Title = jo.getString("Title"); //$NON-NLS-1$
         SubTitle = jo.getString("SubTitle"); //$NON-NLS-1$
         Description = jo.getString("Description"); //$NON-NLS-1$
         Category = jo.getString("Category"); //$NON-NLS-1$
         Path = jo.getString("FileName"); //$NON-NLS-1$
-        
         StartTime = Globals.utcFmt.parse(jo.getString("StartTime")); //$NON-NLS-1$
         EndTime = Globals.utcFmt.parse(jo.getString("EndTime")); //$NON-NLS-1$
+        
         RecPrio = RecordInfo.getInt("Priority"); //$NON-NLS-1$
         Status = RecStatus.get(RecordInfo.getInt("Status")); //$NON-NLS-1$
         RecID = RecordInfo.getInt("RecordId"); //$NON-NLS-1$
@@ -576,6 +586,21 @@ public class Program implements Comparable<Program> {
         else if (StartTime.getTime() > another.StartTime.getTime())
             return 1;
         return 0;
+    }
+    
+    /**
+     * Test whether this object represents the same program as another
+     * @param another the object to compare
+     * @return true if the objects represent the same program, false otherwise
+     */
+    public boolean equals(Program another) {
+        if (another == null) return false;
+        if (
+            ChanID == another.ChanID &&
+            StartTime.equals(another.StartTime)
+        )
+            return true;
+        return false;
     }
 
 }

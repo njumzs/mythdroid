@@ -25,7 +25,6 @@ import org.mythdroid.Enums.RecEpiFilter;
 import org.mythdroid.activities.MDFragmentActivity;
 import org.mythdroid.fragments.RecEditFragment;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -42,22 +41,10 @@ public class RecEditSchedFragment extends Fragment {
     private MDFragmentActivity activity = null;
     private View view = null;
     private RecEditFragment ref = null;
+    private boolean enabled = false;
     
     private Spinner dupMatchSpinner = null, dupInSpinner = null,
                     epiFilterSpinner = null;
-
-    /**
-     * Instantiate a new RecEditSechedFragment
-     * @param id - id of parent RecEditFragment
-     * @return new instance
-     */
-    public static RecEditSchedFragment newInstance(int id) {
-        RecEditSchedFragment resf = new RecEditSchedFragment();
-        Bundle args = new Bundle();
-        args.putInt("RecEditFragId", id); //$NON-NLS-1$
-        resf.setArguments(args);
-        return resf;
-    }
 
     @Override
     public View onCreateView(
@@ -66,20 +53,10 @@ public class RecEditSchedFragment extends Fragment {
         if (container == null) return null;
         activity = (MDFragmentActivity)getActivity();
         view = inflater.inflate(R.layout.recording_edit_sched, null, false);
-        Bundle args = getArguments();
-        if (args != null) {
-            int id = args.getInt("RecEditFragId", -1); //$NON-NLS-1$
-            if (id != -1)
-                ref = (RecEditFragment)getFragmentManager()
-                          .findFragmentById(id);
-        }
+        ref = (RecEditFragment)getFragmentManager()
+                  .findFragmentByTag("RecEditFragment"); //$NON-NLS-1$
         setViews();
         return view;
-    }
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        activity.setResult(Activity.RESULT_OK);
     }
 
     private void setViews() {
@@ -97,21 +74,20 @@ public class RecEditSchedFragment extends Fragment {
             dupMatchAdapter.add(method.msg());
 
         dupMatchSpinner.setAdapter(dupMatchAdapter);
-        if (RecEditFragment.recId == 0 || RecEditFragment.dupMethod == null)
+        if (ref.recId == 0 || ref.dupMethod == null)
             dupMatchSpinner.setSelection(
                 dupMatchAdapter.getPosition(RecDupMethod.SUBTHENDESC.msg())
             );
         else
-            dupMatchSpinner.setSelection(RecEditFragment.dupMethod.ordinal());
+            dupMatchSpinner.setSelection(ref.dupMethod.ordinal());
         dupMatchSpinner.setOnItemSelectedListener(
             new OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(
                     AdapterView<?> parent, View view, int pos, long id
                 ) {
-                    RecEditFragment.dupMethod = RecDupMethod.values()[pos];
-                    if (ref != null)
-                        ref.checkChildren();
+                    ref.dupMethod = RecDupMethod.values()[pos];
+                    ref.checkChildren();
                 }
 
                 @Override
@@ -133,21 +109,20 @@ public class RecEditSchedFragment extends Fragment {
             dupInAdapter.add(set.msg());
 
         dupInSpinner.setAdapter(dupInAdapter);
-        if (RecEditFragment.recId == 0 || RecEditFragment.dupIn == null)
+        if (ref.recId == 0 || ref.dupIn == null)
             dupInSpinner.setSelection(
                 dupInAdapter.getPosition(RecDupIn.ALL.msg())
             );
         else
-            dupInSpinner.setSelection(RecEditFragment.dupIn.ordinal());
+            dupInSpinner.setSelection(ref.dupIn.ordinal());
         dupInSpinner.setOnItemSelectedListener(
             new OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(
                     AdapterView<?> parent, View view, int pos, long id
                 ) {
-                    RecEditFragment.dupIn = RecDupIn.values()[pos];
-                    if (ref != null)
-                        ref.checkChildren();
+                    ref.dupIn = RecDupIn.values()[pos];
+                    ref.checkChildren();
                 }
 
                 @Override
@@ -169,19 +144,18 @@ public class RecEditSchedFragment extends Fragment {
             epiFilterAdapter.add(filter.msg());
 
         epiFilterSpinner.setAdapter(epiFilterAdapter);
-        if (RecEditFragment.epiFilter == null)
+        if (ref.epiFilter == null)
             epiFilterSpinner.setSelection(RecEpiFilter.NONE.ordinal());
         else
-            epiFilterSpinner.setSelection(RecEditFragment.epiFilter.ordinal());
+            epiFilterSpinner.setSelection(ref.epiFilter.ordinal());
         epiFilterSpinner.setOnItemSelectedListener(
             new OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(
                     AdapterView<?> parent, View view, int pos, long id
                 ) {
-                    RecEditFragment.epiFilter = RecEpiFilter.values()[pos];
-                    if (ref != null)
-                        ref.checkChildren();
+                    ref.epiFilter = RecEpiFilter.values()[pos];
+                    ref.checkChildren();
                 }
 
                 @Override
@@ -193,12 +167,21 @@ public class RecEditSchedFragment extends Fragment {
     
     /**
      * Set the enabled state of this fragment's spinners 
-     * @param enabled new state
+     * @param enable new state
      */
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(boolean enable) {
+        enabled = enable;
         if (dupMatchSpinner == null) return;
         dupMatchSpinner.setEnabled(enabled);
         dupInSpinner.setEnabled(enabled);
         epiFilterSpinner.setEnabled(enabled);
+    }
+    
+    /**
+     * Get the enabled state of this fragment's spinners
+     * @return enabled state
+     */
+    public boolean isEnabled() {
+        return enabled;
     }
 }

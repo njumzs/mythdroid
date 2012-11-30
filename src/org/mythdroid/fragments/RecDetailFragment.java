@@ -31,6 +31,7 @@ import org.mythdroid.activities.VideoPlayer;
 import org.mythdroid.data.Program;
 import org.mythdroid.remote.TVRemote;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.services.GuideService;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.views.PreviewImageView;
 
@@ -46,7 +47,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -62,18 +62,42 @@ import android.widget.TextView;
 public class RecDetailFragment extends Fragment {
     
     private MDFragmentActivity activity = null;
+    private RecDetailFragment rdf       = this;
     private Handler handler             = new Handler();
     private Program prog                = null;
     private Button stop                 = null;
     private View view                   = null;
     private int containerId;
-    private boolean livetv   = false, guide    = false,
+    private boolean livetv   = false, guide    = false, refresh = false,
                     embedded = false, dualPane = false;
     
     private OnClickListener no = new OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
             dialog.dismiss();
+        }
+    };
+    
+    private Runnable refreshRunnable = 
+        new Runnable() {
+        @Override
+        public void run() {
+            activity.showLoadingDialog();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {}
+            try {
+                Globals.curProg = prog = 
+                    new GuideService(Globals.getBackend().addr)
+                        .GetProgram(prog.ChanID, prog.StartTime);
+            } catch (Exception e) { ErrUtil.postErr(activity, e); }
+            activity.dismissLoadingDialog();
+            handler.post(
+                new Runnable() {
+                    @Override
+                    public void run() { setViews(); }
+                }
+            );
         }
     };
     
@@ -93,7 +117,7 @@ public class RecDetailFragment extends Fragment {
         rdf.setArguments(icicle);
         return rdf;
     }
-    
+
     @Override
     public View onCreateView(
         LayoutInflater inflater, ViewGroup container, Bundle icicle
@@ -108,11 +132,11 @@ public class RecDetailFragment extends Fragment {
             guide  = args.getBoolean(Extras.GUIDE.toString());
         }
         
-        View detailsFrame = getActivity().findViewById(R.id.recdetails);
+        View detailsFrame = activity.findViewById(R.id.recdetails);
         dualPane = detailsFrame != null && 
                    detailsFrame.getVisibility() == View.VISIBLE;
-        embedded = 
-            activity.getClass().getName().endsWith("Recordings"); //$NON-NLS-1$
+        embedded = activity.getClass().equals(Recordings.class);
+        
         if (!embedded)
             activity.addHereToFrontendChooser(VideoPlayer.class);
         
@@ -124,6 +148,7 @@ public class RecDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (view == null) return;
         if (activity == null) activity = (MDFragmentActivity)getActivity();
         if ((prog = Globals.curProg) == null) {
             ErrUtil.report("Globals.curProg was null!"); //$NON-NLS-1$
@@ -131,12 +156,19 @@ public class RecDetailFragment extends Fragment {
             if (!embedded) activity.finish();
             return;
         }
-        setViews();
+        setImages();
+        if (refresh && Globals.haveServices()) {
+            refresh = false;
+            Globals.runOnThreadPool(refreshRunnable);
+        }
+        else
+            setViews();
     }
     
     @Override
     public void onPause() {
         super.onPause();
+        if (view == null) return;
         ((PreviewImageView)view.findViewById(R.id.image)).setImageBitmap(null);
         view.setBackgroundDrawable(null);
     }
@@ -146,6 +178,14 @@ public class RecDetailFragment extends Fragment {
         super.onDestroy();
         if (!embedded && activity != null) 
             activity.setResult(Activity.RESULT_OK);
+    }
+    
+    /**
+     * Tell RecDetailFragment to pull new program information via the services
+     * api, if it can, when it resumes
+     */
+    public void refresh() {
+        refresh = true;
     }
 
     /**
@@ -172,17 +212,19 @@ public class RecDetailFragment extends Fragment {
             new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    FragmentTransaction ft = 
-                        getFragmentManager().beginTransaction();
-                    ft.replace(containerId, new RecEditFragment());
-                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                    ft.addToBackStack(null);
-                    ft.commitAllowingStateLoss();
+                    getFragmentManager().beginTransaction()
+                        .replace(
+                            containerId, new RecEditFragment(),
+                            "RecEditFragment" //$NON-NLS-1$
+                        )
+                        .setTransition(
+                            FragmentTransaction.TRANSIT_FRAGMENT_FADE
+                        )
+                        .addToBackStack(null)
+                        .commitAllowingStateLoss();
                 }
             }
         );
-        
-        setImages();
 
         // The rest only apply to non-livetv recordings
         if (livetv || prog.Status == null) return;
@@ -196,7 +238,9 @@ public class RecDetailFragment extends Fragment {
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            new stopDialog().show(
+                            stopDialog sd = new stopDialog();
+                            sd.setTargetFragment(rdf, 0);
+                            sd.show(
                                 getFragmentManager(), "stopDialog" //$NON-NLS-1$
                             );
                         }
@@ -214,7 +258,9 @@ public class RecDetailFragment extends Fragment {
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                new deleteDialog().show(
+                                deleteDialog dd = new deleteDialog();
+                                dd.setTargetFragment(rdf, 0);
+                                dd.show(
                                     getFragmentManager(), "deleteDialog" //$NON-NLS-1$
                                 );
                             }
@@ -328,16 +374,43 @@ public class RecDetailFragment extends Fragment {
     
     @SuppressWarnings("javadoc")
     public static class deleteDialog extends DialogFragment {
+        
+        private Runnable delete = new Runnable() {
+            @Override
+            public void run() {
+                
+                final MDFragmentActivity activity =
+                    (MDFragmentActivity)getActivity();
+                final RecDetailFragment rdf =
+                    (RecDetailFragment)getTargetFragment();
 
+                activity.showLoadingDialog();
+                try {
+                    Globals.getBackend().deleteRecording(rdf.prog);
+                } catch (IOException e) {
+                    ErrUtil.postErr(activity, e);
+                    return;
+                } finally {
+                    activity.dismissLoadingDialog();
+                }
+                
+                if (rdf.embedded) {
+                    ((Recordings)activity).deleteRecording();
+                    if (!rdf.dualPane)
+                        rdf.getFragmentManager().popBackStack();
+                }
+                else
+                    activity.finish();
+                
+            }
+        };
+        
         @Override
         public Dialog onCreateDialog(Bundle icicle) {
-            final FragmentActivity activity = getActivity();
-            final RecDetailFragment rdf = 
-                (RecDetailFragment)activity.getSupportFragmentManager()
-                    .findFragmentById(
-                        activity.getClass().equals(RecDetailFragment.class) ?
-                            android.R.id.content : R.id.recdetails
-                    );
+            final MDFragmentActivity activity =
+                (MDFragmentActivity)getActivity();
+            final RecDetailFragment rdf =
+                (RecDetailFragment)getTargetFragment();
             return
                 new AlertDialog.Builder(activity)
                     .setTitle(R.string.delRec)
@@ -349,23 +422,7 @@ public class RecDetailFragment extends Fragment {
                                 DialogInterface dialog, int which
                             ) {
                                 dialog.dismiss();
-                                
-                                try {
-                                    Globals.getBackend().deleteRecording(
-                                        rdf.prog
-                                    );
-                                } catch (IOException e) {
-                                    ErrUtil.err(activity, e);
-                                    return;
-                                }
-                                
-                                if (rdf.embedded) {
-                                    ((Recordings)activity).deleteRecording();
-                                    if (!rdf.dualPane)
-                                        getFragmentManager().popBackStack();
-                                }
-                                else
-                                    activity.finish();
+                                Globals.runOnThreadPool(delete);
                             }
                         }
                     )
@@ -377,15 +434,49 @@ public class RecDetailFragment extends Fragment {
 
     @SuppressWarnings("javadoc")
     public static class stopDialog extends DialogFragment {
+        
+        private Runnable stop = new Runnable() {
+            @Override
+            public void run() {
+                
+                final MDFragmentActivity activity =
+                    (MDFragmentActivity)getActivity();
+                final RecDetailFragment rdf =
+                    (RecDetailFragment)getTargetFragment();
+                
+                activity.showLoadingDialog();
+                
+                try {
+                    Globals.getBackend().stopRecording(rdf.prog);
+                } catch (IOException e) {
+                    ErrUtil.postErr(activity, e);
+                    return;
+                } finally {
+                    activity.dismissLoadingDialog();
+                }
+                
+                rdf.handler.post(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            rdf.stop.setVisibility(View.GONE);
+                            rdf.prog.Status = RecStatus.RECORDED;
+                            rdf.setViews();
+                            if (rdf.embedded)
+                                ((Recordings)activity).invalidate();
+                        }
+                    }
+                );
+            }
+            
+        };
+        
         @Override
         public Dialog onCreateDialog(Bundle icicle) {
-            final FragmentActivity activity = getActivity();
-            final RecDetailFragment rdf = 
-                (RecDetailFragment)activity.getSupportFragmentManager()
-                    .findFragmentById(
-                        activity.getClass().equals(RecDetailFragment.class) ?
-                            android.R.id.content : R.id.recdetails
-                    );
+            final MDFragmentActivity activity =
+                (MDFragmentActivity)getActivity();
+            final RecDetailFragment rdf =
+                (RecDetailFragment)getTargetFragment();
             return
                 new AlertDialog.Builder(activity)
                     .setTitle(R.string.stopRecording)
@@ -397,27 +488,14 @@ public class RecDetailFragment extends Fragment {
                                 DialogInterface dialog, int which
                             ) {
                                 dialog.dismiss();
-                                
-                                try {
-                                    Globals.getBackend().stopRecording(
-                                        rdf.prog
-                                    );
-                                } catch (IOException e) {
-                                    ErrUtil.err(getActivity(), e);
-                                    return;
-                                }
-                                
-                                rdf.stop.setVisibility(View.GONE);
-                                rdf.prog.Status = RecStatus.RECORDED;
-                                rdf.setViews();
-                                if (rdf.embedded)
-                                    ((Recordings)activity).invalidate();
+                                Globals.runOnThreadPool(stop);
                             }
                         }
                     )
                     .setNegativeButton(R.string.no, rdf.no)
                     .create();
         }
+        
     }
     
 }
