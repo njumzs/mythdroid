@@ -41,9 +41,11 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.view.View;
 import android.widget.AdapterView;
@@ -84,6 +86,8 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         new HashMap<String, Integer>();
     final private HashMap<String, String> stringExtras =
         new HashMap<String, String>();
+    
+    private Handler handler = new Handler();
     
     /** ActionBar Indicator for Frontend */
     private TextView frontendIndicator = null;
@@ -145,6 +149,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
                 final ProgressDialog prog = new ProgressDialog(this);
                 prog.setIndeterminate(true);
                 prog.setMessage(getResources().getText(R.string.loading));
+                prog.setCanceledOnTouchOutside(false);
                 prog.setOnCancelListener(
                     new OnCancelListener() {
                         @Override
@@ -173,15 +178,10 @@ public abstract class MDFragmentActivity extends FragmentActivity {
     }
     
     @Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
-        Reflection.setThreadPolicy();
-    }
-    
-    @Override
     public void onResume() {
         super.onResume();
         
+        Reflection.setThreadPolicy();
         updateFrontendIndicator();
         
         isPaused = false;
@@ -279,14 +279,28 @@ public abstract class MDFragmentActivity extends FragmentActivity {
     
     /** Show the loading dialog */
     public void showLoadingDialog() {
-        showDialog(DIALOG_LOAD);
+        handler.post(
+            new Runnable() {
+                @Override
+                public void run() {
+                    showDialog(DIALOG_LOAD);
+                }
+            }
+        );
     }
 
     /** Dismiss the loading dialog */
     public void dismissLoadingDialog() {
-        try {
-            dismissDialog(DIALOG_LOAD);
-        } catch (IllegalArgumentException e) {}
+        handler.post(
+            new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        dismissDialog(DIALOG_LOAD);
+                    } catch (IllegalArgumentException e) {}
+                }
+            }
+        );
     }
 
     /**
@@ -316,7 +330,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         }
         
         if (f == null) {
-            ErrUtil.err(this, Messages.getString("MDFragmentActivity.0")); //$NON-NLS-1$
+            ErrUtil.reportErr(this, Messages.getString("MDFragmentActivity.0")); //$NON-NLS-1$
             return;
         }
         
@@ -330,8 +344,12 @@ public abstract class MDFragmentActivity extends FragmentActivity {
         f.setArguments(args);
         
         fm.popBackStackImmediate();
-        fm.beginTransaction().replace(android.R.id.content, f)
-            .addToBackStack(null).commitAllowingStateLoss();
+        FragmentTransaction ft = 
+            fm.beginTransaction()
+                .replace(android.R.id.content, f, f.getClass().getSimpleName());
+        if (fm.getBackStackEntryCount() > 0)
+            ft.addToBackStack(null);
+        ft.commitAllowingStateLoss();
         fm.executePendingTransactions();
     }
 
