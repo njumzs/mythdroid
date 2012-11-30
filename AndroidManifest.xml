@@ -3,7 +3,7 @@
     package="org.mythdroid"
     android:versionCode="63" android:versionName="0.6.3">
     
-    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="11"/>
+    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="12"/>
     
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
@@ -17,7 +17,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_LOGS"/>
     
-	<application android:icon="@drawable/logo" android:label="@string/appName" android:name=".MythDroid">
+	<application android:name=".MythDroid"
+	     android:icon="@drawable/logo" android:label="@string/appName">
       	
       	<receiver android:name=".receivers.PhoneStateReceiver">
         	<intent-filter>
@@ -35,7 +36,7 @@
         	android:excludeFromRecents="true"
         	android:finishOnTaskLaunch="true"/>
         
-        <activity android:name="org.mythdroid.activities.Main" 
+        <activity android:name=".activities.Main" 
         	android:label="@string/appName"
         	android:configChanges="keyboardHidden|orientation">
           <intent-filter>
