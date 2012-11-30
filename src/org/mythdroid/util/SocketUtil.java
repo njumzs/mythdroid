@@ -186,6 +186,7 @@ public class SocketUtil {
         
         @Override
         public InputStream getInputStream() throws IOException {
+            if (params == null) return super.getInputStream();
             if (inputStream != null) return inputStream;
             try {
                 Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding"); //$NON-NLS-1$
@@ -204,6 +205,7 @@ public class SocketUtil {
         
         @Override
         public OutputStream getOutputStream() throws IOException {
+            if (params == null) return super.getOutputStream();
             if (outputStream != null) return outputStream;
             try {
                 Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding"); //$NON-NLS-1$
