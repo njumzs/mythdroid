@@ -58,6 +58,7 @@ public class Videos extends MDActivity implements
     private boolean largeScreen     = false;
     /** Scale factor for pixel values for different display densities */
     private float scale             = 1;
+    private Object initLock         = new Object();
     
     private VideoService videoService = null;
 
@@ -82,6 +83,7 @@ public class Videos extends MDActivity implements
                 try {
                     addr = Globals.getBackend().addr;
                 } catch (IOException e) {
+                    dismissLoadingDialog();
                     ErrUtil.postErr(ctx, e);
                     finish();
                     return;
@@ -89,6 +91,7 @@ public class Videos extends MDActivity implements
                 try {
                     videos = MDDManager.getVideos(addr, viddir, tmppath);
                 } catch (IOException e) {
+                    dismissLoadingDialog();
                     ErrUtil.postErr(ctx, e);
                     finish();
                     return;
@@ -98,6 +101,7 @@ public class Videos extends MDActivity implements
                 try {
                     videos = videoService.getVideos(tmppath);
                 } catch (IOException e) {
+                    dismissLoadingDialog();
                     ErrUtil.postErr(ctx, e);
                     finish();
                     return;
@@ -159,13 +163,27 @@ public class Videos extends MDActivity implements
         scale = getResources().getDisplayMetrics().density;
         largeScreen = getResources().getDisplayMetrics().widthPixels > 1000;
         
-        if (Globals.haveServices()) 
-            try {
-                videoService = new VideoService(Globals.getBackend().addr);
-            } catch (IOException e) {
-                ErrUtil.err(this, e.getMessage());
-                finish();
-            }
+        if (Globals.haveServices())
+            Globals.runOnThreadPool(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        synchronized (initLock) {
+                            showLoadingDialog();
+                            try {
+                                videoService =
+                                    new VideoService(Globals.getBackend().addr);
+                            } catch (IOException e) {
+                                ErrUtil.postErr(ctx, e);
+                                finish();
+                            } finally {
+                                dismissLoadingDialog();
+                                initLock.notify();
+                            }
+                        }
+                    }
+                }
+           );
         
     }
     
@@ -182,7 +200,13 @@ public class Videos extends MDActivity implements
     @Override
     public void onResume() {
         super.onResume();
-        refresh();
+        synchronized (initLock) {
+            while (videoService == null && !isFinishing())
+                try {
+                    initLock.wait();
+                } catch (InterruptedException e) {}
+            refresh(); 
+        }
     }
 
     @Override
@@ -286,7 +310,7 @@ public class Videos extends MDActivity implements
     
     private void refresh() {
         Globals.removeThreadPoolTask(getVideos);
-        showDialog(DIALOG_LOAD);
+        showLoadingDialog();
         Globals.runOnThreadPool(getVideos);
     }
 
