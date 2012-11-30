@@ -86,8 +86,8 @@ public class HttpFetcher {
                 ) :
                 cmgr.getSchemeRegistry();
         
-        HttpConnectionParams.setConnectionTimeout(params, 4000);
-        HttpConnectionParams.setSoTimeout(params, 8000);
+        HttpConnectionParams.setConnectionTimeout(params, 6000);
+        HttpConnectionParams.setSoTimeout(params, 6000);
         
         client = new DefaultHttpClient(
             new ThreadSafeClientConnManager(params, registry), params
