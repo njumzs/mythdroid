@@ -155,6 +155,8 @@ public class RecListFragment extends ListFragment
      */
     public void updateSelection() {
         
+        boolean newProgram = true;
+        
         ListAdapter adapter = lv.getAdapter();
         if (adapter == null) return;
         
@@ -167,6 +169,8 @@ public class RecListFragment extends ListFragment
         
         Program p = (Program)lv.getItemAtPosition(activity.checkedIndex);
         if (p == null) return;
+        if (p.equals(Globals.curProg))
+            newProgram = false;
         Globals.curProg = p;
 
         lv.setSelection(
@@ -182,16 +186,16 @@ public class RecListFragment extends ListFragment
         Fragment df = getFragmentManager().findFragmentById(R.id.recdetails);
         
         if (
-            df == null || !df.getClass().equals(RecDetailFragment.class) ||
-            !df.isVisible()
-        ) {
+            df == null || newProgram ||
+            (
+                df.getClass().equals(RecDetailFragment.class) &&
+                (
+                    ((RecDetailFragment)df).getProg() == null ||
+                    !df.isVisible()
+                )
+            )
+        )
             showDetails();
-            return;
-        }
-
-        Program prog = ((RecDetailFragment)df).getProg();
-        if (prog == null || !prog.equals(Globals.curProg))
-            showDetails();    
         
     }
     
@@ -204,11 +208,18 @@ public class RecListFragment extends ListFragment
         FragmentTransaction ft = fm.beginTransaction();
   
         rdf = RecDetailFragment.newInstance(false, false);
-        
-        if (dualPane)
-            ft.replace(R.id.recdetails, rdf);
+
+        if (dualPane) {
+            Fragment existing = fm.findFragmentById(R.id.recdetails);
+            if (
+                existing != null &&
+                !existing.getClass().equals(RecDetailFragment.class)
+            )
+                fm.popBackStackImmediate();
+            ft.replace(R.id.recdetails, rdf, rdf.getClass().getSimpleName());
+        }
         else {
-            ft.replace(R.id.reclistframe, rdf);
+            ft.replace(R.id.reclistframe, rdf, rdf.getClass().getSimpleName());
             ft.addToBackStack(null);
         }
         

@@ -19,9 +19,8 @@
 package org.mythdroid.fragments;
 
 import java.io.IOException;
-import java.text.ParseException;
 
-import org.json.JSONException;
+import org.mythdroid.Enums.RecStatus;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.RecDupIn;
@@ -38,6 +37,7 @@ import org.mythdroid.services.DvrService;
 import org.mythdroid.util.ErrUtil;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
@@ -54,28 +54,24 @@ import android.widget.AdapterView.OnItemSelectedListener;
 /** Edit a recording rule */
 public class RecEditFragment extends Fragment {
 
-    /** recording rule id for the current recording rule */
-    static public int           recId;
-    /** Duplicate matching method for the current recording rule */
-    static public RecDupMethod  dupMethod;
-    /** Duplicate matching type for the current recording rule */
-    static public RecDupIn      dupIn;
-    /** Episode filter for the current recording rule */
-    static public RecEpiFilter  epiFilter;
-    /** Recording group for the current recording rule */
-    static public String        recGroup;
-    /** Storage group for the current recording rule */
-    static public String        storGroup;
-
+    int             recId;
+    RecDupMethod    dupMethod;
+    RecDupIn        dupIn;
+    RecEpiFilter    epiFilter;
+    String          recGroup, storGroup;
+    
     private MDFragmentActivity activity = null;
     private View view                   = null;
     private Program prog                = null;
     private BackendManager beMgr        = null;
-    private RecType type;
-    private int prio;
+    private Handler handler             = new Handler();
+    private Object initLock             = new Object();
     
-    RecEditSchedFragment  resf = null;
-    RecEditGroupsFragment regf = null;
+    private int     prio;
+    private RecType type;
+    
+    private RecEditSchedFragment  resf = null;
+    private RecEditGroupsFragment regf = null;
 
     private Button  save, schedOptions, groupOptions;
     private Spinner prioSpinner;
@@ -90,71 +86,191 @@ public class RecEditFragment extends Fragment {
     
     private StringBuilder updates = new StringBuilder(16);
     
+    private Runnable doneRunnable = new Runnable() {
+        @Override
+        public void run() { done(); }
+    };
+    
+    
+    private Runnable getRuleRunnable = new Runnable() {
+        @Override
+        public void run() {
+            
+            synchronized (initLock) {
+                
+                activity.showLoadingDialog();
+                try {
+                    beMgr = Globals.getBackend();
+                } catch (IOException e) {
+                    activity.dismissLoadingDialog();
+                    initError(e);
+                    initLock.notify();
+                    return;
+                } 
+                if ((prog = Globals.curProg) == null) {
+                    ErrUtil.report(Messages.getString("RecEditFragment.0")); //$NON-NLS-1$
+                    activity.dismissLoadingDialog();
+                    initError(
+                        new IllegalArgumentException(
+                            Messages.getString("RecEditFragment.0") //$NON-NLS-1$
+                        )
+                    );
+                    initLock.notify();
+                    return;
+                }
+                
+                recId       = prog.RecID;        
+                type        = prog.Type;
+                prio        = prog.RecPrio;
+                dupMethod   = prog.DupMethod;
+                dupIn       = prog.DupIn;
+                epiFilter   = prog.EpiFilter;
+                recGroup    = prog.RecGroup;
+                storGroup   = prog.StorGroup;
+    
+                if (!Globals.haveServices()) {
+                    if (recId != -1)
+                        try {
+                            type = prog.Type =
+                                MDDManager.getRecType(beMgr.addr, recId);
+                            if (storGroup == null) {
+                                storGroup = prog.StorGroup =
+                                    MDDManager.getStorageGroup(
+                                        beMgr.addr, recId
+                                    );
+                            }
+                        } catch (IOException e) {
+                            activity.dismissLoadingDialog();
+                            initError(e);
+                            initLock.notify();
+                            return;
+                        }
+                    rule = new RecordingRule();
+                }
+                else {
+                    dvr = new DvrService(beMgr.addr);
+                    try {
+                        rule = dvr.getRecRule(recId);
+                    } catch (Exception e) {
+                        activity.dismissLoadingDialog();
+                        initError(e);
+                        initLock.notify();
+                        return;
+                    }
+                    if (rule == null)
+                        rule = new RecordingRule(prog);
+                    else {
+                        type        = prog.Type      = rule.type;
+                        prio        = prog.RecPrio   = rule.recpriority;
+                        dupMethod   = prog.DupMethod = rule.dupMethod;
+                        dupIn       = prog.DupIn     = rule.dupIn;
+                        recGroup    = prog.RecGroup  = rule.recGroup;
+                        storGroup   = prog.StorGroup = rule.storGroup;
+                    }
+                }
+                activity.dismissLoadingDialog();
+                initLock.notify();
+            }
+        }
+    };
+
+    private Runnable saveRunnable = new Runnable() {
+        @Override
+        public void run() {
+        
+            activity.showLoadingDialog();
+            
+            int recid = -1;
+    
+            if (modified) {
+                if (prio != prog.RecPrio) {
+                    addUpdate("RecPriority", prio); //$NON-NLS-1$
+                    prog.RecPrio = rule.recpriority = prio;
+                }
+                if (type != prog.Type) {
+    
+                    addUpdate("Type", type.value()); //$NON-NLS-1$
+                    prog.Type = rule.type = type;
+    
+                    if (type == RecType.NOT && prog.RecID != -1) {
+                        
+                        try {
+                            if (!Globals.haveServices()) {
+                                MDDManager.deleteRecording(
+                                    beMgr.addr, prog.RecID
+                                );
+                                beMgr.reschedule(prog.RecID);
+                            }
+                            else
+                                dvr.deleteRecording(prog.RecID);
+                        } catch (IOException e) {
+                            ErrUtil.postErr(activity, e);
+                            handler.post(doneRunnable);
+                            return;
+                        } finally {
+                            activity.dismissLoadingDialog();
+                        }
+                        prog.RecID = -1;
+                        if (prog.Status != RecStatus.RECORDED)
+                            ((RecDetailFragment)
+                                getFragmentManager()
+                                    .findFragmentByTag("RecDetailFragment") //$NON-NLS-1$
+                            ).refresh();
+                        handler.post(doneRunnable);
+                        return;
+                    }
+    
+                    addUpdate("FindDay", prog.StartTime.getDay()); //$NON-NLS-1$
+                    rule.day = prog.StartTime.getDay();
+                    String time = 
+                        prog.StartTime.getHours() + ":" + //$NON-NLS-1$
+                            prog.StartTime.getMinutes() + ":" + //$NON-NLS-1$
+                                prog.StartTime.getSeconds(); 
+                    addUpdate("FindTime", time);//$NON-NLS-1$
+                    rule.time = time;
+                    long id =
+                        (prog.StartTime.getTime() / (1000*60*60*24)) + 719528;
+                    addUpdate("FindId", id); //$NON-NLS-1$
+                    rule.findid = id;
+    
+                }
+            }
+    
+            if (childrenModified) {
+                if (dupMethod != prog.DupMethod) {
+                    addUpdate("DupMethod", dupMethod.value()); //$NON-NLS-1$
+                    prog.DupMethod = rule.dupMethod = dupMethod;
+                }
+                if (dupIn != prog.DupIn || epiFilter != prog.EpiFilter) {
+                    addUpdate("DupIn", (dupIn.value() | epiFilter.value())); //$NON-NLS-1$
+                    prog.DupIn = rule.dupIn = dupIn;
+                }
+                if (recGroup != prog.RecGroup) {
+                    addUpdate("RecGroup", recGroup); //$NON-NLS-1$
+                    prog.RecGroup = rule.recGroup = recGroup;
+                }
+                if (storGroup != prog.StorGroup) {
+                    addUpdate("StorageGroup", storGroup); //$NON-NLS-1$
+                    prog.StorGroup = rule.storGroup = storGroup;
+                }
+            }
+    
+            if (updates.length() != 0)
+                updateRecording(recid, updates);
+            
+            activity.dismissLoadingDialog();
+            handler.post(doneRunnable);
+            
+        }
+
+    };
+    
     @Override
     public void onCreate(Bundle icicle) {
         
         super.onCreate(icicle);
-        
         activity = (MDFragmentActivity)getActivity();
-        
-        try {
-            beMgr = Globals.getBackend();
-        } catch (IOException e) {
-            initError(e);
-            return;
-        }
-        
-        if ((prog = Globals.curProg) == null) {
-            ErrUtil.report(Messages.getString("RecEditFragment.0")); //$NON-NLS-1$
-            initError(
-                new IllegalArgumentException(
-                    Messages.getString("RecEditFragment.0") //$NON-NLS-1$
-                )
-            );
-            return;
-        }
-        
-        recId       = prog.RecID;        
-        type        = prog.Type;
-        prio        = prog.RecPrio;
-        dupMethod   = prog.DupMethod;
-        dupIn       = prog.DupIn;
-        epiFilter   = prog.EpiFilter;
-        recGroup    = prog.RecGroup;
-        storGroup   = prog.StorGroup;
-
-        if (!Globals.haveServices()) {
-            if (recId != -1)
-                try {
-                    type = prog.Type =
-                        MDDManager.getRecType(beMgr.addr, recId);
-                    if (storGroup == null) {
-                        storGroup = prog.StorGroup =
-                            MDDManager.getStorageGroup(beMgr.addr, recId);
-                    }
-                } catch (IOException e) { initError(e); }
-            rule = new RecordingRule();
-        }
-        else {
-            dvr = new DvrService(beMgr.addr);
-            try {
-                rule = dvr.getRecRule(recId);
-            } catch (JSONException e) {
-                initError(e);
-            } catch (ParseException e) {
-                initError(e);
-            }
-            if (rule == null)
-                rule = new RecordingRule(prog);
-            else {
-                type        = prog.Type      = rule.type;
-                prio        = prog.RecPrio   = rule.recpriority;
-                dupMethod   = prog.DupMethod = rule.dupMethod;
-                dupIn       = prog.DupIn     = rule.dupIn;
-                recGroup    = prog.RecGroup  = rule.recGroup;
-                storGroup   = prog.StorGroup = rule.storGroup;
-            }
-        }
+        Globals.runOnThreadPool(getRuleRunnable);
         
     }
 
@@ -162,8 +278,15 @@ public class RecEditFragment extends Fragment {
     public View onCreateView(
         LayoutInflater inflater, ViewGroup container, Bundle icicle
     ) {
+
+        synchronized (initLock) {
+            while (!initErr && rule == null)
+                try {
+                    initLock.wait();
+                } catch (InterruptedException e) {}
+        }
         
-        if (container == null) return null;
+        if (container == null || initErr) return null;
         
         containerId = container.getId();
         
@@ -173,14 +296,18 @@ public class RecEditFragment extends Fragment {
         inlineOpts = schedOptFrame != null &&
                      schedOptFrame.getVisibility() == View.VISIBLE;
         
-        if (inlineOpts && !initErr) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            resf = RecEditSchedFragment.newInstance(getId());
-            regf = RecEditGroupsFragment.newInstance(getId());
-            ft.replace(R.id.schedOptFrame, resf);
-            ft.replace(R.id.groupOptFrame, regf);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            ft.commitAllowingStateLoss();
+        if (inlineOpts) {
+            resf = new RecEditSchedFragment();
+            regf = new RecEditGroupsFragment();
+            getFragmentManager().beginTransaction()
+                .replace(
+                    R.id.schedOptFrame, resf, resf.getClass().getSimpleName()
+                )
+                .replace(
+                    R.id.groupOptFrame, regf, regf.getClass().getSimpleName()
+                )
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commitAllowingStateLoss();
         }
 
         if ((prog = Globals.curProg) == null) {
@@ -203,24 +330,37 @@ public class RecEditFragment extends Fragment {
     public void onResume() {
 
         super.onResume();
-        try {
-            beMgr = Globals.getBackend();
-        } catch (IOException e) {
-            initError(e);
-            return;
-        }
-
-        if (!Globals.haveServices())
-            try {
-                MDDManager mdd = new MDDManager(beMgr.addr, Globals.muxConns);
-                mdd.shutdown();
-            } catch (IOException e) {
-                initError(
-                    new IOException(
-                        Messages.getString("RecordingEdit.2") + beMgr.addr //$NON-NLS-1$
-                    )
-                );
+        
+        Globals.runOnThreadPool(
+            new Runnable() {
+                @Override
+                public void run() {
+                    activity.showLoadingDialog();
+                    try {
+                        beMgr = Globals.getBackend();
+                    } catch (IOException e) {
+                        initError(e);
+                        return;
+                    } finally {
+                        activity.dismissLoadingDialog();
+                    }
+            
+                    if (!Globals.haveServices())
+                        try {
+                            MDDManager mdd =
+                                new MDDManager(beMgr.addr, Globals.muxConns);
+                            mdd.shutdown();
+                        } catch (IOException e) {
+                            initError(
+                                new IOException(
+                                    Messages.getString("RecordingEdit.2") +  //$NON-NLS-1$
+                                    beMgr.addr
+                                )
+                            );
+                        }
+                }
             }
+        );
         
     }
 
@@ -228,15 +368,20 @@ public class RecEditFragment extends Fragment {
      * Check for changes that child fragments might have made
      */
     public void checkChildren() {
-        if (prog == null || recGroup == null || storGroup == null) return;
-        if (
-            dupMethod == prog.DupMethod && dupIn == prog.DupIn &&
-            epiFilter == prog.EpiFilter && recGroup.equals(prog.RecGroup) &&
-            storGroup.equals(prog.StorGroup)
-        )
+        if (prog == null) return;
+        if (resf != null && !resf.isEnabled())
             childrenModified = false;
-        else
+        else if
+            (
+                dupMethod != prog.DupMethod       ||
+                dupIn     != prog.DupIn           ||
+                epiFilter != prog.EpiFilter       ||
+                !recGroup.equals(prog.RecGroup)   ||
+                !storGroup.equals(prog.StorGroup)
+            )
             childrenModified = true;
+        else
+            childrenModified = false;
         updateSaveEnabled();
     }
 
@@ -348,14 +493,16 @@ public class RecEditFragment extends Fragment {
                 new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        FragmentTransaction ft = 
-                            getFragmentManager().beginTransaction();
-                        ft.replace(containerId, new RecEditSchedFragment());
-                        ft.setTransition(
-                            FragmentTransaction.TRANSIT_FRAGMENT_FADE
-                        );
-                        ft.addToBackStack(null);
-                        ft.commitAllowingStateLoss();
+                        getFragmentManager().beginTransaction()
+                            .replace(
+                                containerId, new RecEditSchedFragment(),
+                                "RecEditSchedFragment" //$NON-NLS-1$
+                            )
+                            .setTransition(
+                                FragmentTransaction.TRANSIT_FRAGMENT_FADE
+                            )
+                            .addToBackStack(null)
+                            .commitAllowingStateLoss();
                     }
                 }
             );
@@ -366,14 +513,16 @@ public class RecEditFragment extends Fragment {
                 new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        FragmentTransaction ft = 
-                            getFragmentManager().beginTransaction();
-                        ft.replace(containerId, new RecEditGroupsFragment());
-                        ft.setTransition(
+                        getFragmentManager().beginTransaction()
+                        .replace(
+                            containerId, new RecEditGroupsFragment(),
+                            "RecEditGroupsFragment" //$NON-NLS-1$
+                        )
+                        .setTransition(
                             FragmentTransaction.TRANSIT_FRAGMENT_FADE
-                        );
-                        ft.addToBackStack(null);
-                        ft.commitAllowingStateLoss();
+                        )
+                        .addToBackStack(null)
+                        .commitAllowingStateLoss();
                     }
                 }
             );
@@ -402,79 +551,11 @@ public class RecEditFragment extends Fragment {
 
     // Save the changes and reschedule the rule
     private void doSave() {
-
-        int recid = -1;
-
-        if (modified) {
-            if (prio != prog.RecPrio) {
-                addUpdate("RecPriority", prio); //$NON-NLS-1$
-                prog.RecPrio = rule.recpriority = prio;
-            }
-            if (type != prog.Type) {
-
-                addUpdate("Type", type.value()); //$NON-NLS-1$
-                prog.Type = rule.type = type;
-
-                if (type == RecType.NOT && prog.RecID != -1) {
-                    
-                    if (!Globals.haveServices())
-                        try {
-                            MDDManager.deleteRecording(beMgr.addr, prog.RecID);
-                            beMgr.reschedule(prog.RecID);
-                        } catch (IOException e) {
-                            ErrUtil.err(activity, e);
-                        }
-                    else {
-                        try {
-                            dvr.deleteRecording(prog.RecID);
-                        } catch (IOException e) {
-                            ErrUtil.err(activity, e);
-                        }
-                    }
-                    prog.RecID = -1;
-                    done();
-                    return;
-                }
-
-                addUpdate("FindDay", prog.StartTime.getDay()); //$NON-NLS-1$
-                rule.day = prog.StartTime.getDay();
-                String time = 
-                    prog.StartTime.getHours() + ":" + //$NON-NLS-1$
-                        prog.StartTime.getMinutes() + ":" + //$NON-NLS-1$
-                            prog.StartTime.getSeconds(); 
-                addUpdate("FindTime", time);//$NON-NLS-1$
-                rule.time = time;
-                long id = (prog.StartTime.getTime() / (1000*60*60*24)) + 719528;
-                addUpdate("FindId", id); //$NON-NLS-1$
-                rule.findid = id;
-
-            }
-        }
-
-        if (childrenModified) {
-            if (dupMethod != prog.DupMethod) {
-                addUpdate("DupMethod", dupMethod.value()); //$NON-NLS-1$
-                prog.DupMethod = rule.dupMethod = dupMethod;
-            }
-            if (dupIn != prog.DupIn || epiFilter != prog.EpiFilter) {
-                addUpdate("DupIn", (dupIn.value() | epiFilter.value())); //$NON-NLS-1$
-                prog.DupIn = rule.dupIn = dupIn;
-            }
-            if (recGroup != prog.RecGroup) {
-                addUpdate("RecGroup", recGroup); //$NON-NLS-1$
-                prog.RecGroup = rule.recGroup = recGroup;
-            }
-            if (storGroup != prog.StorGroup) {
-                addUpdate("StorageGroup", storGroup); //$NON-NLS-1$
-                prog.StorGroup = rule.storGroup = storGroup;
-            }
-        }
-
-        if (updates.length() == 0) {
-            done();
-            return;
-        }
-
+       Globals.runOnThreadPool(saveRunnable);
+    }
+    
+    private void updateRecording(int recid, StringBuilder updates) {
+        
         // Send the schedule updates to MDD, get back the (new) recid
         if (!Globals.haveServices())
             try {
@@ -482,7 +563,8 @@ public class RecEditFragment extends Fragment {
                     beMgr.addr, prog, updates.toString()
                 );
             } catch (IOException e) {
-                ErrUtil.err(activity, e);
+                ErrUtil.postErr(activity, e);
+                return;
             }
         else {
             /* We need to use the program start time, not that of the rule
@@ -499,27 +581,31 @@ public class RecEditFragment extends Fragment {
             }
             try {
                 recid = dvr.updateRecording(rule);
-            } catch (IOException e) {
-                ErrUtil.err(activity, e);
+            } catch (IOException e) { 
+                ErrUtil.postErr(activity, e);
+                return;
             }
         }
         prog.RecID = recid;
 
         if (recid == -1) {
-            ErrUtil.err(activity, Messages.getString("RecordingEdit.0")); //$NON-NLS-1$
-            done();
+            ErrUtil.postErr(
+                activity, Messages.getString("RecordingEdit.0") //$NON-NLS-1$
+            );
             return;
         }
 
         // Tell the backend to reschedule this rule
         try {
             beMgr.reschedule(recid);
-        } catch (IOException e) {
-            ErrUtil.err(activity, e);
-        }
-
-        done();
-
+        } catch (IOException e) { ErrUtil.postErr(activity, e); }
+        
+        if (prog.Status != RecStatus.RECORDED)
+            ((RecDetailFragment)
+                getFragmentManager()
+                    .findFragmentByTag("RecDetailFragment") //$NON-NLS-1$
+            ).refresh();
+        
     }
 
     /**
@@ -542,14 +628,24 @@ public class RecEditFragment extends Fragment {
         updates.append(update).append(" = '").append(value).append("'"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     
+    private void removeInlineFrags() {
+        if (!inlineOpts && resf == null && regf == null)
+            return;
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.remove(resf);
+        ft.remove(regf);
+        ft.commitAllowingStateLoss();
+    }
+    
     private void initError(Exception e) {
-        if (e != null)
-            ErrUtil.err(activity, e);
-        getFragmentManager().popBackStack();
+        if (e != null) ErrUtil.postErr(activity, e);
         initErr = true;
+        removeInlineFrags();
+        getFragmentManager().popBackStack();
     }
     
     private void done() {
+        removeInlineFrags();
         getFragmentManager().popBackStackImmediate();
     }
 }

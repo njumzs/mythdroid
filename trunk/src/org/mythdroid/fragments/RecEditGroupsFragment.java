@@ -24,14 +24,15 @@ import org.mythdroid.Globals;
 import org.mythdroid.R;
 
 import org.mythdroid.activities.MDFragmentActivity;
+import org.mythdroid.activities.Recordings;
 import org.mythdroid.fragments.RecEditFragment;
 import org.mythdroid.mdd.MDDManager;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.services.MythService;
 import org.mythdroid.util.ErrUtil;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,27 +47,16 @@ import android.widget.AdapterView.OnItemSelectedListener;
 public class RecEditGroupsFragment extends Fragment {
 
     private MDFragmentActivity activity = null;
-    private boolean embedded = false;
-    private View view = null;
-    private RecEditFragment ref = null;
-    
+    private View view                   = null;
+    private RecEditFragment ref         = null;
+    private Handler handler             = new Handler();
+    private String[] recGroups          = null;
+    private String[] storGroups         = null;
+
+
+    private boolean embedded = false, enabled = false;
     private Spinner recGroupSpinner = null, storGroupSpinner = null;
     
-    private String[] recGroups = null;
-    private String[] storGroups = null;
-    
-    /**
-     * Instantiate a new RecEditGroupsFragment
-     * @param id - id of parent RecEditFragment
-     * @return new instance
-     */
-    public static RecEditGroupsFragment newInstance(int id) {
-        RecEditGroupsFragment regf = new RecEditGroupsFragment();
-        Bundle args = new Bundle();
-        args.putInt("RecEditFragId", id); //$NON-NLS-1$
-        regf.setArguments(args);
-        return regf;
-    }
 
     @Override
     public View onCreateView(
@@ -74,51 +64,59 @@ public class RecEditGroupsFragment extends Fragment {
     ) {
         if (container == null) return null;
         activity = (MDFragmentActivity)getActivity();
-        embedded = 
-            activity.getClass().getName().endsWith("Recordings"); //$NON-NLS-1$
+        embedded = activity.getClass().equals(Recordings.class);
         view = inflater.inflate(R.layout.recording_edit_groups, null, false);
+        ref = (RecEditFragment)getFragmentManager()
+                  .findFragmentByTag("RecEditFragment"); //$NON-NLS-1$
         
-        Bundle args = getArguments();
-        if (args != null) {
-            int id = args.getInt("RecEditFragId", -1); //$NON-NLS-1$
-            if (id != -1)
-                ref = (RecEditFragment)getFragmentManager()
-                          .findFragmentById(id);
-        }
-        
-        try {
-            if (!Globals.haveServices()) {
-                recGroups  = MDDManager.getRecGroups(
-                    Globals.getBackend().addr
-                );
-                storGroups = MDDManager.getStorageGroups(
-                    Globals.getBackend().addr
-                );
+        Globals.runOnThreadPool(
+            new Runnable() {
+                @Override
+                public void run() {
+                    activity.showLoadingDialog();
+                    try {
+                        if (!Globals.haveServices()) {
+                            recGroups  = MDDManager.getRecGroups(
+                                Globals.getBackend().addr
+                            );
+                            storGroups = MDDManager.getStorageGroups(
+                                Globals.getBackend().addr
+                            );
+                        }
+                        else {
+                            MythService myth =
+                                new MythService(Globals.getBackend().addr);
+                            recGroups = new String[1];
+                            recGroups[0] =
+                                Messages.getString("RecEditGroupsFragment.0"); //$NON-NLS-1$
+                            storGroups = myth.getStorageGroups();
+                        }
+                    } catch (IOException e) {
+                        ErrUtil.postErr(activity, e);
+                        done();
+                        return;
+                    } finally {
+                        activity.dismissLoadingDialog();
+                    }
+                    if (recGroups == null || storGroups == null) {
+                        ErrUtil.postErr(
+                            activity,
+                            Messages.getString("RecordingEditGroups.0") //$NON-NLS-1$
+                        );
+                        done();
+                        return;
+                    }
+                    handler.post(
+                        new Runnable() {
+                            @Override
+                            public void run() { setViews(); }
+                            
+                        }
+                    );
+                }
             }
-            else {
-                MythService myth = new MythService(Globals.getBackend().addr);
-                recGroups = new String[1];
-                recGroups[0] = Messages.getString("RecEditGroupsFragment.0"); //$NON-NLS-1$
-                storGroups = myth.getStorageGroups();
-            }
-        } catch (IOException e) {
-            ErrUtil.err(activity, e);
-            done();
-        }
-       
-        if (recGroups == null || storGroups == null) {
-            ErrUtil.err(activity, Messages.getString("RecordingEditGroups.0")); //$NON-NLS-1$
-            done();
-        }
-        
-        setViews();
+        );
         return view;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        activity.setResult(Activity.RESULT_OK);
     }
 
     private void setViews() {
@@ -136,9 +134,9 @@ public class RecEditGroupsFragment extends Fragment {
 
         int pos = 0, defaultPos =-1;
 
-        if (RecEditFragment.recGroup != null)
+        if (ref.recGroup != null)
             for (pos = 0; pos < recGroups.length; pos++) {
-                if (recGroups[pos].equals(RecEditFragment.recGroup))
+                if (recGroups[pos].equals(ref.recGroup))
                     break;
                 if (recGroups[pos].equals("Default")) //$NON-NLS-1$
                     defaultPos = pos;
@@ -155,9 +153,8 @@ public class RecEditGroupsFragment extends Fragment {
                 public void onItemSelected(
                     AdapterView<?> parent, View view, int pos, long id
                 ) {
-                    RecEditFragment.recGroup = recGroups[pos];
-                    if (ref != null)
-                        ref.checkChildren();
+                    ref.recGroup = recGroups[pos];
+                    ref.checkChildren();
                 }
 
                 @Override
@@ -177,9 +174,9 @@ public class RecEditGroupsFragment extends Fragment {
         pos = 0; 
         defaultPos = -1;
 
-        if (RecEditFragment.storGroup != null)
+        if (ref.storGroup != null)
             for (pos = 0; pos < storGroups.length; pos++) {
-                if (storGroups[pos].equals(RecEditFragment.storGroup))
+                if (storGroups[pos].equals(ref.storGroup))
                     break;
                 if (storGroups[pos].equals("Default")) //$NON-NLS-1$
                     defaultPos = pos;
@@ -196,9 +193,8 @@ public class RecEditGroupsFragment extends Fragment {
                 public void onItemSelected(
                     AdapterView<?> parent, View view, int pos, long id
                 ) {
-                    RecEditFragment.storGroup = storGroups[pos];
-                    if (ref != null)
-                        ref.checkChildren();
+                    ref.storGroup = storGroups[pos];
+                    ref.checkChildren();
                 }
 
                 @Override
@@ -210,12 +206,21 @@ public class RecEditGroupsFragment extends Fragment {
     
     /**
      * Set the enabled state of this fragment's spinners 
-     * @param enabled new state
+     * @param enable new state
      */
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(boolean enable) {
+        enabled = enable;
         if (recGroupSpinner == null) return;
         recGroupSpinner.setEnabled(enabled);
         storGroupSpinner.setEnabled(enabled);
+    }
+    
+    /**
+     * Get the enabled state of this fragment's spinners
+     * @return enabled state
+     */
+    public boolean isEnabled() {
+        return enabled;
     }
     
     private void done() {

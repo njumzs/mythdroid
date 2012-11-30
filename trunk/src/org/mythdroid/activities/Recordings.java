@@ -27,6 +27,7 @@ import org.mythdroid.R;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.data.Program;
+import org.mythdroid.fragments.RecDetailFragment;
 import org.mythdroid.fragments.RecListFragment;
 
 
@@ -80,14 +81,12 @@ public class Recordings extends MDFragmentActivity {
                 recordings = Globals.getBackend().getRecordings();
             } catch (IOException e) {
                 ErrUtil.postErr(ctx, Messages.getString("Recordings.0")); //$NON-NLS-1$
-                dismissLoadingDialog();
                 finish();
+            } finally {
+                dismissLoadingDialog();
             }
 
-            if (recordings == null) {
-                dismissLoadingDialog();
-                return;
-            }
+            if (recordings == null) return;
 
             // Filter the recordings?
             if (filter != null) {
@@ -105,7 +104,6 @@ public class Recordings extends MDFragmentActivity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        dismissLoadingDialog();
                         listFragment.setAdapter(recordings);
                     }
                 }
@@ -140,12 +138,6 @@ public class Recordings extends MDFragmentActivity {
         icicle.putInt("visibleIndex", visibleIndex); //$NON-NLS-1$
         icicle.putString("filter", filter); //$NON-NLS-1$
         
-    }
-    
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        empty();
     }
     
     @Override 
@@ -318,17 +310,17 @@ public class Recordings extends MDFragmentActivity {
         final FragmentManager fm = getSupportFragmentManager();
         
         ArrayList<String> backStackFrags = new ArrayList<String>();
+        
+        // At this stage dualPane reflects the old configuration
         boolean dualPane = findViewById(R.id.recdetails) != null;
-                
-        /* The old backstack is useless now, save the relevant entries
-           At this stage dualPane reflects the old configuration */        
+        
+        /* The old backstack is useless now, save the relevant entries */
         int backStackSize = fm.getBackStackEntryCount();
         for (int i = 0; i < backStackSize; i++) {
             Fragment lf = fm.findFragmentById(R.id.reclistframe);
             Fragment df = fm.findFragmentById(R.id.recdetails);
-            backStackFrags.add(
-                0, (!dualPane || df == null ? lf : df).getClass().getName()
-            );
+            Fragment f = (!dualPane || df == null ? lf : df);
+            backStackFrags.add(0, f.getClass().getName());
             fm.popBackStackImmediate();
         }
         
@@ -336,28 +328,28 @@ public class Recordings extends MDFragmentActivity {
         dualPane = findViewById(R.id.recdetails) != null;     
         
         // Now dualPane reflects the new configuration
-   
+
         listFragment = new RecListFragment();
         
-        fm.beginTransaction().replace(R.id.reclistframe, listFragment)
-            .commitAllowingStateLoss();
+        fm.beginTransaction()
+            .replace(R.id.reclistframe, listFragment)
+                .commitAllowingStateLoss();
         fm.executePendingTransactions();
 
         listFragment.setAdapter(recordings);
         
         // Restore the backstack
         for (String frag : backStackFrags) {
-            // RecListFragment will handle this..
-            if (dualPane && frag.endsWith("RecDetailFragment")) //$NON-NLS-1$
+            // RecListFragment has handled this..
+            if (dualPane && frag.equals(RecDetailFragment.class.getName()))
                 continue;
             try {
                 FragmentTransaction ft = fm.beginTransaction();
+                Fragment f = (Fragment)Class.forName(frag).newInstance();
                 ft.replace(
                         (dualPane ? R.id.recdetails : R.id.reclistframe), 
-                        (Fragment)Class.forName(frag).newInstance()
-                );
-                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
+                        f, f.getClass().getSimpleName()
+                ).addToBackStack(null).commitAllowingStateLoss();
             } catch (Exception e) {
                 ErrUtil.reportErr(this, e);
                 return;
