@@ -42,6 +42,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -74,9 +75,40 @@ public class Main extends MDListActivity implements
 
     /** ListAdapter containing the main menu entries */
     private ArrayAdapter<String> menuAdapter = null;
+    
+    private Handler handler = new Handler();
 
     /** ConnectivityReceiver instance */
     ConnectivityReceiver crecv = null;
+    
+    private Runnable getBackend = new Runnable() {
+        @Override
+        public void run() {
+            boolean gotBackend = true;
+            showLoadingDialog();
+            try {
+                Globals.getBackend();
+            } catch (IOException e) { gotBackend = false; }
+            final boolean b = gotBackend;
+            dismissLoadingDialog();
+            handler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        if (b) {
+                            setListAdapter(menuAdapter);
+                            return;
+                        }
+                        ((TextView)findViewById(R.id.emptyMsg))
+                            .setText(R.string.noBe);
+                        ((TextView)findViewById(R.id.emptyDetail))
+                            .setText(R.string.noBeDetail);
+                        setListAdapter(null);
+                    }
+                }
+            );
+        }
+    };
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -127,20 +159,9 @@ public class Main extends MDListActivity implements
 
     @Override
     public void onResume() {
-
         super.onResume();
         getListView().setOnItemLongClickListener(this);
-
-        try {
-            Globals.getBackend();
-        } catch (IOException e) {
-            ((TextView)findViewById(R.id.emptyMsg)).setText(R.string.noBe);
-            ((TextView)findViewById(R.id.emptyDetail))
-                .setText(R.string.noBeDetail);
-            setListAdapter(null);
-            return;
-        }
-        setListAdapter(menuAdapter);
+        Globals.runOnThreadPool(getBackend);
     }
 
     @Override
@@ -286,9 +307,7 @@ public class Main extends MDListActivity implements
     protected void onActivityResult(int reqCode, int resCode, Intent data) {
         super.onActivityResult(reqCode, resCode, data);
         getPreferences();
-        try {
-            Globals.getBackend();
-        } catch (IOException e) { ErrUtil.err(this, e); }
+        Globals.runOnThreadPool(getBackend);
     }
 
     private Dialog createGuideDialog() {
