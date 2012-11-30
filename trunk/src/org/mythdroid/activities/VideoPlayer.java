@@ -102,6 +102,7 @@ public class VideoPlayer extends MDActivity {
         public void onPlaybackMoved() { finish(); }
     };
     
+    @SuppressWarnings("unused")
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -111,7 +112,7 @@ public class VideoPlayer extends MDActivity {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         showDialog(DIALOG_QUALITY);
         moveHelper = new MovePlaybackHelper(this, onReady, onMoved);
-        if (Globals.haveServices()) 
+        if (Globals.haveServices() && false) 
             try {
                 contentService = new ContentService(Globals.getBackend().addr);
             } catch (IOException e) { ErrUtil.err(this, e); }
@@ -210,7 +211,7 @@ public class VideoPlayer extends MDActivity {
     @SuppressWarnings("unused")
     private void startStream() {
 
-        showDialog(DIALOG_LOAD);
+        showLoadingDialog();
 
         DisplayMetrics dm = getResources().getDisplayMetrics();
         
@@ -283,7 +284,6 @@ public class VideoPlayer extends MDActivity {
             initError(e.getMessage());
             return;
         }
-            
         
         // Give MDD a chance to exec vlc and vlc a chance to start streaming
         new Handler().postDelayed(
@@ -358,6 +358,7 @@ public class VideoPlayer extends MDActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, url);
             if (streamInfo != null)
                 intent.setDataAndType(url, "video/x-mpegurl"); //$NON-NLS-1$
+            dismissLoadingDialog();
             startActivityForResult(intent, 0);
             return;
         }
@@ -436,7 +437,7 @@ public class VideoPlayer extends MDActivity {
                 new OnSeekListener() {
                     @Override
                     public void onSeek() {
-                        showDialog(DIALOG_LOAD);
+                        showLoadingDialog();
                         mplayer.pause();
                         // Dump the buffer, no better way of doing it :(
                         mplayer.reset();
@@ -445,6 +446,7 @@ public class VideoPlayer extends MDActivity {
                             mplayer.prepareAsync();
                         } catch (Exception e) {
                             ErrUtil.reportErr(ctx, e);
+                            dismissLoadingDialog();
                             finish();
                         }
                     }
@@ -505,6 +507,7 @@ public class VideoPlayer extends MDActivity {
     private void initError(String e) {
         if (e != null)
             ErrUtil.err(this, e);
+        dismissLoadingDialog();
         if (seekTo != 0) {
             moveHelper.abortMove();
             return;
