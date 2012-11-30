@@ -41,6 +41,7 @@ import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.MenuItemCompat;
 import android.view.View;
 import android.widget.AdapterView;
@@ -78,6 +79,8 @@ public abstract class MDActivity extends Activity {
         new HashMap<String, Integer>();
     final private HashMap<String, String> stringExtras =
         new HashMap<String, String>();
+    
+    private Handler handler = new Handler();
 
     /** ActionBar Indicator for Frontend */
     private TextView frontendIndicator = null;
@@ -139,6 +142,7 @@ public abstract class MDActivity extends Activity {
                 final ProgressDialog prog = new ProgressDialog(this);
                 prog.setIndeterminate(true);
                 prog.setMessage(getResources().getText(R.string.loading));
+                prog.setCanceledOnTouchOutside(false);
                 prog.setOnCancelListener(
                     new OnCancelListener() {
                         @Override
@@ -252,14 +256,28 @@ public abstract class MDActivity extends Activity {
     
     /** Show the loading dialog */
     protected void showLoadingDialog() {
-        showDialog(DIALOG_LOAD);
+        handler.post(
+            new Runnable() {
+                @Override
+                public void run() {
+                    showDialog(DIALOG_LOAD);
+                }
+            }
+        );
     }
 
     /** Dismiss the loading dialog */
     protected void dismissLoadingDialog() {
-        try {
-            dismissDialog(DIALOG_LOAD);
-        } catch (IllegalArgumentException e) {}
+        handler.post(
+            new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        dismissDialog(DIALOG_LOAD);
+                    } catch (IllegalArgumentException e) {}
+                }
+            }
+        );
     }
 
     /**
