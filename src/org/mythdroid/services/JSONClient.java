@@ -19,6 +19,7 @@
 package org.mythdroid.services;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -29,6 +30,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mythdroid.Globals;
+import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.HttpFetcher;
 import org.mythdroid.util.LogUtil;
@@ -123,6 +125,11 @@ public class JSONClient {
         
         try {
             res = new HttpFetcher(req, Globals.muxConns).getContent();
+        } catch (SocketTimeoutException e) {
+            throw new IOException(
+                Messages.getString("JSONClient.0") + //$NON-NLS-1$
+                req.getURI().getHost() + ":" + req.getURI().getPort() //$NON-NLS-1$
+            );
         } catch (ClientProtocolException e) {
             ErrUtil.logErr(e);
             return null;
