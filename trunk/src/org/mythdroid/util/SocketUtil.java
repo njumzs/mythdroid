@@ -36,8 +36,6 @@ import org.mythdroid.resource.Messages;
 /** Socket Utilities - mostly for managing muxed (encrypted) connections */
 public class SocketUtil {
     
-    private static boolean insecure = false;
-    
     /** A Socket that will mux (and, if possible, encrypt) connections */
     public static class MuxedSocket extends CryptSocket {
         
@@ -174,12 +172,10 @@ public class SocketUtil {
         @Override
         public void connect(SocketAddress addr, int timeout)
             throws IOException {
-            super.connect(addr, timeout);
+            super.connect(addr, 6000);
+            super.setSoTimeout(6000);
             // We shouldn't need auth/crypt if we come from localhost (via SSH)
-            if (
-                !insecure &&
-                !((InetSocketAddress)addr).getAddress().isLoopbackAddress()
-            )
+            if (!((InetSocketAddress)addr).getAddress().isLoopbackAddress())
                 try {
                     params = authenticate();
                 } catch (Exception e) {
@@ -190,10 +186,7 @@ public class SocketUtil {
         
         @Override
         public InputStream getInputStream() throws IOException {
-            if (params == null)
-                return super.getInputStream();
-            if (inputStream != null)
-                return inputStream;
+            if (inputStream != null) return inputStream;
             try {
                 Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding"); //$NON-NLS-1$
                 IvParameterSpec ivps = new IvParameterSpec(params.iv);
@@ -211,10 +204,7 @@ public class SocketUtil {
         
         @Override
         public OutputStream getOutputStream() throws IOException {
-            if (params == null)
-                return super.getOutputStream();
-            if (outputStream != null)
-                return outputStream;
+            if (outputStream != null) return outputStream;
             try {
                 Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding"); //$NON-NLS-1$
                 IvParameterSpec ivps = new IvParameterSpec(params.iv);
@@ -236,28 +226,9 @@ public class SocketUtil {
                    BadPaddingException {
             
             byte[] nonce = new byte[16];
-            
-            int timeout = super.getSoTimeout();
-            super.setSoTimeout(2000);
-            int ret;
-            try {
-                ret = super.getInputStream().read(nonce, 0, 16);
-            } catch (SocketTimeoutException e) {
-                LogUtil.warn(
-                    "No challenge from CMux, attempt insecure connection" //$NON-NLS-1$
-                );
-                LogUtil.warn(
-                    "Sorry for the wait, you should enable crypt in MDD" //$NON-NLS-1$
-                );
-                insecure = true;
-                return null;
-            } finally {
-                super.setSoTimeout(timeout);
-            }
-            if (ret != 16) {
-                LogUtil.error("Received an invalid nonce"); //$NON-NLS-1$
-                return null;
-            }
+
+            if (super.getInputStream().read(nonce, 0, 16) != 16)
+                throw new IOException(Messages.getString("SocketUtil.2")); //$NON-NLS-1$
                         
             if (keys == null || keys.size() == 0)
                 throw new IOException(Messages.getString("SocketUtil.0")); //$NON-NLS-1$
@@ -327,7 +298,8 @@ public class SocketUtil {
                 sock.connect(rAddr, timeout);
             } catch (SocketTimeoutException ex) {
                 throw new ConnectTimeoutException(
-                    Messages.getString("ConnMgr.3") + rAddr //$NON-NLS-1$
+                    Messages.getString("ConnMgr.3") + //$NON-NLS-1$
+                    rAddr.getHostName() + ":" + rAddr.getPort() //$NON-NLS-1$
                 );
             }
             sock.setTcpNoDelay(true);
