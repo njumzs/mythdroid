@@ -295,6 +295,7 @@ public class Guide extends MDActivity {
                 guideService = new GuideService(Globals.getBackend().addr);
             } catch (IOException e) {
                 ErrUtil.err(this, e);
+                finish();
                 return;
             }
 
