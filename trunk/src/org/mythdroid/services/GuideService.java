@@ -28,6 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mythdroid.Globals;
 import org.mythdroid.data.Channel;
+import org.mythdroid.data.Program;
 import org.mythdroid.util.LogUtil;
 
 /** An implementation of the Guide service */
@@ -76,6 +77,29 @@ public class GuideService {
         }
         
         return channels;
+        
+    }
+    
+    /**
+     * Get a Program 
+     * @param chanId channel id
+     * @param start program start time
+     * @return a Program object representing the requested program
+     * @throws JSONException
+     * @throws ParseException
+     * @throws IOException
+     */
+    public Program GetProgram(int chanId, Date start)
+        throws JSONException, ParseException, IOException {
+        
+        final Params params = new Params();
+        params.put("ChanId", chanId); //$NON-NLS-1$
+        params.put("StartTime", Globals.utcFmt.format(start)); //$NON-NLS-1$
+        
+        return
+            new Program(
+                jc.Get("GetProgramDetails", params).getJSONObject("Program") //$NON-NLS-1$ //$NON-NLS-2$
+            );
         
     }
     
