@@ -394,13 +394,20 @@ public class RecDetailFragment extends Fragment {
                     activity.dismissLoadingDialog();
                 }
                 
-                if (rdf.embedded) {
-                    ((Recordings)activity).deleteRecording();
-                    if (!rdf.dualPane)
-                        rdf.getFragmentManager().popBackStack();
-                }
-                else
-                    activity.finish();
+                rdf.handler.post(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            if (rdf.embedded) {
+                                ((Recordings)activity).deleteRecording();
+                                if (!rdf.dualPane)
+                                    rdf.getFragmentManager().popBackStack();
+                            }
+                            else
+                                activity.finish();
+                        }
+                    }
+                );
                 
             }
         };
