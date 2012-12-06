@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/guidevscroll"
 	android:scrollbars="none"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
 	
 	<HorizontalScrollView
+	    android:id="@+id/guidehscroll"
 		android:scrollbars="none"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content">
