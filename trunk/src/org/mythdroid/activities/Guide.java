@@ -55,17 +55,24 @@ import android.app.TimePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.sax.EndTextElementListener;
 import android.util.Xml;
+import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.DatePicker;
+import android.widget.HorizontalScrollView;
+import android.widget.ScrollView;
+import android.widget.Scroller;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -118,15 +125,84 @@ public class Guide extends MDActivity {
     private Drawable
         recordedIcon = null, willRecordIcon = null, failedIcon = null,
         conflictIcon = null, otherIcon = null;
-
+    
+    private HorizontalScrollView hScroll       = null;
+    private ScrollView           vScroll       = null;
+    private GestureDetector      gDetector = null;
+    
     /**
     * Tweak colWidth to alter the visible width of the columns
     * Tweak rowHeight to alter the visible height of rows
     */
-    private int          colWidth, rowHeight, chanWidth;
+    private int          colWidth, rowHeight, chanWidth, hOff, vOff;
     
     private GuideService guideService;
+    
+    private class GuideGestureListener extends SimpleOnGestureListener {
+        
+        final private float minFlingSpeed  = 300 * scale;
+        private Scroller scroller          = new Scroller(ctx);
+        private MotionEvent lastDown       = null;
+        
+        private Runnable animateFling = new Runnable() {
+            @Override
+            public void run() {
+                if (scroller.isFinished())
+                    return;
+                boolean more = scroller.computeScrollOffset();
+                hScroll.scrollTo(scroller.getCurrX(), 0);
+                vScroll.scrollTo(0, scroller.getCurrY());
+                if (more)
+                    handler.post(this);
+            }
+        };
+        
+        @Override
+        public boolean onDown(MotionEvent me) {
+            // Save this down so we can send it on if it turns out to be a tap
+            lastDown = MotionEvent.obtain(me);
+            // Abort any in-progress flings
+            scroller.forceFinished(true);
+            return true;
+        }
+        
+        @Override
+        public boolean onSingleTapUp(MotionEvent me) {
+            // Dispatch both the down and up events to the view hierarchy
+            superDispatchTouchEvent(lastDown);
+            superDispatchTouchEvent(me);
+            return true;
+        }
 
+        @Override
+        public boolean onFling(
+            MotionEvent start, MotionEvent end, float vX, float vY
+        ) {
+            if (Math.abs(vX) < minFlingSpeed) vX = 0;
+            if (Math.abs(vY) < minFlingSpeed) vY = 0;
+            if (vX == 0 && vY == 0) return true;
+            int height = vScroll.getHeight();
+            int bottom = vScroll.getChildAt(0).getHeight();
+            int width  = hScroll.getWidth();
+            int right  = hScroll.getChildAt(0).getWidth();
+            scroller.fling(
+                hScroll.getScrollX(), vScroll.getScrollY(), (int)-vX, (int)-vY,
+                0, Math.max(0, right - width), 0, Math.max(0, bottom - height)
+            );
+            handler.post(animateFling);
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(
+            MotionEvent down, MotionEvent move, float dX, float dY
+        ) {
+            hScroll.scrollBy((int)dX, 0);
+            vScroll.scrollBy(0, (int)dY);
+            return true;
+        }
+    };
+          
     /** Get and sort the list of channels, add them to table in UI thread */
     final private Runnable getData = new Runnable() {
         @Override
@@ -136,65 +212,7 @@ public class Guide extends MDActivity {
             handler.post(
                 new Runnable() {
                     @Override
-                    public void run() {
-
-                        dismissLoadingDialog();
-
-                        tbl.addView(getHeader());
-                        // this is necessary to get proper layout
-                        tbl.addView(getSpacer());
-
-                        int j = 0;
-                        int maxChan = channels.size();
-
-                        for (int i = 0; i < maxChan; i++) {
-
-                            Channel current = channels.get(i);
-
-                            if (current.num.length() == 0)    continue;
-
-                            /*
-                             * MythTV 0.24 sometimes splits programs amongst
-                             * channels with different ids but the same num
-                             * and callsign.. :/
-                             */
-                            if (i < maxChan - 1) {
-
-                                // Luckily, they're always adjacent
-                                Channel next = channels.get(i+1);
-
-                                /* 
-                                 * See if the next channel has the same num
-                                 * and callsign
-                                 */
-                                if (
-                                    current.num.equals(next.num) &&
-                                    current.callSign.equals(next.callSign)
-                                ) {
-                                    /* 
-                                     * It does, add all our programs to it and
-                                     * skip the current channel
-                                     */
-                                    next.programs.addAll(current.programs);
-                                    continue;
-                                }
-
-                            }
-
-                            // Add a header every 7 rows
-                            if (j++ == 7) {
-                                tbl.addView(getHeader());
-                                j = 0;
-                            }
-
-                            // This became necessary in MythTV 0.24
-                            Collections.sort(current.programs);
-
-                            tbl.addView(getRowFromChannel(current));
-
-                        }
-
-                    }
+                    public void run() { displayGuideData(); }
                 }
            );
         }
@@ -238,11 +256,20 @@ public class Guide extends MDActivity {
             }
         };
 
-    @Override
+	@Override
     public void onCreate(Bundle icicle) {
 
         super.onCreate(icicle);
         setContentView(R.layout.guide);
+        
+        hScroll = (HorizontalScrollView)findViewById(R.id.guidehscroll);
+        vScroll = (ScrollView)findViewById(R.id.guidevscroll);
+        
+        Resources res = getResources();
+        
+        scale = res.getDisplayMetrics().density;
+        
+        gDetector = new GestureDetector(this, new GuideGestureListener());
         
         if (
             getWindowManager().getDefaultDisplay().getWidth()  > 1000 ||
@@ -255,7 +282,7 @@ public class Guide extends MDActivity {
         times = new long[numTimes + 1];
         hdrTimes = new String[numTimes / hdrSpan];
 
-        scale = getResources().getDisplayMetrics().density;
+        
         colWidth  = (int)(40  * scale + 0.5f);
         rowHeight = (int)(60  * scale + 0.5f);
         chanWidth = (int)(100 * scale + 0.5f);
@@ -281,11 +308,11 @@ public class Guide extends MDActivity {
         spacerLayout.width = colWidth;
         spacerLayout.span = 1;
 
-        recordedIcon = getResources().getDrawable(R.drawable.recorded);
-        willRecordIcon = getResources().getDrawable(R.drawable.willrecord);
-        failedIcon = getResources().getDrawable(R.drawable.failed);
-        conflictIcon = getResources().getDrawable(R.drawable.conflict);
-        otherIcon = getResources().getDrawable(R.drawable.other);
+        recordedIcon   = res.getDrawable(R.drawable.recorded);
+        willRecordIcon = res.getDrawable(R.drawable.willrecord);
+        failedIcon     = res.getDrawable(R.drawable.failed);
+        conflictIcon   = res.getDrawable(R.drawable.conflict);
+        otherIcon      = res.getDrawable(R.drawable.other);
 
         date.setTimeZone(TimeZone.getDefault());
         time.setTimeZone(TimeZone.getDefault());
@@ -300,7 +327,7 @@ public class Guide extends MDActivity {
             }
 
     }
-    
+	
     @Override
     public void onResume() {
         super.onResume();
@@ -311,6 +338,8 @@ public class Guide extends MDActivity {
     public void onPause() {
         super.onPause();
         Globals.removeThreadPoolTask(getData);
+        hOff = hScroll.getScrollX();
+        vOff = vScroll.getScrollY();
         tbl.removeAllViews();
         channels.clear();
     }
@@ -411,6 +440,15 @@ public class Guide extends MDActivity {
 
         }
 
+    }
+    
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent me) {
+        return gDetector.onTouchEvent(me);
+    }
+    
+    private boolean superDispatchTouchEvent(MotionEvent me) {
+        return super.dispatchTouchEvent(me);
     }
 
     /**
@@ -528,6 +566,86 @@ public class Guide extends MDActivity {
         } catch (IOException e) {
             ErrUtil.postErr(this, e);
         }
+
+    }
+    
+    private void displayGuideData() {
+        
+        dismissLoadingDialog();
+
+        tbl.addView(getHeader());
+        // this is necessary to get proper layout
+        tbl.addView(getSpacer());
+
+        int j = 0;
+        int maxChan = channels.size();
+
+        for (int i = 0; i < maxChan; i++) {
+
+            Channel current = channels.get(i);
+            if (current.num.length() == 0) continue;
+
+            /*
+             * MythTV 0.24 sometimes splits programs amongst
+             * channels with different ids but the same num
+             * and callsign.. :/
+             */
+            if (i < maxChan - 1) {
+
+                // Luckily, they're always adjacent
+                Channel next = channels.get(i+1);
+
+                /* 
+                 * See if the next channel has the same num
+                 * and callsign
+                 */
+                if (
+                    current.num.equals(next.num) &&
+                    current.callSign.equals(next.callSign)
+                ) {
+                    /* 
+                     * It does, add all our programs to it and
+                     * skip the current channel
+                     */
+                    next.programs.addAll(current.programs);
+                    continue;
+                }
+
+            }
+
+            // Add a header every 7 rows
+            if (j++ == 7) {
+                tbl.addView(getHeader());
+                j = 0;
+            }
+
+            // This became necessary in MythTV 0.24
+            Collections.sort(current.programs);
+            tbl.addView(getRowFromChannel(current));
+
+        }
+        
+        /* Restore the scroll position, we have to post this otherwise it
+           has no effect.. The delay might not be required, used as a safety */
+        if (hOff != 0)
+            hScroll.postDelayed(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        hScroll.scrollTo(hOff, 0);
+                    }
+                }, 25
+            );
+                
+        if (vOff != 0)
+            vScroll.postDelayed(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        vScroll.scrollTo(0, vOff);
+                    }
+                }, 25
+            );
 
     }
 
