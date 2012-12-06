@@ -377,17 +377,20 @@ public class Guide extends MDActivity {
             case DIALOG_DATE:
                 return new DatePickerDialog(this,
                     new OnDateSetListener() {
-                        private boolean done = false;
+                        private int Year = -1, Month = -1, Day = -1;
                         @Override
                         public void onDateSet(
                             DatePicker view, int year, int month, int day
                         ) {
-                            if (done) return;
+                            if (year == Year && month == Month && day == Day)
+                                return;
+                            Year  = year;
+                            Month = month;
+                            Day   = day;
                             now.setYear(year - 1900);
                             now.setMonth(month);
                             now.setDate(day);
                             displayGuide(now);
-                            done = true;
                         }
                     },
                     now.getYear() + 1900, now.getMonth(), now.getDate()
@@ -396,16 +399,17 @@ public class Guide extends MDActivity {
             case DIALOG_TIME:
                 return new TimePickerDialog(this,
                     new OnTimeSetListener() {
-                        private boolean done = false;
+                        private int Hour = -1, Min = -1;
                         @Override
                         public void onTimeSet(
                             TimePicker view, int hour, int min
                         ) {
-                            if (done) return;
+                            if (hour == Hour && min == Min) return;
+                            Hour = hour;
+                            Min  = min;
                             now.setHours(hour);
                             now.setMinutes(min);
                             displayGuide(now);
-                            done = true;
                         }
                     },
                     now.getHours(), now.getMinutes(), true
