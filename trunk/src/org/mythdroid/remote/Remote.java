@@ -82,8 +82,7 @@ public abstract class Remote extends MDActivity
         final private static int   SCROLL_LOCK_UNLOCKED = 0;
         final private static int   SCROLL_LOCK_X        = 1, SCROLL_LOCK_Y = 2;
 
-        private float              lastStartX           = 0;
-        private float              lastStartY           = 0;
+        private long               lastDown             = 0;
         private float              scrollMul            = 1;
         private float              scrolledX            = 0, scrolledY = 0;
         private int                scrollLock           = SCROLL_LOCK_UNLOCKED;
@@ -127,14 +126,12 @@ public abstract class Remote extends MDActivity
             MotionEvent start, MotionEvent end, float dX, float dY
         ) {
 
-            if (start == null || end == null)
-                return true;
+            if (end == null) return true;
             
-            if (
-                start.getRawX() != lastStartX ||
-                start.getRawY() != lastStartY
-            ) {
-                resetScroll(start, dX, dY, SCROLL_LOCK_UNLOCKED);
+            long downTime = end.getDownTime();
+            
+            if (downTime != lastDown) {
+                resetScroll(downTime, SCROLL_LOCK_UNLOCKED);
                 return true;
             }
 
@@ -145,14 +142,13 @@ public abstract class Remote extends MDActivity
 
             float absX = Math.abs(scrolledX);
             float absY = Math.abs(scrolledY);
-            long elapsed = end.getEventTime() - start.getEventTime();
+            long elapsed = end.getEventTime() - end.getDownTime();
 
             // fast = fling
-            if (absX / elapsed > maxScrollSpeed) {
-                fling = true;
-                return true;
-            }
-            if (absY / elapsed > maxScrollSpeed) {
+            if (
+                absX / elapsed > maxScrollSpeed ||
+                absY / elapsed > maxScrollSpeed
+            ) {
                 fling = true;
                 return true;
             }
@@ -162,7 +158,7 @@ public abstract class Remote extends MDActivity
                 absX > wobble &&
                 ((scrolledX > 0.0 && dX < 0.0) || (scrolledX < 0.0 && dX > 0.0))
             ) {
-                resetScroll(null, dX, 0, SCROLL_LOCK_X);
+                resetScroll(downTime, SCROLL_LOCK_X);
                 absX = Math.abs(scrolledX);
                 absY = 0;
             }
@@ -171,7 +167,7 @@ public abstract class Remote extends MDActivity
                 absY > wobble &&
                 ((scrolledY > 0.0 && dY < 0.0) || (scrolledY < 0.0 && dY > 0.0))
             ) {
-                resetScroll(null, 0, dY, SCROLL_LOCK_Y);
+                resetScroll(downTime, SCROLL_LOCK_Y);
                 absX = 0;
                 absY = Math.abs(scrolledY);
             }
@@ -206,15 +202,10 @@ public abstract class Remote extends MDActivity
 
         }
 
-        private void resetScroll(
-            MotionEvent start, float dX, float dY, int lock
-        ) {
-            if (start != null) {
-                lastStartX = start.getRawX();
-                lastStartY = start.getRawY();
-            }
-            scrolledX = dX;
-            scrolledY = dY;
+        private void resetScroll(long downTime, int lock) {
+            lastDown = downTime;
+            scrolledX = 0;
+            scrolledY = 0;
             scrollMul = 1;
             scrollLock = lock;
             fling = false;
