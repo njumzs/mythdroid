@@ -62,8 +62,7 @@ public abstract class MDListActivity extends ListActivity {
     final static int MENU_FRONTEND = 0;
 
     /** Frontend chooser and loading dialogs */
-    final protected static int
-        FRONTEND_CHOOSER = -1, DIALOG_LOAD = -2;
+    final protected static int FRONTEND_CHOOSER = -1, DIALOG_LOAD = -2;
     final protected Context ctx = this;
     
     private Handler handler = new Handler();
@@ -174,6 +173,7 @@ public abstract class MDListActivity extends ListActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         Reflection.setThreadPolicy();
+        Reflection.setActionHomeEnabled(this);
     }
     
     @Override
@@ -236,7 +236,7 @@ public abstract class MDListActivity extends ListActivity {
 
     private void prepareFrontendDialog(final Dialog dialog) {
 
-        ArrayList<String> list = DatabaseUtil.getFrontendNames(this);
+        final ArrayList<String> list = DatabaseUtil.getFrontendNames(this);
 
         if (hereActivity != null || nextActivity == null)
             list.add(Messages.getString("MDActivity.0")); // Here //$NON-NLS-1$
@@ -337,7 +337,11 @@ public abstract class MDListActivity extends ListActivity {
             Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.setCurFe
         ).setIcon(drawable.ic_menu_upload_you_tube);
      
-        if (MenuItemCompat.setShowAsAction(item, 2)) {
+        if (
+            MenuItemCompat.setShowAsAction(
+                item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS
+            )
+        ) {
             
             ActionView vi = (ActionView) LayoutInflater.from(this).inflate(
                 R.layout.frontend_indicator, null
@@ -355,7 +359,7 @@ public abstract class MDListActivity extends ListActivity {
                 }
             );
             
-            frontendIndicator = (TextView) vi.findViewById(R.id.actionItemText);
+            frontendIndicator = (TextView)vi.findViewById(R.id.actionItemText);
             updateFrontendIndicator();
     
             MenuItemCompat.setActionView(item, vi);
