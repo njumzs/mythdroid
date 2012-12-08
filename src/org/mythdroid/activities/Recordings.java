@@ -25,10 +25,12 @@ import java.util.Collections;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.resource.Messages;
+import org.mythdroid.util.DatabaseUtil;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.data.Program;
 import org.mythdroid.fragments.RecDetailFragment;
 import org.mythdroid.fragments.RecListFragment;
+import org.mythdroid.frontend.WakeOnLan;
 
 
 import android.R.drawable;
@@ -42,10 +44,14 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 /**
  * MDFragmentActivity, shows list of Recordings
@@ -57,10 +63,11 @@ public class Recordings extends MDFragmentActivity {
     /** The topmost visible view in the recordings list */
     public int visibleIndex = 0;
     
-    final private static int FILTER_DIALOG  = 0;
+    final private static int FILTER_DIALOG  = 0, WAKE_FRONTEND = 1;
 
     final private static int
-        MENU_REFRESH   = 1, MENU_FILTER = 2, MENU_FILTER_RESET = 3;
+        MENU_REFRESH   = 1, MENU_FILTER = 2, MENU_FILTER_RESET = 3,
+        MENU_WAKE = 4;
     
     final private Handler handler = new Handler();
     
@@ -164,75 +171,53 @@ public class Recordings extends MDFragmentActivity {
     
     @Override
     public Dialog onCreateDialog(int id) {
-        
-        OnClickListener no = new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        };
 
         switch (id) {
-
-            case FILTER_DIALOG:
-
-                final ArrayList<String> titles = new ArrayList<String>();
-
-                if (recordings == null)
-                    return new AlertDialog.Builder(this)
-                        .setTitle(R.string.filterRec)
-                        .setMessage(R.string.noRecs)
-                        .setPositiveButton(R.string.ok, no)
-                        .create();
-                
-                RECORDINGSLOOP: for (Program prog : recordings) {
-                    for (String title : titles)
-                        if (title.compareToIgnoreCase(prog.Title) == 0)
-                            continue RECORDINGSLOOP;
-                    titles.add(prog.Title);
-                }
-
-                Collections.sort(titles);
-
-                return
-                    new AlertDialog.Builder(this)
-                        .setTitle(R.string.filterRec)
-                        .setAdapter(
-                            new ArrayAdapter<String>(
-                                this, R.layout.simple_list_item_1, titles
-                            ),
-                            new OnClickListener() {
-                                @Override
-                                public void onClick(
-                                    DialogInterface dialog, int which
-                                ) {
-                                    dialog.dismiss();
-                                    filter = titles.get(which);
-                                    refresh();
-                                }
-
-                            }
-                        )
-                        .create();
-   
+            case FILTER_DIALOG: return createFilterDialog();
+            case WAKE_FRONTEND: return createWakeDialog();
             default:
                 return super.onCreateDialog(id);
-
         }
+    }
+    
+    @Override
+    public void onPrepareDialog(int id, final Dialog dialog) {
+        if (id == WAKE_FRONTEND) {
+            prepareWakeDialog(dialog);
+            return;
+        }
+        super.onPrepareDialog(id, dialog);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_REFRESH, Menu.NONE, R.string.refresh)
+                .setIcon(R.drawable.ic_menu_refresh),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
+        
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_FILTER, Menu.NONE, R.string.filter)
+                .setIcon(drawable.ic_menu_search),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
+        
+        MenuItemCompat.setShowAsAction(
+            menu.add(
+                Menu.NONE, MENU_FILTER_RESET, Menu.NONE, R.string.resetFilter
+            ).setIcon(drawable.ic_menu_revert),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
+        
         addFrontendChooser(menu); 
-
-        menu.add(Menu.NONE, MENU_REFRESH, Menu.NONE, R.string.refresh)
-            .setIcon(R.drawable.ic_menu_refresh);
-        menu.add(Menu.NONE, MENU_FILTER, Menu.NONE, R.string.filter)
-            .setIcon(drawable.ic_menu_search);
-        menu.add(Menu.NONE, MENU_FILTER_RESET, Menu.NONE, R.string.resetFilter)
-            .setIcon(drawable.ic_menu_revert);
+        
+        menu.add(Menu.NONE, MENU_WAKE, Menu.NONE, R.string.wakeFe)
+            .setIcon(drawable.ic_lock_power_off);
+        
         return true;
+        
     }
 
     @Override
@@ -252,6 +237,9 @@ public class Recordings extends MDFragmentActivity {
             case MENU_FILTER_RESET:
                 filter = null;
                 refresh();
+                return true;
+            case MENU_WAKE:
+                showDialog(WAKE_FRONTEND);
                 return true;
         }
 
@@ -359,5 +347,101 @@ public class Recordings extends MDFragmentActivity {
         fm.executePendingTransactions();
 
     }
+    
+    private Dialog createFilterDialog() {
+        
+        final ArrayList<String> titles = new ArrayList<String>();
+
+        OnClickListener no = new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        };
+        
+        if (recordings == null)
+            return new AlertDialog.Builder(this)
+                .setTitle(R.string.filterRec)
+                .setMessage(R.string.noRecs)
+                .setPositiveButton(R.string.ok, no)
+                .create();
+        
+        RECORDINGSLOOP: for (Program prog : recordings) {
+            for (String title : titles)
+                if (title.compareToIgnoreCase(prog.Title) == 0)
+                    continue RECORDINGSLOOP;
+            titles.add(prog.Title);
+        }
+
+        Collections.sort(titles);
+
+        return
+            new AlertDialog.Builder(this)
+                .setTitle(R.string.filterRec)
+                .setAdapter(
+                    new ArrayAdapter<String>(
+                        this, R.layout.simple_list_item_1, titles
+                    ),
+                    new OnClickListener() {
+                        @Override
+                        public void onClick(
+                            DialogInterface dialog, int which
+                        ) {
+                            dialog.dismiss();
+                            filter = titles.get(which);
+                            refresh();
+                        }
+
+                    }
+                )
+                .create();
+        
+    }
+    
+    private Dialog createWakeDialog() {
+
+        final AlertDialog d = new AlertDialog.Builder(ctx)
+            .setItems(new String[] {}, null)
+            .setIcon(drawable.ic_lock_power_off)
+            .setTitle(R.string.wakeFe)
+            .create();
+
+        d.getListView().setOnItemClickListener(
+            new OnItemClickListener() {
+                @Override
+                public void onItemClick(
+                    AdapterView<?> av, View v, int pos, long id
+                ) {
+                    String name = (String)av.getAdapter().getItem(pos);
+                    try {
+                        WakeOnLan.wake(
+                            DatabaseUtil.getFrontendHwAddr(ctx, name)
+                        );
+                        Globals.curFe = name;
+                    } catch (Exception e) { ErrUtil.err(ctx, e); }
+                    d.dismiss();
+                }
+            }
+        );
+
+        return d;
+
+    }
+
+    private void prepareWakeDialog(final Dialog dialog) {
+
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+            ctx, R.layout.simple_list_item_1, DatabaseUtil.getFrontendNames(ctx)
+        );
+
+        if (adapter.getCount() < 1) {
+            ErrUtil.errDialog(ctx, dialog, R.string.noFes, WAKE_FRONTEND);
+            return;
+        }
+
+        ((AlertDialog)dialog).getListView().setAdapter(adapter);
+
+    }
+
     
 }

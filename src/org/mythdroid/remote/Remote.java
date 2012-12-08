@@ -31,7 +31,6 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
-import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
@@ -265,7 +264,7 @@ public abstract class Remote extends MDActivity
         super.onPause();
         
         boolean screenOn = false;
-        if (VERSION.SDK_INT >= 7 && pm != null)
+        if (pm != null)
             screenOn = Reflection.rPowerManager.isScreenOn(pm);
         if (
             wakeMessenger == null || wakeConnection == null ||

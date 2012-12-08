@@ -60,6 +60,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.KeyEvent;
@@ -615,10 +616,16 @@ public class TVRemote extends Remote {
             .setIcon(drawable.ic_menu_add);
         menu.add(Menu.NONE, MENU_GESTURE, Menu.NONE, R.string.gestIface)
             .setIcon(R.drawable.ic_menu_finger);
-        menu.add(Menu.NONE, MENU_OSDMENU, Menu.NONE, R.string.osdMenu)
-            .setIcon(drawable.ic_menu_more);
-        menu.add(Menu.NONE, MENU_MOVE, Menu.NONE, R.string.moveTo)
-            .setIcon(drawable.ic_menu_upload_you_tube);
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_OSDMENU, Menu.NONE, R.string.osdMenu)
+                .setIcon(drawable.ic_menu_more),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_MOVE, Menu.NONE, R.string.moveTo)
+                .setIcon(drawable.ic_menu_upload_you_tube),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
         return true;
     }
 

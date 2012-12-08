@@ -38,6 +38,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -238,8 +239,11 @@ public class NavRemote extends Remote {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_MENU, Menu.NONE, R.string.menu)
-            .setIcon(drawable.ic_menu_more);
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_MENU, Menu.NONE, R.string.menu)
+                .setIcon(drawable.ic_menu_more),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
         menu.add(Menu.NONE, MENU_BUTTON, Menu.NONE, R.string.btnIface)
             .setIcon(android.R.drawable.ic_menu_add);
         menu.add(Menu.NONE, MENU_GESTURE, Menu.NONE, R.string.gestIface)

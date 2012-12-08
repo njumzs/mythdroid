@@ -43,6 +43,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.view.MenuItemCompat;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -300,18 +301,38 @@ public class MusicRemote extends Remote {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_SHUFFLE, Menu.NONE, R.string.shuffle)
-            .setIcon(R.drawable.ic_menu_refresh);
-        menu.add(Menu.NONE, MENU_REPEAT, Menu.NONE, R.string.repeat)
-            .setIcon(drawable.ic_menu_revert);
-        menu.add(Menu.NONE, MENU_VISUALISE, Menu.NONE, R.string.visualiser)
-            .setIcon(drawable.ic_menu_upload_you_tube);
-        menu.add(Menu.NONE, MENU_CHANGE_VISUAL, Menu.NONE, R.string.chVisual)
-            .setIcon(drawable.ic_menu_slideshow);
-        menu.add(Menu.NONE, MENU_EDIT, Menu.NONE, R.string.plEdit)
-            .setIcon(drawable.ic_menu_edit);
-        menu.add(Menu.NONE, MENU_OSDMENU, Menu.NONE, R.string.osdMenu)
-            .setIcon(drawable.ic_menu_more);
+        
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_SHUFFLE, Menu.NONE, R.string.shuffle)
+                .setIcon(R.drawable.ic_menu_refresh),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_REPEAT, Menu.NONE, R.string.repeat)
+                .setIcon(drawable.ic_menu_revert),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_EDIT, Menu.NONE, R.string.plEdit)
+                .setIcon(drawable.ic_menu_edit),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_OSDMENU, Menu.NONE, R.string.osdMenu)
+                .setIcon(drawable.ic_menu_more),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_VISUALISE, Menu.NONE, R.string.visualiser)
+            .setIcon(drawable.ic_menu_upload_you_tube),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_CHANGE_VISUAL, Menu.NONE, R.string.chVisual)
+                .setIcon(drawable.ic_menu_slideshow),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
+        
         return true;
     }
 
