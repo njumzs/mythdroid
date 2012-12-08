@@ -44,6 +44,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -260,17 +261,27 @@ public class Main extends MDListActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        addFrontendChooser(menu);
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_NAV, Menu.NONE, R.string.remote)
+                .setIcon(drawable.ic_menu_compass),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
 
-        menu.add(Menu.NONE, MENU_SETTINGS, Menu.NONE, R.string.settings)
-            .setIcon(drawable.ic_menu_preferences);
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_SETTINGS, Menu.NONE, R.string.settings)
+                .setIcon(drawable.ic_menu_preferences),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
+        
+        addFrontendChooser(menu);
+        
         menu.add(Menu.NONE, MENU_WAKE, Menu.NONE, R.string.wakeFe)
             .setIcon(drawable.ic_lock_power_off);
-        menu.add(Menu.NONE, MENU_NAV, Menu.NONE, R.string.remote)
-            .setIcon(drawable.ic_menu_compass);
         menu.add(Menu.NONE, MENU_MDD, Menu.NONE, R.string.mddCmds)
             .setIcon(drawable.ic_menu_agenda);
+        
         return true;
+        
     }
 
     /** Handle pop-up menu item selection */
@@ -394,7 +405,9 @@ public class Main extends MDListActivity implements
                 ) {
                     String name = (String)av.getAdapter().getItem(pos);
                     try {
-                        WakeOnLan.wake(DatabaseUtil.getFrontendHwAddr(ctx, name));
+                        WakeOnLan.wake(
+                            DatabaseUtil.getFrontendHwAddr(ctx, name)
+                        );
                         Globals.curFe = name;
                     } catch (Exception e) { ErrUtil.err(ctx, e); }
                     d.dismiss();

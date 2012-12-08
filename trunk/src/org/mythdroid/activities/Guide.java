@@ -60,6 +60,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.sax.EndTextElementListener;
+import android.support.v4.view.MenuItemCompat;
 import android.util.Xml;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.GestureDetector;
@@ -346,26 +347,32 @@ public class Guide extends MDActivity {
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_DATE, Menu.NONE, R.string.chStartDate)
-            .setIcon(drawable.ic_menu_today);
-        menu.add(Menu.NONE, MENU_TIME, Menu.NONE, R.string.chStartTime)
-            .setIcon(drawable.ic_menu_recent_history);
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_DATE, Menu.NONE, R.string.chStartDate)
+                .setIcon(drawable.ic_menu_today),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
+        MenuItemCompat.setShowAsAction(
+            menu.add(Menu.NONE, MENU_TIME, Menu.NONE, R.string.chStartTime)
+                .setIcon(drawable.ic_menu_recent_history),
+            MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+        );
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
+        
         switch (item.getItemId()) {
             case MENU_DATE:
                 showDialog(DIALOG_DATE);
-                break;
+                return true;
             case MENU_TIME:
                 showDialog(DIALOG_TIME);
-                break;
+                return true;
         }
 
-        return true;
+        return super.onOptionsItemSelected(item);
 
     }
 
