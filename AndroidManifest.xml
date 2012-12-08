@@ -3,7 +3,7 @@
     package="org.mythdroid"
     android:versionCode="63" android:versionName="0.6.3">
     
-    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="12"/>
+    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="17"/>
     
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
@@ -18,7 +18,8 @@
     <uses-permission android:name="android.permission.READ_LOGS"/>
     
 	<application android:name=".MythDroid"
-	     android:icon="@drawable/logo" android:label="@string/appName">
+	     android:icon="@drawable/logo" android:label="@string/appName"
+	     android:largeHeap="true" android:allowBackup="true">
       	
       	<receiver android:name=".receivers.PhoneStateReceiver">
         	<intent-filter>
@@ -38,7 +39,7 @@
         
         <activity android:name=".activities.Main" 
         	android:label="@string/appName"
-        	android:configChanges="keyboardHidden|orientation">
+        	android:configChanges="keyboardHidden|orientation|screenSize">
           <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -47,11 +48,11 @@
                
         <activity android:name=".activities.Recordings" 
         	android:label="Recordings"
-        	android:configChanges="keyboardHidden|orientation"/>
+        	android:configChanges="keyboardHidden|orientation|screenSize"/>
         	
         <activity android:name=".activities.RecordingDetail" 
         	android:label="Program Details"
-        	android:configChanges="keyboardHidden|orientation"/>
+        	android:configChanges="keyboardHidden|orientation|screenSize"/>
         	
         <activity android:name=".activities.Prefs" 
         	android:label="@string/appName"/>
@@ -61,36 +62,36 @@
         	
        	<activity android:name=".activities.Videos" 
         	android:label="Videos"
-        	android:configChanges="keyboardHidden|orientation"/>
+        	android:configChanges="keyboardHidden|orientation|screenSize"/>
         	
        	<activity android:name=".activities.VideoDetail" 
         	android:label="Video Details"
-        	android:configChanges="keyboardHidden|orientation"/>
+        	android:configChanges="keyboardHidden|orientation|screenSize"/>
         	
         <activity android:name=".activities.VideoPlayer" 
         	android:screenOrientation="landscape"
         	android:theme="@style/MDFullScreen"
-        	android:configChanges="keyboardHidden|orientation"/>
+        	android:configChanges="keyboardHidden|orientation|screenSize"/>
                 	
         <activity android:name=".activities.Status" 
         	android:label="Status"
-        	android:configChanges="keyboardHidden|orientation"/>
+        	android:configChanges="keyboardHidden|orientation|screenSize"/>
           	
         <activity android:name=".activities.Guide" 
         	android:theme="@style/MDNoTitle"
-        	android:configChanges="keyboardHidden|orientation"/>
+        	android:configChanges="keyboardHidden|orientation|screenSize"/>
         	        	        	
         <activity android:name=".remote.NavRemote" 
        		android:theme="@style/MDNoTitle"
-       		android:configChanges="keyboardHidden|orientation"/>
+       		android:configChanges="keyboardHidden|orientation|screenSize"/>
        		
         <activity android:name=".remote.TVRemote" 
         	android:theme="@style/MDNoTitle"
-        	android:configChanges="keyboardHidden|orientation"/>
+        	android:configChanges="keyboardHidden|orientation|screenSize"/>
         	
        	<activity android:name=".remote.MusicRemote" 
         	android:theme="@style/MDNoTitle"
-        	android:configChanges="keyboardHidden|orientation"/>
+        	android:configChanges="keyboardHidden|orientation|screenSize"/>
         	
     </application>
     
