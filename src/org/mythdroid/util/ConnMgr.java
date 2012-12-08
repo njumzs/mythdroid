@@ -817,15 +817,19 @@ public class ConnMgr {
                 return;
         }
         
-        sock.setSoTimeout(localtimeout);
+        synchronized (sockLock) {
+            if (sock == null) return;
+            sock.setSoTimeout(localtimeout);
+        }
 
     }
     
     private void restoreReadTimeout() throws SocketException { 
         
-        if (sock == null || timeOutModifier == timeOut.INFINITE) return;
-        
-        sock.setSoTimeout(timeout);
+        synchronized (sockLock) {
+            if (sock == null || timeOutModifier == timeOut.INFINITE) return;
+            sock.setSoTimeout(timeout);
+        }
         timeOutModifier = timeOut.DEFAULT;
         
     }
