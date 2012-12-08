@@ -62,9 +62,10 @@ public abstract class MDActivity extends Activity {
     final static int MENU_FRONTEND = 0;
 
     /** Frontend chooser and loading dialogs */
-    final protected static int
-        FRONTEND_CHOOSER = -1, DIALOG_LOAD = -2;
+    final protected static int FRONTEND_CHOOSER = -1, DIALOG_LOAD = -2;
     final protected Context ctx = this;
+    
+    private Handler handler = new Handler();
 
     /**
      * The activity we are on the way to when the frontend chooser dialog
@@ -79,8 +80,6 @@ public abstract class MDActivity extends Activity {
         new HashMap<String, Integer>();
     final private HashMap<String, String> stringExtras =
         new HashMap<String, String>();
-    
-    private Handler handler = new Handler();
 
     /** ActionBar Indicator for Frontend */
     private TextView frontendIndicator = null;
@@ -169,17 +168,18 @@ public abstract class MDActivity extends Activity {
                 super.onPrepareDialog(id, dialog);
         }
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        updateFrontendIndicator();
-    }
     
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         Reflection.setThreadPolicy();
+        Reflection.setActionHomeEnabled(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateFrontendIndicator();
     }
     
     @Override
@@ -197,7 +197,7 @@ public abstract class MDActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            final Intent intent = new Intent(this, Main.class);
+            Intent intent = new Intent(this, Main.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             return true;
@@ -337,7 +337,11 @@ public abstract class MDActivity extends Activity {
             Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.setCurFe
         ).setIcon(drawable.ic_menu_upload_you_tube);
      
-        if (MenuItemCompat.setShowAsAction(item, 2)) {
+        if (
+            MenuItemCompat.setShowAsAction(
+                item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS
+            )
+        ) {
             
             ActionView vi = (ActionView) LayoutInflater.from(this).inflate(
                 R.layout.frontend_indicator, null

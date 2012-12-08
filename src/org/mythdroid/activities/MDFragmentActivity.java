@@ -178,6 +178,12 @@ public abstract class MDFragmentActivity extends FragmentActivity {
     }
     
     @Override
+    public void onCreate(Bundle icicle) {
+        super.onCreate(icicle);
+        Reflection.setActionHomeEnabled(this);
+    }
+    
+    @Override
     public void onResume() {
         super.onResume();
         
@@ -401,7 +407,11 @@ public abstract class MDFragmentActivity extends FragmentActivity {
             Menu.NONE, MENU_FRONTEND, Menu.NONE, R.string.setCurFe
         ).setIcon(drawable.ic_menu_upload_you_tube);
      
-        if (MenuItemCompat.setShowAsAction(item, 2)) {
+        if (
+            MenuItemCompat.setShowAsAction(
+                item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS
+            )
+        ) {
             
             ActionView vi = (ActionView) LayoutInflater.from(this).inflate(
                 R.layout.frontend_indicator, null
@@ -423,7 +433,7 @@ public abstract class MDFragmentActivity extends FragmentActivity {
             updateFrontendIndicator();
     
             MenuItemCompat.setActionView(item, vi);
-        
+            
         }
           
     }
