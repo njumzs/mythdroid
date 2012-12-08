@@ -569,8 +569,7 @@ public class RecEditFragment extends Fragment {
         else {
             /* We need to use the program start time, not that of the rule
                Strange, but true because of the implementation of 
-               AddRecordSchedule in the services api
-            */
+               AddRecordSchedule in the services api */
             rule.startTime = prog.StartTime;
             
             // New recording, fill in some sensible defaults
@@ -600,11 +599,14 @@ public class RecEditFragment extends Fragment {
             beMgr.reschedule(recid);
         } catch (IOException e) { ErrUtil.postErr(activity, e); }
         
-        if (prog.Status != RecStatus.RECORDED)
-            ((RecDetailFragment)
-                getFragmentManager()
-                    .findFragmentByTag("RecDetailFragment") //$NON-NLS-1$
-            ).refresh();
+        if (prog.Status != RecStatus.RECORDED) {
+            RecDetailFragment rdf =
+                ((RecDetailFragment)
+                    getFragmentManager()
+                        .findFragmentByTag("RecDetailFragment")); //$NON-NLS-1$
+            if (rdf != null)
+                rdf.refresh();
+        }
         
     }
 
