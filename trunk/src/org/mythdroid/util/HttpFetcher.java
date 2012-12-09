@@ -147,8 +147,11 @@ public class HttpFetcher {
         
         resp = client.execute(new HttpGet(uri));
         int code = resp.getStatusLine().getStatusCode(); 
-        if (code != 200) 
+        if (code != 200) {
+            resp.getEntity().consumeContent();
             throw new IOException(Messages.getString("HttpFetcher.0") + code); //$NON-NLS-1$
+        }
+            
         entity = resp.getEntity();
     }
     
@@ -163,8 +166,10 @@ public class HttpFetcher {
         
         resp = client.execute(req);
         int code = resp.getStatusLine().getStatusCode(); 
-        if (code != 200) 
+        if (code != 200) {
+            resp.getEntity().consumeContent();
             throw new IOException(Messages.getString("HttpFetcher.0") + code); //$NON-NLS-1$
+        }
         entity = resp.getEntity();
         
     }
