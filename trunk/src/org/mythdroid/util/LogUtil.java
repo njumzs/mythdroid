@@ -9,6 +9,8 @@ import android.util.Log;
  */
 public class LogUtil {
     
+    final private static int maxMsgLen = 300;    
+    
     /**
      * Send a message to the device log if debug is enabled
      * @param msg message content
@@ -18,7 +20,7 @@ public class LogUtil {
             return;
         String caller = 
             Thread.currentThread().getStackTrace()[3].getClassName();
-        Log.d(caller.substring(caller.lastIndexOf('.') + 1), msg);
+        Log.d(caller.substring(caller.lastIndexOf('.') + 1), limit(msg));
     }
     
     /**
@@ -30,7 +32,7 @@ public class LogUtil {
         
         Log.e(
             "MythDroid",  //$NON-NLS-1$
-            msg + " in " + ste.getMethodName() + " at line " +  //$NON-NLS-1$ //$NON-NLS-2$
+            limit(msg) + " in " + ste.getMethodName() + " at line " +  //$NON-NLS-1$ //$NON-NLS-2$
                 ste.getLineNumber() + " of " + ste.getFileName() //$NON-NLS-1$
         );
     }
@@ -44,7 +46,7 @@ public class LogUtil {
         
         Log.w(
             "MythDroid",  //$NON-NLS-1$
-            msg + " in " + ste.getMethodName() + " at line " +  //$NON-NLS-1$ //$NON-NLS-2$
+            limit(msg) + " in " + ste.getMethodName() + " at line " +  //$NON-NLS-1$ //$NON-NLS-2$
                 ste.getLineNumber() + " of " + ste.getFileName() //$NON-NLS-1$
         );
     }
@@ -64,6 +66,12 @@ public class LogUtil {
                     .append(elems[i].getLineNumber()).append(")\n"); //$NON-NLS-1$
         }
         Log.e(msg, st.toString().trim());
+    }
+    
+    private static String limit(String msg) {
+        if (msg.length() <= maxMsgLen)
+            return msg;
+        return msg.substring(0, maxMsgLen) + " ..."; //$NON-NLS-1$
     }
         
 }
