@@ -66,39 +66,39 @@ public class ConnectivityReceiver extends BroadcastReceiver {
             " state " + state //$NON-NLS-1$
         );
 
-        /* Ignore irrelevant connectivity changes */
+        // Ignore irrelevant connectivity changes
         if (
-            connected &&
-            netType == ConnectivityManager.TYPE_WIFI &&
-            (
-                type == ConnectivityManager.TYPE_MOBILE ||
-                (
-                    type == ConnectivityManager.TYPE_WIFI &&
-                    state == State.CONNECTED
-                )
-             )
+            // We already knew we were connected via this type
+            (connected && state == State.CONNECTED && netType == type)    ||
+            // We don't care about disconnections if we're not using that type
+            (connected && state == State.DISCONNECTED && type != netType)
         )
             return;
 
-        /* We've lost connectivity - disconnect all */
-        if (state == State.DISCONNECTED) {
-
-            try {
-                ConnMgr.disconnectAll();
-            } catch (IOException e) {}
-
-            connected = false;
-            return;
+        switch (state) {
+            case DISCONNECTED:
+                LogUtil.debug("Disconnected"); //$NON-NLS-1$
+                try {
+                    ConnMgr.disconnectAll();
+                } catch (IOException e) {}
+                connected = false;
+                break;
+            case CONNECTED:
+                boolean typeChanged = netType != type;
+                netType = type;
+                connected = true;
+                if (!typeChanged) {
+                    LogUtil.debug("Reconnected"); //$NON-NLS-1$
+                    // We've regained connectivity - attempt to reconnect
+                    ConnMgr.reconnectAll();
+                    break;
+                }
+                LogUtil.debug("Connected with change of type"); //$NON-NLS-1$
+                // Change of connectivity type, disconnect
+                try {
+                    ConnMgr.disconnectAll();
+                } catch (IOException e) {}
         }
-
-        if (state != State.CONNECTED)
-            return;
-
-        /* We've regained connectivity - attempt to reconnect */
-        netType = type;
-        connected = true;
-
-        ConnMgr.reconnectAll();
 
     }
 
@@ -135,13 +135,14 @@ public class ConnectivityReceiver extends BroadcastReceiver {
                 ctx.getSystemService(Context.WIFI_SERVICE);
 
         NetworkInfo winfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (winfo == null) return;
         
-        if (winfo == null)
-            return;
+        final NetworkInfo info = cm.getActiveNetworkInfo();
+        if (info == null) return;
         
-        connected = (winfo.getState() == NetworkInfo.State.CONNECTED);
-        netType   = winfo.getType();
-
+        connected = (info.getState() == NetworkInfo.State.CONNECTED);
+        netType = info.getType();
+        
         int wifiState = wm.getWifiState();
 
         if (

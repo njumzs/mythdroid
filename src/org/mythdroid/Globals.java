@@ -195,6 +195,8 @@ public class Globals {
         if (beMgr != null && beMgr.isConnected())
             return beMgr;
         
+        muxConns = false;
+        
         boolean mobile = ConnectivityReceiver.networkType() ==
                              ConnectivityManager.TYPE_MOBILE;
         
@@ -220,20 +222,33 @@ public class Globals {
         if (beMgr != null && beMgr.isConnected()) return beMgr;
         
         // If we're not on wifi, maybe there's a ssh tunnel we can use?
-        if (mobile)
+        if (mobile) {
             try {
                 beMgr = new BackendManager("localhost"); //$NON-NLS-1$
-            } catch (IOException e) {}
-        
-        if (beMgr != null && beMgr.isConnected()) return beMgr;
+            } catch (IOException e) {}        
+            if (beMgr != null && beMgr.isConnected()) return beMgr;
+        }
         
         // See if we can locate a backend via UPnP
-        beMgr = new BackendManager(
-            getUPnPListener().findMasterBackend(950)
-        );
-        muxConns = false;
-
-        return beMgr;
+        try {
+            beMgr = new BackendManager(
+                getUPnPListener().findMasterBackend(950)
+            );
+        } catch (IOException e) {}
+        
+        if (beMgr != null && beMgr.isConnected()) {
+            muxConns = false;
+            return beMgr;
+        }
+        
+        // See if we can use a muxed connection to the specified backend        
+        if (backend != null && testMuxConn()) {
+            muxConns = true;
+            beMgr = new BackendManager(backend);
+            return beMgr;
+        }
+        
+        throw new IOException(Messages.getString("BackendManager.2")); //$NON-NLS-1$
 
     }
     
