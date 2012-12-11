@@ -129,7 +129,7 @@ public class MovePlaybackHelper {
         
         final AlertDialog d = new AlertDialog.Builder(ctx)
         .setItems(new String[] {}, null)
-        .setIcon(drawable.ic_menu_upload_you_tube)
+        .setIcon(R.drawable.move_to)
         .setTitle(R.string.chFe)
         .create();
 

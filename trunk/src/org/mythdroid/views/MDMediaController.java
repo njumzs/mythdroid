@@ -33,7 +33,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.PopupWindow;
@@ -57,8 +56,7 @@ public class MDMediaController extends MediaController {
     private String               title;
     private int                  duration;
     private boolean              showing, dragging;
-    private ImageButton          pauseButton;
-    private Button               moveToButton;
+    private ImageButton          pauseButton, moveToButton;
     private AudioManager         audioMgr;
     private StringBuilder        sb;
     private Formatter            formatter;
@@ -292,7 +290,7 @@ public class MDMediaController extends MediaController {
         }
         
         if (moveToListener != null)
-            moveToButton = (Button)v.findViewById(R.id.mctrlMoveTo);
+            moveToButton = (ImageButton)v.findViewById(R.id.mctrlMoveTo);
             if (moveToButton != null)
                 moveToButton.setOnClickListener(moveToListener);
 
