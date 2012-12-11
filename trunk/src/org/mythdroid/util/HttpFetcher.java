@@ -140,19 +140,26 @@ public class HttpFetcher {
     /**
      * Fetch a URL
      * @param uri URI to fetch
-     * @throws ClientProtocolException
      * @throws IOException
      */
     public void get(URI uri) throws IOException {
-        
-        resp = client.execute(new HttpGet(uri));
-        int code = resp.getStatusLine().getStatusCode(); 
-        if (code != 200) {
-            resp.getEntity().consumeContent();
-            throw new IOException(Messages.getString("HttpFetcher.0") + code); //$NON-NLS-1$
+        try {
+            resp = client.execute(new HttpGet(uri));
+            int code = resp.getStatusLine().getStatusCode(); 
+            if (code != 200)
+                throw new IOException(
+                    Messages.getString("HttpFetcher.0") + code //$NON-NLS-1$
+                );
+        } catch (IOException e) {
+            if (resp != null)
+                if ((entity = resp.getEntity()) != null)
+                    entity.consumeContent();
+            entity = null;
+            throw(e);
         }
             
         entity = resp.getEntity();
+        
     }
     
     /**
@@ -164,12 +171,21 @@ public class HttpFetcher {
     public void request(HttpUriRequest req)
         throws ClientProtocolException, IOException {
         
-        resp = client.execute(req);
-        int code = resp.getStatusLine().getStatusCode(); 
-        if (code != 200) {
-            resp.getEntity().consumeContent();
-            throw new IOException(Messages.getString("HttpFetcher.0") + code); //$NON-NLS-1$
+        try {
+            resp = client.execute(req);
+            int code = resp.getStatusLine().getStatusCode(); 
+            if (code != 200)
+                throw new IOException(
+                    Messages.getString("HttpFetcher.0") + code //$NON-NLS-1$
+                );
+        } catch (IOException e) {
+            if (resp != null)
+                if ((entity = resp.getEntity()) != null)
+                    entity.consumeContent();
+            entity = null;
+            throw(e);
         }
+        
         entity = resp.getEntity();
         
     }
