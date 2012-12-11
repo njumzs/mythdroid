@@ -168,8 +168,7 @@ public class HttpFetcher {
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public void request(HttpUriRequest req)
-        throws ClientProtocolException, IOException {
+    public void request(HttpUriRequest req) throws IOException {
         
         try {
             resp = client.execute(req);
