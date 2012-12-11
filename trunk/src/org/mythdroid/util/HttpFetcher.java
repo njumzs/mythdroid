@@ -256,7 +256,8 @@ public class HttpFetcher {
         
         final InputStream is = new BufferedHttpEntity(entity).getContent();
         final BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inScaled = false;
+        opts.inScaled    = false;
+        opts.inPurgeable = true;
         final Bitmap bm = BitmapFactory.decodeStream(is, null, opts);
         is.close();
         entity.consumeContent();
