@@ -28,6 +28,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import android.graphics.Bitmap;
+
 /**
  * A synchronised, in-memory cache implemented with SoftReferences
  * @param <K> key, identifies a cached item 
@@ -146,8 +148,15 @@ public class MemCache<K,V> extends AbstractMap<K,V> {
     
     private void clean() {
         Reference<? extends V> sv;
-        while ((sv = queue.poll()) != null) 
+        while ((sv = queue.poll()) != null) { 
+            SoftReference<V> sr = hash.get(sv);
+            if (sr != null) {
+                V val = sr.get();
+                if (val != null && Bitmap.class.isInstance(val))
+                    ((Bitmap)val).recycle();
+            }
             hash.remove(sv);
+        }
     }
     
 }
