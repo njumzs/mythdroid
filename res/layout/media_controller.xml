@@ -52,7 +52,7 @@
         android:layout_marginBottom="6dp"
         android:src="@drawable/pause" />
     
-    <Button
+    <ImageButton
         android:id="@+id/mctrlMoveTo"
         style="@style/MDButtonNormal"
         android:layout_width="wrap_content"
@@ -61,9 +61,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="6dp"
         android:layout_marginRight="6dp"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:text="@string/moveTo"/>
+        android:src="@drawable/move_to" />
     
     <RelativeLayout android:id="@+id/mctrlTopPanel"
         android:layout_width="match_parent" 

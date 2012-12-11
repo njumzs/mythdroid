@@ -623,7 +623,7 @@ public class TVRemote extends Remote {
         );
         MenuItemCompat.setShowAsAction(
             menu.add(Menu.NONE, MENU_MOVE, Menu.NONE, R.string.moveTo)
-                .setIcon(drawable.ic_menu_upload_you_tube),
+                .setIcon(R.drawable.move_to),
             MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
         );
         return true;
