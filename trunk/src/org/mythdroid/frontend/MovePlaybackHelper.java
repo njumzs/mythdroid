@@ -34,7 +34,6 @@ import org.mythdroid.util.ErrUtil;
 import org.mythdroid.views.MDVideoView;
 import org.mythdroid.vlc.VLCRemote;
 
-import android.R.drawable;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
