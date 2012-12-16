@@ -73,11 +73,17 @@ public class JSONClient {
             return Request(new HttpGet(CreateURI(path, query)));
         } catch (URISyntaxException e) {
             ErrUtil.logErr(e);
-            return null;
+            ErrUtil.report(e);
+            throw new IOException(e.getMessage());
         } catch (IllegalStateException e) {
             ErrUtil.logErr(e);
             ErrUtil.report(e);
-            return null;
+            throw new IOException(e.getMessage());
+        } catch (OutOfMemoryError e) {
+            System.gc();
+            ErrUtil.logErr(e.getMessage());
+            ErrUtil.report(e.getMessage());
+            throw new IOException(e.getMessage());
         }
     }
     
@@ -93,11 +99,17 @@ public class JSONClient {
             return Request(new HttpPost(CreateURI(path, query)));
         } catch (URISyntaxException e) {
             ErrUtil.logErr(e);
-            return null;
+            ErrUtil.report(e);
+            throw new IOException(e.getMessage());
         } catch (IllegalStateException e) {
             ErrUtil.logErr(e);
             ErrUtil.report(e);
-            return null;
+            throw new IOException(e.getMessage());
+        } catch (OutOfMemoryError e) {
+            System.gc();
+            ErrUtil.logErr(e.getMessage());
+            ErrUtil.report(e.getMessage());
+            throw new IOException(e.getMessage());
         }
     }
     
@@ -132,7 +144,7 @@ public class JSONClient {
             );
         } catch (ClientProtocolException e) {
             ErrUtil.logErr(e);
-            return null;
+            throw new IOException(e.getMessage());
         }
         
         LogUtil.debug("JSON response: " + res); //$NON-NLS-1$
@@ -141,7 +153,7 @@ public class JSONClient {
             return new JSONObject(res);
         } catch (JSONException e) {
             ErrUtil.logErr(e);
-            return null;
+            throw new IOException(e.getMessage());
         }
     
     }
