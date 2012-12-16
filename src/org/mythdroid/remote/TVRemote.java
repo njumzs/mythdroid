@@ -831,10 +831,7 @@ public class TVRemote extends Remote {
                         } catch (IOException e) { 
                             ErrUtil.err(ctx, e);
                             return; 
-                        }  catch (IllegalArgumentException e) {
-                            ErrUtil.reportErr(ctx, e);
-                            return;
-                        }
+                        }  catch (IllegalArgumentException e) { return; }
                         if (loc.end <= 0) return;
                         progress = (loc.end * progress) / 1000;
                     }
