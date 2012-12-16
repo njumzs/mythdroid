@@ -84,44 +84,44 @@ import android.widget.TableRow.LayoutParams;
 @SuppressLint("SimpleDateFormat")
 public class Guide extends MDActivity {
 
-    /**
-     * A resultCode that child activities should set via setResult() to tell
-     * Guide to refresh when they finish
-     */
     final private static int MENU_DATE    = 0, MENU_TIME = 1;
     final private static int DIALOG_DATE  = 0, DIALOG_TIME = 1;
 
     final private static Pattern catPat = Pattern.compile("[\\s/-]"); //$NON-NLS-1$
     
-    /**
-     * Change numHours to configure how many hours are displayed at a time 
-     * This value is doubled for devices with one screen dimension > 1000 pixels 
-     */
-    private static int       numHours = 2, numTimes;
-    final private static int colMins  = 5, hdrSpan = 6;
-
-    private Date             now = null,   later = null;
-
-    /** ArrayList of channel objects, capacity ensured during XML parsing */
-    private ArrayList<Channel> channels = new ArrayList<Channel>();
-
-	final private SimpleDateFormat
+    final private SimpleDateFormat
         date = new SimpleDateFormat("d MMM yy"), //$NON-NLS-1$
         time = new SimpleDateFormat("HH:mm"); //$NON-NLS-1$
-    
+
     final private LayoutParams
         rowLayout     = new LayoutParams(), chanLayout    = new LayoutParams(),
         hdrDateLayout = new LayoutParams(), hdrTimeLayout = new LayoutParams(),
         spacerLayout  = new LayoutParams();
 
     final private Handler handler = new Handler();
-
+    
+    final private static int colMins  = 5, hdrSpan = 6;
+    
+    /** ArrayList of channel objects, capacity ensured during XML parsing */
+    private ArrayList<Channel> channels = new ArrayList<Channel>();
+    
+    /**
+     * Change numHours to configure how many hours are displayed at a time 
+     * This value is doubled for devices with one screen dimension > 1000 pixels 
+     */
+    private int          numHours  = 2, numTimes;
+    private Date         now       = null,   later = null;
     private long[]       times     = null;
     private String[]     hdrTimes  = null;
     private String       hdrDate   = null;
     private TableLayout  tbl       = null;
     /** Scale factor for pixel values for different display densities */
     private float        scale     = 1;
+    /**
+     * Tweak colWidth to alter the visible width of the columns
+     * Tweak rowHeight to alter the visible height of rows
+     */
+    private int          colWidth, rowHeight, chanWidth, hOff, vOff;
     
     private Drawable
         recordedIcon = null, willRecordIcon = null, failedIcon = null,
@@ -129,15 +129,8 @@ public class Guide extends MDActivity {
     
     private HorizontalScrollView hScroll       = null;
     private ScrollView           vScroll       = null;
-    private GestureDetector      gDetector = null;
-    
-    /**
-    * Tweak colWidth to alter the visible width of the columns
-    * Tweak rowHeight to alter the visible height of rows
-    */
-    private int          colWidth, rowHeight, chanWidth, hOff, vOff;
-    
-    private GuideService guideService;
+    private GestureDetector      gDetector     = null;
+    private GuideService         guideService  = null;
     
     private class GuideGestureListener extends SimpleOnGestureListener {
         
@@ -145,11 +138,11 @@ public class Guide extends MDActivity {
         private Scroller scroller          = new Scroller(ctx);
         private MotionEvent lastDown       = null;
         
+        // A runnable that animates flings by scrolling the scroll views
         private Runnable animateFling = new Runnable() {
             @Override
             public void run() {
-                if (scroller.isFinished())
-                    return;
+                if (scroller.isFinished()) return;
                 boolean more = scroller.computeScrollOffset();
                 hScroll.scrollTo(scroller.getCurrX(), 0);
                 vScroll.scrollTo(0, scroller.getCurrY());
@@ -179,17 +172,21 @@ public class Guide extends MDActivity {
         public boolean onFling(
             MotionEvent start, MotionEvent end, float vX, float vY
         ) {
+            // Check it was fast enough
             if (Math.abs(vX) < minFlingSpeed) vX = 0;
             if (Math.abs(vY) < minFlingSpeed) vY = 0;
+            // Check for noop
             if (vX == 0 && vY == 0) return true;
             int height = vScroll.getHeight();
             int bottom = vScroll.getChildAt(0).getHeight();
             int width  = hScroll.getWidth();
             int right  = hScroll.getChildAt(0).getWidth();
+            // Set the scroller going
             scroller.fling(
                 hScroll.getScrollX(), vScroll.getScrollY(), (int)-vX, (int)-vY,
                 0, Math.max(0, right - width), 0, Math.max(0, bottom - height)
             );
+            // Animate the fling
             handler.post(animateFling);
             return true;
         }
@@ -526,6 +523,8 @@ public class Guide extends MDActivity {
             return;
         }
 
+        // No services api - use MythXML
+        
         XMLHandler handler = new XMLHandler("GetProgramGuideResponse"); //$NON-NLS-1$
         Element root = handler.rootElement();
 
