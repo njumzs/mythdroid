@@ -501,7 +501,7 @@ sub getKey() {
     my $addr  = $client->sockhost;
     my $paddr = $client->peerhost;
 
-    unless (defined $paddr && exists $config{key}) {
+    unless (defined $paddr && $addr ne $paddr && exists $config{key}) {
         sendMsg("ERROR");
         return;
     }
@@ -723,6 +723,14 @@ sub streamFile($) {
     $log->dbg("Streaming - resolved path is $file");
 
     my $cmd = $stream_cmd;
+
+    # The default demuxer doesn't support get_length et al in ts
+    if (
+        $file =~ /\.mpg$/ || $file =~ /\.mpeg$/ ||
+        $file =~ /\.ts$/ || $file =~ /\.m2ts$/
+    ) {
+        $cmd =~ s/vlc /vlc --demux avformat /;
+    }
 
     # Limit maximum resolution
     $width  = 1024 if $width  > 1024;
