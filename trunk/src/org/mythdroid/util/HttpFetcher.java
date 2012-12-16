@@ -51,7 +51,9 @@ public class HttpFetcher {
              bm = new HttpFetcher(uri, Globals.muxConns).getImage();
          } catch (IOException e) { 
              ErrUtil.logWarn(e);
-         } catch (OutOfMemoryError e) { 
+         } catch (OutOfMemoryError e) {
+             System.gc();
+             ErrUtil.report(e.getMessage());
              ErrUtil.logWarn(e.getMessage());
          }
          
