@@ -365,9 +365,7 @@ public class RecEditFragment extends Fragment {
         
     }
 
-    /**
-     * Check for changes that child fragments might have made
-     */
+    /** Check for changes that child fragments might have made */
     public void checkChildren() {
         if (prog == null) return;
         if (resf != null && !resf.isEnabled())

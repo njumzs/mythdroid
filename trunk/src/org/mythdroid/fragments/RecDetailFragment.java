@@ -57,7 +57,7 @@ import android.widget.TextView;
 
 /**
  * Shows a Recording's details.
- * Allows user to stop, delete or play the recording
+ * Allows user to stop, delete, edit or play the recording
  */
 public class RecDetailFragment extends Fragment {
     

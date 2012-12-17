@@ -29,9 +29,7 @@ import org.mythdroid.Enums.RecDupMethod;
 import org.mythdroid.Enums.RecType;
 import org.mythdroid.services.Params;
 
-/**
- * Represents a recording rule
- */
+/** Represents a recording rule */
 public class RecordingRule {
     
     @SuppressWarnings("javadoc")
