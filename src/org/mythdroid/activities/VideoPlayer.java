@@ -85,6 +85,7 @@ public class VideoPlayer extends MDActivity {
     private MovePlaybackHelper moveHelper = null;
     private String         title          = null;
     
+    // OnFrontendReady callback for "moveTo"
     final private OnFrontendReady onReady = new OnFrontendReady() {
         @Override
         public void onFrontendReady(String name) {
@@ -97,6 +98,7 @@ public class VideoPlayer extends MDActivity {
         }
     };
     
+    // OnPlaybackMoved callback for "moveTo"
     final private OnPlaybackMoved onMoved = new OnPlaybackMoved() {
         @Override
         public void onPlaybackMoved() { finish(); }
@@ -112,6 +114,7 @@ public class VideoPlayer extends MDActivity {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         showDialog(DIALOG_QUALITY);
         moveHelper = new MovePlaybackHelper(this, onReady, onMoved);
+        // We don't use HLS yet
         if (Globals.haveServices() && false) 
             try {
                 contentService = new ContentService(Globals.getBackend().addr);
@@ -134,7 +137,7 @@ public class VideoPlayer extends MDActivity {
                     vlc.disconnect();
                 } catch (IOException e) { ErrUtil.err(ctx, e); }
         }
-        else
+        else if (contentService != null)
             contentService.RemoveStream(streamInfo.id);
     }
 
@@ -208,7 +211,7 @@ public class VideoPlayer extends MDActivity {
         return d;
     }
 
-    @SuppressWarnings("unused")
+    /** Ask for the stream to be started and start up our media player */
     private void startStream() {
 
         showLoadingDialog();
@@ -223,8 +226,9 @@ public class VideoPlayer extends MDActivity {
             String path = null, sg = null;
             int id = -1;
             
-            /** MythTV HLS is really low bitrate and seeking isn't supported */
-            if (false && Globals.haveServices() && contentService != null) {
+            /* HLS is disabled in onCreate() -
+               MythTV HLS is really low bitrate and seeking isn't supported */
+            if (Globals.haveServices() && contentService != null) {
 
                 if (intent.hasExtra(Extras.VIDEOID.toString())) {
                     id = intent.getIntExtra(Extras.VIDEOID.toString(), -1);
@@ -247,6 +251,7 @@ public class VideoPlayer extends MDActivity {
                 }
 
             }
+            // Stream via MDD / VLC
             else {
             
                 if (intent.hasExtra(Extras.FILENAME.toString())) {
@@ -262,7 +267,7 @@ public class VideoPlayer extends MDActivity {
                         return;
                     }
                     title = prog.Title;
-                    path = prog.Path;
+                    path  = prog.Path;
                     if (prog.StorGroup != null)
                         sg = prog.StorGroup;
                     else
@@ -297,6 +302,7 @@ public class VideoPlayer extends MDActivity {
 
     }
     
+    /** Get a VLC remote */
     private VLCRemote getVLC() {
         
         int attempts = 0;
@@ -326,6 +332,7 @@ public class VideoPlayer extends MDActivity {
         finish();
     }
     
+    /** Prepare and startup the media player */
     private void playVideo() {
             
         if (streamInfo != null)
@@ -351,6 +358,7 @@ public class VideoPlayer extends MDActivity {
             url = Uri.parse("rtsp://" + sdpAddr + ":5554/stream"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         
+        // Check to see if we're using an external player
         if (
             PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("streamExternalPlayer", false) //$NON-NLS-1$
@@ -388,6 +396,7 @@ public class VideoPlayer extends MDActivity {
                         }
                         return false;
                     }
+                    // Try again
                     if (mp != null)  mp.reset();
                     retries++;
                     showLoadingDialog();
@@ -407,6 +416,7 @@ public class VideoPlayer extends MDActivity {
         if (streamInfo == null)
             videoView.setVLC(getVLC());
         
+        // Do we need to seek the stream?
         if (seekTo != 0 && !doneSeek) {
             if (vlc == null) { 
                 initError(Messages.getString("VideoPlayer.2")); //$NON-NLS-1$
@@ -421,6 +431,7 @@ public class VideoPlayer extends MDActivity {
             doneSeek = true;
         }
         
+        // Add our custom media controller 
         MDMediaController mctrl = new MDMediaController(ctx);
         mctrl.setTitle(title);
         mctrl.setMoveToListener(
@@ -476,6 +487,7 @@ public class VideoPlayer extends MDActivity {
         
     }
     
+    /** Setup the MediaPlayer */
     private void setupMediaPlayer(final MediaPlayer mp) {
         
         mp.setOnVideoSizeChangedListener(

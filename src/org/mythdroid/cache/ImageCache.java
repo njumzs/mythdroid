@@ -48,6 +48,7 @@ public class ImageCache {
      * Constructor
      * @param name name of the cache
      * @param memCapacity maximum capacity of MemCache in bytes
+     * @param memMaxSize maximum size of image to cache in memory in bytes
      * @param diskMaxSize maximum size of disk backed cache in bytes
      */
     public ImageCache(
@@ -112,9 +113,7 @@ public class ImageCache {
         return ret;
     }
     
-    /**
-     * Clean up internal resources employed by the ImageCache
-     */
+    /** Clean up internal resources employed by the ImageCache */
     public void shutdown() {
         runDiskCacheThread = false;
         if (diskCacheThread == null) {
@@ -127,6 +126,7 @@ public class ImageCache {
         } catch (InterruptedException e) {}
         diskCacheThread = null;
         runDiskCacheThread = true;
+        memCache.evictAll();
     }
     
     private void newDiskCacheThread() {

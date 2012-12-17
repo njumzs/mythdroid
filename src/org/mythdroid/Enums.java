@@ -497,12 +497,14 @@ public class Enums {
 
     }
     
+    /** Types of artwork */
     public enum ArtworkType {
         coverart,
         fanart,
         banner;
     }
     
+    /** Types of playback location in the frontend services api */
     public enum PlaybackLocation {
         None,
         WatchingPreRecorded, 

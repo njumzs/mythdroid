@@ -205,9 +205,7 @@ public class VideoDetail extends MDActivity {
                 showDialog(FRONTEND_CHOOSER);
                 return true;
         }
-
         return super.onOptionsItemSelected(item);
-
     }
     
     private void setBackground(final Video video, final View v) {

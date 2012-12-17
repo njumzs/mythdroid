@@ -171,7 +171,6 @@ public class Recordings extends MDFragmentActivity {
     
     @Override
     public Dialog onCreateDialog(int id) {
-
         switch (id) {
             case FILTER_DIALOG: return createFilterDialog();
             case WAKE_FRONTEND: return createWakeDialog();
@@ -255,9 +254,7 @@ public class Recordings extends MDFragmentActivity {
         return recordings != null && !recordings.isEmpty();
     }
     
-    /**
-     * Empty the recordings list
-     */
+    /** Empty the recordings list */
     public void empty() {
         Globals.removeThreadPoolTask(getRecordings);
         if (recordings != null)
@@ -265,18 +262,14 @@ public class Recordings extends MDFragmentActivity {
         recordings = null;
     }
 
-    /**
-     * Refresh the recordings list
-     */
+    /** Refresh the recordings list */
     public void refresh() {
         empty();
         showLoadingDialog();
         Globals.runOnThreadPool(getRecordings);
     }
     
-    /**
-     * Remove a recording from the list
-     */
+    /** Remove a recording from the list */
     public void deleteRecording() {
         if (checkedIndex >= recordings.size()) return;
         recordings.remove(checkedIndex);

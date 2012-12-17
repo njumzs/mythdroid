@@ -78,34 +78,20 @@ public class Videos extends MDActivity implements
                and there shouldn't be anything else in the queue (we hope!) */
             Globals.removeAllThreadPoolTasks();
 
-            if (!Globals.haveServices()) {
-                String addr = null;
-                try {
+            try {
+                if (!Globals.haveServices()) {
+                    String addr = null;
                     addr = Globals.getBackend().addr;
-                } catch (IOException e) {
-                    dismissLoadingDialog();
-                    ErrUtil.postErr(ctx, e);
-                    finish();
-                    return;
-                }
-                try {
                     videos = MDDManager.getVideos(addr, viddir, tmppath);
-                } catch (IOException e) {
-                    dismissLoadingDialog();
-                    ErrUtil.postErr(ctx, e);
-                    finish();
-                    return;
                 }
-            }
-            else
-                try {
+                else
                     videos = videoService.getVideos(tmppath);
-                } catch (IOException e) {
-                    dismissLoadingDialog();
-                    ErrUtil.postErr(ctx, e);
-                    finish();
-                    return;
-                }
+            } catch (IOException e) {
+                dismissLoadingDialog();
+                ErrUtil.postErr(ctx, e);
+                finish();
+                return;
+            }
             
             for (final Video vid : videos) {
                 
@@ -200,13 +186,15 @@ public class Videos extends MDActivity implements
     @Override
     public void onResume() {
         super.onResume();
-        synchronized (initLock) {
-            while (videoService == null && !isFinishing())
-                try {
-                    initLock.wait();
-                } catch (InterruptedException e) {}
-            refresh(); 
-        }
+        // Wait until we have a videoService
+        if (Globals.haveServices())
+            synchronized (initLock) {
+                while (videoService == null && !isFinishing())
+                    try {
+                        initLock.wait();
+                    } catch (InterruptedException e) {}
+            }
+        refresh(); 
     }
 
     @Override
