@@ -211,11 +211,12 @@ public class RecEditFragment extends Fragment {
                             activity.dismissLoadingDialog();
                         }
                         prog.RecID = -1;
-                        if (prog.Status != RecStatus.RECORDED)
+                        RecDetailFragment rdf =
                             ((RecDetailFragment)
                                 getFragmentManager()
-                                    .findFragmentByTag("RecDetailFragment") //$NON-NLS-1$
-                            ).refresh();
+                                    .findFragmentByTag("RecDetailFragment")); //$NON-NLS-1$
+                        if (rdf != null)
+                            rdf.refresh();
                         handler.post(doneRunnable);
                         return;
                     }

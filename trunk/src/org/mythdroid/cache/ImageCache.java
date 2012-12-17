@@ -25,6 +25,7 @@ import java.util.NoSuchElementException;
 import org.mythdroid.util.LogUtil;
 
 import android.graphics.Bitmap;
+import android.support.v4.util.LruCache;
 
 /**
  * A two level cache for images.
@@ -39,19 +40,18 @@ public class ImageCache {
     static private Thread diskCacheThread = null;
     static private boolean runDiskCacheThread = true;
     
-    private MemCache<String, Bitmap> memCache = null;
+    private LruCache<String, Bitmap> memCache = null;
     private ImageDiskCache diskCache = null;
     private long memMax = 0;
         
     /**
      * Constructor
      * @param name name of the cache
-     * @param memCapacity initial capacity of MemCache in bytes
-     * @param memMaxCapacity maximum capacity of MemCache in bytes
+     * @param memCapacity maximum capacity of MemCache in bytes
      * @param diskMaxSize maximum size of disk backed cache in bytes
      */
     public ImageCache(
-        String name, int memCapacity, int memMaxCapacity, long memMaxSize, int diskMaxSize
+        String name, long memCapacity, long memMaxSize, int diskMaxSize
     ) {
         try {
             diskCache = new ImageDiskCache(name, diskMaxSize);
@@ -62,7 +62,13 @@ public class ImageCache {
         if (diskCache != null && diskCacheThread == null)
             newDiskCacheThread();
         
-        memCache = new MemCache<String, Bitmap>(memCapacity, memMaxCapacity);
+        memCache =
+            new LruCache<String, Bitmap>((int)memCapacity) {
+                @Override
+                protected int sizeOf(String key, Bitmap value) {
+                    return value.getRowBytes() * value.getHeight();
+                }
+            };
         
         memMax = memMaxSize;
         
@@ -82,9 +88,7 @@ public class ImageCache {
                 queue.add(
                     new Runnable() {
                         @Override
-                        public void run() {
-                            diskCache.put(k, value);
-                        }
+                        public void run() { diskCache.put(k, value); }
                     }
                 );
                 queue.notify();
@@ -164,6 +168,7 @@ public class ImageCache {
         diskCacheThread.start();
     }
     
+    /** Normalise a URL by removing protocol strings and bad characters */
     private String normalise(final String key) {
         
         int i = 0;

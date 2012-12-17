@@ -79,7 +79,8 @@ public class Globals {
     }
     /** An ImageCache for artwork */
     public static ImageCache artCache = new ImageCache(
-        "artwork", 32, 64, Runtime.getRuntime().maxMemory() / 16, 1024*1024*128 //$NON-NLS-1$
+        "artwork", Runtime.getRuntime().maxMemory() / 4, //$NON-NLS-1$
+        Runtime.getRuntime().maxMemory() / 16, 1024*1024*128
     );
     
     /** To remember where we were */
@@ -164,9 +165,11 @@ public class Globals {
             if ((name = DatabaseUtil.getFirstFrontendName(ctx)) == null)
                 throw new IOException(Messages.getString("Globals.1")); //$NON-NLS-1$
             feMgr = 
-                new FrontendManager(name, DatabaseUtil.getFirstFrontendAddr(ctx));
+                new FrontendManager(
+                    name, DatabaseUtil.getFirstFrontendAddr(ctx)
+                );
         }
-        
+        // Check if the current frontend is set to 'Here'
         else if (name.equals(Messages.getString("MDActivity.0"))) //$NON-NLS-1$
             throw new IOException(Messages.getString("Globals.0")); //$NON-NLS-1$
 
@@ -195,10 +198,12 @@ public class Globals {
         if (beMgr != null && beMgr.isConnected())
             return beMgr;
         
+        // Reset muxConns
         muxConns = false;
         
-        boolean mobile = ConnectivityReceiver.networkType() ==
-                             ConnectivityManager.TYPE_MOBILE;
+        boolean mobile =
+            ConnectivityReceiver.networkType() ==
+                ConnectivityManager.TYPE_MOBILE;
         
         /* SSH port forwarding or not connected to wifi? 
            Mux conns via MDD's CMux if possible */
@@ -253,7 +258,8 @@ public class Globals {
     }
     
     /**
-     * Set the timezone of the backend we're connected to
+     * Setup the global Date formatters with a given timezone, which would
+     * usually be obtained from the backend we're connected to
      * @param zone String containing name of the timezone
      */
     public static void setBackendTimezone(String zone) {
@@ -272,7 +278,7 @@ public class Globals {
 
     /**
      * Run a Runnable on the background worker thread
-     * Runnable's will be run one-at-a-time in the order they are submitted
+     * Runnable's will be run consecutively in the order they are submitted
      */
     public static void runOnWorker(final Runnable r) {
         if (wHandler == null)
@@ -378,7 +384,7 @@ public class Globals {
     
     /**
      * Check whether the supplied address has already been checked for updates
-     * mark it so if not
+     * and mark it so if not
      * @param addr address to check
      * @return true if already checked, false otherwise
      */

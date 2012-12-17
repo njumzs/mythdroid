@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mythdroid.cache.MemCache;
 import org.mythdroid.data.Video;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
@@ -35,15 +34,13 @@ public class VideoService {
     
     private JSONClient jc = null;
     private JSONArray  ja = null;
-    private MemCache<Integer, Video> videoCache = null;
     
     /**
-     * Construct a client for the Content service
+     * Construct a client for the Video service
      * @param addr IP address or hostname of server
      */
     public VideoService(String addr) {
         jc = new JSONClient(addr, "Video"); //$NON-NLS-1$
-        videoCache = new MemCache<Integer, Video>(20, 100);
     }
     
     /**
@@ -95,15 +92,12 @@ public class VideoService {
             try {
                 
                 Video vid = null;
-                
-                if ((vid = videoCache.get(i)) == null) {
-                    try {
-                        vid = new Video(ja.getJSONObject(i));
-                        videoCache.put(i, vid);
-                    } catch (IllegalArgumentException e) {
-                        ErrUtil.logWarn(e);
-                        continue;
-                    }
+            
+                try {
+                    vid = new Video(ja.getJSONObject(i));
+                } catch (IllegalArgumentException e) {
+                    ErrUtil.logWarn(e);
+                    continue;
                 }
                 
                 if (!subdir.equals("ROOT") && !vid.filename.startsWith(subdir)) //$NON-NLS-1$

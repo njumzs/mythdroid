@@ -26,23 +26,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mythdroid.Globals;
 import org.mythdroid.Enums.ArtworkType;
-import org.mythdroid.cache.MemCache;
 import org.mythdroid.data.StreamInfo;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.LogUtil;
 
 import android.graphics.Bitmap;
+import android.support.v4.util.LruCache;
 
-/** An implementation of the Guide service */
+/** An implementation of the Content service */
 public class ContentService {
     
-    static private MemCache<String, String> artUrlCache =
-        new MemCache<String,String>(10, 40);
+    static private LruCache<String, String> artUrlCache =
+        new LruCache<String,String>(32);
     
     private JSONClient  jc = null;
     
     /**
-     * Construct a client for the Guide service
+     * Construct a client for the Content service
      * @param addr IP address or hostname of server
      */
     public ContentService(String addr) {

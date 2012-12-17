@@ -23,14 +23,12 @@ import java.text.ParseException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mythdroid.cache.MemCache;
 import org.mythdroid.data.RecordingRule;
 import org.mythdroid.util.LogUtil;
 
-/** An implementation of the Myth service */
+/** An implementation of the Dvr service */
 public class DvrService {
     
-    private MemCache<Integer, RecordingRule> recRuleCache = null;
     private JSONClient jc = null;
     
     /**
@@ -39,7 +37,6 @@ public class DvrService {
      */
     public DvrService(String addr) {
         jc = new JSONClient(addr, "Dvr"); //$NON-NLS-1$
-        recRuleCache = new MemCache<Integer, RecordingRule>(5, 10);
     }
     
     /**
@@ -50,10 +47,6 @@ public class DvrService {
     public RecordingRule getRecRule(int id) 
         throws JSONException, ParseException {
 
-       if (recRuleCache.containsKey(id)) {
-           return recRuleCache.get(id);
-       }
-       
        JSONObject jo = null;
        
        try {
@@ -72,11 +65,7 @@ public class DvrService {
            return null;
        }
        
-       final RecordingRule rule = new RecordingRule(jo);
-       
-       recRuleCache.put(id, rule);
-    
-       return rule;
+       return new RecordingRule(jo);
         
     }
 
@@ -90,7 +79,6 @@ public class DvrService {
             "RemoveRecordSchedule", //$NON-NLS-1$
             new Params("RecordId", String.valueOf(recid)) //$NON-NLS-1$
         );
-        recRuleCache.remove(recid);
     }
     
     /**
@@ -107,10 +95,7 @@ public class DvrService {
         if (jo == null) return -1;
         
         try {
-            int id = jo.getInt("int"); //$NON-NLS-1$
-            if (id != -1)
-                recRuleCache.put(id, rule);
-            return id;
+            return jo.getInt("int"); //$NON-NLS-1$
         } catch (JSONException e) {
             LogUtil.debug(e.getMessage());
             return -1;

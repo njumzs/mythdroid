@@ -152,7 +152,7 @@ public class Video {
      */
     public Bitmap getArtwork(ArtworkType type, float x, float y) {
        
-        Bitmap bm = Video.getArtwork(id, type, x, y, coverfile);
+        Bitmap bm = getArtwork(id, type, x, y, coverfile);
         if (bm == null) return null;
         
         if (type == ArtworkType.coverart)
