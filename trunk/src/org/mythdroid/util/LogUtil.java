@@ -69,7 +69,7 @@ public class LogUtil {
     }
     
     private static String limit(String msg) {
-        if (msg.length() <= maxMsgLen)
+        if (msg == null || msg.length() <= maxMsgLen)
             return msg;
         return msg.substring(0, maxMsgLen) + " ..."; //$NON-NLS-1$
     }
