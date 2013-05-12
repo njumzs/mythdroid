@@ -81,7 +81,11 @@ public class FrontendLocation {
          "util_menu.xml",               "Utilities",                    //$NON-NLS-1$ //$NON-NLS-2$
          "tv_lists.xml",                "TV Lists",                     //$NON-NLS-1$ //$NON-NLS-2$
          "manage_recordings.xml",       "Manage Recordings",            //$NON-NLS-1$ //$NON-NLS-2$
-         "tv_schedule.xml",             "Schedule Recordings"           //$NON-NLS-1$ //$NON-NLS-2$
+         "tv_schedule.xml",             "Schedule Recordings",          //$NON-NLS-1$ //$NON-NLS-2$
+         "playlistview",                "Music Playlists",              //$NON-NLS-1$ //$NON-NLS-2$
+         "playlisteditorview",          "Music Playlist Editor",        //$NON-NLS-1$ //$NON-NLS-2$
+         "searchview",                  "Music Search",                 //$NON-NLS-1$ //$NON-NLS-2$
+         "visualizerview",              "Music Visualizer"              //$NON-NLS-1$ //$NON-NLS-2$
     };
 
     /**
@@ -103,10 +107,7 @@ public class FrontendLocation {
             parsePlaybackLoc(loc);
         else {
             niceLocation = getNiceLocation(loc);
-            if (loc.equals("playmusic"))  //$NON-NLS-1$
-                music = true;
-            else if (loc.equals("musicplaylists")) //$NON-NLS-1$
-                musiceditor = true;
+            setMusicLocation(loc);
         }
 
         LogUtil.debug(
@@ -131,10 +132,7 @@ public class FrontendLocation {
         if (location.equals("idle")) { //$NON-NLS-1$
             location = state.getString("currentlocation"); //$NON-NLS-1$
             niceLocation = getNiceLocation(location);
-            if (location.equals("playmusic"))  //$NON-NLS-1$
-                music = true;
-            else if (location.equals("musicplaylists")) //$NON-NLS-1$
-                musiceditor = true;
+            setMusicLocation(location);            
             return;
         }
         
@@ -183,6 +181,22 @@ public class FrontendLocation {
         if (loc.startsWith("error")) return "Error"; //$NON-NLS-1$ //$NON-NLS-2$
         if (locations.containsKey(loc)) return locations.get(loc);
         return "Unknown"; //$NON-NLS-1$
+    }
+    
+    private void setMusicLocation(String loc) {
+        if (
+            location.equals("playmusic") || //$NON-NLS-1$
+            location.equals("playlistview") || //$NON-NLS-1$
+            location.equals("searchview") || //$NON-NLS-1$
+            location.equals("visualizerview") //$NON-NLS-1$
+        )
+            music = true;
+        
+        if (
+            location.equals("musicplaylists") || //$NON-NLS-1$
+            location.equals("playlisteditorview") //$NON-NLS-1$
+        )
+            musiceditor = true;
     }
 
     private void parsePlaybackLoc(String loc) throws IllegalArgumentException {
