@@ -79,11 +79,12 @@ public class ContentService {
                 path = jo.getString("URL"); //$NON-NLS-1$
             }
             
+            if (path != null)
+                artUrlCache.put(key, path);
+            
         }
         
         if (path == null) return null;
-        
-        artUrlCache.put(key, path);
         
         path += "&Width=" + w + "&Height=" + h; //$NON-NLS-1$ //$NON-NLS-2$
         

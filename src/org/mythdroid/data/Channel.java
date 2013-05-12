@@ -18,6 +18,7 @@
 
 package org.mythdroid.data;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
@@ -29,6 +30,12 @@ import org.mythdroid.data.Program.ProgramXMLParser;
 import org.mythdroid.Enums.RecStatus;
 import org.mythdroid.data.XMLHandler.Element;
 import org.xml.sax.Attributes;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
 import android.content.Context;
 import android.sax.EndElementListener;
@@ -108,6 +115,54 @@ public class Channel implements Comparable<Channel> {
             chan.num = attr.getValue("chanNum"); //$NON-NLS-1$
             chan.ID = Integer.valueOf(attr.getValue("chanId")); //$NON-NLS-1$
         }
+
+    }
+    
+    /** A gson TypeAdapter for the Program class */
+    public static class ChannelJsonAdapter extends TypeAdapter<Channel> {
+        
+        static GsonBuilder gsonBuilder = new GsonBuilder();
+        static {
+            gsonBuilder.registerTypeAdapter(Program.class, new Program.ProgramJsonAdapter());
+        }
+        static Gson gson = gsonBuilder.create();
+        
+        
+        @Override
+        public Channel read(JsonReader jr) throws IOException {
+            
+            Channel chan = new Channel();
+            
+            while (jr.hasNext()) {
+                String name = jr.nextName();
+                if (name.equals("ChanId")) //$NON-NLS-1$
+                    chan.ID = jr.nextInt();
+                else if (name.equals("ChanNum")) //$NON-NLS-1$
+                    chan.num = jr.nextString();
+                else if (name.equals("CallSign")) //$NON-NLS-1$
+                    chan.callSign = jr.nextString();
+                else if (name.equals("Programs")) { //$NON-NLS-1$
+                    jr.beginArray();
+                    while (jr.hasNext()) {
+                        jr.beginObject();
+                        Program prog = gson.fromJson(jr, Program.class);
+                        prog.ChanID = chan.ID;
+                        prog.Channel = chan.callSign;
+                        chan.programs.add(prog);
+                        jr.endObject();
+                    }
+                    jr.endArray();
+                }
+                else
+                    jr.skipValue();
+            }
+            
+            return chan;
+            
+        }
+
+        @Override
+        public void write(JsonWriter arg0, Channel arg1) throws IOException {}
 
     }
 

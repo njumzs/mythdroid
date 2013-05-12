@@ -96,6 +96,7 @@ public class Status extends MDFragmentActivity {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         URL url = null;
+        HttpFetcher fetcher = null;
         try {
             if (Globals.haveServices()) 
                 url = new URL(
@@ -104,15 +105,19 @@ public class Status extends MDFragmentActivity {
             else
                 url = new URL(Globals.getBackend().getStatusURL() + "/xml"); //$NON-NLS-1$
             LogUtil.debug("Fetching XML from " + url.toString()); //$NON-NLS-1$
-            InputStream is = 
-                new HttpFetcher(url.toString(), Globals.muxConns)
-                    .getInputStream();
+            fetcher = new HttpFetcher(url.toString(), Globals.muxConns); 
+            InputStream is = fetcher.getInputStream();
             if (is == null)
                 throw new IOException(Messages.getString("Status.4")); //$NON-NLS-1$
             statusDoc = dbf.newDocumentBuilder().parse(is);
         } catch (SAXException e) {
             ErrUtil.postErr(ctx, Messages.getString("Status.10")); //$NON-NLS-1$
-        } catch (Exception e) { ErrUtil.postErr(ctx, e); }
+        } catch (Exception e) {
+            ErrUtil.postErr(ctx, e);
+        } finally {
+            if (fetcher != null)
+                try { fetcher.endStream(); } catch (IOException e) {}
+        }
         
         return statusDoc != null;
 

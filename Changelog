@@ -5,6 +5,7 @@ In 0.6.3:
 MythTV 0.26 support
 Automated secure, remote connectivity via CMux (see http://code.google.com/p/mythdroid/source/detail?r=854)
 Minimise memory usage throughout, release large bitmaps for collection faster
+Use gson's streaming json parser for big json responses, faster and will hopefully fix OOMs 
 Fix TVRemote's progress bar not updated by MDD
 Fix record scheduling creating extraneous rules
 Set better defaults when record scheduling 

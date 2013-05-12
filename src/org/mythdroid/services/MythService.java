@@ -120,7 +120,7 @@ public class MythService {
             try {
                 jo = jo.getJSONObject("SettingList"); //$NON-NLS-1$
                 jo = jo.getJSONObject("Settings"); //$NON-NLS-1$
-                return jo.getString("SecurityPin"); //$NON-NLS-1$
+                return jo.getString(key);
             } catch (JSONException e) {
                 LogUtil.debug(e.getMessage());
                 return null;

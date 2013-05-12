@@ -206,6 +206,12 @@ public class HttpFetcher {
         return entity.getContent();
     }
     
+    /** End a stream by consuming the entity content */
+    public void endStream() throws IOException {
+        if (entity == null) return;
+        entity.consumeContent();
+    }
+    
     /**
      * Get the content of the url as a String
      * @return String containing the content of the url
@@ -233,13 +239,18 @@ public class HttpFetcher {
         
         final byte[] buf = new byte[len];
         int read = 0;
-        while (read < len)
-            read += st.read(buf, read, len);
+        try {
+            while (read < len)
+                read += st.read(buf, read, len);
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            st.close();
+            entity.consumeContent();
+            entity = null;
+            resp   = null;
+        }
         
-        st.close();
-        entity.consumeContent();
-        entity = null;
-        resp   = null;
         return new String(buf);
         
     }
