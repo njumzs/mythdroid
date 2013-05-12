@@ -318,9 +318,8 @@ public class BackendManager {
         
         LogUtil.debug("Fetching XML from " + url.toString()); //$NON-NLS-1$
 
-        InputStream is = 
-            new HttpFetcher(url.toString(), Globals.muxConns).getInputStream();
-        
+        HttpFetcher fetcher = new HttpFetcher(url.toString(), Globals.muxConns);
+        InputStream is = fetcher.getInputStream();
         if (is == null) throw new IOException();
         
         try {
@@ -331,6 +330,8 @@ public class BackendManager {
             throw new IOException(Messages.getString("Status.10")); //$NON-NLS-1$
         } catch (ParserConfigurationException e) {
             throw new IOException(Messages.getString("Status.10")); //$NON-NLS-1$
+        } finally {
+            fetcher.endStream();
         }
 
         Node status = doc.getElementsByTagName("Status").item(0); //$NON-NLS-1$

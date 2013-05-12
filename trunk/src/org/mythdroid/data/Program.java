@@ -43,6 +43,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.Attributes;
 
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.sax.EndElementListener;
@@ -178,6 +182,110 @@ public class Program implements Comparable<Program> {
             }
 
         }
+
+    }
+    
+    /** A gson TypeAdapter for the Program class */
+    public static class ProgramJsonAdapter extends TypeAdapter<Program> {
+        
+        @Override
+        public Program read(JsonReader jr) throws IOException {
+            
+            Program prog = new Program();
+            String name  = null;
+            
+            while (jr.hasNext()) {
+                name = jr.nextName();
+                if (name.equals("Title")) //$NON-NLS-1$
+                    prog.Title = jr.nextString();
+                else if (name.equals("SubTitle")) //$NON-NLS-1$
+                    prog.SubTitle = jr.nextString();
+                else if (name.equals("Description")) //$NON-NLS-1$
+                    prog.Description = jr.nextString();
+                else if (name.equals("Category")) //$NON-NLS-1$
+                    prog.Category = jr.nextString();
+                else if (name.equals("FileName")) //$NON-NLS-1$
+                    prog.Path = jr.nextString();
+                else if (name.equals("StartTime")) //$NON-NLS-1$
+                    try {
+                        prog.StartTime = Globals.utcFmt.parse(jr.nextString());
+                    } catch (ParseException e) {
+                        throw new IOException(e.getMessage());
+                    }
+                else if (name.equals("EndTime")) //$NON-NLS-1$
+                    try {
+                        prog.EndTime = Globals.utcFmt.parse(jr.nextString());
+                    } catch (ParseException e) {
+                        throw new IOException(e.getMessage());
+                    }
+                else if (name.equals("Recording")) { //$NON-NLS-1$
+                    jr.beginObject();
+                    while (jr.hasNext()) {
+                        name = jr.nextName();
+                        if (name.equals("Priority")) //$NON-NLS-1$
+                            prog.RecPrio = jr.nextInt();
+                        else if (name.equals("Status")) //$NON-NLS-1$
+                            prog.Status = RecStatus.get(jr.nextInt());
+                        else if (name.equals("RecordId")) //$NON-NLS-1$
+                            prog.RecID = jr.nextInt();
+                        else if (name.equals("RecType")) //$NON-NLS-1$
+                            prog.Type = RecType.get(jr.nextInt());
+                        else if (name.equals("DupInType")) //$NON-NLS-1$
+                            prog.DupIn = RecDupIn.get(jr.nextInt());
+                        else if (name.equals("DupMethod")) //$NON-NLS-1$
+                            prog.DupMethod = RecDupMethod.get(jr.nextInt());
+                        else if (name.equals("StartTs")) { //$NON-NLS-1$
+                            String rstart = jr.nextString();
+                            if (rstart.length() > 0)
+                                try {
+                                    prog.RecStartTime =
+                                        Globals.utcFmt.parse(rstart);
+                                } catch (ParseException e) {
+                                    throw new IOException(e.getMessage());
+                                }
+                        }
+                        else if (name.equals("EndTs")) { //$NON-NLS-1$
+                            String rend = jr.nextString();
+                            if (rend.length() > 0)
+                                try {
+                                    prog.RecEndTime =
+                                        Globals.utcFmt.parse(rend);
+                                } catch (ParseException e) {
+                                    throw new IOException(e.getMessage());
+                                }
+                        }
+                        else if (name.equals("RecGroup")) //$NON-NLS-1$
+                            prog.RecGroup = jr.nextString();
+                        else if (name.equals("StorageGroup")) //$NON-NLS-1$
+                            prog.StorGroup = jr.nextString();
+                        else
+                            jr.skipValue();
+                    }
+                    jr.endObject();   
+                }
+                else if (name.equals("Channel")) { //$NON-NLS-1$
+                    jr.beginObject();
+                    while (jr.hasNext()) {
+                        name = jr.nextName();
+                        if (name.equals("ChanId")) //$NON-NLS-1$
+                            prog.ChanID = jr.nextInt();
+                        else if (name.equals("CallSign")) //$NON-NLS-1$
+                            prog.Channel = jr.nextString();
+                        else
+                            jr.skipValue();
+                    }
+                    jr.endObject();
+                }
+                else
+                    jr.skipValue();
+            }
+
+            prog.EpiFilter = RecEpiFilter.NONE;
+            return prog;
+        }
+
+        @Override
+        public void write(JsonWriter arg0, Program arg1) throws IOException {}
 
     }
     

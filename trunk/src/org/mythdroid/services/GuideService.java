@@ -18,23 +18,30 @@
 
 package org.mythdroid.services;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.mythdroid.Globals;
 import org.mythdroid.data.Channel;
 import org.mythdroid.data.Program;
-import org.mythdroid.util.LogUtil;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 
 /** An implementation of the Guide service */
 public class GuideService {
     
     private JSONClient jc = null;
+    private GsonBuilder gsonBuilder = null;
+    private Gson gson = null;
     
     /**
      * Construct a client for the Guide service
@@ -42,6 +49,11 @@ public class GuideService {
      */
     public GuideService(String addr) {
         jc = new JSONClient(addr, "Guide"); //$NON-NLS-1$
+        gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(
+            Channel.class, new Channel.ChannelJsonAdapter()
+        );
+        gson = gsonBuilder.create();
     }
     
     /**
@@ -51,7 +63,7 @@ public class GuideService {
      * @return ArrayList of Channels
      */
     public ArrayList<Channel> GetProgramGuide(Date start, Date end) 
-        throws IOException, JSONException {
+        throws IOException {
         
         final Params params = new Params();
         params.put("StartTime", Globals.utcFmt.format(start)); //$NON-NLS-1$
@@ -60,24 +72,45 @@ public class GuideService {
         params.put("NumChannels", -1); //$NON-NLS-1$
         params.put("Details", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         
-        JSONObject jo = jc.Get("GetProgramGuide", params); //$NON-NLS-1$
-        jo = jo.getJSONObject("ProgramGuide"); //$NON-NLS-1$
-        int num = jo.getInt("NumOfChannels"); //$NON-NLS-1$
+        InputStream is = jc.GetStream("GetProgramGuide", params); //$NON-NLS-1$
+        JsonReader jreader = new JsonReader(
+            new BufferedReader(new InputStreamReader(is, "UTF-8")) //$NON-NLS-1$
+        );
         
-        final ArrayList<Channel> channels = new ArrayList<Channel>(num);
-        final JSONArray ja = jo.getJSONArray("Channels"); //$NON-NLS-1$
+        ArrayList<Channel> channels = new ArrayList<Channel>();
         
-        for (int i = 0; i < num; i++) {
-            try {
-                channels.add(new Channel(ja.getJSONObject(i)));
-            } catch (ParseException e) {
-                LogUtil.error(e.getMessage());
-                continue;
+        jreader.beginObject();
+        skipTo(jreader, JsonToken.BEGIN_OBJECT);
+        jreader.beginObject();
+        skipTo(jreader, JsonToken.NAME);
+        while (jreader.hasNext()) {
+            String name = jreader.nextName();
+            if (name.equals("NumOfChannels")) { //$NON-NLS-1$
+                channels.ensureCapacity(jreader.nextInt());
+                break;
             }
+            jreader.skipValue();
         }
+        skipTo(jreader, JsonToken.BEGIN_ARRAY);
+        jreader.beginArray();
+        while (jreader.hasNext()) {
+            jreader.beginObject();
+            channels.add((Channel)gson.fromJson(jreader, Channel.class));
+            jreader.endObject();
+        }
+        jreader.endArray();
+        jreader.endObject();
+        jreader.endObject();
+        jreader.close();
+        jc.endStream();
         
         return channels;
         
+    }
+    
+    private void skipTo(JsonReader jr, JsonToken token) throws IOException {
+        while (jr.hasNext() && jr.peek() != token)
+                jr.skipValue();
     }
     
     /**

@@ -19,6 +19,7 @@
 package org.mythdroid.services;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,6 +39,7 @@ import org.mythdroid.util.LogUtil;
 /** A JSON web service client */
 public class JSONClient {
     
+    private HttpFetcher fetcher = null;
     private String addr = null;
     private String serv = null;
     private int port    = 0;
@@ -59,6 +61,26 @@ public class JSONClient {
         addr = address;
         serv = service;
         this.port = port;
+    }
+    
+    /**
+     * Perform a GET request of the specified path
+     * @param path relative path of the query
+     * @param query HashMap of query parameters
+     * @return an InputStream of the content
+     * @throws IOException 
+     */
+    public InputStream GetStream(String path, Params query) throws IOException {
+        try {
+            return RequestStream(new HttpGet(CreateURI(path, query)));
+        } catch (URISyntaxException e) {
+            ErrUtil.logErr(e);
+            return null;
+        } catch (IllegalStateException e) {
+            ErrUtil.logErr(e);
+            ErrUtil.report(e);
+            return null;
+        }
     }
     
     /**
@@ -91,6 +113,26 @@ public class JSONClient {
      * Perform a POST request to the specified path
      * @param path relative path of the query
      * @param query HashMap of query parameters
+     * @return an InputStream of the content
+     * @throws IOException 
+     */
+    public InputStream PostStream(String path, Params query) throws IOException {
+        try {
+            return RequestStream(new HttpPost(CreateURI(path, query)));
+        } catch (URISyntaxException e) {
+            ErrUtil.logErr(e);
+            return null;
+        } catch (IllegalStateException e) {
+            ErrUtil.logErr(e);
+            ErrUtil.report(e);
+            return null;
+        }
+    }
+    
+    /**
+     * Perform a POST request to the specified path
+     * @param path relative path of the query
+     * @param query HashMap of query parameters
      * @return a JSONObject with the results
      * @throws IOException 
      */
@@ -113,6 +155,12 @@ public class JSONClient {
         }
     }
     
+    /** End a stream by consuming any remaining content */
+    public void endStream() throws IOException {
+        if (fetcher == null) return;
+        fetcher.endStream();
+    }
+    
     private URI CreateURI(String method, Params query) 
         throws URISyntaxException {
 
@@ -123,9 +171,29 @@ public class JSONClient {
         
         return new URI(
             "http", null, addr, port == 0 ? 6544 : port, //$NON-NLS-1$
-            "/" + serv + "/" + method, params, null//$NON-NLS-1$ //$NON-NLS-2$
+            "/" + serv + "/" + method, params, null //$NON-NLS-1$ //$NON-NLS-2$
         );
         
+    }
+    
+    private InputStream RequestStream(HttpUriRequest req) throws IOException {
+
+        req.setHeader("Accept", "application/json"); //$NON-NLS-1$ //$NON-NLS-2$
+        LogUtil.debug("JSON request: " + req.getURI().toString()); //$NON-NLS-1$
+        
+        try {
+            fetcher = new HttpFetcher(req, Globals.muxConns);
+            return fetcher.getInputStream();
+        } catch (SocketTimeoutException e) {
+            throw new IOException(
+                Messages.getString("JSONClient.0") + //$NON-NLS-1$
+                req.getURI().getHost() + ":" + req.getURI().getPort() //$NON-NLS-1$
+            );
+        } catch (ClientProtocolException e) {
+            ErrUtil.logErr(e);
+            return null;
+        }
+    
     }
     
     private JSONObject Request(HttpUriRequest req) throws IOException {

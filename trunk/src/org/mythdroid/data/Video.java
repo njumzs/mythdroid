@@ -24,13 +24,15 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.regex.Pattern;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.mythdroid.Enums.ArtworkType;
 import org.mythdroid.Globals;
 import org.mythdroid.resource.Messages;
 import org.mythdroid.util.ErrUtil;
 import org.mythdroid.util.HttpFetcher;
+
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -58,7 +60,60 @@ public class Video {
     public boolean directory = false;
     @SuppressWarnings("all")
     public BitmapDrawable poster = null;
+    
+    /** A gson TypeAdapter for the Video class */
+    public static class VideoJsonAdapter extends TypeAdapter<Video> {
+        
+        @Override
+        public Video read(JsonReader jr) throws IOException {
+            
+            Video video = new Video();
+            
+            while (jr.hasNext()) {
+                String name = jr.nextName();
+                if (name.equals("Id")) //$NON-NLS-1$
+                    video.id = jr.nextInt();
+                else if (name.equals("Title")) //$NON-NLS-1$
+                    video.title = jr.nextString();
+                else if (name.equals("SubTitle")) //$NON-NLS-1$
+                    video.subtitle = jr.nextString();
+                else if (name.equals("Director")) //$NON-NLS-1$
+                    video.director = jr.nextString();
+                else if (name.equals("Description")) //$NON-NLS-1$
+                    video.plot = jr.nextString();
+                else if (name.equals("HomePage")) //$NON-NLS-1$
+                    video.homepage = jr.nextString();
+                else if (name.equals("Length")) //$NON-NLS-1$
+                    video.length = jr.nextInt();
+                else if (name.equals("FileName")) //$NON-NLS-1$
+                    video.filename = jr.nextString();
+                else if (name.equals("Coverart")) //$NON-NLS-1$
+                    video.coverfile = jr.nextString();
+                else if (name.equals("UserRating")) //$NON-NLS-1$
+                    video.rating = (float)jr.nextDouble();
+                else if (name.equals("ReleaseDate")) { //$NON-NLS-1$
+                    String release = jr.nextString();
+                    if (release.length() > 0)
+                        try {
+                            video.year =
+                                Globals.dateFmt.parse(release).getYear();
+                        } catch (ParseException e) {}
+                }
+                else
+                    jr.skipValue();
+            }
+            
+            return video;
+            
+        }
 
+        @Override
+        public void write(JsonWriter arg0, Video arg1) throws IOException {}
+    }
+    
+    /** Construct an empty Video */
+    public Video() {}
+    
     /**
      * Constructor
      * @param line A String containing a DIRECTORY or VIDEO line from MDD
@@ -113,28 +168,6 @@ public class Video {
     }
     
     /**
-     * Constructor
-     * @param jo VideoMetadataInfo JSONObject
-     * @throws JSONException 
-     * @throws ParseException 
-     */
-    public Video(JSONObject jo) throws ParseException, JSONException {
-        id             = jo.getInt("Id"); //$NON-NLS-1$
-        title          = jo.getString("Title"); //$NON-NLS-1$
-        subtitle       = jo.getString("SubTitle"); //$NON-NLS-1$
-        director       = jo.getString("Director"); //$NON-NLS-1$
-        plot           = jo.getString("Description"); //$NON-NLS-1$
-        homepage       = jo.getString("HomePage"); //$NON-NLS-1$
-        rating         = jo.getInt("UserRating"); //$NON-NLS-1$
-        length         = jo.getInt("Length"); //$NON-NLS-1$
-        filename       = jo.getString("FileName"); //$NON-NLS-1$
-        coverfile      = jo.getString("Coverart"); //$NON-NLS-1$
-        String release = jo.getString("ReleaseDate"); //$NON-NLS-1$
-        if (release.length() > 0)
-            year = Globals.dateFmt.parse(release).getYear();
-    }
-    
-    /**
      * Get a full path to the video (a myth:// URL if it's in a storage group)
      * @return String containing path to the video
      */
@@ -142,7 +175,6 @@ public class Video {
         if (filename.startsWith("/")) return filename; //$NON-NLS-1$
         return "myth://Videos@" + Globals.getBackend().addr + "/" + filename; //$NON-NLS-1$ //$NON-NLS-2$
     }
-
 
     /**
      * Fetch the poster for the video, scale it and store it as a Drawable

@@ -18,22 +18,32 @@
 
 package org.mythdroid.services;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.text.ParseException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.mythdroid.data.Video;
 import org.mythdroid.util.ErrUtil;
-import org.mythdroid.util.LogUtil;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 
 /** An implementation of the Video service */
 public class VideoService {
     
+    static private GsonBuilder gsonBuilder = new GsonBuilder();
+    static {
+        gsonBuilder.registerTypeAdapter(
+            Video.class, new Video.VideoJsonAdapter()
+        ); 
+    }
+    static private Gson gson = gsonBuilder.create();
+    
     private JSONClient jc = null;
-    private JSONArray  ja = null;
     
     /**
      * Construct a client for the Video service
@@ -50,82 +60,51 @@ public class VideoService {
      */
     public ArrayList<Video> getVideos(String subdir) throws IOException {
         
-        ArrayList<Video> videos = null;
+        ArrayList<Video> videos = new ArrayList<Video>(128);
         
-        if (ja == null) {
+        InputStream is = jc.GetStream("GetVideoList", null); //$NON-NLS-1$
         
-            JSONObject jo = jc.Get("GetVideoList", null); //$NON-NLS-1$
+        if (is == null) return null;
         
-            if (jo == null) return null;
+        JsonReader jreader = new JsonReader(
+            new BufferedReader(new InputStreamReader(is, "UTF-8")) //$NON-NLS-1$
+        );
         
-            try {
-                jo = jo.getJSONObject("VideoMetadataInfoList"); //$NON-NLS-1$
-            } catch (JSONException e) {
-                LogUtil.error(e.getMessage());
-                return null;
-            }
-        
-            try {
-                videos = new ArrayList<Video>(jo.getInt("TotalAvailable")); //$NON-NLS-1$
-            } catch (JSONException e) {
-                LogUtil.error(e.getMessage());
-                return null;
-            }
-        
-            try {
-                ja = jo.getJSONArray("VideoMetadataInfos"); //$NON-NLS-1$
-            } catch (JSONException e) {
-                LogUtil.debug(e.getMessage());
-                return null;
-            }
-            
-        }
-        else
-            videos = new ArrayList<Video>(ja.length());
-        
-        int num = ja.length();
-        
+        Video vid;
         final ArrayList<String> subdirs = new ArrayList<String>(16);
         
-        for (int i = 0; i < num; i++) {
+        jreader.beginObject();
+        skipTo(jreader, JsonToken.BEGIN_OBJECT);
+        jreader.beginObject();
+        skipTo(jreader, JsonToken.BEGIN_ARRAY);
+        jreader.beginArray();
+        while (jreader.hasNext()) {
+            jreader.beginObject();
+            vid = gson.fromJson(jreader, Video.class);
+            jreader.endObject();
             
-            try {
-                
-                Video vid = null;
+            if (!subdir.equals("ROOT") && !vid.filename.startsWith(subdir)) //$NON-NLS-1$
+                continue;
             
-                try {
-                    vid = new Video(ja.getJSONObject(i));
-                } catch (IllegalArgumentException e) {
-                    ErrUtil.logWarn(e);
-                    continue;
-                }
-                
-                if (!subdir.equals("ROOT") && !vid.filename.startsWith(subdir)) //$NON-NLS-1$
-                    continue;
-                
-                String name = vid.filename;
-                
-                if (!subdir.equals("ROOT")) //$NON-NLS-1$
-                    name = vid.filename.substring(subdir.length() + 1);
-                
-                int slash;
-                if ((slash = name.indexOf('/')) > 0) {
-                    String dir = name.substring(0, slash);
-                    if (!subdirs.contains(dir))
-                        subdirs.add(dir);
-                }
-                else
-                    videos.add(vid);   
-                
-            } catch (ParseException e) {
-                LogUtil.error(e.getMessage());
-                continue;
-            } catch (JSONException e) {
-                LogUtil.error(e.getMessage());
-                continue;
+            String name = vid.filename;
+            
+            if (!subdir.equals("ROOT")) //$NON-NLS-1$
+                name = vid.filename.substring(subdir.length() + 1);
+            
+            int slash;
+            if ((slash = name.indexOf('/')) > 0) {
+                String dir = name.substring(0, slash);
+                if (!subdirs.contains(dir))
+                    subdirs.add(dir);
             }
-            
+            else
+                videos.add(vid);  
         }
+        jreader.endArray();
+        jreader.endObject();
+        jreader.endObject();
+        jreader.close();
+        jc.endStream();
         
         for (String name : subdirs) {
             try {
@@ -133,8 +112,15 @@ public class VideoService {
             } catch (IllegalArgumentException e) { ErrUtil.logWarn(e); }            
         }
         
+        videos.trimToSize();
+        
         return videos;
         
+    }
+    
+    private void skipTo(JsonReader jr, JsonToken token) throws IOException {
+        while (jr.hasNext() && jr.peek() != token)
+                jr.skipValue();
     }
     
 }

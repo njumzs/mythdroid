@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-import org.json.JSONException;
 import org.mythdroid.Globals;
 import org.mythdroid.R;
 import org.mythdroid.Enums.Extras;
@@ -516,9 +515,6 @@ public class Guide extends MDActivity {
             } catch (IOException e) {
                 ErrUtil.postErr(this, e);
                 return;
-            } catch (JSONException e) {
-                ErrUtil.postErr(this, e);
-                return;
             }
             return;
         }
@@ -551,6 +547,8 @@ public class Guide extends MDActivity {
                 }
             )
         );
+        
+        HttpFetcher fetcher = null;
 
         try {
 
@@ -564,8 +562,8 @@ public class Guide extends MDActivity {
 
             LogUtil.debug("Fetching XML from " + url.toString()); //$NON-NLS-1$
             
-            InputStream is = 
-                new HttpFetcher(url.toString(), Globals.muxConns).getInputStream();
+            fetcher = new HttpFetcher(url.toString(), Globals.muxConns); 
+            InputStream is = fetcher.getInputStream();
             if (is == null)
                 throw new IOException(Messages.getString("Guide.0")); //$NON-NLS-1$
             
@@ -575,6 +573,9 @@ public class Guide extends MDActivity {
             ErrUtil.postErr(this, Messages.getString("Guide.13")); //$NON-NLS-1$
         } catch (IOException e) {
             ErrUtil.postErr(this, e);
+        } finally {
+            if (fetcher != null)
+                try { fetcher.endStream(); } catch (IOException e) {}
         }
 
     }
