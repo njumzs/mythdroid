@@ -113,14 +113,14 @@ my (%commands, %videos, %storageGroups);
 
 my $stream_cmd = $config{stream} ||
     '/usr/bin/vlc -vvv -I oldrc --rc-host 0.0.0.0:16547 --rc-fake-tty '      .
-    '--file-caching=2000 --rtsp-timeout=-1 %FILE% '                          . 
+    '--file-caching=2000 --rtsp-timeout=-1 --sout-keep %FILE% '              . 
     '--sout=\'#transcode{vcodec=h264,venc=x264{no-cabac,keyint=50,ref=1,'    .
     'level=31,bframes=0,bpyramid=none,profile=baseline,no-weightb,weightp=0,'.
     'no-8x8dct,trellis=0,me=dia,subme=1,no-mbtree,partitions=none,'          .
     'no-mixed-refs,intra-refresh=1},'                                        .
     'vb=%VB%,threads=%THR%,deinterlace,maxwidth=%WIDTH%,maxheight=%HEIGHT%,' .
     'acodec=mp4a,samplerate=48000,ab=%AB%,channels=2,audio-sync}'            .
-    ':rtp{sdp=rtsp://0.0.0.0:5554/stream}\' 2>&1';
+    ':gather:rtp{sdp=rtsp://0.0.0.0:5554/stream}\' 2>&1';
 
 
 # List of regex to match messages we might get from MythDroid
