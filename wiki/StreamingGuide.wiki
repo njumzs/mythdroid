@@ -25,7 +25,7 @@ To stream over the Internet, you'll need to:
   * If !MythDroid is behind NAT, hope that it has a RTSP ALG
   * Hope that your carrier doesn't block RTSP or RTP streams
 
-In addition, the public address of your backend (i.e. of your router) must be configured in the !MythDroid [SetttingsGuide manual backend configuration].
+In addition, the public address of your backend (i.e. of your router) must be configured in the !MythDroid [SettingsGuide manual backend configuration].
 
 If you know what you're doing, you can customise the streaming command in 
 [MDDConf mdd.conf].
