@@ -1,6 +1,6 @@
 #summary Technical details of CMux's crypt
 
-== CMux's crypt functionality ==
+== Secure connectivity via CMux ==
 
 MDD generates a random, 128 bit key at install time and then hands it out to
 !MythDroid when it connects from a private address (inside your LAN).
