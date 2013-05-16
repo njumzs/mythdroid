@@ -10,7 +10,6 @@
    * [MDDConf MDD Configuration]
    * [CMux MDD's Connection Muxer (CMux)]
     * [CMuxCrypt Secure connectivity via CMux] 
-
   * [UserGuide User Guide]
    * [SettingsGuide Settings Guide]
    * [RemoteGuide Remotes Guide]
