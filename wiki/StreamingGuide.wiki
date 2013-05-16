@@ -11,7 +11,7 @@ chooser (found by long pressing a recording or video or the 'play' button in a
 recording or video detail page).
 
 Transcoding the video requires a hefty cpu on the backend; a reasonable 
-dual-core is probably the minimum. You can configure the stream complexity in MythDroid's [SettingsGuide settings]. A lower complexity will require less cpu on the backend. 
+dual-core is probably the minimum. You can configure the stream complexity in !MythDroid's [SettingsGuide settings]. A lower complexity will require less cpu on the backend. 
 
 You should be able to stream any recording or video that vlc can demux and 
 decode (dvds ripped to iso won't work). If you have problems, check 
