@@ -43,7 +43,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import java.util.ArrayList;
 
-
 /** ListActivity, displays, and lets the user manage, a list of frontends */
 public class FrontendList extends ListActivity implements
     DialogInterface.OnClickListener {
@@ -55,36 +54,38 @@ public class FrontendList extends ListActivity implements
 
     private AlertDialog   feEditor        = null;
     private int           clickedPosition = 0;
-    private View          ftr             = null;
+    private View          defHdr          = null;
 
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
-        final View hdr = getLayoutInflater().inflate(
-            R.layout.frontend_list_item, null
-        );
-
-        ((TextView)(hdr.findViewById(R.id.name))).setText(R.string.addFe);
-        ((TextView)(hdr.findViewById(R.id.addr))).setText(R.string.clickAddFe);
-        
         ListView lv = getListView();
-
-        lv.addHeaderView(hdr);
-
-        ftr = getLayoutInflater().inflate(
+        
+        final View addHdr = getLayoutInflater().inflate(
             R.layout.frontend_list_item, null
         );
 
-        ((TextView)(ftr.findViewById(R.id.name))).setText(R.string.defFe);
+        ((TextView)(addHdr.findViewById(R.id.name)))
+            .setText(R.string.addFe);
+        ((TextView)(addHdr.findViewById(R.id.addr)))
+            .setText(R.string.clickAddFe);
+
+        lv.addHeaderView(addHdr);
+
+        defHdr = getLayoutInflater().inflate(
+            R.layout.frontend_list_item, null
+        );
+
+        ((TextView)(defHdr.findViewById(R.id.name))).setText(R.string.defFe);
 
         String defFE = DatabaseUtil.getDefault(this);
         
         if (defFE != null)
-            ((TextView)(ftr.findViewById(R.id.addr)))
+            ((TextView)(defHdr.findViewById(R.id.addr)))
                 .setText(DatabaseUtil.getDefault(this));
         
-        lv.addHeaderView(ftr);
+        lv.addHeaderView(defHdr);
         lv.setPadding(0, 4, 0, 0);
 
         Cursor c = DatabaseUtil.getFrontends(this);
@@ -152,7 +153,7 @@ public class FrontendList extends ListActivity implements
 
             case EDIT_DIALOG:
 
-                View v = this.getListView().getChildAt(clickedPosition);
+                View v = getListView().getChildAt(clickedPosition);
                 if (v == null) return;
                 
                 CharSequence name =
@@ -201,6 +202,7 @@ public class FrontendList extends ListActivity implements
     @Override
     public void onClick(DialogInterface dialog, int which) {
 
+        // There are 2 header items in the list
         long rowID = getListAdapter().getItemId(clickedPosition - 2);
 
         switch (which) {
@@ -217,11 +219,20 @@ public class FrontendList extends ListActivity implements
 
                 if (name.length() == 0 || addr.length() == 0) {
                     ErrUtil.err(ctx, Messages.getString("FrontendList.4")); //$NON-NLS-1$
-                    dialog.dismiss();
                     return;
                 }
-
+                
+                /* 
+                 * Catch an addr with a port specified - this'll get interpreted
+                 * as an (invalid) IPv6 addr by URI in some versions of Android 
+                 */
+                int colon = addr.indexOf(':');
+                if (colon != -1 && colon == addr.lastIndexOf(':'))
+                    addr = addr.substring(0, colon);
+                
+ 
                 if (rowID < 1) {
+                    // A new frontend
                     if (!DatabaseUtil.insert(this, name, addr, hwaddr, false))
                         ErrUtil.err(
                             ctx, Messages.getString("FrontendList.5") + name //$NON-NLS-1$
@@ -229,8 +240,7 @@ public class FrontendList extends ListActivity implements
                     if (DatabaseUtil.getFrontendNames(ctx).size() == 1)
                         setDefaultFrontend(name);
                 }
-
-                else
+                else // An existing frontend
                     DatabaseUtil.update(this, rowID, name, addr, hwaddr);
 
                 break;
@@ -239,7 +249,7 @@ public class FrontendList extends ListActivity implements
 
                 DatabaseUtil.delete(this, rowID);
                 String n = ((EditText)feEditor.findViewById(R.id.name))
-                             .getText().toString();
+                               .getText().toString();
                 if (Globals.curFe != null && Globals.curFe.equals(n))
                     Globals.curFe = DatabaseUtil.getDefault(ctx);
                 
@@ -249,8 +259,8 @@ public class FrontendList extends ListActivity implements
 
         dialog.dismiss();
     }
-
-    /** Create a dialog allowing user to choose default frontend */
+    
+    /** Create a dialog allowing the user to choose a default frontend */
     private Dialog createDefaultFrontendDialog() {
 
         final AlertDialog d = new AlertDialog.Builder(ctx)
@@ -291,7 +301,7 @@ public class FrontendList extends ListActivity implements
     private void setDefaultFrontend(String name) {
         DatabaseUtil.updateDefault(ctx, name);
         Globals.curFe = name;
-        ((TextView)(ftr.findViewById(R.id.addr))).setText(name);
+        ((TextView)(defHdr.findViewById(R.id.addr))).setText(name);
     }
 
 }
