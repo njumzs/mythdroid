@@ -118,7 +118,7 @@ public class Channel implements Comparable<Channel> {
 
     }
     
-    /** A gson TypeAdapter for the Program class */
+    /** A gson TypeAdapter for the Channel class */
     public static class ChannelJsonAdapter extends TypeAdapter<Channel> {
         
         static GsonBuilder gsonBuilder = new GsonBuilder();
