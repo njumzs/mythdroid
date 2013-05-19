@@ -153,6 +153,8 @@ public class Guide extends MDActivity {
         @Override
         public boolean onDown(MotionEvent me) {
             // Save this down so we can send it on if it turns out to be a tap
+            if (lastDown != null)
+                lastDown.recycle();
             lastDown = MotionEvent.obtain(me);
             // Abort any in-progress flings
             scroller.forceFinished(true);
@@ -164,6 +166,8 @@ public class Guide extends MDActivity {
             // Dispatch both the down and up events to the view hierarchy
             superDispatchTouchEvent(lastDown);
             superDispatchTouchEvent(me);
+            lastDown.recycle();
+            lastDown = null;
             return true;
         }
 
@@ -337,6 +341,7 @@ public class Guide extends MDActivity {
         Globals.removeThreadPoolTask(getData);
         hOff = hScroll.getScrollX();
         vOff = vScroll.getScrollY();
+        // Free up some memory
         tbl.removeAllViews();
         channels.clear();
     }
@@ -541,9 +546,7 @@ public class Guide extends MDActivity {
             new ChannelXMLParser(this, chanElement,
                 new ChannelListener() {
                     @Override
-                    public void channel(Channel chan) {
-                        channels.add(chan);
-                    }
+                    public void channel(Channel chan) { channels.add(chan); }
                 }
             )
         );
