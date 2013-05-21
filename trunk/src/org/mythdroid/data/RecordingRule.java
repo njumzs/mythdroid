@@ -74,8 +74,8 @@ public class RecordingRule {
         season          = jo.getInt("Season"); //$NON-NLS-1$
         episode         = jo.getInt("Episode"); //$NON-NLS-1$
         category        = jo.getString("Category"); //$NON-NLS-1$
-        startTime       = Globals.utcFmt.parse(jo.getString("StartTime")); //$NON-NLS-1$
-        endTime         = Globals.utcFmt.parse(jo.getString("EndTime")); //$NON-NLS-1$
+        startTime       = Globals.utcParse(jo.getString("StartTime")); //$NON-NLS-1$
+        endTime         = Globals.utcParse(jo.getString("EndTime")); //$NON-NLS-1$
         seriesid        = jo.getString("SeriesId"); //$NON-NLS-1$
         programid       = jo.getString("ProgramId"); //$NON-NLS-1$
         inetref         = jo.getString("Inetref"); //$NON-NLS-1$
@@ -145,8 +145,8 @@ public class RecordingRule {
         params.put("Inactive", inactive); //$NON-NLS-1$
         params.put("Season", season); //$NON-NLS-1$
         params.put("Episode", episode); //$NON-NLS-1$
-        params.put("StartTime", Globals.utcFmt.format(startTime)); //$NON-NLS-1$
-        params.put("EndTime", Globals.utcFmt.format(endTime)); //$NON-NLS-1$#
+        params.put("StartTime", Globals.utcFormat(startTime)); //$NON-NLS-1$
+        params.put("EndTime", Globals.utcFormat(endTime)); //$NON-NLS-1$#
         if (inetref != null)
             params.put("Inetref", inetref); //$NON-NLS-1$
         params.put("ChanId", chanid); //$NON-NLS-1$

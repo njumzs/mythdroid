@@ -34,11 +34,10 @@ import android.support.v4.util.LruCache;
  */
 public class ImageCache {
     
-    static final private LinkedList<Runnable> queue
-        = new LinkedList<Runnable>();
+    final private LinkedList<Runnable> queue = new LinkedList<Runnable>();
     
-    static private Thread diskCacheThread = null;
-    static private boolean runDiskCacheThread = true;
+    private Thread diskCacheThread = null;
+    private boolean runDiskCacheThread = true;
     
     private LruCache<String, Bitmap> memCache = null;
     private ImageDiskCache diskCache = null;

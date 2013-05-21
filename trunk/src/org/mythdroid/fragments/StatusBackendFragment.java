@@ -84,7 +84,7 @@ public class StatusBackendFragment extends Fragment {
         }
 
         if (StorageNode != null) {
-            if (Globals.protoVersion < 50) {
+            if (Globals.protoVersion() < 50) {
                 attr = StorageNode.getAttributes();
                 stotal = attr.getNamedItem("drive_total_total").getNodeValue(); //$NON-NLS-1$
                 sused = attr.getNamedItem("drive_total_used").getNodeValue(); //$NON-NLS-1$
@@ -150,7 +150,7 @@ public class StatusBackendFragment extends Fragment {
             Date when = null;
 
             try {
-                when = Globals.dateFmt.parse(
+                when = Globals.dateParse(
                     attr.getNamedItem("guideThru").getNodeValue() //$NON-NLS-1$
                 );
             } catch (Exception e) {}
@@ -161,7 +161,7 @@ public class StatusBackendFragment extends Fragment {
                 ((TextView)view.findViewById(R.id.guideLength)).setText(
                     String.format(
                         Messages.getString("StatusBackend.30"), //$NON-NLS-1$
-                        days.getNodeValue(), Globals.dispFmt.format(when)
+                        days.getNodeValue(), Globals.dispFormat(when)
                     )
                 );
 

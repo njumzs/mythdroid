@@ -218,7 +218,7 @@ public class FrontendLocation {
                 );
             chanid = Integer.parseInt(tok[6]);
             try {
-                starttime = Globals.dateFmt.parse(tok[7]);
+                starttime = Globals.dateParse(tok[7]);
             } catch (ParseException e) {}
             filename = tok[9];
             try {
@@ -281,7 +281,7 @@ public class FrontendLocation {
         title           = state.getString("title"); //$NON-NLS-1$
         subtitle        = state.getString("subtitle"); //$NON-NLS-1$
         audiotrack      = state.getString("audiotrack"); //$NON-NLS-1$
-        starttime       = Globals.utcFmt.parse(state.getString("starttime")); //$NON-NLS-1$
+        starttime       = Globals.utcParse(state.getString("starttime")); //$NON-NLS-1$
         
     }
 

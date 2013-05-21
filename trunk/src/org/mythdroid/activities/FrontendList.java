@@ -58,10 +58,12 @@ public class FrontendList extends ListActivity implements
 
     @Override
     public void onCreate(Bundle icicle) {
+        
         super.onCreate(icicle);
 
         ListView lv = getListView();
         
+        // Add an "Add a frontend" header
         final View addHdr = getLayoutInflater().inflate(
             R.layout.frontend_list_item, null
         );
@@ -73,21 +75,20 @@ public class FrontendList extends ListActivity implements
 
         lv.addHeaderView(addHdr);
 
-        defHdr = getLayoutInflater().inflate(
-            R.layout.frontend_list_item, null
-        );
+        // Add a "Default frontend" header
+        defHdr = getLayoutInflater().inflate(R.layout.frontend_list_item, null);
 
         ((TextView)(defHdr.findViewById(R.id.name))).setText(R.string.defFe);
 
         String defFE = DatabaseUtil.getDefault(this);
         
         if (defFE != null)
-            ((TextView)(defHdr.findViewById(R.id.addr)))
-                .setText(DatabaseUtil.getDefault(this));
+            ((TextView)(defHdr.findViewById(R.id.addr))).setText(defFE);
         
         lv.addHeaderView(defHdr);
         lv.setPadding(0, 4, 0, 0);
 
+        // Add the lits of frontends
         Cursor c = DatabaseUtil.getFrontends(this);
 
         setListAdapter(
@@ -209,10 +210,12 @@ public class FrontendList extends ListActivity implements
 
             case AlertDialog.BUTTON_POSITIVE:
 
-                String name   = ((EditText)feEditor.findViewById(R.id.name))
-                                  .getText().toString();
-                String addr   = ((EditText)feEditor.findViewById(R.id.addr))
-                                  .getText().toString();
+                String name   = 
+                    ((EditText)feEditor.findViewById(R.id.name))
+                        .getText().toString();
+                String addr   = 
+                    ((EditText)feEditor.findViewById(R.id.addr))
+                        .getText().toString();
                 String hwaddr =
                     ((EditText)feEditor.findViewById(R.id.hwaddr))
                         .getText().toString();
@@ -229,7 +232,6 @@ public class FrontendList extends ListActivity implements
                 int colon = addr.indexOf(':');
                 if (colon != -1 && colon == addr.lastIndexOf(':'))
                     addr = addr.substring(0, colon);
-                
  
                 if (rowID < 1) {
                     // A new frontend

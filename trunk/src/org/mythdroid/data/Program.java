@@ -117,10 +117,10 @@ public class Program implements Comparable<Program> {
                     @Override
                     public void start(Attributes attr) {
                         try {
-                            prog.RecStartTime = Globals.dateFmt.parse(
+                            prog.RecStartTime = Globals.dateParse(
                                 attr.getValue("recStartTs") //$NON-NLS-1$
                             );
-                            prog.RecEndTime = Globals.dateFmt.parse(
+                            prog.RecEndTime = Globals.dateParse(
                                 attr.getValue("recEndTs") //$NON-NLS-1$
                             );
                         } catch (ParseException e) {}
@@ -171,10 +171,10 @@ public class Program implements Comparable<Program> {
             prog.Category = attr.getValue("category"); //$NON-NLS-1$
 
             try {
-                prog.StartTime = Globals.dateFmt.parse(
+                prog.StartTime = Globals.dateParse(
                     attr.getValue("startTime") //$NON-NLS-1$
                 );
-                prog.EndTime = Globals.dateFmt.parse(
+                prog.EndTime = Globals.dateParse(
                     attr.getValue("endTime") //$NON-NLS-1$
                 );
             } catch (ParseException e) {
@@ -208,13 +208,13 @@ public class Program implements Comparable<Program> {
                     prog.Path = jr.nextString();
                 else if (name.equals("StartTime")) //$NON-NLS-1$
                     try {
-                        prog.StartTime = Globals.utcFmt.parse(jr.nextString());
+                        prog.StartTime = Globals.utcParse(jr.nextString());
                     } catch (ParseException e) {
                         throw new IOException(e.getMessage());
                     }
                 else if (name.equals("EndTime")) //$NON-NLS-1$
                     try {
-                        prog.EndTime = Globals.utcFmt.parse(jr.nextString());
+                        prog.EndTime = Globals.utcParse(jr.nextString());
                     } catch (ParseException e) {
                         throw new IOException(e.getMessage());
                     }
@@ -239,7 +239,7 @@ public class Program implements Comparable<Program> {
                             if (rstart.length() > 0)
                                 try {
                                     prog.RecStartTime =
-                                        Globals.utcFmt.parse(rstart);
+                                        Globals.utcParse(rstart);
                                 } catch (ParseException e) {
                                     throw new IOException(e.getMessage());
                                 }
@@ -248,8 +248,7 @@ public class Program implements Comparable<Program> {
                             String rend = jr.nextString();
                             if (rend.length() > 0)
                                 try {
-                                    prog.RecEndTime =
-                                        Globals.utcFmt.parse(rend);
+                                    prog.RecEndTime = Globals.utcParse(rend);
                                 } catch (ParseException e) {
                                     throw new IOException(e.getMessage());
                                 }
@@ -330,15 +329,15 @@ public class Program implements Comparable<Program> {
         TOTAL;
 
     static {
-        if (Globals.protoVersion < 57) {
+        if (Globals.protoVersion() < 57) {
             CATEGORY  =  3; CHANID    =  4; CHANNEL   =  6; PATH      =  8;
             START     = 11; END       = 12; FINDID    = 15; RECPRIO   = 20;
             STATUS    = 21; RECID     = 22; RECTYPE   = 23; RECDUPIN  = 24;
             DUPMETHOD = 25; RECSTART  = 26; RECEND    = 27; RECGROUP  = 30;
             SERIESID  = 33; PROGID    = 34; STORGROUP = 42;
-            TOTAL     = Globals.protoVersion < 50 ? 46 : 47;
+            TOTAL     = Globals.protoVersion() < 50 ? 46 : 47;
         }
-        else if (Globals.protoVersion < 67){
+        else if (Globals.protoVersion() < 67){
             CATEGORY  =  3; CHANID    =  4; CHANNEL   =  6; PATH      =  8;
             START     = 10; END       = 11; FINDID    = 12; RECPRIO   = 17;
             STATUS    = 18; RECID     = 19; RECTYPE   = 20; RECDUPIN  = 21;
@@ -428,10 +427,10 @@ public class Program implements Comparable<Program> {
         SubTitle = attr.getNamedItem("subTitle").getNodeValue(); //$NON-NLS-1$
         Category = attr.getNamedItem("category").getNodeValue(); //$NON-NLS-1$
         try {
-            StartTime = Globals.dateFmt.parse(
+            StartTime = Globals.dateParse(
                 attr.getNamedItem("startTime").getNodeValue() //$NON-NLS-1$
             );
-            EndTime = Globals.dateFmt.parse(
+            EndTime = Globals.dateParse(
                 attr.getNamedItem("endTime").getNodeValue() //$NON-NLS-1$
             );
         } catch (ParseException e) {}
@@ -468,10 +467,10 @@ public class Program implements Comparable<Program> {
         if (RecNode != null) {
             attr = RecNode.getAttributes();
             try {
-                RecStartTime = Globals.dateFmt.parse(
+                RecStartTime = Globals.dateParse(
                     attr.getNamedItem("recStartTs").getNodeValue() //$NON-NLS-1$
                 );
-                RecEndTime = Globals.dateFmt.parse(
+                RecEndTime = Globals.dateParse(
                     attr.getNamedItem("recEndTs").getNodeValue() //$NON-NLS-1$
                 );
             } catch (ParseException e) {}
@@ -524,8 +523,8 @@ public class Program implements Comparable<Program> {
         Description = jo.getString("Description"); //$NON-NLS-1$
         Category = jo.getString("Category"); //$NON-NLS-1$
         Path = jo.getString("FileName"); //$NON-NLS-1$
-        StartTime = Globals.utcFmt.parse(jo.getString("StartTime")); //$NON-NLS-1$
-        EndTime = Globals.utcFmt.parse(jo.getString("EndTime")); //$NON-NLS-1$
+        StartTime = Globals.utcParse(jo.getString("StartTime")); //$NON-NLS-1$
+        EndTime = Globals.utcParse(jo.getString("EndTime")); //$NON-NLS-1$
         
         RecPrio = RecordInfo.getInt("Priority"); //$NON-NLS-1$
         Status = RecStatus.get(RecordInfo.getInt("Status")); //$NON-NLS-1$
@@ -534,11 +533,9 @@ public class Program implements Comparable<Program> {
         DupIn = RecDupIn.get(RecordInfo.getInt("DupInType")); //$NON-NLS-1$
         DupMethod = RecDupMethod.get(RecordInfo.getInt("DupMethod")); //$NON-NLS-1$
         String rstart = RecordInfo.getString("StartTs"); //$NON-NLS-1$
-        if (rstart.length() > 0)
-            RecStartTime = Globals.utcFmt.parse(rstart);
+        if (rstart.length() > 0) RecStartTime = Globals.utcParse(rstart);
         String rend = RecordInfo.getString("EndTs"); //$NON-NLS-1$
-        if (rend.length() > 0)
-            RecEndTime = Globals.utcFmt.parse(rend);
+        if (rend.length() > 0)   RecEndTime = Globals.utcParse(rend);
         RecGroup = RecordInfo.getString("RecGroup"); //$NON-NLS-1$
         StorGroup = RecordInfo.getString("StorageGroup"); //$NON-NLS-1$
         EpiFilter = RecEpiFilter.NONE;
@@ -553,7 +550,7 @@ public class Program implements Comparable<Program> {
      * @return String of form "ChanID FormattedRecStartTime"
      */
     public String playbackID() {
-        return ChanID + " " + Globals.dateFmt.format(RecStartTime); //$NON-NLS-1$
+        return ChanID + " " + Globals.dateFormat(RecStartTime); //$NON-NLS-1$
     }
 
     /**
@@ -574,8 +571,8 @@ public class Program implements Comparable<Program> {
             "GetPreviewImage?ChanId=" + ChanID + //$NON-NLS-1$
             "&StartTime=" + //$NON-NLS-1$
             (Globals.haveServices() ? 
-                Globals.utcFmt.format(RecStartTime) :
-                Globals.dateFmt.format(RecStartTime)
+                Globals.utcFormat(RecStartTime) :
+                Globals.dateFormat(RecStartTime)
             );
 
         try {
@@ -612,7 +609,7 @@ public class Program implements Comparable<Program> {
      * @return String of format "12:00, Mon 1 Jan 09"
      */
     public String startString() {
-        return Globals.dispFmt.format(StartTime);
+        return Globals.dispFormat(StartTime);
     }
 
     /**
@@ -620,7 +617,7 @@ public class Program implements Comparable<Program> {
      * @return String of format "12:00, Mon 1 Jan 09"
      */
     public String endString() {
-        return Globals.dispFmt.format(EndTime);
+        return Globals.dispFormat(EndTime);
     }
     
     /**

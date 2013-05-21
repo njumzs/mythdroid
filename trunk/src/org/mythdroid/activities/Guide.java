@@ -558,8 +558,8 @@ public class Guide extends MDActivity {
             URL url = new URL(
                 Globals.getBackend().getStatusURL() +
                 "/Myth/GetProgramGuide?" +  //$NON-NLS-1$
-                "StartTime=" + Globals.dateFmt.format(start) + //$NON-NLS-1$
-                "&EndTime="  + Globals.dateFmt.format(end)   + //$NON-NLS-1$
+                "StartTime=" + Globals.dateFormat(start) + //$NON-NLS-1$
+                "&EndTime="  + Globals.dateFormat(end)   + //$NON-NLS-1$
                 "&StartChanId=0" + "&NumOfChannels=-1" + "&Details=1" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             );
 

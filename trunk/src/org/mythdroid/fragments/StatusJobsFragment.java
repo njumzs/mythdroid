@@ -149,7 +149,7 @@ public class StatusJobsFragment extends ListFragment {
             try {
 
                 NamedNodeMap attr = item.getAttributes();
-                startTime = Globals.dateFmt.parse(
+                startTime = Globals.dateParse(
                     attr.getNamedItem("startTime").getNodeValue() //$NON-NLS-1$
                 );
                 status = JobStatus.get(
@@ -224,7 +224,7 @@ public class StatusJobsFragment extends ListFragment {
             vHolder.details.setText(
                 String.format(
                     Messages.getString("StatusJobs.9"), //$NON-NLS-1$
-                    Globals.dispFmt.format(j.startTime), j.hostname 
+                    Globals.dispFormat(j.startTime), j.hostname 
                 )
             );
             vHolder.comments.setText(j.comments);
