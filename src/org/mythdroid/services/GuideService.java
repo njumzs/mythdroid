@@ -66,8 +66,8 @@ public class GuideService {
         throws IOException {
         
         final Params params = new Params();
-        params.put("StartTime", Globals.utcFmt.format(start)); //$NON-NLS-1$
-        params.put("EndTime", Globals.utcFmt.format(end)); //$NON-NLS-1$
+        params.put("StartTime", Globals.utcFormat(start)); //$NON-NLS-1$
+        params.put("EndTime", Globals.utcFormat(end)); //$NON-NLS-1$
         params.put("StartChanId", 0); //$NON-NLS-1$
         params.put("NumChannels", -1); //$NON-NLS-1$
         params.put("Details", "true"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -127,7 +127,7 @@ public class GuideService {
         
         final Params params = new Params();
         params.put("ChanId", chanId); //$NON-NLS-1$
-        params.put("StartTime", Globals.utcFmt.format(start)); //$NON-NLS-1$
+        params.put("StartTime", Globals.utcFormat(start)); //$NON-NLS-1$
         
         return
             new Program(

@@ -58,6 +58,10 @@ public class BackendManager {
 
     /** Hostname or IP address of the backend */
     public String addr = null;
+    /** Protocol version */
+    public int protoVersion = 0;
+    /** Backend version - used only to workaround MythTV r25366 */
+    public int beVersion = 0;
 
     static final private String myAddr = "android"; //$NON-NLS-1$
     
@@ -74,21 +78,21 @@ public class BackendManager {
         statusURL = "http://" + host + ":6544"; //$NON-NLS-1$ //$NON-NLS-2$
 
         try {
-            Globals.protoVersion = getVersion(statusURL);
+            protoVersion = getVersion(statusURL);
         } catch (IOException e) {
             MythService myth = new MythService(host);
-            Globals.protoVersion = myth.getVersion();
+            protoVersion = myth.getVersion();
         }
         
         // Cope with odd protoVer resulting from mythtv r25366
-        if (Globals.protoVersion > 1000) {
-            Globals.beVersion = Globals.protoVersion / 1000;
-            Globals.protoVersion = Globals.protoVersion % 1000;
+        if (protoVersion > 1000) {
+            beVersion = protoVersion / 1000;
+            protoVersion = protoVersion % 1000;
         }
 
         LogUtil.debug(
             "Connecting to " + host +  //$NON-NLS-1$
-            ":6543 (ProtoVer " + Globals.protoVersion +")" //$NON-NLS-1$ //$NON-NLS-2$
+            ":6543 (ProtoVer " + protoVersion +")" //$NON-NLS-1$ //$NON-NLS-2$
         );
         
         synchronized (cmgrLock) {
@@ -204,7 +208,7 @@ public class BackendManager {
             cmgr.setTimeout(ConnMgr.timeOut.LONG);
         
             String type = "Ascending"; //$NON-NLS-1$
-            if (Globals.protoVersion < 65) 
+            if (protoVersion < 65) 
                 type = "Play"; //$NON-NLS-1$
             cmgr.sendString("QUERY_RECORDINGS " + type); //$NON-NLS-1$
             resp = cmgr.readStringList();
@@ -226,7 +230,7 @@ public class BackendManager {
             }
         }
 
-        if (Globals.protoVersion > 56)
+        if (protoVersion > 56)
             Collections.sort(programs, Collections.reverseOrder());
 
         return programs;
@@ -266,7 +270,7 @@ public class BackendManager {
      */
     public void reschedule(int recid) throws IOException {
         synchronized (cmgrLock) {
-            if (Globals.protoVersion >= 73)
+            if (protoVersion >= 73)
                 cmgr.sendStringList(
                     new String[] {
                         "RESCHEDULE_RECORDINGS", //$NON-NLS-1$
@@ -348,7 +352,7 @@ public class BackendManager {
     private boolean announce(ConnMgr cmgr) throws IOException {
 
         // Cope with odd protoVer resulting from mythtv r25366
-        int protoVer = Globals.beVersion * 1000 + Globals.protoVersion;
+        int protoVer = beVersion * 1000 + protoVersion;
 
         String protoToken = getToken(protoVer);
         // prefix a space for the actual request

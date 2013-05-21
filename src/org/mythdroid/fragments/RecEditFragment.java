@@ -246,11 +246,11 @@ public class RecEditFragment extends Fragment {
                     addUpdate("DupIn", (dupIn.value() | epiFilter.value())); //$NON-NLS-1$
                     prog.DupIn = rule.dupIn = dupIn;
                 }
-                if (recGroup != prog.RecGroup) {
+                if (!recGroup.equals(prog.RecGroup)) {
                     addUpdate("RecGroup", recGroup); //$NON-NLS-1$
                     prog.RecGroup = rule.recGroup = recGroup;
                 }
-                if (storGroup != prog.StorGroup) {
+                if (!storGroup.equals(prog.StorGroup)) {
                     addUpdate("StorageGroup", storGroup); //$NON-NLS-1$
                     prog.StorGroup = rule.storGroup = storGroup;
                 }

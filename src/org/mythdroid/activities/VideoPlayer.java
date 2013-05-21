@@ -245,7 +245,7 @@ public class VideoPlayer extends MDActivity {
                     }
                     title = prog.Title;
                     streamInfo = contentService.StreamFile(
-                        prog.ChanID, Globals.utcFmt.format(prog.RecStartTime), 
+                        prog.ChanID, Globals.utcFormat(prog.RecStartTime), 
                         w, 0, vb * 1000, ab * 1000
                     );
                 }

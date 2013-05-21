@@ -2,8 +2,10 @@ package org.mythdroid;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -37,69 +39,72 @@ public class Globals {
     final public static boolean debug = true;
 
     /** Backend protocol version */
-    public static int protoVersion    = 0;
+    // public static int protoVersion    = 0;
     /** Backend version - used only to workaround MythTV r25366 */
-    public static int beVersion       = 0;
+    // public static int beVersion       = 0;
 
     /** Application context */
     public static Context appContext  = null;
-
     /** The name of the current frontend */
     public static String curFe        = null;
     /** The name of the previous frontend (used by TVRemote's moveTo) */
     public static String prevFe       = null;
-
     /** Backend address from preferences */
     public static String backend      = null;
-    
     /** Mux connections to the backend host via MDD */
     public static boolean muxConns    = false;
-
     /** A Program representing the currently selected recording */
     public static Program curProg     = null;
     /** A Video representing the currently selected video */
     public static Video curVid        = null;
     
-    /** SimpleDateFormat of yyyy-MM-dd'T'HH:mm:ss */
-    @SuppressLint("SimpleDateFormat")
-	final public static SimpleDateFormat dateFmt =
-        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
-    /** SimpleDateFormat of HH:mm, EEE d MMM yy */
-    @SuppressLint("SimpleDateFormat")
-	final public static SimpleDateFormat dispFmt =
-        new SimpleDateFormat("HH:mm, EEE d MMM yy"); //$NON-NLS-1$
-    /** SimpleDataFormat like dateFmt but in UTC */
-    @SuppressLint("SimpleDateFormat")
-	final public static SimpleDateFormat utcFmt = 
-        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$;
-    static {
-        dispFmt.setTimeZone(TimeZone.getDefault());
-        dateFmt.setTimeZone(TimeZone.getDefault());
-        utcFmt.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
-    }
     /** An ImageCache for artwork */
     public static ImageCache artCache = new ImageCache(
         "artwork", Runtime.getRuntime().maxMemory() / 4, //$NON-NLS-1$
         Runtime.getRuntime().maxMemory() / 16, 1024*1024*128
     );
     
+    /** SimpleDateFormat of yyyy-MM-dd'T'HH:mm:ss */
+    @SuppressLint("SimpleDateFormat")
+    final private static SimpleDateFormat dateFmt =
+        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
+    /** SimpleDateFormat of HH:mm, EEE d MMM yy */
+    @SuppressLint("SimpleDateFormat")
+    final private static SimpleDateFormat dispFmt =
+        new SimpleDateFormat("HH:mm, EEE d MMM yy"); //$NON-NLS-1$
+    /** SimpleDataFormat like dateFmt but in UTC */
+    @SuppressLint("SimpleDateFormat")
+    final private static SimpleDateFormat utcFmt = 
+        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$;
+    static {
+        dispFmt.setTimeZone(TimeZone.getDefault());
+        dateFmt.setTimeZone(TimeZone.getDefault());
+        utcFmt.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
+    }
+    
     /** To remember where we were */
     private static FrontendLocation lastLocation =
         new FrontendLocation(null, "MainMenu"); //$NON-NLS-1$
     /** The global UPnPListener */
     private static UPnPListener upnp      = null;
+    private static Object upnpLock        = new Object();
     /** A BackendManager representing a connected backend */
     private static BackendManager  beMgr  = null;
+    private static Object beMgrLock       = new Object();
     /** A FrontendManager representing a connected frontend */
     private static FrontendManager feMgr  = null;
+    private static Object feMgrLock       = new Object();
     /** A handler for the worker thread */
     private static Handler wHandler       = null;
+    private static Object wHandlerLock    = new Object();
     /** A list of addresses that have been checked for updates */
     private static ArrayList<String> updateChecked = new ArrayList<String>(4);
     /** The queue for the thread pool */
     private static LinkedBlockingQueue<Runnable> threadQueue = null;
+    private static Object threadQueueLock                    = new Object();
     /** An ExecutorService for accessing the thread pool */
     private static ThreadPoolExecutor threadPool             = null;
+    private static Object threadPoolLock                     = new Object();
     /** A ThreadGroup for the pool threads */
     private static ThreadGroup poolGroup     = new ThreadGroup("GlobalPool"); //$NON-NLS-1$
     private static ThreadFactory poolFactory = new ThreadFactory() {
@@ -151,36 +156,38 @@ public class Globals {
 
         String name = curFe;
 
-        // Are we already connected to the desired frontend?
-        if (feMgr != null && feMgr.isConnected()) {
-            if (name != null && name.equals(feMgr.name))
-                return feMgr;
-            // Wrong frontend, disconnect
-            feMgr.disconnect();
-            feMgr = null;
-        }
-
-        // If unspecified, connect to the first defined frontend
-        if (name == null) {
-            if ((name = DatabaseUtil.getFirstFrontendName(ctx)) == null)
-                throw new IOException(Messages.getString("Globals.1")); //$NON-NLS-1$
-            feMgr = 
-                new FrontendManager(
-                    name, DatabaseUtil.getFirstFrontendAddr(ctx)
+        synchronized (feMgrLock) {
+            // Are we already connected to the desired frontend?
+            if (feMgr != null && feMgr.isConnected()) {
+                if (name != null && name.equals(feMgr.name))
+                    return feMgr;
+                // Wrong frontend, disconnect
+                feMgr.disconnect();
+                feMgr = null;
+            }
+    
+            // If unspecified, connect to the first defined frontend
+            if (name == null) {
+                if ((name = DatabaseUtil.getFirstFrontendName(ctx)) == null)
+                    throw new IOException(Messages.getString("Globals.1")); //$NON-NLS-1$
+                feMgr = 
+                    new FrontendManager(
+                        name, DatabaseUtil.getFirstFrontendAddr(ctx)
+                    );
+            }
+            // Check if the current frontend is set to 'Here'
+            else if (name.equals(Messages.getString("MDActivity.0"))) //$NON-NLS-1$
+                throw new IOException(Messages.getString("Globals.0")); //$NON-NLS-1$
+    
+            // Connect to the specified frontend
+            else
+                feMgr = new FrontendManager(
+                    name, DatabaseUtil.getFrontendAddr(ctx, name)
                 );
+
+            curFe = feMgr.name;
+            return feMgr;
         }
-        // Check if the current frontend is set to 'Here'
-        else if (name.equals(Messages.getString("MDActivity.0"))) //$NON-NLS-1$
-            throw new IOException(Messages.getString("Globals.0")); //$NON-NLS-1$
-
-        // Connect to the specified frontend
-        else
-            feMgr = new FrontendManager(
-                name, DatabaseUtil.getFrontendAddr(ctx, name)
-            );
-
-        curFe = feMgr.name;
-        return feMgr;
 
     }
 
@@ -194,67 +201,84 @@ public class Globals {
      */
     public static BackendManager getBackend() throws IOException {
 
-        // Check to see if we're already connected to a backend
-        if (beMgr != null && beMgr.isConnected())
-            return beMgr;
+        synchronized (beMgrLock) {
         
-        // Reset muxConns
-        muxConns = false;
-        
-        boolean mobile =
-            ConnectivityReceiver.networkType() ==
-                ConnectivityManager.TYPE_MOBILE;
-        
-        /* SSH port forwarding or not connected to wifi? 
-           Mux conns via MDD's CMux if possible */
-        if (
-            backend != null &&
-            (
-                backend.equals("127.0.0.1") || //$NON-NLS-1$
-                backend.equals("localhost") || //$NON-NLS-1$
-                mobile
-            ) && 
-            testMuxConn()
-        )
-            muxConns = true;
-
-        // Connect to the specified backend
-        if (backend != null && backend.length() > 0)
-            try {
-                beMgr = new BackendManager(backend);
-            } catch (IOException e) {}
-        
-        if (beMgr != null && beMgr.isConnected()) return beMgr;
-        
-        // If we're not on wifi, maybe there's a ssh tunnel we can use?
-        if (mobile) {
-            try {
-                beMgr = new BackendManager("localhost"); //$NON-NLS-1$
-            } catch (IOException e) {}        
-            if (beMgr != null && beMgr.isConnected()) return beMgr;
-        }
-        
-        // See if we can locate a backend via UPnP
-        try {
-            beMgr = new BackendManager(
-                getUPnPListener().findMasterBackend(950)
-            );
-        } catch (IOException e) {}
-        
-        if (beMgr != null && beMgr.isConnected()) {
+            // Check to see if we're already connected to a backend
+            if (beMgr != null && beMgr.isConnected())
+                return beMgr;
+            
+            // Reset muxConns
             muxConns = false;
-            return beMgr;
-        }
+            
+            boolean mobile =
+                ConnectivityReceiver.networkType() ==
+                    ConnectivityManager.TYPE_MOBILE;
+            
+            /* SSH port forwarding or not connected to wifi? 
+               Mux conns via MDD's CMux if possible */
+            if (
+                backend != null &&
+                (
+                    backend.equals("127.0.0.1") || //$NON-NLS-1$
+                    backend.equals("localhost") || //$NON-NLS-1$
+                    mobile
+                ) && 
+                testMuxConn()
+            )
+                muxConns = true;
+    
+            // Connect to the specified backend
+            if (backend != null && backend.length() > 0)
+                try {
+                    beMgr = new BackendManager(backend);
+                } catch (IOException e) {}
+            
+            if (beMgr != null && beMgr.isConnected()) return beMgr;
+            
+            // If we're not on wifi, maybe there's a ssh tunnel we can use?
+            if (mobile) {
+                try {
+                    beMgr = new BackendManager("localhost"); //$NON-NLS-1$
+                } catch (IOException e) {}        
+                if (beMgr != null && beMgr.isConnected()) return beMgr;
+            }
+            
+            // See if we can locate a backend via UPnP
+            try {
+                beMgr = new BackendManager(
+                    getUPnPListener().findMasterBackend(950)
+                );
+            } catch (IOException e) {}
+            
+            if (beMgr != null && beMgr.isConnected()) {
+                muxConns = false;
+                return beMgr;
+            }
+            
+            // See if we can use a muxed connection to the specified backend        
+            if (backend != null && testMuxConn()) {
+                muxConns = true;
+                beMgr = new BackendManager(backend);
+                return beMgr;
+            }
         
-        // See if we can use a muxed connection to the specified backend        
-        if (backend != null && testMuxConn()) {
-            muxConns = true;
-            beMgr = new BackendManager(backend);
-            return beMgr;
         }
         
         throw new IOException(Messages.getString("BackendManager.2")); //$NON-NLS-1$
 
+    }
+    
+    /**
+     * Get the protocol version of the currently connected backend
+     * @return Protocol version of connected backend or 0 if no backend is 
+     * connected
+     */
+    public static int protoVersion() {
+        synchronized (beMgrLock) {
+            if (beMgr != null)
+                return beMgr.protoVersion;
+        }
+        return 0;
     }
     
     /**
@@ -264,8 +288,8 @@ public class Globals {
      */
     public static void setBackendTimezone(String zone) {
         TimeZone tz = TimeZone.getTimeZone(zone);
-        dispFmt.setTimeZone(tz);
-        dateFmt.setTimeZone(tz);
+        synchronized (dispFmt) { dispFmt.setTimeZone(tz); }
+        synchronized (dateFmt) { dateFmt.setTimeZone(tz); }
     }
     
     /**
@@ -273,7 +297,70 @@ public class Globals {
      * @return true if the backend supports the Services API, false otherwise
      */
     public static boolean haveServices() {
-        return protoVersion >= 72;
+        synchronized (beMgrLock) {
+            if (beMgr != null && beMgr.protoVersion >= 72)
+                return true;
+            return false;
+        }
+    }
+    
+    /**
+     * Format a Date like "yyyy-MM-dd'T'HH:mm:ss" in the local/backend timezone
+     * @param date Date to format
+     * @return String
+     */
+    public static String dateFormat(Date date) {
+        synchronized (dateFmt) { return dateFmt.format(date); }
+    }
+    
+    /**
+     * Parse a string in the format "yyyy-MM-dd'T'HH:mm:ss" and local/backend 
+     * timezone
+     * @param date String to parse
+     * @return a Date
+     * @throws ParseException
+     */
+    public static Date dateParse(String date) throws ParseException {
+        synchronized (dateFmt) { return dateFmt.parse(date); }
+    }
+    
+    /**
+     * Format a Date like "HH:mm, EEE d MMM yy" in the local/backend timezone
+     * @param date Date to format
+     * @return String
+     */
+    public static String dispFormat(Date date) {
+        synchronized (dispFmt) { return dispFmt.format(date); }
+    }
+    
+    /**
+     * Parse a string in the format "HH:mm, EEE d MMM yy" and local/backend 
+     * timezone
+     * @param date String to parse
+     * @return a Date
+     * @throws ParseException
+     */
+    public static Date dispParse(String date) throws ParseException {
+        synchronized (dispFmt) { return dispFmt.parse(date); }
+    }
+
+    /**
+     * Format a Date like "yyyy-MM-dd'T'HH:mm:ss" in UTC
+     * @param date Date to format
+     * @return String
+     */
+    public static String utcFormat(Date date) {
+        synchronized (utcFmt) { return utcFmt.format(date); }
+    }
+    
+    /**
+     * Parse a string in the format "yyyy-MM-dd'T'HH:mm:ss" and UTC 
+     * @param date String to parse
+     * @return a Date
+     * @throws ParseException
+     */
+    public static Date utcParse(String date) throws ParseException {
+        synchronized (utcFmt) { return utcFmt.parse(date); }
     }
 
     /**
@@ -281,9 +368,11 @@ public class Globals {
      * Runnable's will be run consecutively in the order they are submitted
      */
     public static void runOnWorker(final Runnable r) {
-        if (wHandler == null)
-            wHandler = createWorker();
-        wHandler.post(r);
+        synchronized (wHandlerLock) {
+            if (wHandler == null)
+                wHandler = createWorker();
+            wHandler.post(r);
+        }
     }
     
     /**
@@ -292,9 +381,11 @@ public class Globals {
      * @param delay time in milliseconds before it will be run
      */
     public static void scheduleOnWorker(final Runnable r, int delay) {
-        if (wHandler == null)
-            wHandler = createWorker();
-        wHandler.postDelayed(r, delay);
+        synchronized (wHandlerLock) {
+            if (wHandler == null)
+                wHandler = createWorker();
+            wHandler.postDelayed(r, delay);
+        }
     }
     
     /**
@@ -305,13 +396,17 @@ public class Globals {
      */
     public static void runOnThreadPool(final Runnable r) {
         
-        if (threadQueue == null)
-            threadQueue = new LinkedBlockingQueue<Runnable>();
-        if (threadPool == null)
-            threadPool = new ThreadPoolExecutor(
-                2, 8, 30, TimeUnit.SECONDS, threadQueue, poolFactory
-            );
-        threadPool.execute(r);
+        synchronized (threadQueueLock) {
+            if (threadQueue == null)
+                threadQueue = new LinkedBlockingQueue<Runnable>();
+        }
+        synchronized (threadPoolLock) {
+            if (threadPool == null)
+                threadPool = new ThreadPoolExecutor(
+                    2, 8, 30, TimeUnit.SECONDS, threadQueue, poolFactory
+                );
+            threadPool.execute(r);
+        }
         
     }
     
@@ -320,14 +415,18 @@ public class Globals {
      * @param r
      */
     public static void removeThreadPoolTask(final Runnable r) {
-        if (threadPool == null) return;
-        threadPool.remove(r);
+        synchronized (threadPoolLock) {
+            if (threadPool == null) return;
+            threadPool.remove(r);
+        }
     }
     
     /** Clear the queue of tasks awaiting execution on the global thread pool */
     public static void removeAllThreadPoolTasks() {
-        if (threadQueue == null) return;
-        threadQueue.clear();
+        synchronized (threadQueueLock) {
+            if (threadQueue == null) return;
+            threadQueue.clear();
+        }
     }
     
     /**
@@ -336,30 +435,38 @@ public class Globals {
      * @throws SocketException
      */
     public static UPnPListener getUPnPListener() throws SocketException {
-        if (upnp != null) return upnp;
-        upnp = new UPnPListener();
-        return upnp;
+        synchronized (upnpLock) {
+            if (upnp != null) return upnp;
+            upnp = new UPnPListener();
+            return upnp;
+        }
     }
 
     /** Disconnect and dispose of the currently connected frontend */
     public static void destroyFrontend() {
-         if (feMgr != null && feMgr.isConnected())
-             feMgr.disconnect();
-         feMgr = null;
+        synchronized (feMgrLock) {
+            if (feMgr != null && feMgr.isConnected())
+                feMgr.disconnect();
+            feMgr = null;
+        }
     }
 
     /** Disconnect and dispose of the currently connected backend */
     public static void destroyBackend() {
-        if (beMgr != null)
-            beMgr.done();
-        beMgr = null;
+        synchronized (beMgrLock) {
+            if (beMgr != null)
+                beMgr.done();
+            beMgr = null;
+        }
     }
 
     /** Dispose of the worker thread */
     public static void destroyWorker() {
-        if (wHandler != null)
-            wHandler.getLooper().quit();
-        wHandler = null;
+        synchronized (wHandlerLock) {
+            if (wHandler != null)
+                wHandler.getLooper().quit();
+            wHandler = null;
+        }
     }
     
     /**

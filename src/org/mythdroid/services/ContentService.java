@@ -64,7 +64,7 @@ public class ContentService {
         
         if (start == null) return null;
         
-        final String key  = chanid + Globals.utcFmt.format(start) + type.name();
+        final String key  = chanid + Globals.utcFormat(start) + type.name();
         String path = artUrlCache.get(key);
         
         if (path == null) {
@@ -213,7 +213,7 @@ public class ContentService {
         
         final Params params = new Params();
         params.put("ChanId", chanid); //$NON-NLS-1$
-        params.put("StartTime", Globals.utcFmt.format(start)); //$NON-NLS-1$
+        params.put("StartTime", Globals.utcFormat(start)); //$NON-NLS-1$
         
         JSONObject jo = jc.Get("GetRecordingArtworkList", params); //$NON-NLS-1$
         jo = jo.getJSONObject("ArtworkInfoList"); //$NON-NLS-1$

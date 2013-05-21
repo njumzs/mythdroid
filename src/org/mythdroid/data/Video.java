@@ -95,8 +95,7 @@ public class Video {
                     String release = jr.nextString();
                     if (release.length() > 0)
                         try {
-                            video.year =
-                                Globals.dateFmt.parse(release).getYear();
+                            video.year = Globals.dateParse(release).getYear();
                         } catch (ParseException e) {}
                 }
                 else
